@@ -21,12 +21,12 @@ namespace BayrellRtl.Interfaces;
 use BayrellRtl.Types.IteratorValue;
 
 
-declare class Iterator<T>{
+class Iterator<T>{
 	
 	/**
 	 * Return next value or throw exception StopIterator then done
 	 * @return T
 	 */
-	declare public T next();
+	public T next();
 	
 }

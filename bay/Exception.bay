@@ -94,11 +94,12 @@ class Exception extends ClassException{
 	
 	
 	
-	#ifcode PHP then
+	#switch
+	#case ifcode PHP then
 	public function __toString (){
 		$this->toString();
 	}
-	#endifcode
+	#endswitch
 	
 
 

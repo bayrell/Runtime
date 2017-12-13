@@ -21,7 +21,7 @@ namespace BayrellRtl.Types;
 use BayrellRtl.Types.IndexValue;
 
 
-declare class Vector<T>{
+class Vector<T>{
 	
 	
 	/**

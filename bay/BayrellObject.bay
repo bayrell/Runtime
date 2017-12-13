@@ -18,12 +18,11 @@
 
 namespace BayrellRtl;
 
-use .BayrellTranslate import BayrellTranslate;
-use .BayrellError import BayrellError;
-use .lib import rtl;
+use BayrellRtl.Lib.rtl;
+use BayrellRtl.Interfaces.ContextInterface;
 
 
-export class BayrellObject{
+class BayrellObject{
 	
 	protected ContextInterface context = null;
 	protected bool _is_destroyed = false;
@@ -56,7 +55,7 @@ export class BayrellObject{
 	/** 
 	 * Constructor
 	 */
-	void constructor(context = null){
+	void constructor(ContextInterface context = null){
 		this.context = context;
 	}
 	

@@ -19,7 +19,7 @@
 namespace BayrellRtl.Exceptions;
 
 
-declare class ClassException;
+declare class ClassException{}
 
 
 #switch
@@ -27,5 +27,8 @@ declare class ClassException;
 class ClassException extends Error {}
 #case ifcode PHP then
 class ClassException extends \Exception {}
+#case ifcode NODEJS then
+module.exports.Exceptions = {};
+module.exports.Exceptions.ClassException = ClassException;
 #endswitch
 

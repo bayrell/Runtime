@@ -18,10 +18,9 @@
 
 namespace BayrellRtl.Lib;
 
-
-use .BayrellError import BayrellError;
-use .BayrellObject import BayrellObject;
-use .rtl import rtl;
+use BayrellRtl.BayrellObject;
+use BayrellRtl.Lib.rtl;
+use BayrellRtl.Error;
 
 
 export class re{
