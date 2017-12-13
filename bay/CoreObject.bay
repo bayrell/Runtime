@@ -19,6 +19,7 @@
 namespace BayrellRtl;
 
 use BayrellRtl.Lib.rtl;
+use BayrellRtl.Interfaces.AssertInterface;
 use BayrellRtl.Interfaces.ContextInterface;
 
 
@@ -36,6 +37,37 @@ class CoreObject{
 	 */
 	public ContextInterface context(){
 		return this._context;
+	}
+	
+	
+	
+	/**
+	 * Get assert provider
+	 *
+	 * @return AssertInterface 
+	 */
+	public AssertInterface assert(){
+		return this._context.assert();
+	}
+	
+	
+	
+	/**
+	 * Assert if value is true
+	 *
+	 */
+	public void assertTrue(bool value, string message = ""){
+		return this._context.assert().checkTrue(value, message);
+	}
+	
+	
+	
+	/**
+	 * Assert if value is false
+	 *
+	 */
+	public void assertFalse(bool value, string message = ""){
+		return this._context.assert().checkFalse(value, message);
 	}
 	
 	

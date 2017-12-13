@@ -16,6 +16,7 @@ module.exports = {
 		'Exceptions/KeyNotFound',
 		'Exceptions/StopIterator',
 		'Exceptions/UnknownError',
+		'Interfaces/AssertInterface',
 		'Interfaces/ContextInterface',
 		'Interfaces/MapInterface',
 		'Types/IndexValue',

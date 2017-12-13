@@ -28,7 +28,6 @@ class ClassException extends Error { _init(){} }
 #case ifcode PHP then
 class ClassException extends \Exception {}
 #case ifcode NODEJS then
-module.exports.Exceptions = {};
-module.exports.Exceptions.ClassException = ClassException;
+module.exports.ClassException = ClassException;
 #endswitch
 
