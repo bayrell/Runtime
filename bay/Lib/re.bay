@@ -18,10 +18,6 @@
 
 namespace BayrellRtl.Lib;
 
-use BayrellRtl.BayrellObject;
-use BayrellRtl.Lib.rtl;
-use BayrellRtl.Error;
-
 
 export class re{
 	

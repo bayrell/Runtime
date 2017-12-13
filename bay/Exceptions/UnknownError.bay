@@ -18,6 +18,7 @@
 
 namespace BayrellRtl.Exceptions;
 
+use BayrellRtl.Lib.rtl;
 use BayrellRtl.Exception;
 use BayrellRtl.RuntimeError;
 use BayrellRtl.Interfaces.ContextInterface;

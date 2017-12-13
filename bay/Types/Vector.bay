@@ -146,7 +146,7 @@ class Vector<T>{
 	 * @param Contextsize_terface context
 	 * @return Vector<T>
 	 */
-	declare public Vector<T> clone(Contextsize_terface context = null);
+	declare public Vector<T> clone(ContextInterface context = null);
 	
 	
 	

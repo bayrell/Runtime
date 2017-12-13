@@ -19,7 +19,7 @@
 namespace BayrellRtl.Types;
 
 use BayrellRtl.Types.Iterator;
-use BayrellRtl.Iterfaces.MapInterface;
+use BayrellRtl.Interfaces.MapInterface;
 
 
 class Map<T1, T2> implements MapInterface{

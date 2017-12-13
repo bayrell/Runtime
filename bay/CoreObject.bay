@@ -18,6 +18,7 @@
 
 namespace BayrellRtl;
 
+use BayrellRtl.Lib.rtl;
 use BayrellRtl.Interfaces.ContextInterface;
 
 
@@ -55,8 +56,20 @@ class CoreObject{
 	 * Constructor
 	 */
 	void constructor(ContextInterface context = null){
+		#switch
+		#case ifcode JAVASCRIPT then
+		this._init();
+		#endswitch
 		this._context = context;
 	}
+	
+	
+	
+	#switch
+	#case ifcode JAVASCRIPT then
+	_init(){
+	}
+	#endswitch
 	
 	
 	
@@ -71,7 +84,7 @@ class CoreObject{
 	
 	#switch
 	#case ifcode JAVASCRIPT then
-	void _del(){
+	_del(){
 		if (!this._is_destroyed)
 			this.destructor();
 	}

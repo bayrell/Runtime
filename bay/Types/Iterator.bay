@@ -16,9 +16,7 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl.Interfaces;
-
-use BayrellRtl.Types.IteratorValue;
+namespace BayrellRtl.Types;
 
 
 class Iterator<T>{

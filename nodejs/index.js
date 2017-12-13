@@ -26,11 +26,11 @@ function combine(obj1, obj2){
 
 combine( module.exports, require("./Lib/rtl.js") );
 combine( module.exports, require("./Lib/re.js") );
-combine( module.exports, require("./BayrellObject.js") );
+combine( module.exports, require("./RuntimeError.js") );
+combine( module.exports, require("./CoreObject.js") );
 combine( module.exports, require("./Exceptions/ClassException.js") );
 combine( module.exports, require("./Interfaces/ContextInterface.js") );
 combine( module.exports, require("./Interfaces/MapInterface.js") );
-combine( module.exports, require("./Error.js") );
 combine( module.exports, require("./Exception.js") );
 combine( module.exports, require("./Exceptions/IndexOutOfRange.js") );
 combine( module.exports, require("./Exceptions/KeyNotFound.js") );

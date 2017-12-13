@@ -59,7 +59,7 @@ export class rtl{
 	 * Create object by class_name
 	 * @return Object
 	 */
-	declare export static Object Instance(string class_name);
+	declare export static Object Instance(string class_name, array args);
 
 	#switch
 	#case ifcode PHP then
@@ -67,9 +67,12 @@ export class rtl{
 		return new $class_name();
 	}
 	#case ifcode JAVASCRIPT then
-	static Instance(class_name){
+	static Instance(class_name, args){
 		var obj = rtl.find_class(class_name);
-		return new obj;
+		args = args.slice(); 
+		args.unshift(null);
+		var f = Function.prototype.bind.apply(obj, args);
+		return new f;
 	}
 	#endswitch
 	
@@ -88,7 +91,7 @@ export class rtl{
 	}
 	#case ifcode JAVASCRIPT then
 	static callMethod(obj, method_name, args){
-		var f = obj[method];
+		var f = obj[method_name];
 		return f.apply(obj, args);
 	}
 	#endswitch
@@ -109,7 +112,7 @@ export class rtl{
 	#case ifcode JAVASCRIPT then
 	static callStaticMethod(class_name, method_name, args){
 		var obj = rtl.find_class(class_name);
-		var f = obj[method];
+		var f = obj[method_name];
 		return f.apply(obj, args);
 	}
 	#endswitch
@@ -211,6 +214,28 @@ export class rtl{
 		if (typeof value == 'string') return true;
 		else if (value instanceof String) return true;
 		return false;
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Convert value to string
+	 * @param var value
+	 * @return string
+	 */
+	declare export static string toString(var value);
+
+	#switch
+	#case ifcode PHP then
+	static function toString($value){
+		return (string)$value;
+	}
+	#case ifcode JAVASCRIPT then
+	static toString(value){
+		if (typeof value == 'string') return value;
+		if (value instanceof String) return value;
+		return new String(value);
 	}
 	#endswitch
 

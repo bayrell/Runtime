@@ -21,12 +21,12 @@ namespace BayrellRtl;
 
 class RuntimeError{
 	
-	const ERROR_UNKNOWN = -1;
-	const ERROR_INDEX_OUT_OF_RANGE = -2;
-	const ERROR_KEY_NOT_FOUND = -3;
-	const ERROR_STOP_ITERATION = -4;
-	const ERROR_MODULE_UNIT = -1000;
-	const ERROR_MODULE_LANG = -2000;
-	const ERROR_USER = -100000;
+	static const int ERROR_UNKNOWN = -1;
+	static const int ERROR_INDEX_OUT_OF_RANGE = -2;
+	static const int ERROR_KEY_NOT_FOUND = -3;
+	static const int ERROR_STOP_ITERATION = -4;
+	static const int ERROR_MODULE_UNIT = -1000;
+	static const int ERROR_MODULE_LANG = -2000;
+	static const int ERROR_USER = -100000;
 
 }

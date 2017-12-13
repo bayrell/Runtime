@@ -18,6 +18,7 @@
 
 namespace BayrellRtl;
 
+use BayrellRtl.Lib.rtl;
 use BayrellRtl.Exceptions.ClassException;
 use BayrellRtl.Interfaces.ContextInterface;
 
@@ -35,6 +36,7 @@ class Exception extends ClassException{
 	
 	
 	void constructor(ContextInterface context, string message = "", int code = 0, Exception prev = null){
+		parent(message, code, prev);
 		this.context = context;
 		this.message = message;
 		this.code = code;

@@ -24,7 +24,7 @@ declare class ClassException{}
 
 #switch
 #case ifcode JAVASCRIPT then
-class ClassException extends Error {}
+class ClassException extends Error { _init(){} }
 #case ifcode PHP then
 class ClassException extends \Exception {}
 #case ifcode NODEJS then
