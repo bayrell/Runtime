@@ -18,8 +18,8 @@
 
 namespace BayrellRtl.Exceptions;
 
-use BayrellRtl.Error;
 use BayrellRtl.Exception;
+use BayrellRtl.RuntimeError;
 use BayrellRtl.Interfaces.ContextInterface;
 
 
@@ -29,7 +29,7 @@ class IndexOutOfRange extends Exception{
 		parent::constructor(
 			context, 
 			context.translate("ERROR_INDEX_OUT_OF_RANGE"), 
-			Error::ERROR_INDEX_OUT_OF_RANGE, 
+			RuntimeError::ERROR_INDEX_OUT_OF_RANGE, 
 			prev
 		);
 	}

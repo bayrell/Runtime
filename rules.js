@@ -24,8 +24,8 @@ module.exports = {
 		'Types/Vector',
 		'Lib/re',
 		'Lib/rtl',
-		'Error',
-		'BayrellObject',
+		'RuntimeError',
+		'CoreObject',
 		'Exception',
 	],
 };

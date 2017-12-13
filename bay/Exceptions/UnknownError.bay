@@ -18,8 +18,8 @@
 
 namespace BayrellRtl.Exceptions;
 
-use BayrellRtl.Error;
 use BayrellRtl.Exception;
+use BayrellRtl.RuntimeError;
 use BayrellRtl.Interfaces.ContextInterface;
 
 
@@ -29,7 +29,7 @@ class UnknownError extends Exception{
 		parent::constructor(
 			context, 
 			context.translate("ERROR_UNKNOWN"), 
-			Error::ERROR_UNKNOWN, 
+			RuntimeError::ERROR_UNKNOWN, 
 			prev
 		);
 	}

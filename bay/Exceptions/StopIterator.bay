@@ -18,7 +18,7 @@
  
 namespace BayrellRtl.Exceptions;
 
-use BayrellRtl.Error;
+use BayrellRtl.RuntimeError;
 
 
 declare class StopIterator;

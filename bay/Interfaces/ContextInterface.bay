@@ -18,7 +18,7 @@
 
 namespace BayrellRtl.Interfaces;
 
-use BayrellRtl.BayrellObject;
+use BayrellRtl.CoreObject;
 use BayrellRtl.Interfaces.MapInterface;
 
 
@@ -46,9 +46,9 @@ interface ContextInterface{
 	 * Returns provider
 	 *
 	 * @params string worker_name
-	 * @return BayrellObject
+	 * @return CoreObject
 	 */
-	public BayrellObject getProvider(string provider_name);
+	public CoreObject getProvider(string provider_name);
 	
 	
 	
@@ -56,9 +56,9 @@ interface ContextInterface{
 	 * Returns temporary provider
 	 *
 	 * @params string provider_name
-	 * @return BayrellObject
+	 * @return CoreObject
 	 */
-	public BayrellObject getTemporaryProvider(string provider_name);
+	public CoreObject getTemporaryProvider(string provider_name);
 	
 	
 	

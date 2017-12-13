@@ -18,13 +18,12 @@
 
 namespace BayrellRtl;
 
-use BayrellRtl.Lib.rtl;
 use BayrellRtl.Interfaces.ContextInterface;
 
 
-class BayrellObject{
+class CoreObject{
 	
-	protected ContextInterface context = null;
+	protected ContextInterface _context = null;
 	protected bool _is_destroyed = false;
 	
 	
@@ -34,8 +33,8 @@ class BayrellObject{
 	 *
 	 * @return ContextInterface 
 	 */
-	public ContextInterface getContext(){
-		return this.context;
+	public ContextInterface context(){
+		return this._context;
 	}
 	
 	
@@ -46,8 +45,8 @@ class BayrellObject{
 	 * @param ContextInterface 
 	 */
 	public ContextInterface setContext(ContextInterface context){
-		if (this.context == null)
-			this.context = context;
+		if (this._context == null)
+			this._context = context;
 	}
 	
 	
@@ -56,7 +55,7 @@ class BayrellObject{
 	 * Constructor
 	 */
 	void constructor(ContextInterface context = null){
-		this.context = context;
+		this._context = context;
 	}
 	
 	
@@ -87,15 +86,15 @@ class BayrellObject{
 	
 	/**
 	 * Clone current object
-	 * @return BayrellObject
+	 * @return CoreObject
 	 */
-	BayrellObject clone(ContextInterface context = null){
-		BayrellObject res = this.newInstance();
+	CoreObject clone(ContextInterface context = null){
+		CoreObject res = this.newInstance();
 		
 		if (context == null)
-			res.context = this.context;
+			res._context = this._context;
 		else
-			res.context = context;
+			res._context = context;
 		
 		return res;
 	}

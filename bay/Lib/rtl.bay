@@ -22,6 +22,99 @@ namespace BayrellRtl.Lib;
 export class rtl{
 	
 	
+	#switch
+	#case ifcode NODEJS then
+	static find_class(class_name){
+		if (class_name instanceof Function)
+			return class_name;
+		
+		var class_name_arr = class_name.split('.');
+		if (class_name_arr.length < 2)
+			return null;
+		
+		var module_name = class_name_arr[0];
+		var last_name = class_name_arr[ class_name_arr.length - 1 ];
+		
+		var obj = require(module_name);
+		for (var i=1; i<class_name_arr.length - 1; i++){
+			if (!rtl.exists(obj[class_name_arr[i]])){
+				obj = null;
+				break;
+			}
+			obj = obj[ class_name_arr[i] ];
+		}
+		
+		if (!rtl.exists(obj))
+			return null;
+		
+		obj = obj[last_name];
+		return obj;
+	}
+	#endswitch
+	
+	
+	
+	
+	/**
+	 * Create object by class_name
+	 * @return Object
+	 */
+	declare export static Object Instance(string class_name);
+
+	#switch
+	#case ifcode PHP then
+	static function Instance($class_name){
+		return new $class_name();
+	}
+	#case ifcode JAVASCRIPT then
+	static Instance(class_name){
+		var obj = rtl.find_class(class_name);
+		return new obj;
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Call method
+	 * @return Object
+	 */
+	declare export static var callMethod(Object obj, string method_name, array args);
+	
+	#switch
+	#case ifcode PHP then
+	static function callMethod($obj, $method_name, $args){
+		return call_user_func_array([$obj, $method_name], $args);
+	}
+	#case ifcode JAVASCRIPT then
+	static callMethod(obj, method_name, args){
+		var f = obj[method];
+		return f.apply(obj, args);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Call method
+	 * @return Object
+	 */
+	declare export static var callStaticMethod(string class_name, string method_name, array args);
+	
+	#switch
+	#case ifcode PHP then
+	static function callStaticMethod($class_name, $method_name, $args){
+		return call_user_func_array([$class_name, $method_name], $args);
+	}
+	#case ifcode JAVASCRIPT then
+	static callStaticMethod(class_name, method_name, args){
+		var obj = rtl.find_class(class_name);
+		var f = obj[method];
+		return f.apply(obj, args);
+	}
+	#endswitch
+	
+	
 	
 	/**
 	 * Clone var
@@ -80,5 +173,46 @@ export class rtl{
 	#endswitch
 	
 	
+	
+	/**
+	 * Return true if value is exists
+	 * @param var value
+	 * @return boolean
+	 */
+	declare export static boolean exists(var value);
+
+	#switch
+	#case ifcode PHP then
+	static function exists(&$value){ 
+		return isset($value);
+	}
+	#case ifcode JAVASCRIPT then
+	static exists(value){
+		return (value != null) && (value != undefined);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Return true if value is string
+	 * @param var value
+	 * @return boolean
+	 */
+	declare export static boolean is_string(var value);
+
+	#switch
+	#case ifcode PHP then
+	static function is_string($value){
+		return is_string($value);
+	}
+	#case ifcode JAVASCRIPT then
+	static is_string(value){
+		if (typeof value == 'string') return true;
+		else if (value instanceof String) return true;
+		return false;
+	}
+	#endswitch
+
 	
 }

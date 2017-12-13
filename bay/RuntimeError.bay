@@ -19,12 +19,14 @@
 namespace BayrellRtl;
 
 
-class Error{
+class RuntimeError{
 	
 	const ERROR_UNKNOWN = -1;
 	const ERROR_INDEX_OUT_OF_RANGE = -2;
 	const ERROR_KEY_NOT_FOUND = -3;
 	const ERROR_STOP_ITERATION = -4;
+	const ERROR_MODULE_UNIT = -1000;
+	const ERROR_MODULE_LANG = -2000;
 	const ERROR_USER = -100000;
 
 }
