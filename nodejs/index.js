@@ -8,40 +8,31 @@
 
 module.exports = {
 	VERSION: '0.2.0',
-	'Exceptions': {},
-	'Interfaces': {},
-	'Lib': {},
-	'Types': {},
+	'Exceptions': {
+		'ClassException': require("./Exceptions/ClassException.js"),
+		'IndexOutOfRange': require("./Exceptions/IndexOutOfRange.js"),
+		'KeyNotFound': require("./Exceptions/KeyNotFound.js"),
+		'StopIterator': require("./Exceptions/StopIterator.js"),
+		'UnknownError': require("./Exceptions/UnknownError.js"),
+	},
+	'Interfaces': {
+		'AssertInterface': require("./Interfaces/AssertInterface.js"),
+		'ContextInterface': require("./Interfaces/ContextInterface.js"),
+		'MapInterface': require("./Interfaces/MapInterface.js"),
+	},
+	'Lib': {
+		'rtl': require("./Lib/rtl.js"),
+		're': require("./Lib/re.js"),
+	},
+	'Types': {
+		'IndexValue': require("./Types/IndexValue.js"),
+		'Iterator': require("./Types/Iterator.js"),
+		'Map': require("./Types/Map.js"),
+		'Vector': require("./Types/Vector.js"),
+	},
+	'RuntimeError': require("./RuntimeError.js"),
+	'CoreObject': require("./CoreObject.js"),
+	'Exception': require("./Exception.js"),
 };
 
-function combine(obj1, obj2){
-	for (var key in obj2){
-		if (typeof obj2[key] == 'object'){
-			if (obj1[key] == undefined || obj1[key] == null || typeof obj1[key] != 'object')
-				obj1[key] = {};
-			combine(obj1[key], obj2[key]);
-		}
-		else{
-			obj1[key] = obj2[key];
-		}
-	}
-}
 
-
-combine( module.exports.Lib, require("./Lib/rtl.js") );
-combine( module.exports.Lib, require("./Lib/re.js") );
-combine( module.exports, require("./RuntimeError.js") );
-combine( module.exports, require("./CoreObject.js") );
-combine( module.exports, require("./Exception.js") );
-combine( module.exports.Exceptions, require("./Exceptions/ClassException.js") );
-combine( module.exports.Interfaces, require("./Interfaces/AssertInterface.js") );
-combine( module.exports.Interfaces, require("./Interfaces/ContextInterface.js") );
-combine( module.exports.Interfaces, require("./Interfaces/MapInterface.js") );
-combine( module.exports.Exceptions, require("./Exceptions/IndexOutOfRange.js") );
-combine( module.exports.Exceptions, require("./Exceptions/KeyNotFound.js") );
-combine( module.exports.Exceptions, require("./Exceptions/StopIterator.js") );
-combine( module.exports.Exceptions, require("./Exceptions/UnknownError.js") );
-combine( module.exports.Types, require("./Types/IndexValue.js") );
-combine( module.exports.Types, require("./Types/Iterator.js") );
-combine( module.exports.Types, require("./Types/Map.js") );
-combine( module.exports.Types, require("./Types/Vector.js") );
