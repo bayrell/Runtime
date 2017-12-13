@@ -1,0 +1,105 @@
+/*!
+ *  Bayrell Runtime Library.  
+ *
+ *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace BayrellRtl;
+
+use BayrellRtl.Exceptions.ClassException;
+use BayrellRtl.Interfaces.ContextInterface;
+
+
+class Exception extends ClassException{
+	
+	
+	protected ContextInterface context = null;
+	protected Exception prev = null;
+	protected string message = "";
+	protected int code = 0;
+	protected string file = "";
+	protected int line = -1;
+	protected int pos = -1;
+	
+	
+	void constructor(ContextInterface context, string message = "", int code = 0, Exception prev = null){
+		this.context = context;
+		this.message = message;
+		this.code = code;
+		this.prev = prev;
+	}
+	
+	public Exception getPreviousException(){
+		return this.prev;
+	}
+	
+	public string getErrorMessage(){
+		return this.message;
+	}
+	
+	public int getErrorCode(){
+		return this.code;
+	}
+	
+	public string getFileName(){
+		return this.file;
+	}
+	
+	public void setFileName(string file){
+		this.file = file;
+	}
+	
+	public string getErrorLine(){
+		return this.line;
+	}
+	
+	public void setErrorLine(int line){
+		this.line = line;
+	}
+	
+	public string getErrorPos(){
+		return this.pos;
+	}
+	
+	public void setErrorPos(int pos){
+		this.pos = pos;
+	}
+	
+	
+	public string toString(){
+		
+		string s = this.message;
+		if (line != -1 and pos != -1){
+			s = s ~ " at Ln:" ~ line ~ ", Pos:" ~ pos;
+		}
+		if (file_name != ""){
+			s = s ~ " in file:'" ~ file_name ~ "'";
+		}
+		
+		s = s ~ ".";
+		return s;
+	}
+	
+	
+	
+	#ifcode PHP then
+	public function __toString (){
+		$this->toString();
+	}
+	#endifcode
+	
+
+
+}

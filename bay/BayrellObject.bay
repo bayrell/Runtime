@@ -1,0 +1,105 @@
+/*!
+ *  Bayrell Runtime Library.  
+ *
+ *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace BayrellRtl;
+
+use .BayrellTranslate import BayrellTranslate;
+use .BayrellError import BayrellError;
+use .lib import rtl;
+
+
+export class BayrellObject{
+	
+	protected ContextInterface context = null;
+	protected bool _is_destroyed = false;
+	
+	
+	
+	/**
+	 * Get context
+	 *
+	 * @return ContextInterface 
+	 */
+	public ContextInterface getContext(){
+		return this.context;
+	}
+	
+	
+	
+	/**
+	 * Set context
+	 *
+	 * @param ContextInterface 
+	 */
+	public ContextInterface setContext(ContextInterface context){
+		if (this.context == null)
+			this.context = context;
+	}
+	
+	
+	
+	/** 
+	 * Constructor
+	 */
+	void constructor(context = null){
+		this.context = context;
+	}
+	
+	
+	
+	/**
+	 * Destructor
+	 */
+	public void destructor(){
+		this._is_destroyed = true;
+	}
+	
+	
+	
+	#switch
+	#case ifcode JAVASCRIPT then
+	void _del(){
+		if (!this._is_destroyed)
+			this.destructor();
+	}
+	#case ifcode PHP then
+	function __destruct() {
+		if (!$this->_is_destroyed) 
+			$this->destructor();
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Clone current object
+	 * @return BayrellObject
+	 */
+	BayrellObject clone(ContextInterface context = null){
+		BayrellObject res = this.newInstance();
+		
+		if (context == null)
+			res.context = this.context;
+		else
+			res.context = context;
+		
+		return res;
+	}
+	
+	
+}

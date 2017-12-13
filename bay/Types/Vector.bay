@@ -1,0 +1,180 @@
+/*!
+ *  Bayrell Runtime Library.  
+ *
+ *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+ 
+namespace BayrellRtl.Types;
+
+use BayrellRtl.Types.IndexValue;
+
+
+declare class Vector<T>{
+	
+	
+	/**
+	 * Append value to the end of array
+	 * @param T value
+	 */
+	declare public void push(T value);
+	
+	
+	
+	/**
+	 * Insert first value size_to array
+	 * @return T value
+	 */
+	declare public void unshift(T value);
+	
+	
+	
+	/**
+	 * Extract last value from array
+	 * @return T value
+	 */
+	declare public T pop();
+	
+	
+	
+	/**
+	 * Extract first value from array
+	 * @return T value
+	 */
+	declare public T shift();
+	
+	
+	
+	/**
+	 * Find value in array
+	 * @param T value
+	 * @return  IndexValue
+	 */
+	declare public IndexValue indexOf(T value);
+	
+	
+	
+	/**
+	 * Find value in array, and returns position. 
+	 * @param T value
+	 * @param size_t pos_begin - begin position
+	 * @param size_t pos_end - end position
+	 * @return  IndexValue
+	 */
+	declare public IndexValue indexOfRange(T value, size_t pos_begin, size_t pos_end);
+	
+	
+	
+	/**
+	 * Insert value size_to position
+	 * @param T value
+	 * @param size_t pos - position
+	 */
+	declare public void insert(size_t pos, T value);
+	
+	
+	
+	/**
+	 * Remove value from position
+	 * @param size_t pos - position
+	 */
+	declare public void remove(size_t pos);
+	
+	
+	
+	/**
+	 * Remove range
+	 * @param size_t pos - start position
+	 * @param size_t count - count
+	 */
+	declare public void removeRange(size_t pos, size_t count);
+	
+	
+	
+	/**
+	 * Returns value from position
+	 * @param size_t pos - position
+	 */
+	declare public T get(size_t pos, T default_value);
+	
+	
+	
+	/**
+	 * Returns value from position. Throw exception, if position does not exists
+	 * @param size_t pos - position
+	 */
+	declare public T item(size_t pos);
+	
+	
+	
+	/**
+	 * Set value size_to position
+	 * @param size_t pos - position
+	 * @param T value 
+	 */
+	declare public T set(size_t pos, T value);
+	
+	
+	
+	/**
+	 * Clear all values from vector
+	 */
+	declare public void clear();
+	
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	declare public size_t count();
+	
+	
+	
+	/**
+	 * Clone vector and all items
+	 * @param Contextsize_terface context
+	 * @return Vector<T>
+	 */
+	declare public Vector<T> clone(Contextsize_terface context = null);
+	
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	public size_t length(){
+		return this.count();
+	}
+	
+	
+	
+	/**
+	 * Append value to the end of array
+	 * @param T value
+	 */
+	public void append(T value){
+		this.push(value);
+	}
+	
+	
+	
+	/**
+	 * Insert first value size_to array
+	 * @return T value
+	 */
+	public void prepend(T value){
+		this.unshift(value);
+	}
+	
+}

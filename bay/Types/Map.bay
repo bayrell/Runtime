@@ -1,0 +1,101 @@
+/*!
+ *  Bayrell Runtime Library.  
+ *
+ *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+ 
+namespace BayrellRtl.Types;
+
+use BayrellRtl.Types.Iterator;
+use BayrellRtl.Iterfaces.MapInterface;
+
+
+declare class Map<T1, T2> implements MapInterface{
+
+
+	/**
+	 * Returns value from position
+	 * @param T1 key
+	 * @param T2 default_value
+	 * @return T2
+	 */
+	declare public T2 get(T1 key, T2 default_value);
+	
+	
+	
+	/**
+	 * Returns value from position. Throw exception, if position does not exists
+	 * @param T1 key - position
+	 * @return T2
+	 */
+	declare public T2 item(T1 key);
+	
+	
+	
+	/**
+	 * Set value size_to position
+	 * @param T1 pos - position
+	 * @param T2 value 
+	 */
+	declare public void set(T1 key, T2 value);
+	
+	
+	
+	/**
+	 * Remove value from position
+	 * @param T1 key
+	 */
+	declare public void remove(T1 key);
+	
+	
+	
+	/**
+	 * Return true if key exists
+	 * @param T1 key
+	 * @return var
+	 */
+	declare public bool contains(T1 key);
+	
+	
+	
+	/**
+	 * Clear all values from vector
+	 */
+	declare public void clear();
+
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	declare public size_t count();
+	
+	
+	
+	/**
+	 * Returns vector of the keys
+	 * @return Iterator
+	 */
+	declare public Iterator<T1> keys();
+	
+	
+	
+	/**
+	 * Returns vector of the values
+	 * @return Iterator
+	 */
+	declare public Iterator<T2> values();
+	
+}

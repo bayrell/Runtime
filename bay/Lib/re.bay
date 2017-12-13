@@ -1,0 +1,152 @@
+/*!
+ *  Bayrell Runtime Library.  
+ *
+ *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace BayrellRtl.Lib;
+
+
+use .BayrellError import BayrellError;
+use .BayrellObject import BayrellObject;
+use .rtl import rtl;
+
+
+export class re{
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function compile($r){
+		if (!is_array($r))
+			$r = [$r];
+		if (!isset($r[1]))
+			$r[1] = "";
+		
+		/* http://php.net/manual/ru/reference.pcre.pattern.modifiers.php */
+		if (!in_array($r[1], ["i", "m", "s", "x", "A", "D", "S", "U", "X", "J", "u"]))
+			$r[1] = "";
+		
+		return "/" . $r[0] . "/" . $r[1];
+	}
+	#case ifcode JAVASCRIPT then
+	static compile(r){
+		if (!Array.isArray(r))
+			r = [r];
+		if (r.length == 1)
+			r.push("g");
+		
+		return new RegExp(r[0], r[1]);
+	}
+	#endswitch
+	
+	
+	/**
+	 * Поиск через регулярные выражения
+	 * @param {var} r - регулярное выражение
+	 * @param {string} s - строка, в которой происходит поиск
+	 * @return {array} результат
+	 */
+	static array match(array r, string s){
+		#switch
+		
+		#case ifcode PHP then
+		
+		$matches = [];
+		if (preg_match(static::compile($r), $s, $matches)){
+			return $matches;
+		}
+		
+		#case ifcode JAVASCRIPT then
+		return s.match(re.compile(r));
+		
+		#endswitch
+		
+		return [];
+	}
+	
+	
+	
+	
+	/**
+	 * Поиск через регулярные выражения
+	 * @param {var} r - регулярное выражение
+	 * @param {string} s - строка, в которой происходит поиск
+	 * @return {array} результат
+	 */
+	static array matchAll(var r, string s){
+		#switch
+		
+		#case ifcode PHP then
+		
+		$matches = [];
+		if (preg_match_all(static::compile($r), $s, $matches)){
+			return $matches;
+		}
+		
+		#endswitch
+		
+		return [];
+	}
+	
+	
+	/**
+	 * Замена через регулярные выражения
+	 * @param {var} r - регулярное выражение
+	 * @param {string} replace - новое значение, на которое нужно заменить
+	 * @param {string} s - строка, в которой происходит замена
+	 * @return {string} результат
+	 */
+	static string replace(var r, string replace, string s){
+		#switch
+		
+		#case ifcode PHP then
+		return preg_replace(static::compile($r), $replace, $s);
+		
+		#case ifcode JAVASCRIPT then
+		return s.replace(re.compile(r), replace);
+		
+		#endswitch
+	}
+	
+	
+	static string replaceArr(array arr, string s){
+		#switch
+		
+		#case ifcode PHP then
+		$patterns = [];
+		$replacements = [];
+		
+		foreach ($arr as $r){
+			array_push($patterns, static::compile($r[0]));
+			array_push($replacements, $r[1]);
+		}
+		
+		return preg_replace($patterns, $replacements, $s);
+		
+		
+		#case ifcode JAVASCRIPT then
+		if (Array.isArray(arr)){
+			for (var i = 0; i < arr.length; i++){
+				var r = arr[i];
+				s = s.replace(re.compile(r[0]), r[1]);
+			}
+		}
+		return s;
+		
+		#endswitch
+	}
+	
+}

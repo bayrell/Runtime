@@ -1,0 +1,76 @@
+/*!
+ *  Bayrell Runtime Library.  
+ *
+ *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace BayrellRtl.Interfaces;
+
+use BayrellRtl.BayrellObject;
+use BayrellRtl.Interfaces.MapInterface;
+
+
+interface ContextInterface{
+	
+	
+	
+	/**
+	 * Set application locale
+	 * @params string locale
+	 */
+	void setLocale(string locale);
+	
+	
+	
+	/**
+	 * Get application locale
+	 * @params string locale
+	 */
+	string getLocale();
+	
+	
+	
+	/**
+	 * Returns provider
+	 *
+	 * @params string worker_name
+	 * @return BayrellObject
+	 */
+	public BayrellObject getProvider(string provider_name);
+	
+	
+	
+	/**
+	 * Returns temporary provider
+	 *
+	 * @params string provider_name
+	 * @return BayrellObject
+	 */
+	public BayrellObject getTemporaryProvider(string provider_name);
+	
+	
+	
+	/**
+	 * Translate message
+	 * @params string message - message need to be translated
+	 * @params MapInterface params - Messages params. Default null.
+	 * @params string locale - Different locale. Default "".
+	 * @return string - translated string
+	 */
+	string translate(string message, MapInterface params = null, string locale = "");
+	
+	
+}
+

@@ -1,0 +1,84 @@
+/*!
+ *  Bayrell Runtime Library.  
+ *
+ *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace BayrellRtl.Lib;
+
+
+export class rtl{
+	
+	
+	
+	/**
+	 * Clone var
+	 * @param {var} value - Variable
+	 * @return {var} result
+	 */
+	declare static var clone(var value, ContextInterface context = null);
+	
+	
+	#switch
+	#case ifcode JAVASCRIPT then
+	static clone(val, context){
+		
+		if (val == null)
+			return null;
+		
+		else if (val instanceof Number){
+			return new Number(val);
+		}
+		else if (val instanceof String){
+			return new String(val);
+		}
+		else if (val instanceof Boolean){
+			return new Boolean(val);
+		}
+		else if (val instanceof Date){
+			return new Date(val);
+		}
+		else if (Array.isArray(val)){	
+			var res = [];
+			for (var i=0;i<val.length;i++){
+				res[i] = rtl.clone(val[i]);
+			}
+			return res;
+		}
+		else if (typeof val == 'object'){
+			var res = {};
+			
+			if (val.nodeType && typeof val.cloneNode == "function"){
+				return val.cloneNode(true);
+			}
+			else if (typeof val.clone == "function"){
+				return val.clone( context );
+			}
+			else if (val.prototype){
+				res = new item.constructor();
+			}
+			
+			for (var i in val){
+				res[i] = rtl.clone(val[i]);
+			}
+			
+			return res;
+		}
+	}
+	#endswitch
+	
+	
+	
+}
