@@ -19,15 +19,22 @@
 namespace BayrellRtl;
 
 use BayrellRtl.Lib.rtl;
-use BayrellRtl.Exceptions.ClassException;
 use BayrellRtl.Interfaces.ContextInterface;
 
 
-class Exception extends ClassException{
+#switch
+#case ifcode JAVASCRIPT then
+class ClassException extends Error { _init(){} }
+#case ifcode PHP then
+class ClassException extends \Exception {}
+#endswitch
+
+
+class RuntimeException extends ClassException{
 	
 	
 	protected ContextInterface context = null;
-	protected Exception prev = null;
+	protected Object prev = null;
 	protected string message = "";
 	protected int code = 0;
 	protected string file = "";
@@ -35,12 +42,15 @@ class Exception extends ClassException{
 	protected int pos = -1;
 	
 	
-	void constructor(ContextInterface context, string message = "", int code = 0, Exception prev = null){
+	void constructor(ContextInterface context, string message = "", int code = 0, Object prev = null){
 		parent(message, code, prev);
 		this.context = context;
 		this.message = message;
 		this.code = code;
 		this.prev = prev;
+		this.file = "";
+		this.line = -1;
+		this.pos = -1;
 	}
 	
 	public Exception getPreviousException(){

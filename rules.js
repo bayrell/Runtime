@@ -11,7 +11,6 @@ module.exports = {
 	'type': 1,
 	'base_path': base_path,
 	'files': [
-		'Exceptions/ClassException',
 		'Exceptions/IndexOutOfRange',
 		'Exceptions/KeyNotFound',
 		'Exceptions/StopIterator',
@@ -26,7 +25,7 @@ module.exports = {
 		'Lib/re',
 		'Lib/rtl',
 		'RuntimeError',
+		'RuntimeException',
 		'CoreObject',
-		'Exception',
 	],
 };

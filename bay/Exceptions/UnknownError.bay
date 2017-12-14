@@ -19,14 +19,14 @@
 namespace BayrellRtl.Exceptions;
 
 use BayrellRtl.Lib.rtl;
-use BayrellRtl.Exception;
 use BayrellRtl.RuntimeError;
+use BayrellRtl.RuntimeException;
 use BayrellRtl.Interfaces.ContextInterface;
 
 
-class UnknownError extends Exception{
+class UnknownError extends RuntimeException{
 	
-	void constructor(ContextInterface context, Exception prev = null){
+	void constructor(ContextInterface context, Object prev = null){
 		parent::constructor(
 			context, 
 			context.translate("ERROR_UNKNOWN"), 

@@ -9,7 +9,6 @@
 module.exports = {
 	VERSION: '0.2.0',
 	'Exceptions': {
-		'ClassException': require("./Exceptions/ClassException.js"),
 		'IndexOutOfRange': require("./Exceptions/IndexOutOfRange.js"),
 		'KeyNotFound': require("./Exceptions/KeyNotFound.js"),
 		'StopIterator': require("./Exceptions/StopIterator.js"),
@@ -31,8 +30,8 @@ module.exports = {
 		'Vector': require("./Types/Vector.js"),
 	},
 	'RuntimeError': require("./RuntimeError.js"),
+	'RuntimeException': require("./RuntimeException.js"),
 	'CoreObject': require("./CoreObject.js"),
-	'Exception': require("./Exception.js"),
 };
 
 
