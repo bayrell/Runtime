@@ -99,3 +99,20 @@ class Map<T1, T2> implements MapInterface{
 	declare public Iterator<T2> values();
 	
 }
+
+
+#switch
+#case ifcode JAVASCRIPT then
+if (BayrellRtl == undefined) BayrellRtl = {};
+if (BayrellRtl.Types == undefined) BayrellRtl.Types = {};
+
+BayrellRtl.Types.Map = class extends Map{
+	
+	
+	
+	
+}
+
+#case ifcode NODEJS then
+module.exports = BayrellRtl.Types.Map;
+#endswitch

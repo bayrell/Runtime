@@ -21,7 +21,7 @@ namespace BayrellRtl.Types;
 use BayrellRtl.Types.IndexValue;
 
 
-class Vector<T>{
+declare class Vector<T>{
 	
 	
 	/**
@@ -151,15 +151,6 @@ class Vector<T>{
 	
 	
 	/**
-	 * Returns count items in vector
-	 */
-	public size_t length(){
-		return this.count();
-	}
-	
-	
-	
-	/**
 	 * Append value to the end of array
 	 * @param T value
 	 */
@@ -177,4 +168,196 @@ class Vector<T>{
 		this.unshift(value);
 	}
 	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	public void length(){
+		this.count();
+	}
 }
+
+
+
+#switch
+#case ifcode JAVASCRIPT then
+if (BayrellRtl == undefined) BayrellRtl = {};
+if (BayrellRtl.Types == undefined) BayrellRtl.Types = {};
+
+BayrellRtl.Types.Map = class extends Array{
+	
+	
+	/**
+	 * Append value to the end of array
+	 * @param T value
+	 */
+	push(value){
+		/*Array.prototype.push.call(this, value);*/
+		super.push(value);
+	}
+	
+	
+	
+	/**
+	 * Insert first value size_to array
+	 * @return T value
+	 */
+	unshift(value){
+	}
+	
+	
+	
+	/**
+	 * Extract last value from array
+	 * @return T value
+	 */
+	pop(){
+		return super.pop();
+	}
+	
+	
+	
+	/**
+	 * Extract first value from array
+	 * @return T value
+	 */
+	shift(){
+	}
+	
+	
+	
+	/**
+	 * Find value in array
+	 * @param T value
+	 * @return  IndexValue
+	 */
+	indexOf(value){
+	}
+	
+	
+	
+	/**
+	 * Find value in array, and returns position. 
+	 * @param T value
+	 * @param size_t pos_begin - begin position
+	 * @param size_t pos_end - end position
+	 * @return  IndexValue
+	 */
+	indexOfRange(value, pos_begin, pos_end){
+	}
+	
+	
+	
+	/**
+	 * Insert value size_to position
+	 * @param T value
+	 * @param size_t pos - position
+	 */
+	insert(pos, value){
+	}
+	
+	
+	
+	/**
+	 * Remove value from position
+	 * @param size_t pos - position
+	 */
+	remove(pos){
+	}
+	
+	
+	
+	/**
+	 * Remove range
+	 * @param size_t pos - start position
+	 * @param size_t count - count
+	 */
+	removeRange(pos, count){
+	}
+	
+	
+	
+	/**
+	 * Returns value from position
+	 * @param size_t pos - position
+	 */
+	get(pos, default_value){
+		if (pos < 0 || (pos >= this.length)
+			return default_value;
+		return this[pos];
+	}
+	
+	
+	
+	/**
+	 * Returns value from position. Throw exception, if position does not exists
+	 * @param size_t pos - position
+	 */
+	item(pos){
+		if (pos < 0 || (pos >= this.length)
+			throw Error();
+		return this[pos];
+	}
+	
+	
+	
+	/**
+	 * Set value size_to position
+	 * @param size_t pos - position
+	 * @param T value 
+	 */
+	set(pos, value){
+	}
+	
+	
+	
+	/**
+	 * Clear all values from vector
+	 */
+	clear(){
+	}
+	
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	count(){
+		return this.length;
+	}
+	
+	
+	
+	/**
+	 * Clone vector and all items
+	 * @param Contextsize_terface context
+	 * @return Vector<T>
+	 */
+	clone(context = null){
+	}
+	
+	
+	
+	/**
+	 * Append value to the end of array
+	 * @param T value
+	 */
+	append(value){
+		this.push(value);
+	}
+	
+	
+	
+	/**
+	 * Insert first value size_to array
+	 * @return T value
+	 */
+	prepend(value){
+		this.unshift(value);
+	}
+	
+}
+
+#case ifcode NODEJS then
+module.exports = BayrellRtl.Types.Vector;
+#endswitch
