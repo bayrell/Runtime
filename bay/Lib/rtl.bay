@@ -44,14 +44,14 @@ export class rtl{
 		
 		var obj = require(module_name);
 		for (var i=1; i<class_name_arr.length - 1; i++){
-			if (!rtl.exists(obj[class_name_arr[i]])){
+			if (!BayrellRtl.Lib.rtl.exists(obj[class_name_arr[i]])){
 				obj = null;
 				break;
 			}
 			obj = obj[ class_name_arr[i] ];
 		}
 		
-		if (!rtl.exists(obj))
+		if (!BayrellRtl.Lib.rtl.exists(obj))
 			return null;
 		
 		obj = obj[last_name];
@@ -75,8 +75,8 @@ export class rtl{
 	}
 	#case ifcode JAVASCRIPT then
 	static Instance(class_name, args){
-		var obj = rtl.find_class(class_name);
-		if (!rtl.exists(obj)) return null;
+		var obj = BayrellRtl.Lib.rtl.find_class(class_name);
+		if (!BayrellRtl.Lib.rtl.exists(obj)) return null;
 		if (!(class_name instanceof Function)) return null;
 		if (args == undefined) args = [];
 		args = args.slice(); 
@@ -121,7 +121,7 @@ export class rtl{
 	}
 	#case ifcode JAVASCRIPT then
 	static callStaticMethod(class_name, method_name, args){
-		var obj = rtl.find_class(class_name);
+		var obj = BayrellRtl.Lib.rtl.find_class(class_name);
 		var f = obj[method_name];
 		return f.apply(obj, args);
 	}
@@ -159,7 +159,7 @@ export class rtl{
 		else if (Array.isArray(val)){	
 			var res = [];
 			for (var i=0;i<val.length;i++){
-				res[i] = rtl.clone(val[i]);
+				res[i] = BayrellRtl.Lib.rtl.clone(val[i]);
 			}
 			return res;
 		}
@@ -177,7 +177,7 @@ export class rtl{
 			}
 			
 			for (var i in val){
-				res[i] = rtl.clone(val[i]);
+				res[i] = BayrellRtl.Lib.rtl.clone(val[i]);
 			}
 			
 			return res;
