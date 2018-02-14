@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library.  
  *
- *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,8 +19,15 @@
 namespace BayrellRtl;
 
 
-class RuntimeError{
+class RuntimeConstant{
 	
+	
+	/* Status codes */ 
+	static const int STATUS_PROCESS = 1;
+	
+	
+	/* Errors */
+	static const int ERROR_OK = 0;
 	static const int ERROR_UNKNOWN = -1;
 	static const int ERROR_INDEX_OUT_OF_RANGE = -2;
 	static const int ERROR_KEY_NOT_FOUND = -3;
@@ -28,6 +35,16 @@ class RuntimeError{
 	static const int ERROR_MODULE_CONTEXT = -1000;
 	static const int ERROR_MODULE_LANG = -2000;
 	static const int ERROR_MODULE_UNIT = -3000;
+	static const int ERROR_MODULE_BUS = -4100;
 	static const int ERROR_USER = -100000;
-
+	
+	
+	/* Bus errors */
+	static const int ERROR_BUS_CONNECTION = -4001;
+	static const int ERROR_BUS_RUNTIME = -4002;
+	static const int ERROR_BUS_UNKNOWN_COMMAND = -4003;
+	static const int ERROR_BUS_WRONG_ANSWER = -4005;
+	static const int ERROR_BUS_TIMEOUT = -4006;
+	
+	
 }

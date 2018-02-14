@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library.  
  *
- *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,18 +19,23 @@
 namespace BayrellRtl.Exceptions;
 
 use BayrellRtl.Lib.rtl;
-use BayrellRtl.RuntimeError;
+use BayrellRtl.CoreObject;
+use BayrellRtl.RuntimeConstant;
 use BayrellRtl.RuntimeException;
 use BayrellRtl.Interfaces.ContextInterface;
 
 
 class IndexOutOfRange extends RuntimeException{
 	
-	void constructor(ContextInterface context, Object prev = null){
+	void constructor(ContextInterface context = null, Object prev = null){
+		
+		if (context == null)
+			context = CoreObject.globalContext();
+		
 		parent::constructor(
 			context, 
 			context.translate("ERROR_INDEX_OUT_OF_RANGE"), 
-			RuntimeError::ERROR_INDEX_OUT_OF_RANGE, 
+			RuntimeConstant::ERROR_INDEX_OUT_OF_RANGE, 
 			prev
 		);
 	}

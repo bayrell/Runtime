@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library.  
  *
- *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
  
 namespace BayrellRtl.Types;
 
-use BayrellRtl.Types.IndexValue;
+use BayrellRtl.Exceptions.IndexOutOfRange;
 
 
 declare class Vector<T>{
@@ -57,73 +57,74 @@ declare class Vector<T>{
 	
 	
 	/**
-	 * Find value in array
+	 * Find value in array. Returns -1 if value not found.
 	 * @param T value
-	 * @return  IndexValue
+	 * @return  int
 	 */
-	declare public IndexValue indexOf(T value);
+	declare public int indexOf(T value);
 	
 	
 	
 	/**
-	 * Find value in array, and returns position. 
+	 * Find value in array, and returns position. Returns -1 if value not found.
 	 * @param T value
-	 * @param size_t pos_begin - begin position
-	 * @param size_t pos_end - end position
-	 * @return  IndexValue
+	 * @param int pos_begin - begin position
+	 * @param int pos_end - end position
+	 * @return  int
 	 */
-	declare public IndexValue indexOfRange(T value, size_t pos_begin, size_t pos_end);
+	declare public int indexOfRange(T value, int pos_begin, int pos_end);
 	
 	
 	
 	/**
 	 * Insert value size_to position
 	 * @param T value
-	 * @param size_t pos - position
+	 * @param int pos - position
 	 */
-	declare public void insert(size_t pos, T value);
+	declare public void insert(int pos, T value);
 	
 	
 	
 	/**
 	 * Remove value from position
-	 * @param size_t pos - position
+	 * @param int pos - position
+	 * @param int count - count remove items
 	 */
-	declare public void remove(size_t pos);
+	declare public void remove(int pos, int count = 1);
 	
 	
 	
 	/**
 	 * Remove range
-	 * @param size_t pos - start position
-	 * @param size_t count - count
+	 * @param int pos_begin - start position
+	 * @param int pos_end - end position
 	 */
-	declare public void removeRange(size_t pos, size_t count);
+	declare public void removeRange(int pos_begin, int pos_end);
 	
 	
 	
 	/**
 	 * Returns value from position
-	 * @param size_t pos - position
+	 * @param int pos - position
 	 */
-	declare public T get(size_t pos, T default_value);
+	declare public T get(int pos, T default_value);
 	
 	
 	
 	/**
 	 * Returns value from position. Throw exception, if position does not exists
-	 * @param size_t pos - position
+	 * @param int pos - position
 	 */
-	declare public T item(size_t pos);
+	declare public T item(int pos);
 	
 	
 	
 	/**
 	 * Set value size_to position
-	 * @param size_t pos - position
+	 * @param int pos - position
 	 * @param T value 
 	 */
-	declare public T set(size_t pos, T value);
+	declare public T set(int pos, T value);
 	
 	
 	
@@ -137,7 +138,7 @@ declare class Vector<T>{
 	/**
 	 * Returns count items in vector
 	 */
-	declare public size_t count();
+	declare public int count();
 	
 	
 	
@@ -181,10 +182,10 @@ declare class Vector<T>{
 
 #switch
 #case ifcode JAVASCRIPT then
-if (BayrellRtl == undefined) BayrellRtl = {};
-if (BayrellRtl.Types == undefined) BayrellRtl.Types = {};
+if (typeof BayrellRtl == "undefined") BayrellRtl = {};
+if (typeof BayrellRtl.Types == "undefined") BayrellRtl.Types = {};
 
-BayrellRtl.Types.Map = class extends Array{
+BayrellRtl.Types.Vector = class extends Array{
 	
 	
 	/**
@@ -203,6 +204,7 @@ BayrellRtl.Types.Map = class extends Array{
 	 * @return T value
 	 */
 	unshift(value){
+		super.unshift(value);
 	}
 	
 	
@@ -222,6 +224,7 @@ BayrellRtl.Types.Map = class extends Array{
 	 * @return T value
 	 */
 	shift(){
+		return super.shift();
 	}
 	
 	
@@ -229,21 +232,26 @@ BayrellRtl.Types.Map = class extends Array{
 	/**
 	 * Find value in array
 	 * @param T value
-	 * @return  IndexValue
+	 * @return  int
 	 */
 	indexOf(value){
+		return super.indexOf(value);
 	}
 	
 	
 	
 	/**
-	 * Find value in array, and returns position. 
+	 * Find value in array in range pos_begin <= pos <= pos_end, and returns position. 
 	 * @param T value
-	 * @param size_t pos_begin - begin position
-	 * @param size_t pos_end - end position
-	 * @return  IndexValue
+	 * @param int pos_begin - begin position
+	 * @param int pos_end - end position
+	 * @return int - position
 	 */
 	indexOfRange(value, pos_begin, pos_end){
+		var pos = super.indexOf(value, pos_begin);
+		if (pos == -1 || pos > pos_end)
+			return -1;
+		return pos;
 	}
 	
 	
@@ -251,38 +259,42 @@ BayrellRtl.Types.Map = class extends Array{
 	/**
 	 * Insert value size_to position
 	 * @param T value
-	 * @param size_t pos - position
+	 * @param int pos - position
 	 */
 	insert(pos, value){
+		super.splice(pos, 0, value);
 	}
 	
 	
 	
 	/**
 	 * Remove value from position
-	 * @param size_t pos - position
+	 * @param int pos - position
 	 */
-	remove(pos){
+	remove(pos, count){
+		if (count == undefined) count = 1;
+		super.splice(pos, count);
 	}
 	
 	
 	
 	/**
 	 * Remove range
-	 * @param size_t pos - start position
-	 * @param size_t count - count
+	 * @param int pos_begin - start position
+	 * @param int pos_end - end position
 	 */
-	removeRange(pos, count){
+	removeRange(pos_begin, pos_end){
+		super.splice(pos_begin, pos_end - pos_begin + 1);
 	}
 	
 	
 	
 	/**
 	 * Returns value from position
-	 * @param size_t pos - position
+	 * @param int pos - position
 	 */
 	get(pos, default_value){
-		if (pos < 0 || (pos >= this.length)
+		if (pos < 0 || pos >= this.length)
 			return default_value;
 		return this[pos];
 	}
@@ -291,11 +303,11 @@ BayrellRtl.Types.Map = class extends Array{
 	
 	/**
 	 * Returns value from position. Throw exception, if position does not exists
-	 * @param size_t pos - position
+	 * @param int pos - position
 	 */
 	item(pos){
-		if (pos < 0 || (pos >= this.length)
-			throw Error();
+		if (pos < 0 || pos >= this.length)
+			throw new IndexOutOfRange();
 		return this[pos];
 	}
 	
@@ -303,10 +315,13 @@ BayrellRtl.Types.Map = class extends Array{
 	
 	/**
 	 * Set value size_to position
-	 * @param size_t pos - position
+	 * @param int pos - position
 	 * @param T value 
 	 */
 	set(pos, value){
+		if (pos < 0 || pos >= this.length)
+			throw new IndexOutOfRange();
+		this[pos] = value;
 	}
 	
 	
@@ -315,6 +330,7 @@ BayrellRtl.Types.Map = class extends Array{
 	 * Clear all values from vector
 	 */
 	clear(){
+		super.splice(0, this.length);
 	}
 	
 	

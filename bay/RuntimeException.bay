@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library.  
  *
- *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace BayrellRtl;
 
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.Interfaces.ContextInterface;
+use BayrellRtl.CoreObject;
 
 
 #switch
@@ -42,8 +43,12 @@ class RuntimeException extends ClassException{
 	protected int pos = -1;
 	
 	
-	void constructor(ContextInterface context, string message = "", int code = 0, Object prev = null){
+	void constructor(ContextInterface context = null, string message = "", int code = 0, Object prev = null){
 		parent(message, code, prev);
+		
+		if (context == null)
+			context = CoreObject.globalContext();
+		
 		this.context = context;
 		this.message = message;
 		this.code = code;

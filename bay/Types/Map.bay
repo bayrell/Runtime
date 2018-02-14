@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library.  
  *
- *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@
  
 namespace BayrellRtl.Types;
 
-use BayrellRtl.Types.Iterator;
+use BayrellRtl.Types.Vector;
+use BayrellRtl.Exceptions.KeyNotFound;
 use BayrellRtl.Interfaces.MapInterface;
 
 
-class Map<T1, T2> implements MapInterface{
+declare class Map<T1, T2> implements MapInterface{
 
 
 	/**
@@ -64,7 +65,7 @@ class Map<T1, T2> implements MapInterface{
 	/**
 	 * Return true if key exists
 	 * @param T1 key
-	 * @return var
+	 * @return bool var
 	 */
 	declare public bool contains(T1 key);
 	
@@ -86,29 +87,137 @@ class Map<T1, T2> implements MapInterface{
 	
 	/**
 	 * Returns vector of the keys
-	 * @return Iterator
+	 * @return Vector<T1>
 	 */
-	declare public Iterator<T1> keys();
+	declare public Vector<T1> keys();
 	
 	
 	
 	/**
 	 * Returns vector of the values
-	 * @return Iterator
+	 * @return Vector<T2>
 	 */
-	declare public Iterator<T2> values();
+	declare public Vector<T2> values();
 	
 }
 
 
+
 #switch
 #case ifcode JAVASCRIPT then
-if (BayrellRtl == undefined) BayrellRtl = {};
-if (BayrellRtl.Types == undefined) BayrellRtl.Types = {};
+if (typeof BayrellRtl == "undefined") BayrellRtl = {};
+if (typeof BayrellRtl.Types == "undefined") BayrellRtl.Types = {};
 
 BayrellRtl.Types.Map = class extends Map{
 	
 	
+	/**
+	 * Returns value from position
+	 * @param T1 key
+	 * @param T2 default_value
+	 * @return T2
+	 */
+	get(key, default_value){
+		var val = super.get(key);
+		if (val == undefined)
+			return default_value;
+		return val;
+	}
+	
+	
+	
+	/**
+	 * Returns value from position. Throw exception, if position does not exists
+	 * @param T1 key - position
+	 * @return T2
+	 */
+	item(key){
+		var val = super.get(key);
+		if (val == undefined){
+			throw new KeyNotFound();
+		}
+		return val;
+	}
+	
+	
+	
+	/**
+	 * Set value size_to position
+	 * @param T1 pos - position
+	 * @param T2 value 
+	 */
+	set(key, value){
+		super.set(key, value);
+	}
+	
+	
+	
+	/**
+	 * Remove value from position
+	 * @param T1 key
+	 */
+	remove(key){
+		super.delete(key);
+	}
+	
+	
+	
+	/**
+	 * Return true if key exists
+	 * @param T1 key
+	 * @return bool var
+	 */
+	contains(key){
+		return super.has(key);
+	}
+	
+	
+	
+	/**
+	 * Clear all values from vector
+	 */
+	clear(){
+		super.clear();
+	}
+
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	count(){
+		return 0;
+	}
+	
+	
+	
+	/**
+	 * Returns vector of the keys
+	 * @return Vector<T1>
+	 */
+	keys(){
+		var it = super.keys();
+		var res = new Vector();
+		for (var key in it){
+			res.push(key);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns vector of the values
+	 * @return Vector<T2>
+	 */
+	values(){
+		var it = super.values();
+		var res = new Vector();
+		for (var value in it){
+			res.push(value);
+		}
+		return res;
+	}
 	
 	
 }

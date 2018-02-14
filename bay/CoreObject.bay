@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library.  
  *
- *  (c) Copyright 2016-2017 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ use BayrellRtl.Interfaces.ContextInterface;
 
 class CoreObject{
 	
+	protected static ContextInterface _global_context = null;
 	protected ContextInterface _context = null;
 	protected bool _is_destroyed = false;
 	
@@ -87,12 +88,15 @@ class CoreObject{
 	/** 
 	 * Constructor
 	 */
-	void constructor(ContextInterface context = null){
+	public void constructor(ContextInterface context = null){
 		#switch
 		#case ifcode JAVASCRIPT then
 		this._init();
 		#endswitch
-		this._context = context;
+		if (context == null)
+			this._context = self::globalContext();
+		else
+			this._context = context;
 	}
 	
 	
@@ -133,7 +137,7 @@ class CoreObject{
 	 * Clone current object
 	 * @return CoreObject
 	 */
-	CoreObject clone(ContextInterface context = null){
+	public CoreObject clone(ContextInterface context = null){
 		CoreObject res = this.newInstance();
 		
 		if (context == null)
@@ -145,4 +149,22 @@ class CoreObject{
 	}
 	
 	
+	
+	/**
+	 * Returns global context
+	 * @return ContextInterface
+	 */
+	public static ContextInterface globalContext(){
+		return self::_global_context;
+	}
+	
+	
+	
+	/**
+	 * Set global context
+	 * @param ContextInterface context
+	 */
+	public static void setGlobalContext(ContextInterface context){
+		self::_global_context = context;
+	}
 }

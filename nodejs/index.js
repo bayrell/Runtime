@@ -24,12 +24,11 @@ module.exports = {
 		're': require("./Lib/re.js"),
 	},
 	'Types': {
-		'IndexValue': require("./Types/IndexValue.js"),
-		'Iterator': require("./Types/Iterator.js"),
+		//'Iterator': require("./Types/Iterator.js"),
 		'Map': require("./Types/Map.js"),
 		'Vector': require("./Types/Vector.js"),
 	},
-	'RuntimeError': require("./RuntimeError.js"),
+	'RuntimeConstant': require("./RuntimeConstant.js"),
 	'RuntimeException': require("./RuntimeException.js"),
 	'CoreObject': require("./CoreObject.js"),
 };
