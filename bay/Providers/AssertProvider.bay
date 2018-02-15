@@ -19,7 +19,7 @@
 namespace BayrellRtl.Providers;
 
 
-use BayrellRtl.Exception;
+use BayrellRtl.Lib.rtl;
 use BayrellRtl.CoreObject;
 use BayrellRtl.Interfaces.AssertInterface;
 use BayrellRtl.Exceptions.AssertError;
@@ -32,8 +32,8 @@ class AssertProvider extends CoreObject implements AssertInterface{
 	 * Throw exception with message
 	 * @param string message
 	 */
-	public void error(string message = ""){
-		throw new AssertError(this.context(), message);
+	public void error(string message = "", Object prev = null){
+		throw new AssertError(this.context(), message, prev);
 	}
 	
 	

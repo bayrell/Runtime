@@ -16,6 +16,7 @@ module.exports = {
 		'Exceptions/KeyNotFound',
 		'Exceptions/StopIterator',
 		'Exceptions/UnknownError',
+		'Exceptions/RuntimeException',
 		'Interfaces/AssertInterface',
 		'Interfaces/ContextInterface',
 		'Interfaces/MapInterface',
@@ -28,6 +29,5 @@ module.exports = {
 		'Context',
 		'CoreObject',
 		'RuntimeConstant',
-		'RuntimeException',
 	],
 };

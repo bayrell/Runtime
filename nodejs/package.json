@@ -4,6 +4,7 @@
 	"Exceptions/*.js",
 	"Interfaces/*.js",
 	"Lib/*.js",
+	"Providers/*.js",
 	"Types/*.js",
     "*.js"
   ],

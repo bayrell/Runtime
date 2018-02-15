@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Unit Test  
+ *  Bayrell Runtime Library.  
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -16,26 +16,8 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl.Exceptions;
-
-use BayrellRtl.Lib.rtl;
-use BayrellRtl.Exceptions.RuntimeException;
-use BayrellRtl.RuntimeConstant;
+namespace BayrellRtl.Lib;
 
 
-class AssertError extends RuntimeException{
-	
-	void constructor(ContextInterface context, string message, Object prev = null){
-		
-		if (message == "")
-			message = "Assert error";
-		
-		parent::constructor(
-			context, 
-			message,
-			RuntimeConstant::ERROR_ASSERT, 
-			prev
-		);
-	}
-	
+export class rs{
 }
