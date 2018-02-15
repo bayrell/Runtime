@@ -7,6 +7,7 @@
 
 
 $load([
+	"/assets/bayrell_rtl_es6/Lib/rs.js",
 	"/assets/bayrell_rtl_es6/Lib/rtl.js",
 	"/assets/bayrell_rtl_es6/Types/Map.js",
 	"/assets/bayrell_rtl_es6/Types/Vector.js",

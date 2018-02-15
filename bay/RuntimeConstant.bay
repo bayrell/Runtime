@@ -37,6 +37,7 @@ class RuntimeConstant{
 	static const int ERROR_MODULE_LANG = -2000;
 	static const int ERROR_MODULE_UNIT = -3000;
 	static const int ERROR_MODULE_BUS = -4100;
+	static const int ERROR_MODULE_PARSER = -5000;
 	static const int ERROR_USER = -100000;
 	
 	

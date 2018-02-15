@@ -24,6 +24,7 @@ module.exports = {
 		'Types/Map',
 		'Types/Vector',
 		'Lib/re',
+		'Lib/rs',
 		'Lib/rtl',
 		'Providers/AssertProvider',
 		'Context',

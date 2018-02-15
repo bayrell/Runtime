@@ -98,14 +98,13 @@ class RuntimeException extends ClassException{
 	public string toString(){
 		
 		string s = this.message;
-		if (line != -1 and pos != -1){
-			s = s ~ " at Ln:" ~ line ~ ", Pos:" ~ pos;
+		if (this.line != -1 and this.pos != -1){
+			s = s ~ " at Ln:" ~ this.line ~ ", Pos:" ~ this.pos;
 		}
-		if (file_name != ""){
-			s = s ~ " in file:'" ~ file_name ~ "'";
+		if (this.file != ""){
+			s = s ~ " in file:'" ~ this.file ~ "'";
 		}
 		
-		s = s ~ ".";
 		return s;
 	}
 	

@@ -248,6 +248,25 @@ export class rtl{
 		return new String(value);
 	}
 	#endswitch
+	
+	
+	
+	/**
+	 * Convert value to int
+	 * @param var value
+	 * @return string
+	 */
+	declare export static int toInt(var val);
 
+	#switch
+	#case ifcode PHP then
+	static function toInt($val){
+		return (int)$val;
+	}
+	#case ifcode JAVASCRIPT then
+	static toInt(val){
+		return parseInt(val);
+	}
+	#endswitch
 	
 }

@@ -20,4 +20,112 @@ namespace BayrellRtl.Lib;
 
 
 export class rs{
+
+
+	/**
+	 * Returns string lenght
+	 * @param string s The string
+	 * @return int
+	 */
+	declare export static int strlen(string s);
+	 
+	#switch
+	#case ifcode PHP then
+	static function strlen(&$s){
+		return strlen($s);
+	}
+	#case ifcode ES6 then
+	static strlen(s){
+		return BayrellRtl.Lib.rtl.toString(s).length;
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Returns ASCII symbol code
+	 * @param char ch
+	 */
+	declare export static int ord(char ch);
+
+	#switch
+	#case ifcode PHP then
+	static function ord($s){
+		return ord($s);
+	}
+	#case ifcode ES6 then
+	static ord(s){
+		return BayrellRtl.Lib.rtl.toString(s).charCodeAt(0);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Convert string to lower case
+	 * @param string s 
+	 * @return string
+	 */
+	declare export static string strtolower(string s);
+
+	#switch
+	#case ifcode PHP then
+	static function strtolower($s){
+		return mb_strtolower($s);
+	}
+	#case ifcode ES6 then
+	static strtolower(s){
+		return BayrellRtl.Lib.rtl.toString(s).toLowerCase();
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Convert string to upper case
+	 * @param string s
+	 * @return string
+	 */
+	declare export static string strtoupper(string s);
+
+	#switch
+	#case ifcode PHP then
+	static function strtoupper($s){
+		return mb_strtoupper($s);
+	}
+	#case ifcode ES6 then
+	static strtoupper(s){
+		return BayrellRtl.Lib.rtl.toString(s).toUpperCase();
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Ищет позицию первого вхождения подстроки search в строке s.
+	 * @param {string} s - строка, в которой производится поиск 
+	 * @param {string} search - строка, которую ищем 
+	 * @param {string} offset - если этот параметр указан, 
+	 *                 то поиск будет начат с указанного количества символов с начала строки.  
+	 * @return {variable} Если строка найдена, то возвращает позицию вхождения, начиная с 0.
+	 *                    Если строка не найдена, то вернет -1
+	 */
+	declare export static int strpos(string s, string search, string offset = 0);
+
+	#switch
+	#case ifcode PHP then
+	static function strpos($s, $search, $offset = 0){
+		$res = strpos($s, $search, $offset);
+		if ($res === false)
+			return -1;
+		return $res;
+	}
+	#case ifcode ES6 then
+	static strpos(s, search, offset){
+		if (!BayrellRtl.Lib.rtl.exists(offset)) offset = 0;
+		var res = BayrellRtl.Lib.rtl.toString(s).indexOf(search);
+		return res;
+	}
+	#endswitch
+	
 }
