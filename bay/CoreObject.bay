@@ -88,7 +88,7 @@ class CoreObject{
 	/** 
 	 * Constructor
 	 */
-	public void constructor(ContextInterface context = null){
+	public void constructor(ContextInterface context){
 		#switch
 		#case ifcode JAVASCRIPT then
 		this._init();
@@ -145,7 +145,19 @@ class CoreObject{
 		else
 			res._context = context;
 		
+		/* Assign all values */
+		res.assign(this);
+		
 		return res;
+	}
+	
+	
+	
+	/**
+	 * Assign all data from other object
+	 * @param CoreObject obj
+	 */
+	void assign(CoreObject obj){
 	}
 	
 	

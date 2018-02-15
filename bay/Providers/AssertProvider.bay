@@ -1,0 +1,83 @@
+/*!
+ *  Bayrell Unit Test
+ *
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace BayrellRtl.Providers;
+
+
+use BayrellRtl.Exception;
+use BayrellRtl.CoreObject;
+use BayrellRtl.Interfaces.AssertInterface;
+use BayrellRtl.Exceptions.AssertError;
+
+
+class AssertProvider extends CoreObject implements AssertInterface{
+	
+	
+	/**
+	 * Throw exception with message
+	 * @param string message
+	 */
+	public void error(string message = ""){
+		throw new AssertError(this.context(), message);
+	}
+	
+	
+	
+	/**
+	 * Equals value1 and value2. Throw exception if value1 != value2
+	 * @param var value1
+	 * @param var value2
+	 */
+	public void equals(var value1, var value2, string message = ""){
+		if (value1 !== value2)
+			throw new AssertError(this.context(), message);
+	}
+	
+	
+	
+	/**
+	 * Check if value is boolean and equals True
+	 * @param var value
+	 */
+	public void checkTrue(var value, string message = ""){
+		if (value !== true)
+			throw new AssertError(this.context(), message);
+	}
+	
+	
+	
+	/**
+	 * Check if value is boolean and equals False
+	 * @param var value
+	 */
+	public void checkFalse(var value, string message = ""){
+		if (value !== false)
+			throw new AssertError(this.context(), message);
+	}
+
+	
+	
+	/**
+	 * Check if value is not null 
+	 * @param var value
+	 */
+	public void checkExists(var value, string message = ""){
+		if (!rtl::exists(value))
+			throw new AssertError(this.context(), message);
+	}
+}

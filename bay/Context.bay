@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library.  
+ *  Bayrell Context
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -16,22 +16,37 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl.Interfaces;
+namespace BayrellRtl;
 
 use BayrellRtl.CoreObject;
 use BayrellRtl.Interfaces.AssertInterface;
+use BayrellRtl.Interfaces.ContextInterface;
 use BayrellRtl.Interfaces.MapInterface;
+use BayrellRtl.Providers.AssertProvider;
 
 
-interface ContextInterface{
+class Context implements ContextInterface{
 	
+	
+	protected AssertInterface _assert = null;
+	protected string _locale = "";
+	
+	
+	void constructor(){
+		#switch
+		#case ifcode JAVASCRIPT then
+		this._init();
+		#endswitch
+	}
 	
 	
 	/**
 	 * Set application locale
 	 * @params string locale
 	 */
-	void setLocale(string locale);
+	void setLocale(string locale){
+		this._locale = locale;
+	}
 	
 	
 	
@@ -39,17 +54,21 @@ interface ContextInterface{
 	 * Get application locale
 	 * @params string locale
 	 */
-	string getLocale();
+	string getLocale(){
+		return this._locale;
+	}
 	
 	
 	
 	/**
-	 * Returns context provider
+	 * Returns standart provider
 	 *
 	 * @params string provider_name
 	 * @return CoreObject
 	 */
-	public CoreObject getContextProvider(string provider_name);
+	public CoreObject getProvider(string provider_name){
+		return null;
+	}
 	
 	
 	
@@ -59,7 +78,9 @@ interface ContextInterface{
 	 * @params string provider_name
 	 * @return CoreObject
 	 */
-	public CoreObject getGlobalProvider(string provider_name);
+	public CoreObject getGlobalProvider(string provider_name){
+		return null;
+	}
 	
 	
 	
@@ -69,14 +90,9 @@ interface ContextInterface{
 	 * @params string provider_name
 	 * @return CoreObject
 	 */
-	public CoreObject getTemporaryProvider(string provider_name);
-	
-	
-	
-	/**
-	 * Returns assert provider
-	 */
-	public AssertInterface assert();
+	public CoreObject getTemporaryProvider(string provider_name){
+		return null;
+	}
 	
 	
 	
@@ -87,8 +103,19 @@ interface ContextInterface{
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
-	string translate(string message, MapInterface params = null, string locale = "");
+	string translate(string message, MapInterface params = null, string locale = ""){
+		return message;
+	}
 	
 	
-}
+	
+	/**
+	 * Returns assert provider
+	 */
+	public AssertInterface assert(){
+		if (this._assert == null)
+			this._assert = new AssertProvider(this);
+		return this._assert;
+	}
 
+}

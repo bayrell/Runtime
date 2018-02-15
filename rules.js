@@ -11,6 +11,7 @@ module.exports = {
 	'type': 1,
 	'base_path': base_path,
 	'files': [
+		'Exceptions/AssertError',
 		'Exceptions/IndexOutOfRange',
 		'Exceptions/KeyNotFound',
 		'Exceptions/StopIterator',
@@ -23,8 +24,10 @@ module.exports = {
 		'Types/Vector',
 		'Lib/re',
 		'Lib/rtl',
+		'Providers/AssertProvider',
+		'Context',
+		'CoreObject',
 		'RuntimeConstant',
 		'RuntimeException',
-		'CoreObject',
 	],
 };
