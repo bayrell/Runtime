@@ -45,6 +45,7 @@ module.exports = {
 		'Vector': require("./Types/Vector.js"),
 	},
 	'Context': require("./Context.js"),
+	'ContextObject': require("./ContextObject.js"),
 	'CoreObject': require("./CoreObject.js"),
 	'RuntimeConstant': require("./RuntimeConstant.js"),
 };

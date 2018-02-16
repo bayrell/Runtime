@@ -19,70 +19,12 @@
 namespace BayrellRtl;
 
 use BayrellRtl.Lib.rtl;
-use BayrellRtl.Interfaces.AssertInterface;
-use BayrellRtl.Interfaces.ContextInterface;
 
 
 class CoreObject{
 	
-	protected static ContextInterface _global_context = null;
-	protected ContextInterface _context = null;
 	protected bool _is_destroyed = false;
-	
-	
-	
-	/**
-	 * Get context
-	 *
-	 * @return ContextInterface 
-	 */
-	public ContextInterface context(){
-		return this._context;
-	}
-	
-	
-	
-	/**
-	 * Get assert provider
-	 *
-	 * @return AssertInterface 
-	 */
-	public AssertInterface assert(){
-		return this._context.assert();
-	}
-	
-	
-	
-	/**
-	 * Assert if value is true
-	 *
-	 */
-	public void assertTrue(bool value, string message = ""){
-		return this._context.assert().checkTrue(value, message);
-	}
-	
-	
-	
-	/**
-	 * Assert if value is false
-	 *
-	 */
-	public void assertFalse(bool value, string message = ""){
-		return this._context.assert().checkFalse(value, message);
-	}
-	
-	
-	
-	/**
-	 * Set context
-	 *
-	 * @param ContextInterface 
-	 */
-	public ContextInterface setContext(ContextInterface context){
-		if (this._context == null)
-			this._context = context;
-	}
-	
+
 	
 	
 	/** 
@@ -93,10 +35,6 @@ class CoreObject{
 		#case ifcode JAVASCRIPT then
 		this._init();
 		#endswitch
-		if (context == null)
-			this._context = self::globalContext();
-		else
-			this._context = context;
 	}
 	
 	
@@ -140,11 +78,6 @@ class CoreObject{
 	public CoreObject clone(ContextInterface context = null){
 		CoreObject res = this.newInstance();
 		
-		if (context == null)
-			res._context = this._context;
-		else
-			res._context = context;
-		
 		/* Assign all values */
 		res.assign(this);
 		
@@ -158,25 +91,5 @@ class CoreObject{
 	 * @param CoreObject obj
 	 */
 	void assign(CoreObject obj){
-	}
-	
-	
-	
-	/**
-	 * Returns global context
-	 * @return ContextInterface
-	 */
-	public static ContextInterface globalContext(){
-		return self::_global_context;
-	}
-	
-	
-	
-	/**
-	 * Set global context
-	 * @param ContextInterface context
-	 */
-	public static void setGlobalContext(ContextInterface context){
-		self::_global_context = context;
 	}
 }

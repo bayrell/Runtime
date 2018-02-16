@@ -29,6 +29,7 @@ $load([
 ])
 
 .load([
+	"/assets/bayrell_rtl_es6/ContextObject.js",
 	"/assets/bayrell_rtl_es6/Exceptions/AssertError.js",
 	"/assets/bayrell_rtl_es6/Exceptions/IndexOutOfRange.js",
 	"/assets/bayrell_rtl_es6/Exceptions/KeyNotFound.js",

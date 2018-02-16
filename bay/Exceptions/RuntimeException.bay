@@ -20,7 +20,7 @@ namespace BayrellRtl.Exceptions;
 
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.Interfaces.ContextInterface;
-use BayrellRtl.CoreObject;
+use BayrellRtl.ContextObject;
 
 
 #switch
@@ -47,7 +47,7 @@ class RuntimeException extends ClassException{
 		parent(message, code, prev);
 		
 		if (context == null)
-			context = CoreObject.globalContext();
+			context = ContextObject.globalContext();
 		
 		this.context = context;
 		this.message = message;

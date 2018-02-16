@@ -29,6 +29,7 @@ module.exports = {
 		'Providers/AssertProvider',
 		'Context',
 		'CoreObject',
+		'ContextObject',
 		'RuntimeConstant',
 	],
 };

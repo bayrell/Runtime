@@ -19,7 +19,7 @@
 namespace BayrellRtl.Exceptions;
 
 use BayrellRtl.Lib.rtl;
-use BayrellRtl.CoreObject;
+use BayrellRtl.ContextObject;
 use BayrellRtl.RuntimeConstant;
 use BayrellRtl.Exceptions.RuntimeException;
 use BayrellRtl.Interfaces.ContextInterface;
@@ -30,7 +30,7 @@ class IndexOutOfRange extends RuntimeException{
 	void constructor(ContextInterface context = null, Object prev = null){
 		
 		if (context == null)
-			context = CoreObject.globalContext();
+			context = ContextObject.globalContext();
 		
 		parent::constructor(
 			context, 
