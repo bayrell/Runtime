@@ -40,14 +40,6 @@ $load([
 ])
 
 .success(function(){
-	
-	// Create global context
-	var context = new BayrellRtl.Context();
-	BayrellRtl.ContextObject.setGlobalContext(context);
-	
-	// Register current module
-	context.registerModule('BayrellRtl.ModuleDescription');
-	
 	$load.deliver('bayrell_rtl_loaded');
 });
 

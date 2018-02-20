@@ -20,10 +20,19 @@ namespace BayrellRtl.Interfaces;
 
 
 use BayrellRtl.Types.Vector;
+use BayrellRtl.Interfaces.ContextInterface;
 use BayrellRtl.ProviderDescription;
 
 
 interface ModuleDescriptionInterface{
+	
+	
+	/**
+	 * Init context
+	 * @param ContextInterface context
+	 */
+	public static void initContext(ContextInterface context);
+	
 	
 	
 	/**
@@ -33,12 +42,14 @@ interface ModuleDescriptionInterface{
 	public static string getModuleName();
 	
 	
+	
 	/**
 	 * Returns module name
 	 * @return string
 	 */	
 	public static string getModuleVersion();
-
+	
+	
 
 	/**
 	 * Returns providers

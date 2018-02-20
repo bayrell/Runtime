@@ -45,6 +45,15 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	}
 	
 	
+	
+	/**
+	 * Init context
+	 * @param ContextInterface context
+	 */
+	public static void initContext(ContextInterface context){
+	}
+	
+	
 
 	/**
 	 * Returns providers

@@ -37,7 +37,7 @@ interface ContextInterface{
 	/**
 	 * Register module
 	 */
-	void registerModule(string module_description_class_name);
+	void registerModule(string module_name);
 	
 	
 	

@@ -131,6 +131,10 @@ class ContextObject extends CoreObject{
 	public ContextInterface setContext(ContextInterface context){
 		if (this._context == null)
 			this._context = context;
+			
+		if (this._context == null){
+			throw new UnknownError('context is null')
+		}			
 	}
 	
 	
@@ -144,6 +148,10 @@ class ContextObject extends CoreObject{
 			this._context = self::globalContext();
 		else
 			this._context = context;
+			
+		if (this._context == null){
+			throw new UnknownError('context is null')
+		}
 	}
 	
 	

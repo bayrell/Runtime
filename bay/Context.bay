@@ -77,7 +77,9 @@ class Context extends CoreObject implements ContextInterface{
 	/**
 	 * Register module
 	 */
-	void registerModule(string module_description_class_name){
+	void registerModule(string module_name){
+		
+		string module_description_class_name = module_name ~ ".ModuleDescription";
 		
 		if (this._modules.indexOf(module_description_class_name) != -1)
 			return;
@@ -101,6 +103,28 @@ class Context extends CoreObject implements ContextInterface{
 		}
 		
 		delete providers;
+	}
+	
+	
+	
+	/**
+	 * Init context
+	 */
+	void init(){
+		Vector<var> args = new Vector();
+		args.push(this);	
+	
+		int sz = this._modules.count();
+		for (int i=0; i<sz; i++){
+			string module_description_class_name = this._modules.item(i);
+			rtl.callStaticMethod(
+				module_description_class_name, 
+				"initContext",
+				args
+			);
+		}
+		
+		delete args;
 	}
 	
 	
