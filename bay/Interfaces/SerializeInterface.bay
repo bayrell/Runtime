@@ -16,22 +16,46 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl.Types;
+namespace BayrellRtl.Interfaces;
 
 
-class Iterator<T>{
+use BayrellRtl.Types.Vector;
+
+
+interface SerializeInterface{
 	
-	/**
-	 * Return next value or throw exception StopIterator then done
-	 * @return T
-	 */
-	public T next();
 	
 	
 	/**
-	 * Return current value or throw exception NullIterator then value does not exists
-	 * @return T
+	 * Returns classname of the object
+	 * @return string
 	 */
-	public T current();
+	public string getClassName();
+	
+	
+	
+	/**
+	 * Returns name of variables to serialization
+	 * @return Vector<string>
+	 */
+	public Vector<string> getVariablesNames();
+	
+	
+	
+	/**
+	 * Returns value by variable name
+	 * @param string variable_name
+	 * @return var
+	 */
+	public var getValue(string variable_name, var default_value = null);
+	
+	
+	
+	/**
+	 * Returns value by variable name
+	 * @param string variable_name
+	 * @param var value
+	 */
+	public void setValue(string variable_name, var value);
 	
 }

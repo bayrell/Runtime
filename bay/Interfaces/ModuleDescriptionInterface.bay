@@ -16,22 +16,35 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl.Types;
+namespace BayrellRtl.Interfaces;
 
 
-class Iterator<T>{
-	
-	/**
-	 * Return next value or throw exception StopIterator then done
-	 * @return T
-	 */
-	public T next();
+use BayrellRtl.Types.Vector;
+use BayrellRtl.ProviderDescription;
+
+
+interface ModuleDescriptionInterface{
 	
 	
 	/**
-	 * Return current value or throw exception NullIterator then value does not exists
-	 * @return T
+	 * Returns module name
+	 * @return string
 	 */
-	public T current();
+	public static string getModuleName();
+	
+	
+	/**
+	 * Returns module name
+	 * @return string
+	 */	
+	public static string getModuleVersion();
+
+
+	/**
+	 * Returns providers
+	 * @return string
+	 */	
+	public static Vector<ProviderDescription> getProviders();
+
 	
 }

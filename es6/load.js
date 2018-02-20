@@ -30,14 +30,24 @@ $load([
 
 .load([
 	"/assets/bayrell_rtl_es6/ContextObject.js",
+	"/assets/bayrell_rtl_es6/ModuleDescription.js",
 	"/assets/bayrell_rtl_es6/Exceptions/AssertError.js",
 	"/assets/bayrell_rtl_es6/Exceptions/IndexOutOfRange.js",
 	"/assets/bayrell_rtl_es6/Exceptions/KeyNotFound.js",
 	"/assets/bayrell_rtl_es6/Exceptions/UnknownError.js",
 	"/assets/bayrell_rtl_es6/Providers/AssertProvider.js",
+	"/assets/bayrell_rtl_es6/Providers/ProviderDescription.js",
 ])
 
 .success(function(){
+	
+	// Create global context
+	var context = new BayrellRtl.Context();
+	BayrellRtl.ContextObject.setGlobalContext(context);
+	
+	// Register current module
+	context.registerModule('BayrellRtl.ModuleDescription');
+	
 	$load.deliver('bayrell_rtl_loaded');
 });
 

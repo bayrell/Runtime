@@ -16,22 +16,39 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl.Types;
+namespace BayrellRtl.Providers;
 
 
-class Iterator<T>{
+use BayrellRtl.CoreObject;
+
+
+class ProviderDescription extends CoreObject{
+	
+	
+	protected string _provider_name = "";
+	protected string _class_name = "";
+	
+	
+	constructor(string provider_name, string class_name){
+		this._provider_name = provider_name;
+		this._class_name = class_name;
+	}
+	
 	
 	/**
-	 * Return next value or throw exception StopIterator then done
-	 * @return T
+	 * Returns provider name
+	 * @return string
 	 */
-	public T next();
+	public string getProviderName(){
+		return this._provider_name;
+	}
 	
 	
 	/**
-	 * Return current value or throw exception NullIterator then value does not exists
-	 * @return T
-	 */
-	public T current();
-	
+	 * Returns provider name
+	 * @return string
+	 */	
+	public string getClassName(){
+		return this._class_name;
+	}
 }

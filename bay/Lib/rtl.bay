@@ -112,7 +112,7 @@ export class rtl{
 	 * Call method
 	 * @return Object
 	 */
-	declare export static var callStaticMethod(string class_name, string method_name, array args);
+	declare export static var callStaticMethod(string class_name, string method_name, array args = null);
 	
 	#switch
 	#case ifcode PHP then

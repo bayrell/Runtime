@@ -31,5 +31,7 @@ module.exports = {
 		'CoreObject',
 		'ContextObject',
 		'RuntimeConstant',
+		'ModuleDescription',
+		'ProviderDescription',
 	],
 };

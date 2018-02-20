@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library.  
+ *  Bayrell Runtime Library.
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -26,6 +26,66 @@ use BayrellRtl.Interfaces.MapInterface;
 interface ContextInterface{
 	
 	
+	/**
+	 * Returns registed modules
+	 * @return Vector<string>
+	 */
+	Vector<string> getModules();	
+	
+	
+	
+	/**
+	 * Register module
+	 */
+	void registerModule(string module_description_class_name);
+	
+	
+	
+	/**
+	 * Returns class name of the provider. If provider doest not exists return empty string.
+	 * @param string provider_name
+	 * @return string 
+	 */
+	public string getProviderClassName(string provider_name);
+	
+	
+	
+	/**
+	 * Returns global provider
+	 *
+	 * @params string provider_name
+	 * @return ContextObject
+	 */
+	public ContextObject getGlobalProvider(string provider_name);
+	
+	
+	
+	/**
+	 * Returns context provider
+	 *
+	 * @params string provider_name
+	 * @return ContextObject
+	 */
+	public ContextObject getContextProvider(string provider_name);
+	
+	
+	
+	/**
+	 * Returns temporary provider
+	 *
+	 * @params string provider_name
+	 * @return ContextObject
+	 */
+	public ContextObject getTemporaryProvider(string provider_name);
+	
+	
+	
+	/**
+	 * Returns assert provider
+	 */
+	public AssertInterface assert();
+	
+	
 	
 	/**
 	 * Set application locale
@@ -40,43 +100,6 @@ interface ContextInterface{
 	 * @params string locale
 	 */
 	string getLocale();
-	
-	
-	
-	/**
-	 * Returns context provider
-	 *
-	 * @params string provider_name
-	 * @return CoreObject
-	 */
-	public CoreObject getContextProvider(string provider_name);
-	
-	
-	
-	/**
-	 * Returns global provider
-	 *
-	 * @params string provider_name
-	 * @return CoreObject
-	 */
-	public CoreObject getGlobalProvider(string provider_name);
-	
-	
-	
-	/**
-	 * Returns temporary provider
-	 *
-	 * @params string provider_name
-	 * @return CoreObject
-	 */
-	public CoreObject getTemporaryProvider(string provider_name);
-	
-	
-	
-	/**
-	 * Returns assert provider
-	 */
-	public AssertInterface assert();
 	
 	
 	

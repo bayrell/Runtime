@@ -16,22 +16,27 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl.Types;
+namespace BayrellRtl.Interfaces;
 
 
-class Iterator<T>{
+
+interface SerializeProviderInterface{
 	
-	/**
-	 * Return next value or throw exception StopIterator then done
-	 * @return T
-	 */
-	public T next();
 	
 	
 	/**
-	 * Return current value or throw exception NullIterator then value does not exists
-	 * @return T
+	 * Convert object to string
+	 * @return string
 	 */
-	public T current();
+	public string convertToString();
+	
+
+	/**
+	 * Restore object from string
+	 * @param string s
+	 */
+	public void restoreFromString(string s);
+
+
 	
 }

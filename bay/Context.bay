@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Context
+ *  Bayrell Runtime Library.
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -20,25 +20,160 @@ namespace BayrellRtl;
 
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.CoreObject;
+use BayrellRtl.ContextObject;
 use BayrellRtl.Interfaces.AssertInterface;
 use BayrellRtl.Interfaces.ContextInterface;
 use BayrellRtl.Interfaces.MapInterface;
+use BayrellRtl.Interfaces.ModuleDescriptionInterface;
 use BayrellRtl.Providers.AssertProvider;
+use BayrellRtl.Providers.ProviderDescription;
 
 
-class Context implements ContextInterface{
+class Context extends CoreObject implements ContextInterface{
 	
 	
 	protected AssertInterface _assert = null;
 	protected string _locale = "";
+	protected Vector<string> _modules = null;
+	protected Map<string, string> _providers_classes_names = null;
+	protected Map<string, ContextObject> _current_providers = null;
 	
 	
+	
+	/**
+	 * Constructor
+	 */
 	void constructor(){
-		#switch
-		#case ifcode JAVASCRIPT then
-		this._init();
-		#endswitch
+		parent();
+		this._modules = new Vector<string>();
+		this._providers_classes_names = new Map<string, string>();
+		this._current_providers = new Map<string, ContextObject>();
 	}
+	
+	
+	
+	/**
+	 * Destructor
+	 */
+	public void destructor(){
+		delete this._current_providers;
+		delete this._providers_classes_names;
+		delete this._modules;
+		parent();
+	}
+	
+	
+	
+	/**
+	 * Returns registed modules
+	 * @return Vector<string>
+	 */
+	Vector<string> getModules(){
+		return clone this._modules;
+	}
+	
+	
+	
+	/**
+	 * Register module
+	 */
+	void registerModule(string module_description_class_name){
+		
+		if (this._modules.indexOf(module_description_class_name) != -1)
+			return;
+	
+		this._modules.push(module_description_class_name);
+		
+		Vector<ProviderDescription> providers = rtl.callStaticMethod(
+			module_description_class_name, 
+			"getProviders"
+		);
+		
+		int sz = providers.count();
+		for (int i=0; i<sz; i++){
+			ProviderDescription provider = providers.item(i);
+			string provider_name = provider.getProviderName();
+			string class_name = provider.getClassName();
+			
+			if (!this._providers.has(provider_name)){
+				this._providers.push(provider_name, class_name);
+			}
+		}
+		
+		delete providers;
+	}
+	
+	
+	
+	/**
+	 * Returns class name of the provider. If provider doest not exists return empty string.
+	 * @param string provider_name
+	 * @return string 
+	 */
+	public string getProviderClassName(string provider_name){
+		if (!this._providers_classes_names.has(provider_name))
+			return "";
+		
+		return this._providers_classes_names.item(provider_name);
+	}
+	
+	
+	
+	/**
+	 * Returns global provider
+	 *
+	 * @params string provider_name
+	 * @return ContextObject
+	 */
+	public ContextObject getGlobalProvider(string provider_name){
+		Context context = ContextObject::globalContext();
+		if (context == null)
+			throw new UnknownError('Global context is null');
+		return context.getContextProvider(provider_name);
+	}
+	
+	
+	
+	/**
+	 * Returns standart provider
+	 *
+	 * @params string provider_name
+	 * @return ContextObject
+	 */
+	public ContextObject getContextProvider(string provider_name){
+		if (this._current_providers.has(provider_name))
+			return this._current_providers.item(provider_name);
+		
+		ContextObject obj = this.getTemporaryProvider(provider_name);
+		if (obj == null)
+			return null;
+			
+		this._current_providers.push(provider_name, obj);
+		return obj;
+	}
+	
+	
+	
+	/**
+	 * Returns temporary provider
+	 *
+	 * @params string provider_name
+	 * @return ContextObject
+	 */
+	public ContextObject getTemporaryProvider(string provider_name){
+		if (!this._providers_classes_names.has(provider_name))
+			return null;
+		
+		string class_name = this._providers_classes_names.item(provider_name);
+		Vector<var> args = new Vector();
+		args.push(this);
+		
+		ContextObject obj = this.Instance(class_name, args);
+		delete args;
+		
+		return obj;
+	}
+
 	
 	
 	/**
@@ -62,42 +197,6 @@ class Context implements ContextInterface{
 	
 	
 	/**
-	 * Returns standart provider
-	 *
-	 * @params string provider_name
-	 * @return CoreObject
-	 */
-	public CoreObject getProvider(string provider_name){
-		return null;
-	}
-	
-	
-	
-	/**
-	 * Returns global provider
-	 *
-	 * @params string provider_name
-	 * @return CoreObject
-	 */
-	public CoreObject getGlobalProvider(string provider_name){
-		return null;
-	}
-	
-	
-	
-	/**
-	 * Returns temporary provider
-	 *
-	 * @params string provider_name
-	 * @return CoreObject
-	 */
-	public CoreObject getTemporaryProvider(string provider_name){
-		return null;
-	}
-	
-	
-	
-	/**
 	 * Translate message
 	 * @params string message - message need to be translated
 	 * @params MapInterface params - Messages params. Default null.
@@ -114,9 +213,7 @@ class Context implements ContextInterface{
 	 * Returns assert provider
 	 */
 	public AssertInterface assert(){
-		if (this._assert == null)
-			this._assert = new AssertProvider(this);
-		return this._assert;
+		this.getContextProvider('default.assert');
 	}
 
 }
