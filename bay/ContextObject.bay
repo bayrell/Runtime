@@ -133,8 +133,8 @@ class ContextObject extends CoreObject{
 			this._context = context;
 			
 		if (this._context == null){
-			throw new UnknownError('context is null')
-		}			
+			throw new UnknownError('context is null');
+		}
 	}
 	
 	
@@ -150,7 +150,7 @@ class ContextObject extends CoreObject{
 			this._context = context;
 			
 		if (this._context == null){
-			throw new UnknownError('context is null')
+			throw new UnknownError('context is null');
 		}
 	}
 	

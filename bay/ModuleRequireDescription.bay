@@ -22,34 +22,36 @@ namespace BayrellRtl;
 use BayrellRtl.CoreObject;
 
 
-class ProviderDescription extends CoreObject{
+class ModuleRequireDescription extends CoreObject{
 	
 	
-	protected string _provider_name = "";
-	protected string _class_name = "";
+	protected string _module_name = "";
+	protected string _version = "";
 	
 	
-	void constructor(string provider_name, string class_name){
+	void constructor(string module_name, string version){
 		parent();
-		this._provider_name = provider_name;
-		this._class_name = class_name;
+		this._module_name = module_name;
+		this._version = version;
 	}
+	
 	
 	
 	/**
 	 * Returns provider name
 	 * @return string
 	 */
-	public string getProviderName(){
-		return this._provider_name;
+	public string getModuleName(){
+		return this._module_name;
 	}
+	
 	
 	
 	/**
 	 * Returns provider name
 	 * @return string
 	 */	
-	public string getClassName(){
-		return this._class_name;
+	public string getVersion(){
+		return this._version;
 	}
 }

@@ -21,12 +21,14 @@ namespace BayrellRtl;
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.CoreObject;
 use BayrellRtl.ContextObject;
+use BayrellRtl.Types.Vector;
 use BayrellRtl.Interfaces.AssertInterface;
 use BayrellRtl.Interfaces.ContextInterface;
 use BayrellRtl.Interfaces.MapInterface;
 use BayrellRtl.Interfaces.ModuleDescriptionInterface;
 use BayrellRtl.Providers.AssertProvider;
-use BayrellRtl.Providers.ProviderDescription;
+use BayrellRtl.ModuleRequireDescription;
+use BayrellRtl.ProviderDescription;
 
 
 class Context extends CoreObject implements ContextInterface{
@@ -59,7 +61,7 @@ class Context extends CoreObject implements ContextInterface{
 		delete this._current_providers;
 		delete this._providers_classes_names;
 		delete this._modules;
-		parent();
+		parent::destructor();
 	}
 	
 	
@@ -91,18 +93,36 @@ class Context extends CoreObject implements ContextInterface{
 			"getProviders"
 		);
 		
-		int sz = providers.count();
-		for (int i=0; i<sz; i++){
-			ProviderDescription provider = providers.item(i);
-			string provider_name = provider.getProviderName();
-			string class_name = provider.getClassName();
-			
-			if (!this._providers.has(provider_name)){
-				this._providers.push(provider_name, class_name);
+		if (providers != null){
+			int sz = providers.count();
+			for (int i=0; i<sz; i++){
+				ProviderDescription provider = providers.item(i);
+				string provider_name = provider.getProviderName();
+				string class_name = provider.getClassName();
+				
+				if (!this._providers_classes_names.has(provider_name)){
+					this._providers_classes_names.set(provider_name, class_name);
+				}
 			}
+			
+			delete providers;
 		}
 		
-		delete providers;
+		
+		Vector<ModuleRequireDescription> modules = rtl.callStaticMethod(
+			module_description_class_name, 
+			"getRequiredModules"
+		);
+		
+		if (modules != null){
+			int sz = modules.count();
+			for (int i=0; i<sz; i++){
+				ModuleRequireDescription m = modules[i];
+				string module_name_required = m.getModuleName();
+				this.registerModule(module_name_required);
+			}
+			delete modules;
+		}
 	}
 	
 	

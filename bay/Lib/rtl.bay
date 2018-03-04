@@ -22,6 +22,17 @@ namespace BayrellRtl.Lib;
 export class rtl{
 	
 	
+	#switch
+	#case ifcode JAVASCRIPT then
+	static implements(class_name){
+		if (obj == undefined) return false;
+		if (obj.__implements__ == undefined) return false;
+		return obj.__implements__.indexOf(interface_name) != -1;
+	}
+	#endswitch
+	
+	
+	
 	/**
 	 * Find class instance by name. If class does not exists return null.
 	 * @return var - class instance
@@ -30,6 +41,23 @@ export class rtl{
 	
 	
 	#switch
+	#case ifcode ES6 then
+	static find_class(class_name){
+		if (class_name instanceof Function)
+			return class_name;
+		
+		var arr = class_name.split('.');
+		var obj = window;
+		
+		for (var i=0; i<arr.length; i++){
+			var key = arr[i];
+			if (obj[key] == undefined)
+				return false;
+			obj = obj[key];
+		}
+		
+		return obj;
+	}
 	#case ifcode NODEJS then
 	static find_class(class_name){
 		if (class_name instanceof Function)

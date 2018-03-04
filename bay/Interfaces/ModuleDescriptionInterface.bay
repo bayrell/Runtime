@@ -50,12 +50,27 @@ interface ModuleDescriptionInterface{
 	public static string getModuleVersion();
 	
 	
+	
+	/**
+	 * Returns description interfaces of the current module
+	 * @return Vector<string>
+	 */	
+	public static Vector<string> getInterfaces();
+	
+	
 
 	/**
 	 * Returns providers
-	 * @return string
+	 * @return Vector<ProviderDescription>
 	 */	
 	public static Vector<ProviderDescription> getProviders();
 
+	
+	
+	/**
+	 * Returns required modules
+	 * @return Vector<ModuleRequireDescription>
+	 */	
+	public static Vector<ModuleRequireDescription> getRequiredModules();
 	
 }

@@ -20,6 +20,9 @@ module.exports = {
 		'Interfaces/AssertInterface',
 		'Interfaces/ContextInterface',
 		'Interfaces/MapInterface',
+		'Interfaces/ModuleDescriptionInterface',
+		'Interfaces/SerializeInterface',
+		'Interfaces/SerializeStringInterface',
 		'Types/Iterator',
 		'Types/Map',
 		'Types/Vector',
@@ -32,6 +35,7 @@ module.exports = {
 		'ContextObject',
 		'RuntimeConstant',
 		'ModuleDescription',
+		'ModuleRequireDescription',
 		'ProviderDescription',
 	],
 };

@@ -31,6 +31,9 @@ module.exports = {
 		'AssertInterface': require("./Interfaces/AssertInterface.js"),
 		'ContextInterface': require("./Interfaces/ContextInterface.js"),
 		'MapInterface': require("./Interfaces/MapInterface.js"),
+		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),
+		'SerializeInterface': require("./Interfaces/SerializeInterface.js"),
+		'SerializeStringInterface': require("./Interfaces/SerializeStringInterface.js"),
 	},
 	'Lib': {
 		'rtl': require("./Lib/rtl.js"),

@@ -35,8 +35,15 @@ $load([
 	"/assets/bayrell_rtl_es6/Exceptions/IndexOutOfRange.js",
 	"/assets/bayrell_rtl_es6/Exceptions/KeyNotFound.js",
 	"/assets/bayrell_rtl_es6/Exceptions/UnknownError.js",
+	"/assets/bayrell_rtl_es6/Interfaces/AssertInterface.js",
+	"/assets/bayrell_rtl_es6/Interfaces/ContextInterface.js",
+	"/assets/bayrell_rtl_es6/Interfaces/MapInterface.js",
+	"/assets/bayrell_rtl_es6/Interfaces/ModuleDescriptionInterface.js",
+	"/assets/bayrell_rtl_es6/Interfaces/SerializeInterface.js",
+	"/assets/bayrell_rtl_es6/Interfaces/SerializeStringInterface.js",
 	"/assets/bayrell_rtl_es6/Providers/AssertProvider.js",
-	"/assets/bayrell_rtl_es6/Providers/ProviderDescription.js",
+	"/assets/bayrell_rtl_es6/ProviderDescription.js",
+	"/assets/bayrell_rtl_es6/ModuleRequireDescription.js",
 ])
 
 .success(function(){
