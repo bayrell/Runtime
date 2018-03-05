@@ -28,7 +28,7 @@ interface SerializeStringInterface{
 	 * Convert object to string
 	 * @return string
 	 */
-	public string convertToString();
+	public string convertToString(var obj);
 	
 
 	/**

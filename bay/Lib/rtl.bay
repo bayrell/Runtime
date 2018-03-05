@@ -18,13 +18,15 @@
 
 namespace BayrellRtl.Lib;
 
+use BayrellRtl.Types.Vector;
+use BayrellRtl.Types.Map;
 
 export class rtl{
 	
 	
 	#switch
 	#case ifcode JAVASCRIPT then
-	static implements(class_name){
+	static implements(obj, interface_name){
 		if (obj == undefined) return false;
 		if (obj.__implements__ == undefined) return false;
 		return obj.__implements__.indexOf(interface_name) != -1;
@@ -105,7 +107,7 @@ export class rtl{
 	static Instance(class_name, args){
 		var obj = BayrellRtl.Lib.rtl.find_class(class_name);
 		if (!BayrellRtl.Lib.rtl.exists(obj)) return null;
-		if (!(class_name instanceof Function)) return null;
+		if (!(obj instanceof Function)) return null;
 		if (args == undefined) args = [];
 		args = args.slice(); 
 		args.unshift(null);
@@ -236,19 +238,32 @@ export class rtl{
 	
 	
 	/**
+	 * Returns true if value is primitive value
+	 * @return boolean 
+	 */
+	static bool isPrimitiveValue(var value){
+		if (rtl::isString(value)) return true;
+		else if (value instanceof Vector) return true;
+		else if (value instanceof Map) return true;
+		return false;
+	}
+	
+	
+	
+	/**
 	 * Return true if value is string
 	 * @param var value
 	 * @return boolean
 	 */
-	declare export static boolean is_string(var value);
+	declare export static boolean isString(var value);
 
 	#switch
 	#case ifcode PHP then
-	static function is_string($value){
+	static function isString($value){
 		return is_string($value);
 	}
 	#case ifcode JAVASCRIPT then
-	static is_string(value){
+	static isString(value){
 		if (typeof value == 'string') return true;
 		else if (value instanceof String) return true;
 		return false;

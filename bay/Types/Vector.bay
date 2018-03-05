@@ -155,9 +155,7 @@ declare class Vector<T>{
 	 * Append value to the end of array
 	 * @param T value
 	 */
-	public void append(T value){
-		this.push(value);
-	}
+	declare public void append(T value);
 	
 	
 	
@@ -165,17 +163,19 @@ declare class Vector<T>{
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	public void prepend(T value){
-		this.unshift(value);
-	}
+	declare public void prepend(T value);
 	
 	
 	/**
 	 * Returns count items in vector
 	 */
-	public void length(){
-		this.count();
-	}
+	declare public void length();
+	
+	
+	/**
+	 * Join all elements in array to string
+	 */
+	declare public string join(string s);
 }
 
 

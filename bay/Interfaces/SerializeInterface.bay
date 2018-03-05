@@ -38,24 +38,24 @@ interface SerializeInterface{
 	 * Returns name of variables to serialization
 	 * @return Vector<string>
 	 */
-	public Vector<string> getVariablesNames();
+	public void getVariablesNames(Vector<string> names);
 	
 	
 	
 	/**
-	 * Returns value by variable name
+	 * Returns instance of the value by variable name
 	 * @param string variable_name
 	 * @return var
 	 */
-	public var getValue(string variable_name, var default_value = null);
+	public var takeValue(string variable_name, var default_value = null);
 	
 	
 	
 	/**
-	 * Returns value by variable name
+	 * Set new value instance by variable name
 	 * @param string variable_name
 	 * @param var value
 	 */
-	public void setValue(string variable_name, var value);
+	public void assignValue(string variable_name, var value);
 	
 }

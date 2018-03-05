@@ -21,6 +21,7 @@ namespace BayrellRtl;
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.CoreObject;
 use BayrellRtl.ContextObject;
+use BayrellRtl.Types.Map;
 use BayrellRtl.Types.Vector;
 use BayrellRtl.Interfaces.AssertInterface;
 use BayrellRtl.Interfaces.ContextInterface;
@@ -212,7 +213,7 @@ class Context extends CoreObject implements ContextInterface{
 		Vector<var> args = new Vector();
 		args.push(this);
 		
-		ContextObject obj = this.Instance(class_name, args);
+		ContextObject obj = rtl::Instance(class_name, args);
 		delete args;
 		
 		return obj;
