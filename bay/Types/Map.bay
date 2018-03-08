@@ -207,9 +207,11 @@ BayrellRtl.Types.Map = class extends Map{
 	 */
 	keys(){
 		var it = super.keys();
-		var res = new Vector();
-		for (var key in it){
-			res.push(key);
+		var res = new BayrellRtl.Types.Vector();
+		var next = it.next();
+		while (!next.done){
+			res.push( next.value );
+			next = it.next();
 		}
 		return res;
 	}
@@ -222,9 +224,11 @@ BayrellRtl.Types.Map = class extends Map{
 	 */
 	values(){
 		var it = super.values();
-		var res = new Vector();
-		for (var value in it){
-			res.push(value);
+		var res = new BayrellRtl.Types.Vector();
+		var next = it.next();
+		while (!next.done){
+			res.push( next.value );
+			next = it.next();
 		}
 		return res;
 	}

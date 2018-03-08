@@ -37,6 +37,62 @@ interface SerializeStringInterface{
 	 */
 	public void restoreFromString(string s);
 
+	
+	/**
+	 * Set display class name
+	 * @param boolean value
+	 */
+	public void setDisplayClassName(boolean value);
+	
+	
+	/**
+	 * Set indent
+	 * @param string value
+	 */
+	public void setIndent(string value);
 
+	
+	/**
+	 * Set space
+	 * @param string value
+	 */
+	public void setSpace(string value);
+	
+	
+	/**
+	 * Set crlf
+	 * @param string value
+	 */
+	public void setCRLF(string value);
+
+	
+	/**
+	 * Returns display class name
+	 * @return string
+	 */	
+	public boolean getDisplayClassName();
+	
+	
+	/**
+	 * Returns indent
+	 * @return string
+	 */		
+	public string getIndent();	
+	
+	
+	/**
+	 * Set space
+	 * @param string value
+	 */
+	public void getSpace();
+	
+	
+	/**
+	 * Returns crlf
+	 * @return string
+	 */		
+	public string getCRLF();
+	
+	
 	
 }
