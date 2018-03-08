@@ -303,7 +303,7 @@ class Context extends CoreObject implements ContextInterface{
 	 * Returns assert provider
 	 */
 	public AssertInterface assert(){
-		this.getContextProvider('default.assert');
+		return this.getContextProvider('default.assert');
 	}
 
 }

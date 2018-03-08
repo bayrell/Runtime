@@ -18,10 +18,23 @@
 
 namespace BayrellRtl.Lib;
 
-use BayrellRtl.Types.Vector;
-use BayrellRtl.Types.Map;
 
 export class rtl{
+	
+	
+	/**
+	 * Returns global context
+	 */
+	declare export static var globalContext();
+	
+	
+	#switch
+	#case ifcode JAVASCRIPT then
+	static globalContext(obj, interface_name){
+		return this.callStaticMethod('BayrellRtl.ContextObject', 'globalContext');
+	}
+	#endswitch
+	
 	
 	
 	#switch
@@ -74,14 +87,14 @@ export class rtl{
 		
 		var obj = require(module_name);
 		for (var i=1; i<class_name_arr.length - 1; i++){
-			if (!BayrellRtl.Lib.rtl.exists(obj[class_name_arr[i]])){
+			if (!this.exists(obj[class_name_arr[i]])){
 				obj = null;
 				break;
 			}
 			obj = obj[ class_name_arr[i] ];
 		}
 		
-		if (!BayrellRtl.Lib.rtl.exists(obj))
+		if (!this.exists(obj))
 			return null;
 		
 		obj = obj[last_name];
@@ -105,8 +118,8 @@ export class rtl{
 	}
 	#case ifcode JAVASCRIPT then
 	static Instance(class_name, args){
-		var obj = BayrellRtl.Lib.rtl.find_class(class_name);
-		if (!BayrellRtl.Lib.rtl.exists(obj)) return null;
+		var obj = this.find_class(class_name);
+		if (!this.exists(obj)) return null;
 		if (!(obj instanceof Function)) return null;
 		if (args == undefined) args = [];
 		args = args.slice(); 
@@ -151,7 +164,7 @@ export class rtl{
 	}
 	#case ifcode JAVASCRIPT then
 	static callStaticMethod(class_name, method_name, args){
-		var obj = BayrellRtl.Lib.rtl.find_class(class_name);
+		var obj = this.find_class(class_name);
 		var f = obj[method_name];
 		return f.apply(obj, args);
 	}
@@ -189,7 +202,7 @@ export class rtl{
 		else if (Array.isArray(val)){	
 			var res = [];
 			for (var i=0;i<val.length;i++){
-				res[i] = BayrellRtl.Lib.rtl.clone(val[i]);
+				res[i] = this.clone(val[i]);
 			}
 			return res;
 		}
@@ -207,7 +220,7 @@ export class rtl{
 			}
 			
 			for (var i in val){
-				res[i] = BayrellRtl.Lib.rtl.clone(val[i]);
+				res[i] = this.clone(val[i]);
 			}
 			
 			return res;
@@ -241,10 +254,8 @@ export class rtl{
 	 * Returns true if value is primitive value
 	 * @return boolean 
 	 */
-	static bool isPrimitiveValue(var value){
+	static bool isScalarValue(var value){
 		if (rtl::isString(value)) return true;
-		else if (value instanceof Vector) return true;
-		else if (value instanceof Map) return true;
 		return false;
 	}
 	

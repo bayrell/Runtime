@@ -50,7 +50,7 @@ declare class Map<T1, T2> implements MapInterface{
 	 * @param T1 pos - position
 	 * @param T2 value 
 	 */
-	declare public void set(T1 key, T2 value);
+	declare public Map<T1, T2> set(T1 key, T2 value);
 	
 	
 	
@@ -58,7 +58,7 @@ declare class Map<T1, T2> implements MapInterface{
 	 * Remove value from position
 	 * @param T1 key
 	 */
-	declare public void remove(T1 key);
+	declare public Map<T1, T2> remove(T1 key);
 	
 	
 	
@@ -74,7 +74,7 @@ declare class Map<T1, T2> implements MapInterface{
 	/**
 	 * Clear all values from vector
 	 */
-	declare public void clear();
+	declare public Map<T1, T2> clear();
 
 	
 	
@@ -106,7 +106,7 @@ declare class Map<T1, T2> implements MapInterface{
 	 * @param T1 pos - position
 	 * @param T2 value 
 	 */
-	public void push(T1 key, T2 value){
+	public Map<T1, T2> push(T1 key, T2 value){
 		this.set(key, value);
 	}
 }
@@ -158,6 +158,7 @@ BayrellRtl.Types.Map = class extends Map{
 	 */
 	set(key, value){
 		super.set(key, value);
+		return this;
 	}
 	
 	
@@ -168,6 +169,7 @@ BayrellRtl.Types.Map = class extends Map{
 	 */
 	remove(key){
 		super.delete(key);
+		return this;
 	}
 	
 	
@@ -188,6 +190,7 @@ BayrellRtl.Types.Map = class extends Map{
 	 */
 	clear(){
 		super.clear();
+		return this;
 	}
 
 	
@@ -242,6 +245,7 @@ BayrellRtl.Types.Map = class extends Map{
 	 */
 	push(key, value){
 		this.set(key, value);
+		return this;
 	}
 	
 }

@@ -190,7 +190,8 @@ class ContextObject extends CoreObject{
 	 * Set global context
 	 * @param ContextInterface context
 	 */
-	public static void setGlobalContext(ContextInterface context){
+	public static ContextInterface setGlobalContext(ContextInterface context){
 		self::_global_context = context;
+		return context;
 	}
 }

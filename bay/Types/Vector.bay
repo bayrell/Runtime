@@ -28,7 +28,7 @@ declare class Vector<T>{
 	 * Append value to the end of array
 	 * @param T value
 	 */
-	declare public void push(T value);
+	declare public Vector<T> push(T value);
 	
 	
 	
@@ -36,7 +36,7 @@ declare class Vector<T>{
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	declare public void unshift(T value);
+	declare public Vector<T> unshift(T value);
 	
 	
 	
@@ -81,7 +81,7 @@ declare class Vector<T>{
 	 * @param T value
 	 * @param int pos - position
 	 */
-	declare public void insert(int pos, T value);
+	declare public Vector<T> insert(int pos, T value);
 	
 	
 	
@@ -90,7 +90,7 @@ declare class Vector<T>{
 	 * @param int pos - position
 	 * @param int count - count remove items
 	 */
-	declare public void remove(int pos, int count = 1);
+	declare public Vector<T> remove(int pos, int count = 1);
 	
 	
 	
@@ -99,7 +99,7 @@ declare class Vector<T>{
 	 * @param int pos_begin - start position
 	 * @param int pos_end - end position
 	 */
-	declare public void removeRange(int pos_begin, int pos_end);
+	declare public Vector<T> removeRange(int pos_begin, int pos_end);
 	
 	
 	
@@ -131,7 +131,7 @@ declare class Vector<T>{
 	/**
 	 * Clear all values from vector
 	 */
-	declare public void clear();
+	declare public Vector<T> clear();
 	
 	
 	
@@ -155,7 +155,7 @@ declare class Vector<T>{
 	 * Append value to the end of array
 	 * @param T value
 	 */
-	declare public void append(T value);
+	declare public Vector<T> append(T value);
 	
 	
 	
@@ -163,7 +163,7 @@ declare class Vector<T>{
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	declare public void prepend(T value);
+	declare public Vector<T> prepend(T value);
 	
 	
 	/**
@@ -195,6 +195,7 @@ BayrellRtl.Types.Vector = class extends Array{
 	push(value){
 		/*Array.prototype.push.call(this, value);*/
 		super.push(value);
+		return this;
 	}
 	
 	
@@ -205,6 +206,7 @@ BayrellRtl.Types.Vector = class extends Array{
 	 */
 	unshift(value){
 		super.unshift(value);
+		return this;
 	}
 	
 	
@@ -263,6 +265,7 @@ BayrellRtl.Types.Vector = class extends Array{
 	 */
 	insert(pos, value){
 		super.splice(pos, 0, value);
+		return this;
 	}
 	
 	
@@ -274,6 +277,7 @@ BayrellRtl.Types.Vector = class extends Array{
 	remove(pos, count){
 		if (count == undefined) count = 1;
 		super.splice(pos, count);
+		return this;
 	}
 	
 	
@@ -285,6 +289,7 @@ BayrellRtl.Types.Vector = class extends Array{
 	 */
 	removeRange(pos_begin, pos_end){
 		super.splice(pos_begin, pos_end - pos_begin + 1);
+		return this;
 	}
 	
 	
@@ -322,6 +327,7 @@ BayrellRtl.Types.Vector = class extends Array{
 		if (pos < 0 || pos >= this.length)
 			throw new IndexOutOfRange();
 		this[pos] = value;
+		return this;
 	}
 	
 	
@@ -331,6 +337,7 @@ BayrellRtl.Types.Vector = class extends Array{
 	 */
 	clear(){
 		super.splice(0, this.length);
+		return this;
 	}
 	
 	
@@ -360,6 +367,7 @@ BayrellRtl.Types.Vector = class extends Array{
 	 */
 	append(value){
 		this.push(value);
+		return this;
 	}
 	
 	
@@ -370,6 +378,7 @@ BayrellRtl.Types.Vector = class extends Array{
 	 */
 	prepend(value){
 		this.unshift(value);
+		return this;
 	}
 	
 }

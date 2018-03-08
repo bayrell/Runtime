@@ -21,7 +21,7 @@ namespace BayrellRtl.Interfaces;
 
 use BayrellRtl.Types.Vector;
 use BayrellRtl.Interfaces.ContextInterface;
-use BayrellRtl.ProviderDescription;
+use BayrellRtl.Descriptions.ProviderDescription;
 
 
 interface ModuleDescriptionInterface{

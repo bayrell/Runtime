@@ -18,6 +18,7 @@
 
 namespace BayrellRtl.Lib;
 
+use BayrellRtl.Lib.rtl;
 
 export class rs{
 
@@ -38,6 +39,10 @@ export class rs{
 	static strlen(s){
 		return BayrellRtl.Lib.rtl.toString(s).length;
 	}
+	#case ifcode NODEJS then
+	static strlen(s){
+		return rtl.toString(s).length;
+	}
 	#endswitch
 	
 	
@@ -56,6 +61,10 @@ export class rs{
 	#case ifcode ES6 then
 	static ord(s){
 		return BayrellRtl.Lib.rtl.toString(s).charCodeAt(0);
+	}
+	#case ifcode NODEJS then
+	static ord(s){
+		return rtl.toString(s).charCodeAt(0);
 	}
 	#endswitch
 	
@@ -77,6 +86,10 @@ export class rs{
 	static strtolower(s){
 		return BayrellRtl.Lib.rtl.toString(s).toLowerCase();
 	}
+	#case ifcode NODEJS then
+	static strtolower(s){
+		return rtl.toString(s).toLowerCase();
+	}
 	#endswitch
 	
 	
@@ -96,6 +109,10 @@ export class rs{
 	#case ifcode ES6 then
 	static strtoupper(s){
 		return BayrellRtl.Lib.rtl.toString(s).toUpperCase();
+	}
+	#case ifcode NODEJS then
+	static strtoupper(s){
+		return rtl.toString(s).toUpperCase();
 	}
 	#endswitch
 	
@@ -124,6 +141,12 @@ export class rs{
 	static strpos(s, search, offset){
 		if (!BayrellRtl.Lib.rtl.exists(offset)) offset = 0;
 		var res = BayrellRtl.Lib.rtl.toString(s).indexOf(search);
+		return res;
+	}
+	#case ifcode NODEJS then
+	static strpos(s, search, offset){
+		if (!rtl.exists(offset)) offset = 0;
+		var res = rtl.toString(s).indexOf(search);
 		return res;
 	}
 	#endswitch
