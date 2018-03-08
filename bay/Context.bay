@@ -25,11 +25,13 @@ use BayrellRtl.Types.Map;
 use BayrellRtl.Types.Vector;
 use BayrellRtl.Interfaces.AssertInterface;
 use BayrellRtl.Interfaces.ContextInterface;
+use BayrellRtl.Interfaces.FactoryInterface;
 use BayrellRtl.Interfaces.MapInterface;
 use BayrellRtl.Interfaces.ModuleDescriptionInterface;
+use BayrellRtl.Descriptions.ModuleRequireDescription;
+use BayrellRtl.Descriptions.ProviderDescription;
+use BayrellRtl.Descriptions.ProviderFactoryDescription;
 use BayrellRtl.Providers.AssertProvider;
-use BayrellRtl.ModuleRequireDescription;
-use BayrellRtl.ProviderDescription;
 
 
 class Context extends CoreObject implements ContextInterface{
@@ -39,6 +41,7 @@ class Context extends CoreObject implements ContextInterface{
 	protected string _locale = "";
 	protected Vector<string> _modules = null;
 	protected Map<string, string> _providers_classes_names = null;
+	protected Map<string, string> _providers_factory_classes_names = null;
 	protected Map<string, ContextObject> _current_providers = null;
 	
 	
@@ -50,6 +53,7 @@ class Context extends CoreObject implements ContextInterface{
 		parent();
 		this._modules = new Vector<string>();
 		this._providers_classes_names = new Map<string, string>();
+		this._providers_factory_classes_names = new Map<string, string>();
 		this._current_providers = new Map<string, ContextObject>();
 	}
 	
@@ -101,8 +105,15 @@ class Context extends CoreObject implements ContextInterface{
 				string provider_name = provider.getProviderName();
 				string class_name = provider.getClassName();
 				
-				if (!this._providers_classes_names.has(provider_name)){
-					this._providers_classes_names.set(provider_name, class_name);
+				if (provider instanceof ProviderFactoryDescription){
+					if (!this._providers_factory_classes_names.has(provider_name)){
+						this._providers_factory_classes_names.set(provider_name, class_name);
+					}
+				}
+				else{
+					if (!this._providers_classes_names.has(provider_name)){
+						this._providers_classes_names.set(provider_name, class_name);
+					}
 				}
 			}
 			
@@ -151,7 +162,7 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
-	 * Returns class name of the provider. If provider doest not exists return empty string.
+	 * Returns class name of the provider. If provider does not exists returns empty string.
 	 * @param string provider_name
 	 * @return string 
 	 */
@@ -160,6 +171,20 @@ class Context extends CoreObject implements ContextInterface{
 			return "";
 		
 		return this._providers_classes_names.item(provider_name);
+	}
+	
+	
+	
+	/**
+	 * Returns class name of the provider factory. If provider factory does not exists returns empty string.
+	 * @param string provider_name
+	 * @return string 
+	 */
+	public string getProviderFactoryClassName(string provider_name){
+		if (!this._providers_factory_classes_names.has(provider_name))
+			return "";
+		
+		return this._providers_factory_classes_names.item(provider_name);
 	}
 	
 	
@@ -206,17 +231,37 @@ class Context extends CoreObject implements ContextInterface{
 	 * @return ContextObject
 	 */
 	public ContextObject getTemporaryProvider(string provider_name){
-		if (!this._providers_classes_names.has(provider_name))
-			return null;
 		
-		string class_name = this._providers_classes_names.item(provider_name);
-		Vector<var> args = new Vector();
-		args.push(this);
+		if (this._providers_classes_names.has(provider_name)){
+			string class_name = this._providers_classes_names.item(provider_name);
+			Vector<var> args = new Vector();
+			args.push(this);
+			
+			ContextObject obj = rtl::Instance(class_name, args);
+			delete args;
+			
+			return obj;
+		}
 		
-		ContextObject obj = rtl::Instance(class_name, args);
-		delete args;
+		if (this._providers_factory_classes_names.has(provider_name)){
+			string class_name = this._providers_factory_classes_names.item(provider_name);
+			
+			ContextObject obj = null;
+			Vector<var> args = new Vector();
+			args.push(this);
+			
+			ContextObject factory_obj = rtl::Instance(class_name, args);
+			delete args;
+			
+			if (factory_obj implements FactoryInterface){
+				obj = factory_obj.newInstance();
+			}
+			delete factory_obj;
+			
+			return obj;
+		}
 		
-		return obj;
+		return null;
 	}
 
 	

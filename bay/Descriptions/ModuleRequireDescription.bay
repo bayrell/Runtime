@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl;
+namespace BayrellRtl.Descriptions;
 
 
 use BayrellRtl.CoreObject;

@@ -11,6 +11,9 @@ module.exports = {
 	'type': 1,
 	'base_path': base_path,
 	'files': [
+		'Descriptions/ModuleRequireDescription',
+		'Descriptions/ProviderDescription',
+		'Descriptions/ProviderFactoryDescription',
 		'Exceptions/AssertError',
 		'Exceptions/IndexOutOfRange',
 		'Exceptions/KeyNotFound',
@@ -19,6 +22,7 @@ module.exports = {
 		'Exceptions/RuntimeException',
 		'Interfaces/AssertInterface',
 		'Interfaces/ContextInterface',
+		'Interfaces/FactoryInterface',
 		'Interfaces/MapInterface',
 		'Interfaces/ModuleDescriptionInterface',
 		'Interfaces/SerializeInterface',
@@ -35,7 +39,5 @@ module.exports = {
 		'ContextObject',
 		'RuntimeConstant',
 		'ModuleDescription',
-		'ModuleRequireDescription',
-		'ProviderDescription',
 	],
 };

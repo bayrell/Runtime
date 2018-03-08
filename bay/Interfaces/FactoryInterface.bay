@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library.  
+ *  Bayrell Runtime Library.
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -15,41 +15,19 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
- 
-namespace BayrellRtl;
+
+namespace BayrellRtl.Interfaces;
+
+use BayrellRtl.ContextObject;
 
 
-use BayrellRtl.CoreObject;
-
-
-class ProviderDescription extends CoreObject{
-	
-	
-	protected string _provider_name = "";
-	protected string _class_name = "";
-	
-	
-	void constructor(string provider_name, string class_name){
-		parent();
-		this._provider_name = provider_name;
-		this._class_name = class_name;
-	}
+interface FactoryInterface{
 	
 	
 	/**
-	 * Returns provider name
-	 * @return string
+	 * Returns new Instance
 	 */
-	public string getProviderName(){
-		return this._provider_name;
-	}
+	public ContextObject newInstance();
 	
-	
-	/**
-	 * Returns provider name
-	 * @return string
-	 */	
-	public string getClassName(){
-		return this._class_name;
-	}
 }
+

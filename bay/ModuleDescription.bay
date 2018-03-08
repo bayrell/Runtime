@@ -19,7 +19,7 @@
 namespace BayrellRtl;
 
 use BayrellRtl.Interfaces.ModuleDescriptionInterface;
-use BayrellRtl.ProviderDescription;
+use BayrellRtl.Descriptions.ProviderDescription;
 use BayrellRtl.Types.Vector;
 
 
