@@ -21,19 +21,27 @@ namespace BayrellRtl.Lib;
 
 export class rtl{
 	
+	protected static var _global_context = null;
+	
 	
 	/**
 	 * Returns global context
+	 * @return ContextInterface
 	 */
-	declare export static var globalContext();
-	
-	
-	#switch
-	#case ifcode JAVASCRIPT then
-	static globalContext(obj, interface_name){
-		return this.callStaticMethod('BayrellRtl.ContextObject', 'globalContext');
+	public static Object globalContext(){
+		return self::_global_context;
 	}
-	#endswitch
+	
+	
+	
+	/**
+	 * Set global context
+	 * @param ContextInterface context
+	 */
+	public static Object setGlobalContext(Object context){
+		self::_global_context = context;
+		return context;
+	}
 	
 	
 	

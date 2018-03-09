@@ -16,11 +16,11 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl.Interfaces;
+namespace BayrellRtl.Providers;
 
 
 
-interface SerializeStringInterface{
+interface SerializeStringProviderInterface{
 	
 	
 	
@@ -30,7 +30,8 @@ interface SerializeStringInterface{
 	 */
 	public string convertToString(var obj);
 	
-
+	
+	
 	/**
 	 * Restore object from string
 	 * @param string s
@@ -38,11 +39,13 @@ interface SerializeStringInterface{
 	public void restoreFromString(string s);
 
 	
+	
 	/**
 	 * Set display class name
 	 * @param boolean value
 	 */
 	public void setDisplayClassName(boolean value);
+	
 	
 	
 	/**
@@ -52,11 +55,13 @@ interface SerializeStringInterface{
 	public void setIndent(string value);
 
 	
+	
 	/**
 	 * Set space
 	 * @param string value
 	 */
 	public void setSpace(string value);
+	
 	
 	
 	/**
@@ -66,11 +71,13 @@ interface SerializeStringInterface{
 	public void setCRLF(string value);
 
 	
+	
 	/**
 	 * Returns display class name
 	 * @return string
 	 */	
 	public boolean getDisplayClassName();
+	
 	
 	
 	/**
@@ -80,11 +87,13 @@ interface SerializeStringInterface{
 	public string getIndent();	
 	
 	
+	
 	/**
 	 * Set space
 	 * @param string value
 	 */
 	public void getSpace();
+	
 	
 	
 	/**

@@ -55,15 +55,17 @@ interface MapInterface{
 	 * Set value size_to position
 	 * @param var pos - position
 	 * @param var value 
+	 * @return self
 	 */
-	declare public void set(var key, var value);
+	declare public var set(var key, var value);
 	
 	
 	
 	/**
 	 * Remove value from position
 	 * @param var key
+	 * @return self
 	 */
-	declare public void remove(var key);
+	declare public var remove(var key);
 	
 }

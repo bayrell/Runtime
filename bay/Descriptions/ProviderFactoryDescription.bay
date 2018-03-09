@@ -26,4 +26,13 @@ use BayrellRtl.Descriptions.ProviderDescription;
 class ProviderFactoryDescription extends ProviderDescription{
 	
 	
+	
+	/**
+	 * Returns True if class name is factory
+	 * @return boolean
+	 */	
+	public boolean isFactory(){
+		return true;
+	}
+	
 }

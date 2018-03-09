@@ -27,12 +27,14 @@ class ModuleRequireDescription extends CoreObject{
 	
 	protected string _module_name = "";
 	protected string _version = "";
+	protected bool _is_dev = false;
 	
 	
-	void constructor(string module_name, string version){
+	void constructor(string module_name, string version, bool is_dev){
 		parent();
 		this._module_name = module_name;
 		this._version = version;
+		this._is_dev = is_dev;
 	}
 	
 	
@@ -53,5 +55,15 @@ class ModuleRequireDescription extends CoreObject{
 	 */	
 	public string getVersion(){
 		return this._version;
+	}
+	
+	
+	
+	/**
+	 * Returns true, if required only for development
+	 * @return boolean
+	 */	
+	public boolean getVersion(){
+		return this._is_dev;
 	}
 }

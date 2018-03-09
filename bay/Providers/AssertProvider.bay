@@ -21,11 +21,11 @@ namespace BayrellRtl.Providers;
 
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.ContextObject;
-use BayrellRtl.Interfaces.AssertInterface;
 use BayrellRtl.Exceptions.AssertError;
+use BayrellRtl.Providers.AssertProviderInterface;
 
 
-class AssertProvider extends ContextObject implements AssertInterface{
+class AssertProvider extends ContextObject implements AssertProviderInterface{
 	
 	
 	/**

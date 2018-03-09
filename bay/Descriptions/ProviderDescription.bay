@@ -36,6 +36,7 @@ class ProviderDescription extends CoreObject{
 	}
 	
 	
+	
 	/**
 	 * Returns provider name
 	 * @return string
@@ -45,11 +46,22 @@ class ProviderDescription extends CoreObject{
 	}
 	
 	
+	
 	/**
 	 * Returns provider name
 	 * @return string
 	 */	
 	public string getClassName(){
 		return this._class_name;
+	}
+	
+	
+	
+	/**
+	 * Returns True if class name is factory
+	 * @return boolean
+	 */	
+	public boolean isFactory(){
+		return false;
 	}
 }

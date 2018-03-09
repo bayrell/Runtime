@@ -18,36 +18,10 @@
 
 namespace BayrellRtl.Interfaces;
 
-use BayrellRtl.Interfaces.ContextObjectInterface;
-use BayrellRtl.Interfaces.MapInterface;
-use BayrellRtl.Types.Vector;
+use BayrellRtl.Providers.AssertProviderInterface;
 
 
-interface ContextInterface{
-	
-	
-	/**
-	 * Returns registed modules
-	 * @return Vector<string>
-	 */
-	Vector<string> getModules();
-	
-	
-	
-	/**
-	 * Register module
-	 */
-	void registerModule(string module_name);
-	
-	
-	
-	/**
-	 * Returns class name of the provider. If provider doest not exists return empty string.
-	 * @param string provider_name
-	 * @return string 
-	 */
-	public string getProviderClassName(string provider_name);
-	
+interface ContextObjectInterface{
 	
 	
 	/**
@@ -81,22 +55,6 @@ interface ContextInterface{
 	
 	
 	/**
-	 * Set application locale
-	 * @params string locale
-	 */
-	void setLocale(string locale);
-	
-	
-	
-	/**
-	 * Get application locale
-	 * @params string locale
-	 */
-	string getLocale();
-	
-	
-	
-	/**
 	 * Translate message
 	 * @params string message - message need to be translated
 	 * @params MapInterface params - Messages params. Default null.
@@ -105,6 +63,39 @@ interface ContextInterface{
 	 */
 	string translate(string message, MapInterface params = null, string locale = "");
 	
+	
+	
+	/**
+	 * Get assert provider
+	 *
+	 * @return AssertProviderInterface 
+	 */
+	public AssertProviderInterface assert();
+	
+	
+	
+	/**
+	 * Equals value1 and value2. Throw exception if value1 != value2
+	 * @param var value1
+	 * @param var value2
+	 */
+	public void equals(var value1, var value2, string message = "")
+	
+	
+	
+	/**
+	 * Assert if value is true
+	 *
+	 */
+	public void assertTrue(bool value, string message = "");
+	
+	
+	
+	/**
+	 * Assert if value is false
+	 *
+	 */
+	public void assertFalse(bool value, string message = "");
 	
 }
 

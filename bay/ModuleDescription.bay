@@ -60,9 +60,9 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * @return Vector<string>
 	 */	
 	public static Vector<string> getInterfaces(){
-		Vector<string> res = new Vector();
-		res.push('BayrellRtl.Interfaces.ModuleDescriptionInterface');
-		return res;
+		return (new Vector())
+			.push('BayrellRtl.Interfaces.ModuleDescriptionInterface')
+		;
 	}
 	
 	
@@ -72,16 +72,7 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * @return string
 	 */	
 	public static Vector<ProviderDescription> getProviders(){
-		Vector<ProviderDescription> res = new Vector();
-		
-		res.push(
-			new ProviderDescription(
-				"default.assert", 
-				"BayrellRtl.Providers.AssertProvider"
-			)
-		);
-		
-		return res;
+		return null;
 	}
 	
 	

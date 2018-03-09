@@ -22,12 +22,13 @@ use BayrellRtl.CoreObject;
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.Interfaces.AssertInterface;
 use BayrellRtl.Interfaces.ContextInterface;
+use BayrellRtl.Interfaces.ContextObjectInterface;
 
 
-class ContextObject extends CoreObject{
+class ContextObject extends CoreObject implements ContextObjectInterface{
 	
 	
-	protected static ContextInterface _global_context = null;
+	
 	protected ContextInterface _context = null;
 	
 	
@@ -75,6 +76,17 @@ class ContextObject extends CoreObject{
 	 */
 	public AssertInterface assert(){
 		return this._context.assert();
+	}
+	
+	
+	
+	/**
+	 * Equals value1 and value2. Throw exception if value1 != value2
+	 * @param var value1
+	 * @param var value2
+	 */
+	public void equals(var value1, var value2, string message = ""){
+		return this._context.assert().equals(value1, value2, message);
 	}
 	
 	
@@ -145,7 +157,7 @@ class ContextObject extends CoreObject{
 	public void constructor(ContextInterface context){
 		parent();
 		if (context == null)
-			this._context = self::globalContext();
+			this._context = rtl::globalContext();
 		else
 			this._context = context;
 			
@@ -174,24 +186,4 @@ class ContextObject extends CoreObject{
 		return res;
 	}
 	
-	
-	
-	/**
-	 * Returns global context
-	 * @return ContextInterface
-	 */
-	public static ContextInterface globalContext(){
-		return self::_global_context;
-	}
-	
-	
-	
-	/**
-	 * Set global context
-	 * @param ContextInterface context
-	 */
-	public static ContextInterface setGlobalContext(ContextInterface context){
-		self::_global_context = context;
-		return context;
-	}
 }
