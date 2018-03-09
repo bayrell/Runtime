@@ -25,8 +25,20 @@ interface AssertProviderInterface{
 	/**
 	 * Throw exception with message
 	 * @param string message
+	 * @param Object prev - Previous error
 	 */
-	public void error(string message = "");
+	public void error(string message = "", Object prev = null);
+	
+	
+	
+	/**
+	 * Throw exception with message if value is true
+	 * @param boolean value
+	 * @param string message
+	 * @param Object prev - Previous error
+	 */
+	public void assert(boolean value, string message = "", Object prev = null);
+	
 	
 	
 	/**
@@ -34,31 +46,38 @@ interface AssertProviderInterface{
 	 * @param var value1
 	 * @param var value2
 	 * @param string message
+	 * @param Object prev - Previous error
 	 */
-	public void equals(var value1, var value2, string message = "");
+	public void equals(var value1, var value2, string message = "", Object prev = null);
+	
 	
 	
 	/**
 	 * Check if value is boolean and equals True
 	 * @param var value
 	 * @param string message
+	 * @param Object prev - Previous error
 	 */
-	public void checkTrue(var value, string message = "");
+	public void checkTrue(var value, string message = "", Object prev = null);
+	
 	
 	
 	/**
 	 * Check if value is boolean and equals False
 	 * @param var value
 	 * @param string message
+	 * @param Object prev - Previous error
 	 */
-	public void checkFalse(var value, string message = "");
+	public void checkFalse(var value, string message = "", Object prev = null);
+	
 	
 	
 	/**
 	 * Check if value is not null 
 	 * @param var value
 	 * @param string message
+	 * @param Object prev - Previous error
 	 */
-	public void checkExists(var value, string message = "");
+	public void checkExists(var value, string message = "", Object prev = null);
 	
 }

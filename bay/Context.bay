@@ -18,17 +18,15 @@
 
 namespace BayrellRtl;
 
-use BayrellRtl.rtl;
+use BayrellRtl.Lib.rtl;
 use BayrellRtl.CoreObject;
 use BayrellRtl.ContextObject;
 use BayrellRtl.Types.Map;
 use BayrellRtl.Types.Vector;
-use BayrellRtl.Interfaces.AssertInterface;
 use BayrellRtl.Interfaces.ContextInterface;
 use BayrellRtl.Interfaces.FactoryInterface;
 use BayrellRtl.Interfaces.MapInterface;
 use BayrellRtl.Interfaces.ModuleDescriptionInterface;
-use BayrellRtl.Descriptions.ModuleRequireDescription;
 use BayrellRtl.Descriptions.ProviderDescription;
 use BayrellRtl.Descriptions.ProviderFactoryDescription;
 use BayrellRtl.Providers.AssertProvider;
@@ -37,7 +35,6 @@ use BayrellRtl.Providers.AssertProvider;
 class Context extends CoreObject implements ContextInterface{
 	
 	
-	protected AssertInterface _assert = null;
 	protected string _locale = "";
 	protected Vector<string> _modules = null;
 	protected Map<string, string> _providers_classes_names = null;
@@ -121,18 +118,18 @@ class Context extends CoreObject implements ContextInterface{
 		}
 		
 		
-		Vector<ModuleRequireDescription> modules = rtl.callStaticMethod(
+		Map<string, string> modules = rtl.callStaticMethod(
 			module_description_class_name, 
 			"getRequiredModules"
 		);
-		
 		if (modules != null){
-			int sz = modules.count();
-			for (int i=0; i<sz; i++){
-				ModuleRequireDescription m = modules[i];
-				string module_name_required = m.getModuleName();
-				this.registerModule(module_name_required);
+			Vector<string> keys = modules.keys();
+			int sz = keys.count();
+			for (int i=0; i<sz; i++){				
+				string module_name = keys.item(i);
+				this.registerModule(module_name);
 			}
+			delete keys;
 			delete modules;
 		}
 	}
@@ -205,6 +202,18 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
+	 * Returns global provider
+	 *
+	 * @params string provider_name
+	 * @return ContextObject
+	 */
+	public ContextObject getProvider(string provider_name){
+		return this.getContextProvider(provider_name);
+	}
+	
+	
+	
+	/**
 	 * Returns standart provider
 	 *
 	 * @params string provider_name
@@ -218,7 +227,7 @@ class Context extends CoreObject implements ContextInterface{
 		if (obj == null)
 			return null;
 			
-		this._current_providers.push(provider_name, obj);
+		this._current_providers.set(provider_name, obj);
 		return obj;
 	}
 	
@@ -295,15 +304,6 @@ class Context extends CoreObject implements ContextInterface{
 	 */
 	string translate(string message, MapInterface params = null, string locale = ""){
 		return message;
-	}
-	
-	
-	
-	/**
-	 * Returns assert provider
-	 */
-	public AssertInterface assert(){
-		return this.getContextProvider('default.assert');
 	}
 
 }

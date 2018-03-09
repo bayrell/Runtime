@@ -19,9 +19,10 @@
 namespace BayrellRtl.Interfaces;
 
 
-use BayrellRtl.Types.Vector;
 use BayrellRtl.Interfaces.ContextInterface;
 use BayrellRtl.Descriptions.ProviderDescription;
+use BayrellRtl.Types.Vector;
+use BayrellRtl.Types.Map;
 
 
 interface ModuleDescriptionInterface{
@@ -69,8 +70,16 @@ interface ModuleDescriptionInterface{
 	
 	/**
 	 * Returns required modules
-	 * @return Vector<ModuleRequireDescription>
+	 * @return Map<string, string>
 	 */	
-	public static Vector<ModuleRequireDescription> getRequiredModules();
+	public static Map<string, string> getRequiredModules();
+	
+	
+	
+	/**
+	 * Returns required modules
+	 * @return Map<string, string>
+	 */	
+	public static Map<string, string> getRequiredDevModules();
 	
 }

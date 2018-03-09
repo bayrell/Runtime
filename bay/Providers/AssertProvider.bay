@@ -28,9 +28,11 @@ use BayrellRtl.Providers.AssertProviderInterface;
 class AssertProvider extends ContextObject implements AssertProviderInterface{
 	
 	
+
 	/**
 	 * Throw exception with message
 	 * @param string message
+	 * @param Object prev - Previous error
 	 */
 	public void error(string message = "", Object prev = null){
 		throw new AssertError(this.context(), message, prev);
@@ -39,13 +41,29 @@ class AssertProvider extends ContextObject implements AssertProviderInterface{
 	
 	
 	/**
+	 * Throw exception with message if value is true
+	 * @param boolean value
+	 * @param string message
+	 * @param Object prev - Previous error
+	 */
+	public void assert(boolean value, string message = "", Object prev = null){
+		if (!value){
+			throw new AssertError(this.context(), message, prev);
+		}
+	}
+	
+	
+	
+	/**
 	 * Equals value1 and value2. Throw exception if value1 != value2
 	 * @param var value1
 	 * @param var value2
+	 * @param string message
+	 * @param Object prev - Previous error
 	 */
-	public void equals(var value1, var value2, string message = ""){
+	public void equals(var value1, var value2, string message = "", Object prev = null){
 		if (value1 !== value2)
-			throw new AssertError(this.context(), message);
+			throw new AssertError(this.context(), message, prev);
 	}
 	
 	
@@ -53,10 +71,12 @@ class AssertProvider extends ContextObject implements AssertProviderInterface{
 	/**
 	 * Check if value is boolean and equals True
 	 * @param var value
+	 * @param string message
+	 * @param Object prev - Previous error
 	 */
-	public void checkTrue(var value, string message = ""){
+	public void checkTrue(var value, string message = "", Object prev = null){
 		if (value !== true)
-			throw new AssertError(this.context(), message);
+			throw new AssertError(this.context(), message, prev);
 	}
 	
 	
@@ -64,10 +84,12 @@ class AssertProvider extends ContextObject implements AssertProviderInterface{
 	/**
 	 * Check if value is boolean and equals False
 	 * @param var value
+	 * @param string message
+	 * @param Object prev - Previous error
 	 */
-	public void checkFalse(var value, string message = ""){
+	public void checkFalse(var value, string message = "", Object prev = null){
 		if (value !== false)
-			throw new AssertError(this.context(), message);
+			throw new AssertError(this.context(), message, prev);
 	}
 
 	
@@ -75,9 +97,11 @@ class AssertProvider extends ContextObject implements AssertProviderInterface{
 	/**
 	 * Check if value is not null 
 	 * @param var value
+	 * @param string message
+	 * @param Object prev - Previous error
 	 */
-	public void checkExists(var value, string message = ""){
+	public void checkExists(var value, string message = "", Object prev = null){
 		if (!rtl::exists(value))
-			throw new AssertError(this.context(), message);
+			throw new AssertError(this.context(), message, prev);
 	}
 }

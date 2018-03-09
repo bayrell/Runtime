@@ -18,19 +18,11 @@
 
 namespace BayrellRtl.Interfaces;
 
-use BayrellRtl.Interfaces.ContextObjectInterface;
 use BayrellRtl.Interfaces.MapInterface;
-use BayrellRtl.Types.Vector;
+use BayrellRtl.Interfaces.ContextObjectInterface;
 
 
 interface ContextInterface{
-	
-	
-	/**
-	 * Returns registed modules
-	 * @return Vector<string>
-	 */
-	Vector<string> getModules();
 	
 	
 	
@@ -57,6 +49,16 @@ interface ContextInterface{
 	 * @return ContextObjectInterface
 	 */
 	public ContextObjectInterface getGlobalProvider(string provider_name);
+	
+	
+	
+	/**
+	 * Returns global provider
+	 *
+	 * @params string provider_name
+	 * @return ContextObject
+	 */
+	public ContextObject getProvider(string provider_name);
 	
 	
 	

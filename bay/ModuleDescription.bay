@@ -72,6 +72,23 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * @return string
 	 */	
 	public static Vector<ProviderDescription> getProviders(){
+		return (new Vector<ProviderDescription>())
+			.push(
+				new ProviderDescription(
+					"default.assert", 
+					"BayrellRtl.Providers.AssertProvider"
+				)
+			)
+		;
+	}
+	
+	
+	
+	/**
+	 * Returns required modules
+	 * @return Map<string, string>
+	 */	
+	public static Map<string, string> getRequiredModules(){
 		return null;
 	}
 	
@@ -79,9 +96,9 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	
 	/**
 	 * Returns required modules
-	 * @return Vector<ModuleRequireDescription>
+	 * @return Map<string, string>
 	 */	
-	public static Vector<ModuleRequireDescription> getRequiredModules(){
+	public static Map<string, string> getRequiredDevModules(){
 		return null;
 	}
 

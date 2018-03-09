@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library.
+ *  Bayrell Runtime Library.  
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -18,84 +18,29 @@
 
 namespace BayrellRtl.Interfaces;
 
-use BayrellRtl.Providers.AssertProviderInterface;
+use BayrellRtl.Lib.rtl;
+use BayrellRtl.Interfaces.ContextInterface;
 
 
 interface ContextObjectInterface{
 	
 	
+	
 	/**
-	 * Returns global provider
+	 * Get context
 	 *
-	 * @params string provider_name
-	 * @return ContextObjectInterface
+	 * @return ContextInterface 
 	 */
-	public ContextObjectInterface getGlobalProvider(string provider_name);
+	public ContextInterface context();
 	
 	
 	
 	/**
-	 * Returns context provider
+	 * Set context
 	 *
-	 * @params string provider_name
-	 * @return ContextObjectInterface
+	 * @param ContextInterface 
 	 */
-	public ContextObjectInterface getContextProvider(string provider_name);
+	public ContextInterface setContext(ContextInterface context);
 	
-	
-	
-	/**
-	 * Returns temporary provider
-	 *
-	 * @params string provider_name
-	 * @return ContextObjectInterface
-	 */
-	public ContextObjectInterface getTemporaryProvider(string provider_name);
-	
-	
-	
-	/**
-	 * Translate message
-	 * @params string message - message need to be translated
-	 * @params MapInterface params - Messages params. Default null.
-	 * @params string locale - Different locale. Default "".
-	 * @return string - translated string
-	 */
-	string translate(string message, MapInterface params = null, string locale = "");
-	
-	
-	
-	/**
-	 * Get assert provider
-	 *
-	 * @return AssertProviderInterface 
-	 */
-	public AssertProviderInterface assert();
-	
-	
-	
-	/**
-	 * Equals value1 and value2. Throw exception if value1 != value2
-	 * @param var value1
-	 * @param var value2
-	 */
-	public void equals(var value1, var value2, string message = "")
-	
-	
-	
-	/**
-	 * Assert if value is true
-	 *
-	 */
-	public void assertTrue(bool value, string message = "");
-	
-	
-	
-	/**
-	 * Assert if value is false
-	 *
-	 */
-	public void assertFalse(bool value, string message = "");
 	
 }
-

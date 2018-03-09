@@ -18,9 +18,8 @@
 
 namespace BayrellRtl;
 
-use BayrellRtl.CoreObject;
 use BayrellRtl.Lib.rtl;
-use BayrellRtl.Interfaces.AssertInterface;
+use BayrellRtl.CoreObject;
 use BayrellRtl.Interfaces.ContextInterface;
 use BayrellRtl.Interfaces.ContextObjectInterface;
 
@@ -30,6 +29,18 @@ class ContextObject extends CoreObject implements ContextObjectInterface{
 	
 	
 	protected ContextInterface _context = null;
+	
+	
+	
+	/**
+	 * Returns context provider
+	 *
+	 * @params string provider_name
+	 * @return ContextObject
+	 */
+	public ContextObject getProvider(string provider_name){
+		return this._context.getContextProvider(provider_name);
+	}
 	
 	
 	
@@ -65,48 +76,6 @@ class ContextObject extends CoreObject implements ContextObjectInterface{
 	 */
 	public ContextObject getTemporaryProvider(string provider_name){
 		return this._context.getTemporaryProvider(provider_name);
-	}
-		
-	
-	
-	/**
-	 * Get assert provider
-	 *
-	 * @return AssertInterface 
-	 */
-	public AssertInterface assert(){
-		return this._context.assert();
-	}
-	
-	
-	
-	/**
-	 * Equals value1 and value2. Throw exception if value1 != value2
-	 * @param var value1
-	 * @param var value2
-	 */
-	public void equals(var value1, var value2, string message = ""){
-		return this._context.assert().equals(value1, value2, message);
-	}
-	
-	
-	
-	/**
-	 * Assert if value is true
-	 *
-	 */
-	public void assertTrue(bool value, string message = ""){
-		return this._context.assert().checkTrue(value, message);
-	}
-	
-	
-	
-	/**
-	 * Assert if value is false
-	 *
-	 */
-	public void assertFalse(bool value, string message = ""){
-		return this._context.assert().checkFalse(value, message);
 	}
 	
 	

@@ -19,16 +19,19 @@
 namespace BayrellRtl.Exceptions;
 
 use BayrellRtl.Lib.rtl;
-use BayrellRtl.Exceptions.RuntimeException;
 use BayrellRtl.RuntimeConstant;
+use BayrellRtl.Exceptions.RuntimeException;
+use BayrellRtl.Interfaces.ContextInterface;
 
 
 class AssertError extends RuntimeException{
 	
 	void constructor(ContextInterface context, string message, Object prev = null){
 		
-		if (message == "")
-			message = "Assert error";
+		if (context == null) 
+			context = rtl::globalContext();
+		if (message == "") 
+			message = context.translate("ERROR_ASSERT");
 		
 		parent::constructor(
 			context, 

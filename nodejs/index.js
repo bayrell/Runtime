@@ -20,7 +20,6 @@
 module.exports = {
 	VERSION: '0.2.0',
 	'Descriptions': {
-		'ModuleRequireDescription': require("./Descriptions/ModuleRequireDescription.js"),
 		'ProviderDescription': require("./Descriptions/ProviderDescription.js"),
 		'ProviderFactoryDescription': require("./Descriptions/ProviderFactoryDescription.js"),
 	},
@@ -29,17 +28,15 @@ module.exports = {
 		'IndexOutOfRange': require("./Exceptions/IndexOutOfRange.js"),
 		'RuntimeException': require("./Exceptions/RuntimeException.js"),
 		'KeyNotFound': require("./Exceptions/KeyNotFound.js"),
-		'StopIterator': require("./Exceptions/StopIterator.js"),
 		'UnknownError': require("./Exceptions/UnknownError.js"),
 	},
 	'Interfaces': {
-		'AssertInterface': require("./Interfaces/AssertInterface.js"),
 		'ContextInterface': require("./Interfaces/ContextInterface.js"),
+		'ContextObjectInterface': require("./Interfaces/ContextObjectInterface.js"),
 		'FactoryInterface': require("./Interfaces/FactoryInterface.js"),
 		'MapInterface': require("./Interfaces/MapInterface.js"),
 		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),
 		'SerializeInterface': require("./Interfaces/SerializeInterface.js"),
-		'SerializeStringInterface': require("./Interfaces/SerializeStringInterface.js"),
 	},
 	'Lib': {
 		'rtl': require("./Lib/rtl.js"),
@@ -48,6 +45,8 @@ module.exports = {
 	},
 	'Providers': {
 		'AssertProvider': require("./Providers/AssertProvider.js"),
+		'AssertProviderInterface': require("./Providers/AssertProviderInterface.js"),
+		'SerializeStringProviderInterface': require("./Providers/SerializeStringProviderInterface.js"),
 	},
 	'Types': {
 		//'Iterator': require("./Types/Iterator.js"),

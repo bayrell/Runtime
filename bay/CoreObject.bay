@@ -18,6 +18,7 @@
 
 namespace BayrellRtl;
 
+use BayrellRtl.Exceptions.AssertError;
 use BayrellRtl.Lib.rtl;
 
 
@@ -91,5 +92,18 @@ class CoreObject{
 	 * @param CoreObject obj
 	 */
 	void assign(CoreObject obj){
+	}
+	
+	
+	
+	/**
+	 * Equals value1 and value2. Throw exception if value1 != value2
+	 * @param var value1
+	 * @param var value2
+	 */
+	public void assert(boolean value, string message = ""){
+		if (!value){
+			throw new AssertError(null, message);
+		}
 	}
 }
