@@ -18,7 +18,6 @@
 
 namespace BayrellRtl;
 
-use BayrellRtl.Exceptions.AssertError;
 use BayrellRtl.Lib.rtl;
 
 
@@ -31,7 +30,7 @@ class CoreObject{
 	/** 
 	 * Constructor
 	 */
-	public void constructor(ContextInterface context){
+	public void constructor(){
 		#switch
 		#case ifcode JAVASCRIPT then
 		this._init();
@@ -76,7 +75,7 @@ class CoreObject{
 	 * Clone current object
 	 * @return CoreObject
 	 */
-	public CoreObject clone(ContextInterface context = null){
+	public CoreObject clone(){
 		CoreObject res = this.newInstance();
 		
 		/* Assign all values */
@@ -94,16 +93,4 @@ class CoreObject{
 	void assign(CoreObject obj){
 	}
 	
-	
-	
-	/**
-	 * Equals value1 and value2. Throw exception if value1 != value2
-	 * @param var value1
-	 * @param var value2
-	 */
-	public void assert(boolean value, string message = ""){
-		if (!value){
-			throw new AssertError(null, message);
-		}
-	}
 }

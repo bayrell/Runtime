@@ -19,6 +19,7 @@
 namespace BayrellRtl.Lib;
 
 
+
 export class rtl{
 	
 	protected static var _global_context = null;
@@ -28,7 +29,7 @@ export class rtl{
 	 * Returns global context
 	 * @return ContextInterface
 	 */
-	public static Object globalContext(){
+	public static ContextInterface globalContext(){
 		return self::_global_context;
 	}
 	
@@ -38,7 +39,7 @@ export class rtl{
 	 * Set global context
 	 * @param ContextInterface context
 	 */
-	public static Object setGlobalContext(Object context){
+	public static ContextInterface setGlobalContext(ContextInterface context){
 		self::_global_context = context;
 		return context;
 	}
@@ -259,7 +260,7 @@ export class rtl{
 	
 	
 	/**
-	 * Returns true if value is primitive value
+	 * Returns true if value is scalar value
 	 * @return boolean 
 	 */
 	static bool isScalarValue(var value){

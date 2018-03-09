@@ -19,7 +19,7 @@
 namespace BayrellRtl.Interfaces;
 
 use BayrellRtl.Interfaces.MapInterface;
-use BayrellRtl.Interfaces.ContextObjectInterface;
+use BayrellRtl.ContextObject;
 
 
 interface ContextInterface{
@@ -46,16 +46,6 @@ interface ContextInterface{
 	 * Returns global provider
 	 *
 	 * @params string provider_name
-	 * @return ContextObjectInterface
-	 */
-	public ContextObjectInterface getGlobalProvider(string provider_name);
-	
-	
-	
-	/**
-	 * Returns global provider
-	 *
-	 * @params string provider_name
 	 * @return ContextObject
 	 */
 	public ContextObject getProvider(string provider_name);
@@ -66,9 +56,19 @@ interface ContextInterface{
 	 * Returns context provider
 	 *
 	 * @params string provider_name
-	 * @return ContextObjectInterface
+	 * @return ContextObject
 	 */
-	public ContextObjectInterface getContextProvider(string provider_name);
+	public ContextObject getContextProvider(string provider_name);
+	
+
+
+	/**
+	 * Returns global provider
+	 *
+	 * @params string provider_name
+	 * @return ContextObject
+	 */
+	public ContextObject getGlobalProvider(string provider_name);
 	
 	
 	
@@ -76,9 +76,9 @@ interface ContextInterface{
 	 * Returns temporary provider
 	 *
 	 * @params string provider_name
-	 * @return ContextObjectInterface
+	 * @return ContextObject
 	 */
-	public ContextObjectInterface getTemporaryProvider(string provider_name);
+	public ContextObject getTemporaryProvider(string provider_name);
 	
 	
 	

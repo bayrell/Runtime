@@ -305,5 +305,30 @@ class Context extends CoreObject implements ContextInterface{
 	string translate(string message, MapInterface params = null, string locale = ""){
 		return message;
 	}
+	
+	
+	
+	/**
+	 * Assign all data from other object
+	 * @param CoreObject obj
+	 */
+	void assign(CoreObject obj){
+		if (obj instanceof Context){
+		
+			delete this._modules;
+			delete this._providers_classes_names;
+			delete this._providers_factory_classes_names;
+			delete this._current_providers;
+			
+			this._modules = clone obj._modules;
+			this._providers_classes_names = clone obj._providers_classes_names;
+			this._providers_factory_classes_names = clone obj._providers_factory_classes_names;
+			this._current_providers = clone obj._current_providers;
+			
+			this._locale = obj._locale;
+		}
+		
+		parent::assign(obj);
+	}
 
 }

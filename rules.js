@@ -19,7 +19,7 @@ module.exports = {
 		'Exceptions/RuntimeException',
 		'Exceptions/UnknownError',
 		'Interfaces/ContextInterface',
-		'Interfaces/ContextObjectInterface',
+		//'Interfaces/ContextObjectInterface',
 		'Interfaces/FactoryInterface',
 		'Interfaces/MapInterface',
 		'Interfaces/ModuleDescriptionInterface',

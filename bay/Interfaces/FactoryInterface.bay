@@ -18,7 +18,7 @@
 
 namespace BayrellRtl.Interfaces;
 
-use BayrellRtl.Interfaces.ContextObjectInterface;
+use BayrellRtl.ContextObject;
 
 
 interface FactoryInterface{
@@ -27,7 +27,7 @@ interface FactoryInterface{
 	/**
 	 * Returns new Instance
 	 */
-	public ContextObjectInterface newInstance();
+	public ContextObject newInstance();
 	
 }
 

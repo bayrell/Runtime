@@ -16,31 +16,40 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl.Interfaces;
+namespace BayrellRtl.Lib;
 
+use BayrellRtl.Exceptions.AssertError;
 use BayrellRtl.Lib.rtl;
-use BayrellRtl.Interfaces.ContextInterface;
+use BayrellRtl.Types.Vector;
+use BayrellRtl.Types.Map;
 
 
-interface ContextObjectInterface{
+export class Utils{
+
+	
+	/**
+	 * Equals value1 and value2. Throw exception if value1 != value2
+	 * @param var value1
+	 * @param var value2
+	 */
+	public static void assert(boolean value, string message = ""){
+		if (!value){
+			throw new AssertError(null, message);
+		}
+	}
 	
 	
 	
 	/**
-	 * Get context
-	 *
-	 * @return ContextInterface 
+	 * Returns true if value is primitive value
+	 * @return boolean 
 	 */
-	public ContextInterface context();
-	
-	
-	
-	/**
-	 * Set context
-	 *
-	 * @param ContextInterface 
-	 */
-	public ContextInterface setContext(ContextInterface context);
+	static bool isPrimitiveValue(var value){
+		if (rtl::isScalarValue(value)) return true;
+		if (value instanceof Vector) return true;
+		if (value instanceof Map) return true;
+		return false;
+	}
 	
 	
 }

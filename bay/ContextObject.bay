@@ -21,10 +21,9 @@ namespace BayrellRtl;
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.CoreObject;
 use BayrellRtl.Interfaces.ContextInterface;
-use BayrellRtl.Interfaces.ContextObjectInterface;
 
 
-class ContextObject extends CoreObject implements ContextObjectInterface{
+class ContextObject extends CoreObject{
 	
 	
 	

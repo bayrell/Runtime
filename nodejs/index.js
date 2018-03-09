@@ -32,7 +32,7 @@ module.exports = {
 	},
 	'Interfaces': {
 		'ContextInterface': require("./Interfaces/ContextInterface.js"),
-		'ContextObjectInterface': require("./Interfaces/ContextObjectInterface.js"),
+		//'ContextObjectInterface': require("./Interfaces/ContextObjectInterface.js"),
 		'FactoryInterface': require("./Interfaces/FactoryInterface.js"),
 		'MapInterface': require("./Interfaces/MapInterface.js"),
 		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),
