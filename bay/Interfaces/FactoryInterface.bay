@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library.
+ *  Bayrell Runtime Library
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -18,7 +18,7 @@
 
 namespace BayrellRtl.Interfaces;
 
-use BayrellRtl.ContextObject;
+use BayrellRtl.CoreObject;
 
 
 interface FactoryInterface{
@@ -27,7 +27,7 @@ interface FactoryInterface{
 	/**
 	 * Returns new Instance
 	 */
-	public ContextObject newInstance();
+	public CoreObject newInstance();
 	
 }
 

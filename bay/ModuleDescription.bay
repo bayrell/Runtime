@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Json Serializer
+ *  Bayrell Core Library
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -18,9 +18,9 @@
 
 namespace BayrellRtl;
 
-use BayrellRtl.Interfaces.ModuleDescriptionInterface;
-use BayrellRtl.Descriptions.ProviderDescription;
+use BayrellRtl.Lib.rtl;
 use BayrellRtl.Types.Vector;
+use BayrellRtl.Interfaces.ModuleDescriptionInterface;
 
 
 class ModuleDescription implements ModuleDescriptionInterface{
@@ -56,6 +56,15 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	
 	
 	/**
+	 * Called then module registed in context
+	 * @param ContextInterface context
+	 */
+	public static void onRegister(ContextInterface context){
+	}
+	
+	
+	
+	/**
 	 * Returns description interfaces of the current module
 	 * @return Vector<string>
 	 */	
@@ -68,18 +77,10 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	
 	
 	/**
-	 * Returns providers
-	 * @return string
-	 */	
-	public static Vector<ProviderDescription> getProviders(){
-		return (new Vector<ProviderDescription>())
-			.push(
-				new ProviderDescription(
-					"default.assert", 
-					"BayrellRtl.Providers.AssertProvider"
-				)
-			)
-		;
+	 * Called then module registed in context
+	 * @param ContextInterface context
+	 */
+	public static void onRegister(ContextInterface context){
 	}
 	
 	

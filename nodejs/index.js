@@ -19,10 +19,6 @@
 
 module.exports = {
 	VERSION: '0.2.0',
-	'Descriptions': {
-		'ProviderDescription': require("./Descriptions/ProviderDescription.js"),
-		'ProviderFactoryDescription': require("./Descriptions/ProviderFactoryDescription.js"),
-	},
 	'Exceptions': {
 		'AssertError': require("./Exceptions/AssertError.js"),
 		'IndexOutOfRange': require("./Exceptions/IndexOutOfRange.js"),
@@ -32,24 +28,22 @@ module.exports = {
 	},
 	'Interfaces': {
 		'ContextInterface': require("./Interfaces/ContextInterface.js"),
-		//'ContextObjectInterface': require("./Interfaces/ContextObjectInterface.js"),
 		'FactoryInterface': require("./Interfaces/FactoryInterface.js"),
 		'MapInterface': require("./Interfaces/MapInterface.js"),
 		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),
 		'SerializeInterface': require("./Interfaces/SerializeInterface.js"),
 	},
+	'Providers': {
+		'AssertProviderInterface': require("./Providers/AssertProviderInterface.js"),
+		'SerializeStringProviderInterface': require("./Providers/SerializeStringProviderInterface.js"),
+	},
 	'Lib': {
 		'rtl': require("./Lib/rtl.js"),
 		're': require("./Lib/re.js"),
 		'rs': require("./Lib/rs.js"),
-	},
-	'Providers': {
-		'AssertProvider': require("./Providers/AssertProvider.js"),
-		'AssertProviderInterface': require("./Providers/AssertProviderInterface.js"),
-		'SerializeStringProviderInterface': require("./Providers/SerializeStringProviderInterface.js"),
+		'Utils': require("./Lib/Utils.js"),
 	},
 	'Types': {
-		//'Iterator': require("./Types/Iterator.js"),
 		'Map': require("./Types/Map.js"),
 		'Vector': require("./Types/Vector.js"),
 	},

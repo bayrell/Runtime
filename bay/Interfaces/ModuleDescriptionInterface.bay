@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library.  
+ *  Bayrell Core Library
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -18,11 +18,9 @@
  
 namespace BayrellRtl.Interfaces;
 
-
-use BayrellRtl.Interfaces.ContextInterface;
-use BayrellRtl.Descriptions.ProviderDescription;
-use BayrellRtl.Types.Vector;
 use BayrellRtl.Types.Map;
+use BayrellRtl.Types.Vector;
+use BayrellRtl.Interfaces.ContextInterface;
 
 
 interface ModuleDescriptionInterface{
@@ -33,6 +31,14 @@ interface ModuleDescriptionInterface{
 	 * @param ContextInterface context
 	 */
 	public static void initContext(ContextInterface context);
+	
+	
+	
+	/**
+	 * Called then module registed in context
+	 * @param ContextInterface context
+	 */
+	public static void onRegister(ContextInterface context);
 	
 	
 	
@@ -58,14 +64,6 @@ interface ModuleDescriptionInterface{
 	 */	
 	public static Vector<string> getInterfaces();
 	
-	
-
-	/**
-	 * Returns providers
-	 * @return Vector<ProviderDescription>
-	 */	
-	public static Vector<ProviderDescription> getProviders();
-
 	
 	
 	/**

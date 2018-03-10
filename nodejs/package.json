@@ -1,7 +1,6 @@
 {
   "description": "Bayrell RTL",
   "files": [
-	"Descriptions/*.js",
 	"Exceptions/*.js",
 	"Interfaces/*.js",
 	"Lib/*.js",

@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library.  
+ *  Bayrell Core Library
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -17,7 +17,6 @@
  */
  
 namespace BayrellRtl.Interfaces;
-
 
 use BayrellRtl.Types.Vector;
 

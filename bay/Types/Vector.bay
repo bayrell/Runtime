@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library.  
+ *  Bayrell Runtime Library
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -139,15 +139,6 @@ declare class Vector<T>{
 	 * Returns count items in vector
 	 */
 	declare public int count();
-	
-	
-	
-	/**
-	 * Clone vector and all items
-	 * @param Contextsize_terface context
-	 * @return Vector<T>
-	 */
-	declare public Vector<T> clone(ContextInterface context = null);
 	
 	
 	
@@ -347,16 +338,6 @@ BayrellRtl.Types.Vector = class extends Array{
 	 */
 	count(){
 		return this.length;
-	}
-	
-	
-	
-	/**
-	 * Clone vector and all items
-	 * @param Contextsize_terface context
-	 * @return Vector<T>
-	 */
-	clone(context = null){
 	}
 	
 	

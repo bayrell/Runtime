@@ -24,30 +24,25 @@ $load([
 	"/assets/bayrell_rtl_es6/Types/Vector.js",
 	"/assets/bayrell_rtl_es6/CoreObject.js",
 	"/assets/bayrell_rtl_es6/RuntimeConstant.js",
-	"/assets/bayrell_rtl_es6/Context.js",
 	"/assets/bayrell_rtl_es6/Exceptions/RuntimeException.js",
+	"/assets/bayrell_rtl_es6/Interfaces/ModuleDescriptionInterface.js",
+	"/assets/bayrell_rtl_es6/Interfaces/ContextInterface.js",
+	"/assets/bayrell_rtl_es6/Interfaces/FactoryInterface.js",
+	"/assets/bayrell_rtl_es6/Interfaces/MapInterface.js",
+	"/assets/bayrell_rtl_es6/Interfaces/SerializeInterface.js",
+	"/assets/bayrell_rtl_es6/Providers/AssertProviderInterface.js",
+	"/assets/bayrell_rtl_es6/Providers/SerializeStringProviderInterface.js",
 ])
 
 .load([
+	"/assets/bayrell_rtl_es6/Context.js",
 	"/assets/bayrell_rtl_es6/ContextObject.js",
 	"/assets/bayrell_rtl_es6/ModuleDescription.js",
+	"/assets/bayrell_rtl_es6/Lib/Utils.js",
 	"/assets/bayrell_rtl_es6/Exceptions/AssertError.js",
 	"/assets/bayrell_rtl_es6/Exceptions/IndexOutOfRange.js",
 	"/assets/bayrell_rtl_es6/Exceptions/KeyNotFound.js",
 	"/assets/bayrell_rtl_es6/Exceptions/UnknownError.js",
-	"/assets/bayrell_rtl_es6/Interfaces/ContextInterface.js",
-	"/assets/bayrell_rtl_es6/Interfaces/FactoryInterface.js",
-	"/assets/bayrell_rtl_es6/Interfaces/MapInterface.js",
-	"/assets/bayrell_rtl_es6/Interfaces/ModuleDescriptionInterface.js",
-	"/assets/bayrell_rtl_es6/Interfaces/SerializeInterface.js",
-	"/assets/bayrell_rtl_es6/Providers/AssertProvider.js",
-	"/assets/bayrell_rtl_es6/Providers/AssertProviderInterface.js",
-	"/assets/bayrell_rtl_es6/Providers/SerializeStringProviderInterface.js",
-	"/assets/bayrell_rtl_es6/Descriptions/ProviderDescription.js",
-])
-
-.load([
-	"/assets/bayrell_rtl_es6/Descriptions/ProviderFactoryDescription.js",
 ])
 
 .success(function(){

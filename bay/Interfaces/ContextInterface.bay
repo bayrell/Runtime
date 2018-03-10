@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library.
+ *  Bayrell Runtime Library
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -30,6 +30,20 @@ interface ContextInterface{
 	 * Register module
 	 */
 	void registerModule(string module_name);
+	
+	
+	
+	/**
+	 * Register module
+	 */
+	void registerProvider(string name, string class_name);
+	
+	
+	
+	/**
+	 * Register module
+	 */
+	void registerProviderFactory(string name, string class_name);
 	
 	
 	
