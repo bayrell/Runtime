@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Core Library 
+ *  Bayrell Runtime Library
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -109,10 +109,10 @@ class ContextObject extends CoreObject{
 	 * @param ContextInterface 
 	 */
 	public ContextInterface setContext(ContextInterface context){
-		if (this._context == null)
+		if (not rtl::exists(this._context)){
 			this._context = context;
-			
-		if (this._context == null){
+		}
+		if (not rtl::exists(this._context)){
 			throw new UnknownError('context is null');
 		}
 	}
@@ -124,12 +124,8 @@ class ContextObject extends CoreObject{
 	 */
 	public void constructor(ContextInterface context){
 		parent();
-		if (context == null)
-			this._context = rtl::globalContext();
-		else
-			this._context = context;
-			
-		if (this._context == null){
+		this._context = context;
+		if (not rtl::exists(this._context)){
 			throw new UnknownError('context is null');
 		}
 	}
@@ -143,10 +139,12 @@ class ContextObject extends CoreObject{
 	public CoreObject clone(ContextInterface context = null){
 		CoreObject res = this.newInstance();
 		
-		if (context == null)
+		if (not rtl::exists(this._context)){
 			res._context = this._context;
-		else
+		}
+		else{
 			res._context = context;
+		}
 		
 		/* Assign all values */
 		res.assign(this);

@@ -34,7 +34,7 @@ export class Utils{
 	 * @param var value2
 	 */
 	public static void assert(boolean value, string message = ""){
-		if (!value){
+		if (not value){
 			throw new AssertError(null, message);
 		}
 	}

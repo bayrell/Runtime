@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Core Library
+ *  Bayrell Runtime Library
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -121,7 +121,7 @@ class Context extends CoreObject implements ContextInterface{
 	 * Register module
 	 */
 	void registerProvider(string name, string class_name){
-		if (!this._providers_classes_names.has(name)){
+		if (not this._providers_classes_names.has(name)){
 			this._providers_classes_names.set(name, class_name);
 		}
 	}
@@ -132,7 +132,7 @@ class Context extends CoreObject implements ContextInterface{
 	 * Register module
 	 */
 	void registerProviderFactory(string name, string class_name){
-		if (!this._providers_factory_classes_names.has(name)){
+		if (not this._providers_factory_classes_names.has(name)){
 			this._providers_factory_classes_names.set(name, class_name);
 		}
 	}
@@ -167,7 +167,7 @@ class Context extends CoreObject implements ContextInterface{
 	 * @return string 
 	 */
 	public string getProviderClassName(string provider_name){
-		if (!this._providers_classes_names.has(provider_name))
+		if (not this._providers_classes_names.has(provider_name))
 			return "";
 		
 		return this._providers_classes_names.item(provider_name);
@@ -181,7 +181,7 @@ class Context extends CoreObject implements ContextInterface{
 	 * @return string 
 	 */
 	public string getProviderFactoryClassName(string provider_name){
-		if (!this._providers_factory_classes_names.has(provider_name))
+		if (not this._providers_factory_classes_names.has(provider_name))
 			return "";
 		
 		return this._providers_factory_classes_names.item(provider_name);
