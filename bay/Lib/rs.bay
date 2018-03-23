@@ -48,6 +48,21 @@ export class rs{
 	
 	
 	/**
+	 * Returns char from string at the position
+	 * @param string s The string
+	 * @param int pos The position
+	 * @return string
+	 */
+	static string charAt(string s, int pos){
+		int sz = self::strlen(s);
+		if (pos >= 0 && pos < sz)
+			return s[pos];
+		return "";
+	}
+	
+	
+	
+	/**
 	 * Returns ASCII symbol code
 	 * @param char ch
 	 */

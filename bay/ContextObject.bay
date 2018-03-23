@@ -21,6 +21,7 @@ namespace BayrellRtl;
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.CoreObject;
 use BayrellRtl.Interfaces.ContextInterface;
+use BayrellRtl.Interfaces.LogInterface;
 
 
 class ContextObject extends CoreObject{
@@ -152,4 +153,40 @@ class ContextObject extends CoreObject{
 		return res;
 	}
 	
+	
+	
+	/**
+	 * Register log
+	 */
+	int logRegister(string module_name, string log_name){
+		LogInterface log = this.getProvider('default.log');
+		if (log){
+			return log.logRegister(module_name, log_name);
+		}
+		return -1;
+	}
+	
+	
+	
+	/**
+	 * Log message
+	 */
+	void log(int level, string module_name, string log_name, string message){
+		LogInterface log = this.getProvider('default.log');
+		if (log){
+			log.log(level, module_name, log_name, message);
+		}
+	}
+	
+	
+	
+	/**
+	 * Log exception
+	 */
+	void logException(string level, string module_name, string log_name, Object exception){
+		LogInterface log = this.getProvider('default.log');
+		if (log){
+			log.log(level, module_name, log_name, message);
+		}
+	}
 }

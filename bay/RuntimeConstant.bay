@@ -22,6 +22,15 @@ namespace BayrellRtl;
 class RuntimeConstant{
 	
 	
+	/* Log level */
+	static const int LOG_FATAL_ERROR = 0;
+	static const int LOG_ERROR = 1;
+	static const int LOG_WARNING = 2;
+	static const int LOG_INFO = 3;
+	static const int LOG_DEBUG = 4;
+	static const int LOG_DEBUG2 = 5;
+	
+	
 	/* Status codes */ 
 	static const int STATUS_DONE = 0;
 	static const int STATUS_PLAN = 1;
