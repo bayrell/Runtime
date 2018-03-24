@@ -76,7 +76,7 @@ class CoreObject{
 	 * @return CoreObject
 	 */
 	public CoreObject clone(){
-		CoreObject res = this.newInstance();
+		CoreObject res = rtl::newInstanceByObject(this);
 		
 		/* Assign all values */
 		res.assign(this);

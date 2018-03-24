@@ -118,15 +118,15 @@ export class rtl{
 	 * Create object by class_name. If class name does not exists return null
 	 * @return Object
 	 */
-	declare export static Object Instance(string class_name, array args);
+	declare export static Object newInstance(string class_name, array args);
 
 	#switch
 	#case ifcode PHP then
-	static function Instance($class_name){
+	static function newInstance($class_name){
 		return new $class_name();
 	}
 	#case ifcode JAVASCRIPT then
-	static Instance(class_name, args){
+	static newInstance(class_name, args){
 		var obj = this.find_class(class_name);
 		if (!this.exists(obj)) return null;
 		if (!(obj instanceof Function)) return null;
@@ -134,6 +134,25 @@ export class rtl{
 		args = args.slice(); 
 		args.unshift(null);
 		var f = Function.prototype.bind.apply(obj, args);
+		return new f;
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Create object by class_name. If class name does not exists return null
+	 * @return Object
+	 */
+	declare export static Object newInstanceByObject(Object obj);
+	
+	#switch
+	#case ifcode PHP then
+	static function newInstanceByObject($obj){
+	}
+	#case ifcode JAVASCRIPT then
+	static newInstanceByObject(obj){
+		var f = Function.prototype.bind.apply(obj.constructor, [null]);
 		return new f;
 	}
 	#endswitch
@@ -192,6 +211,8 @@ export class rtl{
 	#switch
 	#case ifcode JAVASCRIPT then
 	static clone(val, context){
+		if (context == undefined)
+			context = null;
 		
 		if (val == null)
 			return null;

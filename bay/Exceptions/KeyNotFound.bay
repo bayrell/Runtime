@@ -27,11 +27,12 @@ use BayrellRtl.Interfaces.ContextInterface;
 
 class KeyNotFound extends RuntimeException{
 	
-	void constructor(ContextInterface context = null, Object prev = null){
+	void constructor(ContextInterface context = null, string key, Object prev = null){
 			
+			/* Utils::translate("ERROR_KEY_NOT_FOUND", null, "", context),  */
 		parent::constructor(
 			context, 
-			Utils::translate("ERROR_KEY_NOT_FOUND", null, "", context), 
+			"Key '" ~ key ~ "' not found",
 			RuntimeConstant::ERROR_KEY_NOT_FOUND, 
 			prev
 		);

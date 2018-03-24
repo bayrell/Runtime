@@ -135,8 +135,9 @@ BayrellRtl.Types.Map = class extends Map{
 	 */
 	item(key){
 		var val = super.get(key);
+		if (val === null) return null;
 		if (val == undefined){
-			throw new KeyNotFound();
+			throw new BayrellRtl.Exceptions.KeyNotFound(null, key);
 		}
 		return val;
 	}

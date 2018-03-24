@@ -104,30 +104,14 @@ class ContextObject extends CoreObject{
 	
 	
 	
-	/**
-	 * Set context
-	 *
-	 * @param ContextInterface 
-	 */
-	public ContextInterface setContext(ContextInterface context){
-		if (not rtl::exists(this._context)){
-			this._context = context;
-		}
-		if (not rtl::exists(this._context)){
-			throw new UnknownError('context is null');
-		}
-	}
-	
-	
-	
 	/** 
 	 * Constructor
 	 */
-	public void constructor(ContextInterface context){
+	public void constructor(ContextInterface context = null){
 		parent();
 		this._context = context;
 		if (not rtl::exists(this._context)){
-			throw new UnknownError('context is null');
+			this._context = rtl::globalContext();
 		}
 	}
 	
@@ -138,13 +122,13 @@ class ContextObject extends CoreObject{
 	 * @return CoreObject
 	 */
 	public CoreObject clone(ContextInterface context = null){
-		CoreObject res = this.newInstance();
+		CoreObject res = rtl::newInstanceByObject(this);
 		
-		if (not rtl::exists(this._context)){
-			res._context = this._context;
+		if (rtl::exists(context)){
+			res._context = context;
 		}
 		else{
-			res._context = context;
+			res._context = this._context;
 		}
 		
 		/* Assign all values */

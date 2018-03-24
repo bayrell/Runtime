@@ -48,6 +48,33 @@ export class rs{
 	
 	
 	/**
+	 * Returns substring
+	 * @param string s The string
+	 * @param int start
+	 * @param int length
+	 * @return string
+	 */
+	declare export static string substr(string s, int start, int length);
+	 
+	#switch
+	#case ifcode PHP then
+	static function substr(&$s, $start, $length){
+		return substr($s, $start, $length);
+	}
+	#case ifcode ES6 then
+	static substr(s, start, length){
+		return BayrellRtl.Lib.rtl.toString(s).substring(start, start + length);
+	}
+	#case ifcode NODEJS then
+	static substr(s, start, length){
+		return rtl.toString(s).substring(start, start + length);
+	}
+	#endswitch
+	
+	
+	
+	
+	/**
 	 * Returns char from string at the position
 	 * @param string s The string
 	 * @param int pos The position
@@ -55,7 +82,7 @@ export class rs{
 	 */
 	static string charAt(string s, int pos){
 		int sz = self::strlen(s);
-		if (pos >= 0 && pos < sz)
+		if (pos >= 0 and pos < sz)
 			return s[pos];
 		return "";
 	}
