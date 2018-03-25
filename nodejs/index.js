@@ -29,6 +29,7 @@ module.exports = {
 	'Interfaces': {
 		'ContextInterface': require("./Interfaces/ContextInterface.js"),
 		'FactoryInterface': require("./Interfaces/FactoryInterface.js"),
+		'LogInterface': require("./Interfaces/LogInterface.js"),
 		'MapInterface': require("./Interfaces/MapInterface.js"),
 		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),
 		'SerializeInterface': require("./Interfaces/SerializeInterface.js"),

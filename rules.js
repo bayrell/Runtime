@@ -18,6 +18,7 @@ module.exports = {
 		'Exceptions/UnknownError',
 		'Interfaces/ContextInterface',
 		'Interfaces/FactoryInterface',
+		'Interfaces/LogInterface',
 		'Interfaces/MapInterface',
 		'Interfaces/ModuleDescriptionInterface',
 		'Interfaces/SerializeInterface',
