@@ -91,6 +91,15 @@ class CoreObject{
 	 * @param CoreObject obj
 	 */
 	void assign(CoreObject obj){
+		this.assignAfter(obj);
 	}
 	
+	
+	
+	/**
+	 * Call after assign data
+	 * @param CoreObject obj
+	 */
+	void assignAfter(CoreObject obj){
+	}
 }
