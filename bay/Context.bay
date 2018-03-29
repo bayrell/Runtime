@@ -27,6 +27,7 @@ use BayrellRtl.Interfaces.ContextInterface;
 use BayrellRtl.Interfaces.FactoryInterface;
 use BayrellRtl.Interfaces.ModuleDescriptionInterface;
 use BayrellRtl.ContextObject;
+use BayrellRtl.ProviderDescription;
 
 
 class Context extends CoreObject implements ContextInterface{
@@ -34,10 +35,34 @@ class Context extends CoreObject implements ContextInterface{
 	
 	protected string _locale = "";
 	protected Vector<string> _modules = null;
-	protected Map<string, string> _providers_classes_names = null;
-	protected Map<string, string> _providers_factory_classes_names = null;
+	protected Map<string, ProviderDescription> _providers_names = null;
 	protected Map<string, CoreObject> _current_providers = null;
+	protected Map<string, var> _values = null;
 	
+	
+	
+	/**
+	 * Assign all data from other object
+	 * @param CoreObject obj
+	 */
+	void assign(CoreObject obj){
+		if (obj instanceof Context){
+		
+			delete this._modules;
+			delete this._providers_classes_names;
+			delete this._providers_factory_classes_names;
+			delete this._current_providers;
+			
+			this._modules = clone obj._modules;
+			this._providers_classes_names = clone obj._providers_classes_names;
+			this._providers_factory_classes_names = clone obj._providers_factory_classes_names;
+			this._current_providers = clone obj._current_providers;
+			
+			this._locale = obj._locale;
+		}
+		
+		parent::assign(obj);
+	}
 	
 	
 	/**
@@ -49,6 +74,7 @@ class Context extends CoreObject implements ContextInterface{
 		this._providers_classes_names = new Map<string, string>();
 		this._providers_factory_classes_names = new Map<string, string>();
 		this._current_providers = new Map<string, CoreObject>();
+		this._values = new Map<string, var>();
 	}
 	
 	
@@ -120,20 +146,10 @@ class Context extends CoreObject implements ContextInterface{
 	/**
 	 * Register module
 	 */
-	void registerProvider(string name, string class_name){
-		if (not this._providers_classes_names.has(name)){
-			this._providers_classes_names.set(name, class_name);
-		}
-	}
-	
-	
-	
-	/**
-	 * Register module
-	 */
-	void registerProviderFactory(string name, string class_name){
-		if (not this._providers_factory_classes_names.has(name)){
-			this._providers_factory_classes_names.set(name, class_name);
+	void registerProvider(string name, string class_name, int type){
+		if (not this._providers_names.has(name)){
+			ProviderDescription description = new ProviderDescription(name, class_name, type);
+			this._providers_names.set(description);
 		}
 	}
 	
@@ -162,56 +178,15 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
-	 * Returns class name of the provider. If provider does not exists returns empty string.
+	 * Returns provider description by name. If provider does not exists returns null.
 	 * @param string provider_name
-	 * @return string 
+	 * @return ProviderDescription 
 	 */
-	public string getProviderClassName(string provider_name){
-		if (not this._providers_classes_names.has(provider_name))
-			return "";
+	public ProviderDescription getProviderDescription(string provider_name){
+		if (not this._providers_names.has(provider_name))
+			return null;
 		
-		return this._providers_classes_names.item(provider_name);
-	}
-	
-	
-	
-	/**
-	 * Returns class name of the provider factory. If provider factory does not exists returns empty string.
-	 * @param string provider_name
-	 * @return string 
-	 */
-	public string getProviderFactoryClassName(string provider_name){
-		if (not this._providers_factory_classes_names.has(provider_name))
-			return "";
-		
-		return this._providers_factory_classes_names.item(provider_name);
-	}
-	
-	
-	
-	/**
-	 * Returns global provider
-	 *
-	 * @params string provider_name
-	 * @return ContextObject
-	 */
-	public ContextObject getGlobalProvider(string provider_name){
-		Context context = ContextObject::globalContext();
-		if (context == null)
-			throw new UnknownError('Global context is null');
-		return context.getContextProvider(provider_name);
-	}
-	
-	
-	
-	/**
-	 * Returns global provider
-	 *
-	 * @params string provider_name
-	 * @return ContextObject
-	 */
-	public ContextObject getProvider(string provider_name){
-		return this.getContextProvider(provider_name);
+		return this._providers_names.item(provider_name);
 	}
 	
 	
@@ -222,16 +197,28 @@ class Context extends CoreObject implements ContextInterface{
 	 * @params string provider_name
 	 * @return ContextObject
 	 */
-	public ContextObject getContextProvider(string provider_name){
-		if (this._current_providers.has(provider_name))
-			return this._current_providers.item(provider_name);
-		
-		ContextObject obj = this.getTemporaryProvider(provider_name);
-		if (obj == null)
-			return null;
+	public ContextObject getProvider(string provider_name){
+	
+		if (this._providers_names.has(provider_name)){
+			ProviderDescription description = this._providers_names.item(provider_name);
 			
-		this._current_providers.set(provider_name, obj);
-		return obj;
+			if (description.type == RuntimeConstant::PROVIDER_REGULAR){
+				if (this._current_providers.has(provider_name))
+					return this._current_providers.item(provider_name);
+			}
+			
+			ContextObject obj = this.createProvider(provider_name);
+			if (obj == null)
+				return null;
+			
+			if (description.type == RuntimeConstant::PROVIDER_REGULAR){
+				this._current_providers.set(provider_name, obj);
+			}
+			
+			return obj;
+		}
+		
+		return null;
 	}
 	
 	
@@ -242,27 +229,16 @@ class Context extends CoreObject implements ContextInterface{
 	 * @params string provider_name
 	 * @return ContextObject
 	 */
-	public ContextObject getTemporaryProvider(string provider_name){
+	public ContextObject createProvider(string provider_name){
 		
-		if (this._providers_classes_names.has(provider_name)){
-			string class_name = this._providers_classes_names.item(provider_name);
-			Vector<var> args = new Vector();
-			args.push(this);
-			
-			ContextObject obj = rtl::newInstance(class_name, args);
-			delete args;
-			
-			return obj;
-		}
-		
-		if (this._providers_factory_classes_names.has(provider_name)){
-			string class_name = this._providers_factory_classes_names.item(provider_name);
+		if (this._providers_names.has(provider_name)){
+			ProviderDescription description = this._providers_names.item(provider_name);
 			
 			ContextObject obj = null;
 			Vector<var> args = new Vector();
 			args.push(this);
 			
-			CoreObject factory_obj = rtl::newInstance(class_name, args);
+			CoreObject factory_obj = rtl::newInstance(description.class_name, args);
 			delete args;
 			
 			if (factory_obj implements FactoryInterface){
@@ -312,26 +288,35 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
-	 * Assign all data from other object
-	 * @param CoreObject obj
+	 * Set attribute value
+	 * @params string attr_name - Attribute name
+	 * @params var value - value
 	 */
-	void assign(CoreObject obj){
-		if (obj instanceof Context){
-		
-			delete this._modules;
-			delete this._providers_classes_names;
-			delete this._providers_factory_classes_names;
-			delete this._current_providers;
-			
-			this._modules = clone obj._modules;
-			this._providers_classes_names = clone obj._providers_classes_names;
-			this._providers_factory_classes_names = clone obj._providers_factory_classes_names;
-			this._current_providers = clone obj._current_providers;
-			
-			this._locale = obj._locale;
-		}
-		
-		parent::assign(obj);
+	void setValue(string attr_name, var value){
+		this._values.set(attr_name, value);
 	}
-
+	
+	
+	
+	/**
+	 * Get attribute value
+	 * @params string attr_name - Attribute name
+	 * @params var default_value - Default value if not exists
+	 * @return var value
+	 */
+	var getValue(string attr_name, var default_value){
+		return this._values.get(attr_name, default_value);
+	}
+	
+	
+	
+	/**
+	 * Return true if attr is exists
+	 * @params string attr_name - Attribute name
+	 * @return boolean
+	 */
+	boolean hasValue(string attr_name){
+		return this._values.contains(attr_name);
+	}
+	
 }

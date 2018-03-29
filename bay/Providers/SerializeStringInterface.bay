@@ -20,7 +20,7 @@ namespace BayrellRtl.Providers;
 
 
 
-interface SerializeStringProviderInterface{
+interface SerializeStringInterface{
 	
 	
 	

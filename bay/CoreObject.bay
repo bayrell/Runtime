@@ -27,6 +27,24 @@ class CoreObject{
 
 	
 	
+	/**
+	 * Get module name
+	 */
+	string getModuleName(){
+		return "BayrellRtl";
+	}
+	
+	
+	
+	/**
+	 * Get class name
+	 */
+	string getClassName(){
+		return "BayrellRtl.CoreObject";
+	}
+	
+	
+	
 	/** 
 	 * Constructor
 	 */

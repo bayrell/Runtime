@@ -19,7 +19,7 @@
 namespace BayrellRtl.Providers;
 
 
-interface AssertProviderInterface{
+interface AssertInterface{
 	
 	
 	/**

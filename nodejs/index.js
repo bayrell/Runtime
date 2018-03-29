@@ -35,8 +35,9 @@ module.exports = {
 		'SerializeInterface': require("./Interfaces/SerializeInterface.js"),
 	},
 	'Providers': {
-		'AssertProviderInterface': require("./Providers/AssertProviderInterface.js"),
-		'SerializeStringProviderInterface': require("./Providers/SerializeStringProviderInterface.js"),
+		'AssertInterface': require("./Providers/AssertInterface.js"),
+		'LogInterface': require("./Providers/LogInterface.js"),
+		'SerializeStringInterface': require("./Providers/SerializeStringInterface.js"),
 	},
 	'Lib': {
 		'rtl': require("./Lib/rtl.js"),
@@ -49,9 +50,11 @@ module.exports = {
 		'Vector': require("./Types/Vector.js"),
 	},
 	'Context': require("./Context.js"),
+	'ContextFactory': require("./ContextFactory.js"),
 	'ContextObject': require("./ContextObject.js"),
 	'CoreObject': require("./CoreObject.js"),
 	'ModuleDescription': require("./ModuleDescription.js"),
+	'ProviderDescription': require("./ProviderDescription.js"),
 	'RuntimeConstant': require("./RuntimeConstant.js"),
 };
 

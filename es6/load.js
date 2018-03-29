@@ -30,14 +30,17 @@ $load([
 	"/assets/bayrell_rtl_es6/Interfaces/FactoryInterface.js",
 	"/assets/bayrell_rtl_es6/Interfaces/MapInterface.js",
 	"/assets/bayrell_rtl_es6/Interfaces/SerializeInterface.js",
-	"/assets/bayrell_rtl_es6/Providers/AssertProviderInterface.js",
-	"/assets/bayrell_rtl_es6/Providers/SerializeStringProviderInterface.js",
+	"/assets/bayrell_rtl_es6/Providers/AssertInterface.js",
+	"/assets/bayrell_rtl_es6/Providers/LogInterface.js",
+	"/assets/bayrell_rtl_es6/Providers/SerializeStringInterface.js",
 ])
 
 .load([
 	"/assets/bayrell_rtl_es6/Context.js",
+	"/assets/bayrell_rtl_es6/ContextFactory.js",
 	"/assets/bayrell_rtl_es6/ContextObject.js",
 	"/assets/bayrell_rtl_es6/ModuleDescription.js",
+	"/assets/bayrell_rtl_es6/ProviderDescription.js",
 	"/assets/bayrell_rtl_es6/Lib/Utils.js",
 	"/assets/bayrell_rtl_es6/Exceptions/AssertError.js",
 	"/assets/bayrell_rtl_es6/Exceptions/IndexOutOfRange.js",

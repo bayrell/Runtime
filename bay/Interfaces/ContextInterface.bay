@@ -48,15 +48,6 @@ interface ContextInterface{
 	
 	
 	/**
-	 * Returns class name of the provider. If provider doest not exists return empty string.
-	 * @param string provider_name
-	 * @return string 
-	 */
-	public string getProviderClassName(string provider_name);
-	
-	
-	
-	/**
 	 * Returns global provider
 	 *
 	 * @params string provider_name
@@ -67,32 +58,12 @@ interface ContextInterface{
 	
 	
 	/**
-	 * Returns context provider
-	 *
-	 * @params string provider_name
-	 * @return ContextObject
-	 */
-	public ContextObject getContextProvider(string provider_name);
-	
-
-
-	/**
 	 * Returns global provider
 	 *
 	 * @params string provider_name
 	 * @return ContextObject
 	 */
-	public ContextObject getGlobalProvider(string provider_name);
-	
-	
-	
-	/**
-	 * Returns temporary provider
-	 *
-	 * @params string provider_name
-	 * @return ContextObject
-	 */
-	public ContextObject getTemporaryProvider(string provider_name);
+	public ContextObject createProvider(string provider_name);
 	
 	
 	
@@ -122,5 +93,29 @@ interface ContextInterface{
 	string translate(string message, MapInterface params = null, string locale = "");
 	
 	
+	
+	/**
+	 * Set attribute value
+	 * @params string attr_name - Attribute name
+	 * @params var value - value
+	 */
+	void setValue(string attr_name, var value);
+	
+	
+	/**
+	 * Get attribute value
+	 * @params string attr_name - Attribute name
+	 * @params var default_value - Default value if not exists
+	 * @return var value
+	 */
+	var getValue(string attr_name, var default_value);
+	
+	
+	/**
+	 * Return true if attr is exists
+	 * @params string attr_name - Attribute name
+	 * @return boolean
+	 */
+	boolean hasValue(string attr_name);
 }
 

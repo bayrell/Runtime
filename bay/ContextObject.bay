@@ -27,7 +27,6 @@ use BayrellRtl.Interfaces.LogInterface;
 class ContextObject extends CoreObject{
 	
 	
-	
 	protected ContextInterface _context = null;
 	
 	
@@ -39,43 +38,7 @@ class ContextObject extends CoreObject{
 	 * @return ContextObject
 	 */
 	public ContextObject getProvider(string provider_name){
-		return this._context.getContextProvider(provider_name);
-	}
-	
-	
-	
-	/**
-	 * Returns context provider
-	 *
-	 * @params string provider_name
-	 * @return ContextObject
-	 */
-	public ContextObject getContextProvider(string provider_name){
-		return this._context.getContextProvider(provider_name);
-	}
-	
-	
-	
-	/**
-	 * Returns global provider
-	 *
-	 * @params string provider_name
-	 * @return ContextObject
-	 */
-	public ContextObject getGlobalProvider(string provider_name){
-		return this._context.getGlobalProvider(provider_name);
-	}
-	
-	
-	
-	/**
-	 * Returns temporary provider
-	 *
-	 * @params string provider_name
-	 * @return ContextObject
-	 */
-	public ContextObject getTemporaryProvider(string provider_name){
-		return this._context.getTemporaryProvider(provider_name);
+		return this._context.createProvider(provider_name);
 	}
 	
 	
@@ -142,10 +105,10 @@ class ContextObject extends CoreObject{
 	/**
 	 * Register log
 	 */
-	int logRegister(string module_name, string log_name){
+	int logRegister(string object_name){
 		LogInterface log = this.getProvider('default.log');
 		if (log){
-			return log.logRegister(module_name, log_name);
+			return log.logRegister(this.getClassName(), object_name);
 		}
 		return -1;
 	}
@@ -155,10 +118,10 @@ class ContextObject extends CoreObject{
 	/**
 	 * Log message
 	 */
-	void log(int level, string module_name, string log_name, string message){
+	void log(int level, string object_name, string message){
 		LogInterface log = this.getProvider('default.log');
 		if (log){
-			log.log(level, module_name, log_name, message);
+			log.log(level, this.getClassName(), object_name, message);
 		}
 	}
 	
@@ -167,10 +130,10 @@ class ContextObject extends CoreObject{
 	/**
 	 * Log exception
 	 */
-	void logException(string level, string module_name, string log_name, Object exception){
+	void logException(string level, string object_name, Object exception){
 		LogInterface log = this.getProvider('default.log');
 		if (log){
-			log.log(level, module_name, log_name, message);
+			log.log(level, this.getClassName(), object_name, exception.toString());
 		}
 	}
 }

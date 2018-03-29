@@ -22,6 +22,11 @@ namespace BayrellRtl;
 class RuntimeConstant{
 	
 	
+	/* Provider types */ 
+	static const int PROVIDER_REGULAR = 1;
+	static const int PROVIDER_TEMPORARY = 2;
+	
+	
 	/* Log level */
 	static const int LOG_FATAL_ERROR = 0;
 	static const int LOG_ERROR = 1;
