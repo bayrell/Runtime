@@ -21,6 +21,7 @@ namespace BayrellRtl;
 
 use BayrellRtl.Context;
 use BayrellRtl.CoreObject;
+use BayrellRtl.Types.Vector;
 use BayrellRtl.Interfaces.ContextInterface;
 use BayrellRtl.Interfaces.FactoryInterface;
 

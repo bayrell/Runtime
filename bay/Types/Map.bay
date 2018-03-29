@@ -74,6 +74,15 @@ declare class Map<T1, T2> implements MapInterface{
 	
 	
 	/**
+	 * Return true if key exists
+	 * @param T1 key
+	 * @return bool var
+	 */
+	declare public bool has(T1 key);
+	
+	
+	
+	/**
 	 * Clear all values from vector
 	 * @return self
 	 */
@@ -173,6 +182,17 @@ BayrellRtl.Types.Map = class extends Map{
 	 * @return bool var
 	 */
 	contains(key){
+		return super.has(key);
+	}
+	
+	
+	
+	/**
+	 * Return true if key exists
+	 * @param T1 key
+	 * @return bool var
+	 */
+	has(key){
 		return super.has(key);
 	}
 	

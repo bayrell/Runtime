@@ -71,8 +71,7 @@ class Context extends CoreObject implements ContextInterface{
 	void constructor(){
 		parent();
 		this._modules = new Vector<string>();
-		this._providers_classes_names = new Map<string, string>();
-		this._providers_factory_classes_names = new Map<string, string>();
+		this._providers_names = new Map<string, ProviderDescription>();
 		this._current_providers = new Map<string, CoreObject>();
 		this._values = new Map<string, var>();
 	}
@@ -145,11 +144,14 @@ class Context extends CoreObject implements ContextInterface{
 	
 	/**
 	 * Register module
+	 * @param string provider_name
+	 * @param string factory_name
+	 * @param int type
 	 */
-	void registerProvider(string name, string class_name, int type){
-		if (not this._providers_names.has(name)){
-			ProviderDescription description = new ProviderDescription(name, class_name, type);
-			this._providers_names.set(description);
+	void registerProvider(string provider_name, string factory_name, int type){
+		if (not this._providers_names.has(provider_name)){
+			ProviderDescription description = new ProviderDescription(provider_name, factory_name, type);
+			this._providers_names.set(provider_name, description);
 		}
 	}
 	
@@ -202,7 +204,7 @@ class Context extends CoreObject implements ContextInterface{
 		if (this._providers_names.has(provider_name)){
 			ProviderDescription description = this._providers_names.item(provider_name);
 			
-			if (description.type == RuntimeConstant::PROVIDER_REGULAR){
+			if (description.getType() == RuntimeConstant::PROVIDER_REGULAR){
 				if (this._current_providers.has(provider_name))
 					return this._current_providers.item(provider_name);
 			}
@@ -211,7 +213,7 @@ class Context extends CoreObject implements ContextInterface{
 			if (obj == null)
 				return null;
 			
-			if (description.type == RuntimeConstant::PROVIDER_REGULAR){
+			if (description.getType == RuntimeConstant::PROVIDER_REGULAR){
 				this._current_providers.set(provider_name, obj);
 			}
 			
@@ -238,7 +240,7 @@ class Context extends CoreObject implements ContextInterface{
 			Vector<var> args = new Vector();
 			args.push(this);
 			
-			CoreObject factory_obj = rtl::newInstance(description.class_name, args);
+			CoreObject factory_obj = rtl::newInstance(description.getFactoryName(), args);
 			delete args;
 			
 			if (factory_obj implements FactoryInterface){

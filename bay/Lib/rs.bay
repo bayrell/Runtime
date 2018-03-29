@@ -193,4 +193,31 @@ export class rs{
 	}
 	#endswitch
 	
+	
+	
+	/**
+	 * Возвращает повторяющуюся строку
+	 * @param {string} s - повторяемая строка
+	 * @param {integer} n - количество раз, которые нужно повторить строку s
+	 * @return {string} строка
+	 */
+	declare export static string str_repeat(string s, int n);
+	 
+	#switch
+	#case ifcode PHP then
+	static function str_repeat($s, $n){
+		if ($n <= 0) return "";
+		return str_repeat($s, $n);
+	}
+	#case ifcode JAVASCRIPT then
+	static str_repeat(s, n){
+		if (n <= 0) return "";
+		var res = '';
+		for (var i=0; i < n; i++){
+			res += s;
+		}
+		return res;
+	}
+	#endswitch
+	
 }

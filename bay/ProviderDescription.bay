@@ -57,4 +57,15 @@ class ProviderDescription extends CoreObject{
 		this._type = type;
 	}
 	
+	
+	
+	public string getProviderName(){
+		return this._provider_name;
+	}
+	public string getFactoryName(){
+		return this._factory_name;
+	}
+	public string getTypeName(){
+		return this._type;
+	}
 }
