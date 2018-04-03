@@ -164,9 +164,9 @@ declare class Vector<T>{
 	
 	
 	/**
-	 * Join all elements in array to string
+	 * Get last item
 	 */
-	declare public string join(string s);
+	declare public T getLastItem(T default_value);
 }
 
 
@@ -362,6 +362,16 @@ BayrellRtl.Types.Vector = class extends Array{
 		return this;
 	}
 	
+	
+	
+	/**
+	 * Get last item
+	 */
+	getLastItem(default_value){
+		if (this.length == 0)
+			return default_value;
+		return this[this.length - 1];
+	}
 }
 
 #case ifcode NODEJS then

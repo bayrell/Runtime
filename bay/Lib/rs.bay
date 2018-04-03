@@ -19,6 +19,7 @@
 namespace BayrellRtl.Lib;
 
 use BayrellRtl.Lib.rtl;
+use BayrellRtl.Types.Vector;
 
 export class rs{
 
@@ -217,6 +218,44 @@ export class rs{
 			res += s;
 		}
 		return res;
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Разбивает строку на подстроки
+	 * @param string ch - разделитель
+	 * @param string s - строка, которую нужно разбить
+	 * @param integer limit - ограничение 
+	 * @return Vector<string>
+	 */
+	declare export static Vector<string> explode(string ch, string s, int limit = -1);
+	 
+	#switch
+	#case ifcode PHP then
+	static function explode($s, $n, $limit = -1){
+		if ($limit < 0)
+			return explode($delimiter, $s);
+		return explode($delimiter, $s, $limit);
+	}
+	#case ifcode ES6 then
+	static explode(delimiter, s, limit){
+		var rtl = BayrellRtl.Lib.rtl;
+		var Vector = BayrellRtl.Types.Vector;
+		var arr = null;
+		if (!rtl.exists(limit))
+			arr = s.split(delimiter);
+		arr = s.split(delimiter, limit);
+		return (new Vector()).concat(arr);
+	}	
+	#case ifcode NODEJS then
+	static explode(delimiter, s, limit){
+		var arr = null;
+		if (!rtl.exists(limit))
+			arr = s.split(delimiter);
+		arr = s.split(delimiter, limit);
+		return (new Vector()).concat(arr);
 	}
 	#endswitch
 	
