@@ -110,7 +110,10 @@ export class re{
 		#case ifcode PHP then
 		return preg_replace(static::compile($r), $replace, $s);
 		
-		#case ifcode JAVASCRIPT then
+		#case ifcode ES6 then
+		return s.replace(BayrellRtl.Lib.re.compile(r), replace);
+		
+		#case ifcode NODEJS then
 		return s.replace(re.compile(r), replace);
 		
 		#endswitch

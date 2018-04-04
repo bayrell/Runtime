@@ -259,4 +259,26 @@ export class rs{
 	}
 	#endswitch
 	
+	
+	
+	/**
+	 * Разбивает строку на подстроки
+	 * @param string ch - разделитель
+	 * @param string s - строка, которую нужно разбить
+	 * @param integer limit - ограничение 
+	 * @return Vector<string>
+	 */
+	declare export static string implode(string ch, Vector<string> arr);
+	 
+	#switch
+	#case ifcode PHP then
+	static function implode($s, $arr){
+		return "";
+	}
+	#case ifcode JAVASCRIPT then
+	static implode(ch, arr){
+		return arr.join(ch);
+	}
+	#endswitch
+	
 }
