@@ -281,4 +281,27 @@ export class rs{
 	}
 	#endswitch
 	
+	
+	
+	/**
+	 * Удаляет лишние символы слева и справа
+	 * @param {string} s - входная строка
+	 * @return {integer} новая строка
+	 */
+	declare export static string trim(string s);
+
+	#switch
+	#case ifcode PHP then
+	static function trim(&$s){
+		return trim($s);
+	}
+	#case ifcode ES6 then
+	static trim(s){
+		return BayrellRtl.Lib.rtl.toString(s).trim();
+	}
+	#case ifcode NODEJS then
+	static trim(s){
+		return rtl.toString(s).trim();
+	}
+	#endswitch
 }
