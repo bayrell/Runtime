@@ -60,6 +60,7 @@ class CoreObject{
 	#switch
 	#case ifcode JAVASCRIPT then
 	_init(){
+		this.__implements__ = new Array();
 	}
 	#endswitch
 	
