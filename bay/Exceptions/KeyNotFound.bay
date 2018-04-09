@@ -29,8 +29,8 @@ class KeyNotFound extends RuntimeException{
 	
 	void constructor(ContextInterface context = null, string key, Object prev = null){
 			
-			/* Utils::translate("ERROR_KEY_NOT_FOUND", null, "", context),  */
-		parent::constructor(
+		/* Utils::translate("ERROR_KEY_NOT_FOUND", null, "", context),  */
+		parent(
 			context, 
 			"Key '" ~ key ~ "' not found",
 			RuntimeConstant::ERROR_KEY_NOT_FOUND, 

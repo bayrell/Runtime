@@ -29,7 +29,7 @@ class IndexOutOfRange extends RuntimeException{
 	
 	void constructor(ContextInterface context = null, Object prev = null){
 		
-		parent::constructor(
+		parent(
 			context, 
 			Utils::translate("ERROR_INDEX_OUT_OF_RANGE", null, "", context), 
 			RuntimeConstant::ERROR_INDEX_OUT_OF_RANGE, 

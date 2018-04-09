@@ -32,7 +32,7 @@ class AssertError extends RuntimeException{
 		if (message == "") 
 			message = Utils::translate("ERROR_ASSERT", null, "", context);
 		
-		parent::constructor(
+		parent(
 			context, 
 			message,
 			RuntimeConstant::ERROR_ASSERT, 

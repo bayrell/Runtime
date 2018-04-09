@@ -29,7 +29,7 @@ class UnknownError extends RuntimeException{
 	
 	void constructor(ContextInterface context = null, Object prev = null){
 		
-		parent::constructor(
+		parent(
 			context, 
 			Utils::translate("ERROR_UNKNOWN", null, "", context), 
 			RuntimeConstant::ERROR_UNKNOWN, 
