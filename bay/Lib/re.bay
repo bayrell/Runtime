@@ -68,8 +68,6 @@ export class re{
 		return s.match(re.compile(r));
 		
 		#endswitch
-		
-		return [];
 	}
 	
 	
@@ -92,8 +90,6 @@ export class re{
 		}
 		
 		#endswitch
-		
-		return [];
 	}
 	
 	

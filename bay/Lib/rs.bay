@@ -304,4 +304,29 @@ export class rs{
 		return rtl.toString(s).trim();
 	}
 	#endswitch
+	
+	
+	
+	/**
+	 * json encode
+	 * @param {mixed} obj - объект
+	 * @param {int} flags - Флаги
+	 * @return {string} json строка
+	 */
+	declare export static string json_encode(var s, int flags);
+
+	#switch
+	#case ifcode PHP then
+	static function json_encode($s, $flags = 0){
+		$flags = $flags || JSON_UNESCAPED_UNICODE;
+		return json_encode($s, JSON_UNESCAPED_UNICODE);
+	}
+	#case ifcode JAVASCRIPT then
+	static json_encode(obj, flags = 0){
+		if (flags & 128 == 128) 
+			return JSON.stringify(obj, null, 2);
+		return JSON.stringify(obj);
+	}
+	#endswitch
+	
 }
