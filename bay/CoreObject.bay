@@ -66,25 +66,13 @@ class CoreObject{
 	
 	
 	
-	/**
-	 * Destructor
-	 */
-	public void destructor(){
-		this._is_destroyed = true;
-	}
-	
-	
-	
 	#switch
 	#case ifcode JAVASCRIPT then
 	_del(){
-		if (!this._is_destroyed)
-			this.destructor();
 	}
 	#case ifcode PHP then
 	function __destruct() {
-		if (!$this->_is_destroyed) 
-			$this->destructor();
+		/*this._is_destroyed = true;*/
 	}
 	#endswitch
 	
@@ -94,7 +82,7 @@ class CoreObject{
 	 * Clone current object
 	 * @return CoreObject
 	 */
-	public CoreObject clone(){
+	public CoreObject _clone(){
 		CoreObject res = rtl::newInstanceByObject(this);
 		
 		/* Assign all values */

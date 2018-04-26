@@ -35,15 +35,11 @@ interface ContextInterface{
 	
 	/**
 	 * Register module
+	 * @param string provider_name
+	 * @param string factory_name
+	 * @param int type
 	 */
-	void registerProvider(string name, string class_name);
-	
-	
-	
-	/**
-	 * Register module
-	 */
-	void registerProviderFactory(string name, string class_name);
+	void registerProvider(string provider_name, string factory_name, int type);
 	
 	
 	

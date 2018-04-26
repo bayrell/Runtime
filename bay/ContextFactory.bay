@@ -62,7 +62,7 @@ class ContextFactory extends CoreObject implements FactoryInterface{
 	 */
 	public void destructor(){
 		delete this._modules;
-		parent::destructor();
+		parent();
 	}
 	
 	

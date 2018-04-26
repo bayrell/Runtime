@@ -19,6 +19,11 @@
 namespace BayrellRtl.Lib;
 
 
+#switch
+#case ifcode JAVASCRIPT then
+var isBrowser=function(){return typeof window !== "undefined" && this === window;}
+#endswitch
+
 
 export class rtl{
 	
@@ -30,7 +35,13 @@ export class rtl{
 	 * @return ContextInterface
 	 */
 	public static ContextInterface globalContext(){
-		return self::_global_context;
+		#switch
+		#case ifcode PHP then
+		return self::$_global_context;
+		#case ifcode JAVASCRIPT then
+		if (isBrowser()) return BayrellRtl.Lib.rtl._global_context;
+		return rtl._global_context;
+		#endswitch
 	}
 	
 	
@@ -40,10 +51,15 @@ export class rtl{
 	 * @param ContextInterface context
 	 */
 	public static ContextInterface setGlobalContext(ContextInterface context){
-		self::_global_context = context;
+		#switch
+		#case ifcode PHP then
+		self::$_global_context = $context;
+		#case ifcode JAVASCRIPT then
+		if (isBrowser()) BayrellRtl.Lib.rtl._global_context = context;
+		else rtl._global_context = context;
+		#endswitch
 		return context;
 	}
-	
 	
 	
 	#switch
@@ -57,15 +73,22 @@ export class rtl{
 	
 	
 	
+	#switch
+	#case ifcode PHP then
+	
 	/**
 	 * Find class instance by name. If class does not exists return null.
 	 * @return var - class instance
 	 */
-	declare export static var find_class(var class_name);
+	static function find_class($class_name){
+		return "\\" . re::replace("\\.", "\\", $class_name);
+	}
 	
-	
-	#switch
 	#case ifcode ES6 then
+	/**
+	 * Find class instance by name. If class does not exists return null.
+	 * @return var - class instance
+	 */
 	static find_class(class_name){
 		if (class_name instanceof Function)
 			return class_name;
@@ -83,6 +106,10 @@ export class rtl{
 		return obj;
 	}
 	#case ifcode NODEJS then
+	/**
+	 * Find class instance by name. If class does not exists return null.
+	 * @return var - class instance
+	 */
 	static find_class(class_name){
 		if (class_name instanceof Function)
 			return class_name;
@@ -123,6 +150,7 @@ export class rtl{
 	#switch
 	#case ifcode PHP then
 	static function newInstance($class_name){
+		$class_name = static::find_class($class_name);
 		return new $class_name();
 	}
 	#case ifcode JAVASCRIPT then
@@ -149,6 +177,8 @@ export class rtl{
 	#switch
 	#case ifcode PHP then
 	static function newInstanceByObject($obj){
+		$class_name = get_class($obj);
+		return new $class_name();
 	}
 	#case ifcode JAVASCRIPT then
 	static newInstanceByObject(obj){
@@ -187,8 +217,9 @@ export class rtl{
 	
 	#switch
 	#case ifcode PHP then
-	static function callStaticMethod($class_name, $method_name, $args){
-		return call_user_func_array([$class_name, $method_name], $args);
+	static function callStaticMethod($class_name, $method_name, $args=null){
+		$class_name = static::find_class($class_name);
+		return call_user_func_array([$class_name, $method_name], ($args!=null)?$args->_getArr():[]);
 	}
 	#case ifcode JAVASCRIPT then
 	static callStaticMethod(class_name, method_name, args){
@@ -205,12 +236,24 @@ export class rtl{
 	 * @param {var} value - Variable
 	 * @return {var} result
 	 */
-	declare static var clone(var value, ContextInterface context = null);
+	declare static var _clone(var value, ContextInterface context = null);
 	
 	
 	#switch
+	#case ifcode PHP then
+	static function _clone($val, $context=null){
+		if ($val == null) return null;
+		if ($val instanceof \BayrellRtl\CoreObject){
+			return $val._clone($context);
+		}
+		return clone $val;
+	}
 	#case ifcode JAVASCRIPT then
 	static clone(val, context){
+		if (isBrowser()) return BayrellRtl.Lib.rtl._clone(val, context);
+		else return rtl._clone(val, context);
+	}
+	static _clone(val, context){
 		if (context == undefined)
 			context = null;
 		
@@ -242,15 +285,15 @@ export class rtl{
 			if (val.nodeType && typeof val.cloneNode == "function"){
 				return val.cloneNode(true);
 			}
-			else if (typeof val.clone == "function"){
-				return val.clone( context );
+			else if (typeof val._clone == "function"){
+				return val._clone( context );
 			}
 			else if (val.prototype){
 				res = new item.constructor();
 			}
 			
 			for (var i in val){
-				res[i] = this.clone(val[i]);
+				res[i] = this._clone(val[i]);
 			}
 			
 			return res;

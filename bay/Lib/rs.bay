@@ -21,6 +21,13 @@ namespace BayrellRtl.Lib;
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.Types.Vector;
 
+
+#switch
+#case ifcode JAVASCRIPT then
+var isBrowser=function(){return typeof window !== "undefined" && this === window;}
+#endswitch
+
+
 export class rs{
 
 
@@ -36,12 +43,10 @@ export class rs{
 	static function strlen(&$s){
 		return strlen($s);
 	}
-	#case ifcode ES6 then
+	#case ifcode JAVASCRIPT then
 	static strlen(s){
-		return BayrellRtl.Lib.rtl.toString(s).length;
-	}
-	#case ifcode NODEJS then
-	static strlen(s){
+		if (isBrowser())
+			return BayrellRtl.Lib.rtl.toString(s).length;
 		return rtl.toString(s).length;
 	}
 	#endswitch
@@ -62,12 +67,10 @@ export class rs{
 	static function substr(&$s, $start, $length){
 		return substr($s, $start, $length);
 	}
-	#case ifcode ES6 then
+	#case ifcode JAVASCRIPT then
 	static substr(s, start, length){
-		return BayrellRtl.Lib.rtl.toString(s).substring(start, start + length);
-	}
-	#case ifcode NODEJS then
-	static substr(s, start, length){
+		if (isBrowser())
+			return BayrellRtl.Lib.rtl.toString(s).substring(start, start + length);
 		return rtl.toString(s).substring(start, start + length);
 	}
 	#endswitch
@@ -101,12 +104,10 @@ export class rs{
 	static function ord($s){
 		return ord($s);
 	}
-	#case ifcode ES6 then
+	#case ifcode JAVASCRIPT then
 	static ord(s){
-		return BayrellRtl.Lib.rtl.toString(s).charCodeAt(0);
-	}
-	#case ifcode NODEJS then
-	static ord(s){
+		if (isBrowser())
+			return BayrellRtl.Lib.rtl.toString(s).charCodeAt(0);
 		return rtl.toString(s).charCodeAt(0);
 	}
 	#endswitch
@@ -125,12 +126,10 @@ export class rs{
 	static function strtolower($s){
 		return mb_strtolower($s);
 	}
-	#case ifcode ES6 then
+	#case ifcode JAVASCRIPT then
 	static strtolower(s){
-		return BayrellRtl.Lib.rtl.toString(s).toLowerCase();
-	}
-	#case ifcode NODEJS then
-	static strtolower(s){
+		if (isBrowser())
+			return BayrellRtl.Lib.rtl.toString(s).toLowerCase();
 		return rtl.toString(s).toLowerCase();
 	}
 	#endswitch
@@ -149,12 +148,10 @@ export class rs{
 	static function strtoupper($s){
 		return mb_strtoupper($s);
 	}
-	#case ifcode ES6 then
+	#case ifcode JAVASCRIPT then
 	static strtoupper(s){
-		return BayrellRtl.Lib.rtl.toString(s).toUpperCase();
-	}
-	#case ifcode NODEJS then
-	static strtoupper(s){
+		if (isBrowser())
+			return BayrellRtl.Lib.rtl.toString(s).toUpperCase();
 		return rtl.toString(s).toUpperCase();
 	}
 	#endswitch
@@ -180,16 +177,11 @@ export class rs{
 			return -1;
 		return $res;
 	}
-	#case ifcode ES6 then
+	#case ifcode JAVASCRIPT then
 	static strpos(s, search, offset){
-		if (!BayrellRtl.Lib.rtl.exists(offset)) offset = 0;
-		var res = BayrellRtl.Lib.rtl.toString(s).indexOf(search);
-		return res;
-	}
-	#case ifcode NODEJS then
-	static strpos(s, search, offset){
-		if (!rtl.exists(offset)) offset = 0;
-		var res = rtl.toString(s).indexOf(search);
+		var _rtl; if (isBrowser()) _rtl = BayrellRtl.Lib.rtl; else _rtl = rtl;
+		if (!_rtl.exists(offset)) offset = 0;
+		var res = _rtl.toString(s).indexOf(search);
 		return res;
 	}
 	#endswitch
@@ -231,7 +223,7 @@ export class rs{
 	 * @return Vector<string>
 	 */
 	declare export static Vector<string> explode(string ch, string s, int limit = -1);
-	 
+	
 	#switch
 	#case ifcode PHP then
 	static function explode($s, $n, $limit = -1){
@@ -239,23 +231,15 @@ export class rs{
 			return explode($delimiter, $s);
 		return explode($delimiter, $s, $limit);
 	}
-	#case ifcode ES6 then
+	#case ifcode JAVASCRIPT then
 	static explode(delimiter, s, limit){
-		var rtl = BayrellRtl.Lib.rtl;
-		var Vector = BayrellRtl.Types.Vector;
+		var _rtl; if (isBrowser()) _rtl = BayrellRtl.Lib.rtl; else _rtl = rtl;
+		var _Vector; if (isBrowser()) _Vector = BayrellRtl.Types.Vector; else _Vector = Vector;
 		var arr = null;
-		if (!rtl.exists(limit))
+		if (!_rtl.exists(limit))
 			arr = s.split(delimiter);
 		arr = s.split(delimiter, limit);
-		return (new Vector()).concat(arr);
-	}	
-	#case ifcode NODEJS then
-	static explode(delimiter, s, limit){
-		var arr = null;
-		if (!rtl.exists(limit))
-			arr = s.split(delimiter);
-		arr = s.split(delimiter, limit);
-		return (new Vector()).concat(arr);
+		return (new _Vector()).concat(arr);
 	}
 	#endswitch
 	
@@ -295,12 +279,10 @@ export class rs{
 	static function trim(&$s){
 		return trim($s);
 	}
-	#case ifcode ES6 then
+	#case ifcode JAVASCRIPT then
 	static trim(s){
-		return BayrellRtl.Lib.rtl.toString(s).trim();
-	}
-	#case ifcode NODEJS then
-	static trim(s){
+		if (isBrowser())
+			return BayrellRtl.Lib.rtl.toString(s).trim();
 		return rtl.toString(s).trim();
 	}
 	#endswitch

@@ -18,7 +18,7 @@
 
 
 module.exports = {
-	VERSION: '0.2.0',
+	VERSION: '0.2.2',
 	'Exceptions': {
 		'AssertError': require("./Exceptions/AssertError.js"),
 		'IndexOutOfRange': require("./Exceptions/IndexOutOfRange.js"),

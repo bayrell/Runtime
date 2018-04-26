@@ -22,6 +22,11 @@ use BayrellRtl.Types.Vector;
 use BayrellRtl.Interfaces.MapInterface;
 use BayrellRtl.Exceptions.KeyNotFound;
 
+#switch
+#case ifcode JAVASCRIPT then
+var isBrowser=function(){return typeof window !== "undefined" && this === window;}
+#endswitch
+
 
 declare class Map<T1, T2> implements MapInterface{
 
@@ -93,7 +98,7 @@ declare class Map<T1, T2> implements MapInterface{
 	/**
 	 * Returns count items in vector
 	 */
-	declare public size_t count();
+	declare public int count();
 	
 	
 	
@@ -146,7 +151,8 @@ BayrellRtl.Types.Map = class extends Map{
 		var val = super.get(key);
 		if (val === null) return null;
 		if (val == undefined){
-			throw new BayrellRtl.Exceptions.KeyNotFound(null, key);
+			if (isBrowser()) throw new BayrellRtl.Exceptions.KeyNotFound(null, key);
+			throw new KeyNotFound(null, key);
 		}
 		return val;
 	}
@@ -170,7 +176,9 @@ BayrellRtl.Types.Map = class extends Map{
 	 * @param T1 key
 	 */
 	remove(key){
-		super.delete(key);
+		if (super.has(key)){
+			super.delete(key);
+		}
 		return this;
 	}
 	
@@ -212,7 +220,7 @@ BayrellRtl.Types.Map = class extends Map{
 	 * Returns count items in vector
 	 */
 	count(){
-		return 0;
+		return this.size;
 	}
 	
 	
@@ -253,4 +261,151 @@ BayrellRtl.Types.Map = class extends Map{
 
 #case ifcode NODEJS then
 module.exports = BayrellRtl.Types.Map;
+
+
+
+#case ifcode PHP then
+
+class Map{
+	
+	
+	protected $_map = null;
+	
+	
+	/**
+	 * Constructor
+	 */
+	public function __construct(){
+		$this->_map = [];
+	}
+	
+	
+	
+	/**
+	 * Destructor
+	 */
+	public function __destruct(){
+		unset($this->_map);
+	}
+	
+	
+	/**
+	 * Returns value from position
+	 * @param T1 key
+	 * @param T2 default_value
+	 * @return T2
+	 */
+	public function get($key, $default_value){
+		return isset($this->_map[$key]) ? $this->_map[$key] : $default_value;
+	}
+	
+	
+	
+	/**
+	 * Returns value from position. Throw exception, if position does not exists
+	 * @param T1 key - position
+	 * @return T2
+	 */
+	public function item($key){	
+		if (!isset($this->_map[$key])){
+			throw new KeyNotFound(null, $key);
+		}
+		return $this->_map[$key];
+	}
+	
+	
+	
+	/**
+	 * Set value size_to position
+	 * @param T1 pos - position
+	 * @param T2 value 
+	 * @return self
+	 */
+	public function set($key, $value){
+		$this->_map[$key] = $value;
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Remove value from position
+	 * @param T1 key
+	 * @return self
+	 */
+	public function remove($key){
+		if (isset($this->_map[$key]))
+			unset($this->_map[$key]);
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Return true if key exists
+	 * @param T1 key
+	 * @return bool var
+	 */
+	public function contains($key){
+		return isset($this->_map[$key]);
+	}
+	
+	
+	
+	/**
+	 * Return true if key exists
+	 * @param T1 key
+	 * @return bool var
+	 */
+	public function has($key){
+		return isset($this->_map[$key]);
+	}
+	
+	
+	
+	/**
+	 * Clear all values from vector
+	 * @return self
+	 */
+	public function clear(){
+		$this->_map = [];
+	}
+
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	public function count(){
+		return count($this->_map);
+	}
+	
+	
+	
+	/**
+	 * Returns vector of the keys
+	 * @return Vector<T1>
+	 */
+	public function keys(){
+		$keys = array_keys($this->_map);
+		$res = new Vector();
+		$res->_assignArr($keys);		
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Returns vector of the values
+	 * @return Vector<T2>
+	 */
+	public function values(){
+		$values = array_values($this->_map);
+		$res = new Vector();
+		$res->_assignArr($values);		
+		return $res;
+	}
+	
+}
+
 #endswitch
