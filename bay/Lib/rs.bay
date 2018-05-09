@@ -272,18 +272,24 @@ export class rs{
 	 * @param {string} s - входная строка
 	 * @return {integer} новая строка
 	 */
-	declare export static string trim(string s);
+	declare export static string trim(string s, string ch = "");
 
 	#switch
 	#case ifcode PHP then
-	static function trim(&$s){
-		return trim($s);
+	static function trim(&$s, $ch=""){
+		if ($ch=="")
+			return trim($s);
+		return trim($s, $ch);
 	}
 	#case ifcode JAVASCRIPT then
-	static trim(s){
-		if (isBrowser())
-			return BayrellRtl.Lib.rtl.toString(s).trim();
-		return rtl.toString(s).trim();
+	static trim(s, ch){
+		if (ch == undefined) ch = "";
+		if (isBrowser()) s = BayrellRtl.Lib.rtl.toString(s);
+		else s = rtl.toString(s);
+		if (ch == ""){
+			return s.trim();
+		}
+		return s.replace(new RegExp("^[" + ch + "]+", "g"),"").replace(new RegExp("[" + ch + "]+$", "g"),"");
 	}
 	#endswitch
 	
