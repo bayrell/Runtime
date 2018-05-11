@@ -18,6 +18,8 @@
 
 namespace BayrellRtl.Lib;
 
+use BayrellRtl.Interfaces.StringInterface;
+
 
 #switch
 #case ifcode JAVASCRIPT then
