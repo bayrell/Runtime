@@ -18,7 +18,7 @@
 
 
 module.exports = {
-	VERSION: '0.2.3',
+	VERSION: '0.2.4',
 	'Exceptions': {
 		'AssertError': require("./Exceptions/AssertError.js"),
 		'IndexOutOfRange': require("./Exceptions/IndexOutOfRange.js"),
@@ -40,9 +40,10 @@ module.exports = {
 		'SerializeStringInterface': require("./Providers/SerializeStringInterface.js"),
 	},
 	'Lib': {
-		'rtl': require("./Lib/rtl.js"),
+		'fs': require("./Lib/fs.js"),
 		're': require("./Lib/re.js"),
 		'rs': require("./Lib/rs.js"),
+		'rtl': require("./Lib/rtl.js"),
 		'Utils': require("./Lib/Utils.js"),
 	},
 	'Types': {

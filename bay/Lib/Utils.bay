@@ -136,7 +136,7 @@ export class Utils{
 		
 		int ext_length = rs::strlen(ret.extension);
 		if (ext_length > 0) ext_length++;
-		ret.filename = rs::substr(basename, 0, -1*ext_lenght);
+		ret.filename = rs::substr(ret.basename, 0, -1*ext_length);
 		
 		delete arr1;
 		delete arr2;
@@ -152,7 +152,7 @@ export class Utils{
 	 * @return {string} полное имя файла
 	 */
 	public static string basename(string filepath){
-		PathInfo ret = rtl::mb_pathinfo(filepath);
+		PathInfo ret = self::pathinfo(filepath);
 		string res = ret.basename;
 		delete ret;
 		return res;
@@ -166,7 +166,7 @@ export class Utils{
 	 * @return {string} расширение файла
 	 */
 	public static string extname(string filepath){
-		PathInfo ret = rtl::mb_pathinfo(filepath);
+		PathInfo ret = self::pathinfo(filepath);
 		string res = ret.extension;
 		delete ret;
 		return res;
@@ -180,7 +180,7 @@ export class Utils{
 	 * @return {string} путь к папке, содержащий файл
 	 */
 	public static string dirname(string filepath){
-		PathInfo ret = rtl::mb_pathinfo(filepath);
+		PathInfo ret = self::pathinfo(filepath);
 		string res = ret.dirname;
 		delete ret;
 		return res;

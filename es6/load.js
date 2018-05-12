@@ -18,6 +18,7 @@
 
 
 $load([
+	"/assets/bayrell_rtl_es6/Lib/fs.js",
 	"/assets/bayrell_rtl_es6/Lib/rs.js",
 	"/assets/bayrell_rtl_es6/Lib/re.js",
 	"/assets/bayrell_rtl_es6/Lib/rtl.js",

@@ -25,6 +25,7 @@ module.exports = {
 		'Providers/AssertInterface',
 		'Providers/LogInterface',
 		'Providers/SerializeStringInterface',
+		'Lib/fs',
 		'Lib/re',
 		'Lib/rs',
 		'Lib/rtl',

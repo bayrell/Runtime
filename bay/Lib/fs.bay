@@ -19,21 +19,72 @@
 namespace BayrellRtl.Lib;
 
 
+use BayrellRtl.Lib.Utils;
 use BayrellRtl.Types.PathInfo;
 
 
-#ifcode NODEJS then
+#switch
+#case ifcode NODEJS then
 
 var fsModule = require('fs');
 var shellModule = require('shelljs');
 var upathModule = require('upath');
 var pathModule = require('path');
 
-#endif 
+#endswitch 
 
 
 
-class fs{
+export class fs{
+	
+	
+	
+	/**
+	 * Разбивает путь файла на составляющие
+	 * @param {string} filepath путь к файлу
+	 * @return {json} Объект вида:
+	 *         dirname    - папка, в которой находиться файл
+	 *         basename   - полное имя файла
+	 *         extension  - расширение файла
+	 *         filename   - имя файла без расширения
+	 */
+	public static PathInfo pathinfo(string filepath){
+		return Utils::pathinfo(filepath);
+	}
+	
+	
+	
+	/**
+	 * Возвращает полное имя файла
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} полное имя файла
+	 */
+	public static string basename(string filepath){
+		return Utils::basename(filepath);
+	}
+	
+	
+	
+	/**
+	 * Возвращает расширение файла
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} расширение файла
+	 */
+	public static string extname(string filepath){
+		return Utils::extname(filepath);
+	}
+	
+	
+	
+	/**
+	 * Возвращает путь к папке, содержащий файл
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} путь к папке, содержащий файл
+	 */
+	public static string dirname(string filepath){
+		return Utils::dirname(filepath);
+	}
+	
 	
 	
 	/**
@@ -41,19 +92,19 @@ class fs{
 	 * @param {string} filepath - путь к файлу
 	 * @return {string} Результат
 	 */
-	declare export static string path_normalize(string filepath);
+	declare static string pathNormalize(string filepath);
 
 	#switch
 	#case ifcode PHP then
-	static function path_normalize($filepath){
+	static function pathNormalize($filepath){
 		return realpath($filepath);
 	}
 	#case ifcode ES6 then
-	static path_normalize(filepath){
+	static pathNormalize(filepath){
 		return null;
 	}
 	#case ifcode NODEJS then
-	static path_normalize(filepath){
+	static pathNormalize(filepath){
 		return upath.normalize(file_path);
 	}
 	#endswitch
@@ -65,19 +116,19 @@ class fs{
 	 * @param {string} filepath - полный путь к файлу
 	 * @return {string} Содержимое файла
 	 */
-	declare export static string file_get_contents(string filepath);
-
+	declare static string fileGetContents(string filepath);
+	
 	#switch
 	#case ifcode PHP then
-	static function file_get_contents($filepath){
+	static function fileGetContents($filepath){
 		return file_get_contents($filepath);
 	}
 	#case ifcode ES6 then
-	static file_get_contents(filepath){
+	static fileGetContents(filepath){
 		return "";
 	}
 	#case ifcode NODEJS then
-	static file_get_contents(filepath){
+	static fileGetContents(filepath){
 		return fsModule.readFileSync(filepath, {encoding : 'utf8'}).toString();
 	}
 	#endswitch
@@ -88,18 +139,18 @@ class fs{
 	 * Сохраняет контент файла
 	 * @param {string} filepath - полный путь к файлу
 	 */
-	declare export static string file_put_contents(string filepath, string content);
+	declare static string filePutContents(string filepath, string content);
 
 	#switch
 	#case ifcode PHP then
-	static function file_put_contents($filepath, $content){
+	static function filePutContents($filepath, $content){
 		file_put_contents($filepath, $content);
 	}
 	#case ifcode ES6 then
-	static file_put_contents(filepath, content){
+	static filePutContents(filepath, content){
 	}
 	#case ifcode NODEJS then
-	static file_put_contents(filepath, content){
+	static filePutContents(filepath, content){
 		fsModule.writeFileSync(filepath, content, {encoding : 'utf8'});
 	}
 	#endswitch
@@ -111,19 +162,19 @@ class fs{
 	 * @param {string} filepath - полный путь к файлу
 	 * @return {boolean} Истина, если файл существует
 	 */
-	declare export static string file_exists(string filepath);
+	declare static string fileExists(string filepath);
 
 	#switch
 	#case ifcode PHP then
-	static function file_exists($filepath){
+	static function fileExists($filepath){
 		return file_exists($filepath);
 	}
 	#case ifcode ES6 then
-	static file_exists(filepath){
+	static fileExists(filepath){
 		return false;
 	}
 	#case ifcode NODEJS then
-	static file_exists(filepath){
+	static fileExists(filepath){
 		return fsModule.existsSync(filepath);
 	}
 	#endswitch
@@ -135,19 +186,19 @@ class fs{
 	 * @param {string} filepath - полный путь к файлу
 	 * @return {boolean} Истина, если файл существует
 	 */
-	declare export static string is_dir(string filepath);
+	declare static string isDir(string filepath);
 
 	#switch
 	#case ifcode PHP then
-	static function is_dir($filepath){
+	static function isDir($filepath){
 		return is_dir($filepath);
 	}
 	#case ifcode ES6 then
-	static is_dir(filepath){
+	static isDir(filepath){
 		return false;
 	}
 	#case ifcode NODEJS then
-	static is_dir(filepath){
+	static isDir(filepath){
 		return fsModule.lstatSync(filepath).isDirectory();
 	}
 	#endswitch
@@ -158,7 +209,7 @@ class fs{
 	 * Рекурсивное создание папки
 	 * @param {string} dir_name - полный путь к папке
 	 */
-	declare export static void mkdir(string dir_name);
+	declare static void mkdir(string dir_name);
 
 	#switch
 	#case ifcode PHP then
@@ -172,7 +223,7 @@ class fs{
 	}
 	#case ifcode NODEJS then
 	static mkdir(dir_name){
-		if (rtls.file_exists(dir_name))
+		if (fsModule.existsSync(dir_name))
 			return true;
 		shellModule.mkdir('-p', dir_name);
 	}
