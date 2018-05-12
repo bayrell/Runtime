@@ -22,6 +22,7 @@ $load([
 	"/assets/bayrell_rtl_es6/Lib/re.js",
 	"/assets/bayrell_rtl_es6/Lib/rtl.js",
 	"/assets/bayrell_rtl_es6/Types/Map.js",
+	"/assets/bayrell_rtl_es6/Types/PathInfo.js",
 	"/assets/bayrell_rtl_es6/Types/Vector.js",
 	"/assets/bayrell_rtl_es6/CoreObject.js",
 	"/assets/bayrell_rtl_es6/RuntimeConstant.js",

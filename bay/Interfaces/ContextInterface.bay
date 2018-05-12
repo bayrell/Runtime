@@ -29,7 +29,7 @@ interface ContextInterface{
 	/**
 	 * Register module
 	 */
-	void registerModule(string module_name);
+	ContextInterface registerModule(string module_name);
 	
 	
 	
@@ -39,7 +39,7 @@ interface ContextInterface{
 	 * @param string factory_name
 	 * @param int type
 	 */
-	void registerProvider(string provider_name, string factory_name, int type);
+	ContextInterface registerProvider(string provider_name, string factory_name, int type);
 	
 	
 	

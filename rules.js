@@ -30,6 +30,7 @@ module.exports = {
 		'Lib/rtl',
 		'Lib/Utils',
 		'Types/Map',
+		'Types/PathInfo',
 		'Types/Vector',		
 		'Context',
 		'ContextFactory',

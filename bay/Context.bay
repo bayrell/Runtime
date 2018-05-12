@@ -104,7 +104,7 @@ class Context extends CoreObject implements ContextInterface{
 	/**
 	 * Register module
 	 */
-	void registerModule(string module_name){
+	ContextInterface registerModule(string module_name){
 		
 		string module_description_class_name = module_name ~ ".ModuleDescription";
 		if (this._modules.indexOf(module_description_class_name) != -1)
@@ -139,6 +139,8 @@ class Context extends CoreObject implements ContextInterface{
 			delete keys;
 			delete modules;
 		}
+		
+		return this;
 	}
 	
 	
@@ -149,11 +151,12 @@ class Context extends CoreObject implements ContextInterface{
 	 * @param string factory_name
 	 * @param int type
 	 */
-	void registerProvider(string provider_name, string factory_name, int type){
+	ContextInterface registerProvider(string provider_name, string factory_name, int type){
 		if (not this._providers_names.has(provider_name)){
 			ProviderDescription description = new ProviderDescription(provider_name, factory_name, type);
 			this._providers_names.set(provider_name, description);
 		}
+		return this;
 	}
 	
 	

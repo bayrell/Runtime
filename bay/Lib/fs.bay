@@ -1,0 +1,181 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace BayrellRtl.Lib;
+
+
+use BayrellRtl.Types.PathInfo;
+
+
+#ifcode NODEJS then
+
+var fsModule = require('fs');
+var shellModule = require('shelljs');
+var upathModule = require('upath');
+var pathModule = require('path');
+
+#endif 
+
+
+
+class fs{
+	
+	
+	/**
+	 * Нормализация пути
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} Результат
+	 */
+	declare export static string path_normalize(string filepath);
+
+	#switch
+	#case ifcode PHP then
+	static function path_normalize($filepath){
+		return realpath($filepath);
+	}
+	#case ifcode ES6 then
+	static path_normalize(filepath){
+		return null;
+	}
+	#case ifcode NODEJS then
+	static path_normalize(filepath){
+		return upath.normalize(file_path);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Получить контент файла
+	 * @param {string} filepath - полный путь к файлу
+	 * @return {string} Содержимое файла
+	 */
+	declare export static string file_get_contents(string filepath);
+
+	#switch
+	#case ifcode PHP then
+	static function file_get_contents($filepath){
+		return file_get_contents($filepath);
+	}
+	#case ifcode ES6 then
+	static file_get_contents(filepath){
+		return "";
+	}
+	#case ifcode NODEJS then
+	static file_get_contents(filepath){
+		return fsModule.readFileSync(filepath, {encoding : 'utf8'}).toString();
+	}
+	#endswitch
+
+
+
+	/**
+	 * Сохраняет контент файла
+	 * @param {string} filepath - полный путь к файлу
+	 */
+	declare export static string file_put_contents(string filepath, string content);
+
+	#switch
+	#case ifcode PHP then
+	static function file_put_contents($filepath, $content){
+		file_put_contents($filepath, $content);
+	}
+	#case ifcode ES6 then
+	static file_put_contents(filepath, content){
+	}
+	#case ifcode NODEJS then
+	static file_put_contents(filepath, content){
+		fsModule.writeFileSync(filepath, content, {encoding : 'utf8'});
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Проверяет существование файла
+	 * @param {string} filepath - полный путь к файлу
+	 * @return {boolean} Истина, если файл существует
+	 */
+	declare export static string file_exists(string filepath);
+
+	#switch
+	#case ifcode PHP then
+	static function file_exists($filepath){
+		return file_exists($filepath);
+	}
+	#case ifcode ES6 then
+	static file_exists(filepath){
+		return false;
+	}
+	#case ifcode NODEJS then
+	static file_exists(filepath){
+		return fsModule.existsSync(filepath);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Проверяет существование файла
+	 * @param {string} filepath - полный путь к файлу
+	 * @return {boolean} Истина, если файл существует
+	 */
+	declare export static string is_dir(string filepath);
+
+	#switch
+	#case ifcode PHP then
+	static function is_dir($filepath){
+		return is_dir($filepath);
+	}
+	#case ifcode ES6 then
+	static is_dir(filepath){
+		return false;
+	}
+	#case ifcode NODEJS then
+	static is_dir(filepath){
+		return fsModule.lstatSync(filepath).isDirectory();
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Рекурсивное создание папки
+	 * @param {string} dir_name - полный путь к папке
+	 */
+	declare export static void mkdir(string dir_name);
+
+	#switch
+	#case ifcode PHP then
+	static function mkdir($filepath){
+		if (file_exists($filepath))
+			return true;
+		return mkdir($filepath, 0755, true);
+	}
+	#case ifcode ES6 then
+	static mkdir(dir_name){
+	}
+	#case ifcode NODEJS then
+	static mkdir(dir_name){
+		if (rtls.file_exists(dir_name))
+			return true;
+		shellModule.mkdir('-p', dir_name);
+	}
+	#endswitch
+	
+}

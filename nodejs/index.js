@@ -47,6 +47,7 @@ module.exports = {
 	},
 	'Types': {
 		'Map': require("./Types/Map.js"),
+		'PathInfo': require("./Types/PathInfo.js"),
 		'Vector': require("./Types/Vector.js"),
 	},
 	'Context': require("./Context.js"),

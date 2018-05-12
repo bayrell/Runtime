@@ -18,15 +18,47 @@
 
 namespace BayrellRtl.Lib;
 
+use BayrellRtl.Lib.rs;
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.Exceptions.AssertError;
+use BayrellRtl.Interfaces.ContextInterface;
+use BayrellRtl.Interfaces.FactoryInterface;
 use BayrellRtl.Interfaces.MapInterface;
+use BayrellRtl.Types.PathInfo;
 use BayrellRtl.Types.Vector;
 use BayrellRtl.Types.Map;
+use BayrellRtl.ContextObject;
+use BayrellRtl.CoreObject;
 
 
 export class Utils{
-
+	
+	
+	/**
+	 * Create object by factory
+	 * @param string factory_name
+	 * @param ContextInterface context
+	 * @return CoreObject
+	 */
+	public static CoreObject factory(string factory_name, ContextInterface context = null){
+		
+		ContextObject obj = null;
+		Vector<var> args = new Vector();
+		args.push(context);
+		
+		ContextObject factory_obj = rtl::newInstance(factory_name, args);
+		delete args;
+		
+		if (factory_obj implements FactoryInterface){
+			obj = factory_obj.newInstance();
+		}
+		delete factory_obj;
+		
+		return obj;
+		
+	}
+	
+	
 	
 	/**
 	 * Equals value1 and value2. Throw exception if value1 != value2
@@ -45,7 +77,7 @@ export class Utils{
 	 * Returns true if value is primitive value
 	 * @return boolean 
 	 */
-	static bool isPrimitiveValue(var value){
+	public static bool isPrimitiveValue(var value){
 		if (rtl::isScalarValue(value)) return true;
 		if (value instanceof Vector) return true;
 		if (value instanceof Map) return true;
@@ -78,6 +110,80 @@ export class Utils{
 			);
 		}	
 		return message;
+	}
+	
+	
+	
+	/**
+	 * Разбивает путь файла на составляющие
+	 * @param {string} filepath путь к файлу
+	 * @return {json} Объект вида:
+	 *         dirname    - папка, в которой находиться файл
+	 *         basename   - полное имя файла
+	 *         extension  - расширение файла
+	 *         filename   - имя файла без расширения
+	 */
+	public static PathInfo pathinfo(string filepath){
+		Vector<string> arr1 = rs::explode(".", filepath);
+		Vector<string> arr2 = rs::explode("/", filepath);
+		
+		PathInfo ret = new PathInfo();
+		
+		ret.filepath = filepath;
+		ret.extension = arr1.pop();
+		ret.basename = arr2.pop();
+		ret.dirname = rs::implode("/", arr2);
+		
+		int ext_length = rs::strlen(ret.extension);
+		if (ext_length > 0) ext_length++;
+		ret.filename = rs::substr(basename, 0, -1*ext_lenght);
+		
+		delete arr1;
+		delete arr2;
+		
+		return ret;
+	}
+	
+	
+	
+	/**
+	 * Возвращает полное имя файла
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} полное имя файла
+	 */
+	public static string basename(string filepath){
+		PathInfo ret = rtl::mb_pathinfo(filepath);
+		string res = ret.basename;
+		delete ret;
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Возвращает расширение файла
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} расширение файла
+	 */
+	public static string extname(string filepath){
+		PathInfo ret = rtl::mb_pathinfo(filepath);
+		string res = ret.extension;
+		delete ret;
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Возвращает путь к папке, содержащий файл
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} путь к папке, содержащий файл
+	 */
+	public static string dirname(string filepath){
+		PathInfo ret = rtl::mb_pathinfo(filepath);
+		string res = ret.dirname;
+		delete ret;
+		return res;
 	}
 	
 }

@@ -89,8 +89,9 @@ class ContextFactory extends CoreObject implements FactoryInterface{
 	/**
 	 * Register module
 	 */
-	void registerModule(string module_name){
+	ContextFactory registerModule(string module_name){
 		this._modules.push(module_name);
+		return this;
 	}
 
 }
