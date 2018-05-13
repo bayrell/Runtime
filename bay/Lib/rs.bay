@@ -281,7 +281,7 @@ export class rs{
 
 	#switch
 	#case ifcode PHP then
-	static function trim(&$s, $ch=""){
+	static function trim($s, $ch=""){
 		if ($ch=="")
 			return trim($s);
 		return trim($s, $ch);
