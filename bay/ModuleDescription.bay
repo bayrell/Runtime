@@ -69,9 +69,9 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * @return Vector<string>
 	 */	
 	public static Vector<string> getInterfaces(){
-		return (new Vector())
-			.push('BayrellRtl.Interfaces.ModuleDescriptionInterface')
-		;
+		return [
+			'BayrellRtl.Interfaces.ModuleDescriptionInterface',
+		];
 	}
 	
 	

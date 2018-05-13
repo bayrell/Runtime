@@ -32,20 +32,6 @@ class ContextFactory extends CoreObject implements FactoryInterface{
 	protected Vector<string> _modules = null;
 	
 	
-	/**
-	 * Assign all data from other object
-	 * @param CoreObject obj
-	 */
-	void assign(CoreObject obj){
-		if (obj instanceof ContextFactory){
-			delete this._modules;			
-			this._modules = clone obj._modules;
-		}
-		
-		parent::assign(obj);
-	}
-	
-	
 	
 	/**
 	 * Constructor

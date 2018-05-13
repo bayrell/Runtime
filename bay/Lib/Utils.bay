@@ -34,31 +34,6 @@ use BayrellRtl.CoreObject;
 export class Utils{
 	
 	
-	/**
-	 * Create object by factory
-	 * @param string factory_name
-	 * @param ContextInterface context
-	 * @return CoreObject
-	 */
-	public static CoreObject factory(string factory_name, ContextInterface context = null){
-		
-		ContextObject obj = null;
-		Vector<var> args = new Vector();
-		args.push(context);
-		
-		ContextObject factory_obj = rtl::newInstance(factory_name, args);
-		delete args;
-		
-		if (factory_obj implements FactoryInterface){
-			obj = factory_obj.newInstance();
-		}
-		delete factory_obj;
-		
-		return obj;
-		
-	}
-	
-	
 	
 	/**
 	 * Equals value1 and value2. Throw exception if value1 != value2

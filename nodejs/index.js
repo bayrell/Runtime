@@ -27,6 +27,7 @@ module.exports = {
 		'UnknownError': require("./Exceptions/UnknownError.js"),
 	},
 	'Interfaces': {
+		'CloneableInterface': require("./Interfaces/CloneableInterface.js"),
 		'ContextInterface': require("./Interfaces/ContextInterface.js"),
 		'FactoryInterface': require("./Interfaces/FactoryInterface.js"),
 		'LogInterface': require("./Interfaces/LogInterface.js"),

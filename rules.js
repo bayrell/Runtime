@@ -16,6 +16,7 @@ module.exports = {
 		'Exceptions/KeyNotFound',
 		'Exceptions/RuntimeException',
 		'Exceptions/UnknownError',
+		'Interfaces/CloneableInterface',
 		'Interfaces/ContextInterface',
 		'Interfaces/FactoryInterface',
 		'Interfaces/MapInterface',

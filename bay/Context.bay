@@ -40,32 +40,6 @@ class Context extends CoreObject implements ContextInterface{
 	protected Map<string, var> _values = null;
 	
 	
-	
-	/**
-	 * Assign all data from other object
-	 * @param CoreObject obj
-	 */
-	void assign(CoreObject obj){
-		if (obj instanceof Context){
-		
-			delete this._modules;
-			delete this._providers_classes_names;
-			delete this._providers_factory_classes_names;
-			delete this._current_providers;
-			
-			this._modules = clone obj._modules;
-			this._providers_classes_names = clone obj._providers_classes_names;
-			this._providers_factory_classes_names = clone obj._providers_factory_classes_names;
-			this._current_providers = clone obj._current_providers;
-			
-			this._locale = obj._locale;
-		}
-		
-		parent::assign(obj);
-	}
-	
-	
-	
 	/**
 	 * Constructor
 	 */
@@ -96,7 +70,7 @@ class Context extends CoreObject implements ContextInterface{
 	 * @return Vector<string>
 	 */
 	Vector<string> getModules(){
-		return clone this._modules;
+		return this._modules.copy();
 	}
 	
 	
@@ -151,9 +125,9 @@ class Context extends CoreObject implements ContextInterface{
 	 * @param string factory_name
 	 * @param int type
 	 */
-	ContextInterface registerProvider(string provider_name, string factory_name, int type){
+	ContextInterface registerProvider(string provider_name, FactoryInterface factory, int type){
 		if (not this._providers_names.has(provider_name)){
-			ProviderDescription description = new ProviderDescription(provider_name, factory_name, type);
+			ProviderDescription description = new ProviderDescription(provider_name, factory, type);
 			this._providers_names.set(provider_name, description);
 		}
 		return this;
@@ -203,21 +177,21 @@ class Context extends CoreObject implements ContextInterface{
 	 * @params string provider_name
 	 * @return ContextObject
 	 */
-	public ContextObject getProvider(string provider_name){
+	public CoreObject getProvider(string provider_name){
 	
 		if (this._providers_names.has(provider_name)){
 			ProviderDescription description = this._providers_names.item(provider_name);
 			
-			if (description.getType() == RuntimeConstant::PROVIDER_REGULAR){
+			if (description.getType() == ProviderDescription::PROVIDER_REGULAR){
 				if (this._current_providers.has(provider_name))
 					return this._current_providers.item(provider_name);
 			}
 			
-			ContextObject obj = this.createProvider(provider_name);
+			CoreObject obj = this.createProvider(provider_name);
 			if (obj == null)
 				return null;
 			
-			if (description.getType == RuntimeConstant::PROVIDER_REGULAR){
+			if (description.getType() == ProviderDescription::PROVIDER_REGULAR){
 				this._current_providers.set(provider_name, obj);
 			}
 			
@@ -235,27 +209,18 @@ class Context extends CoreObject implements ContextInterface{
 	 * @params string provider_name
 	 * @return ContextObject
 	 */
-	public ContextObject createProvider(string provider_name){
+	public CoreObject createProvider(string provider_name){
+		if (!this._providers_names.has(provider_name))
+			return null;
+			
+		ProviderDescription description = this._providers_names.item(provider_name);
+		if (description == null)
+			return null;
+			
+		FactoryInterface factory_obj = description.getFactory();
+		CoreObject obj = factory_obj.newInstance();
 		
-		if (this._providers_names.has(provider_name)){
-			ProviderDescription description = this._providers_names.item(provider_name);
-			
-			ContextObject obj = null;
-			Vector<var> args = new Vector();
-			args.push(this);
-			
-			CoreObject factory_obj = rtl::newInstance(description.getFactoryName(), args);
-			delete args;
-			
-			if (factory_obj implements FactoryInterface){
-				obj = factory_obj.newInstance();
-			}
-			delete factory_obj;
-			
-			return obj;
-		}
-		
-		return null;
+		return obj;
 	}
 
 	

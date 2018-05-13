@@ -25,35 +25,24 @@ use BayrellRtl.CoreObject;
 class ProviderDescription extends CoreObject{
 	
 	
+	/* Provider types */ 
+	static const int PROVIDER_REGULAR = 1;
+	static const int PROVIDER_TEMPORARY = 2;
+	
+	
 	protected string _provider_name = "";
-	protected string _factory_name = "";
+	protected FactoryInterface _factory = "";
 	protected int _type = "";
-	
-	
-	
-	/**
-	 * Assign all data from other object
-	 * @param CoreObject obj
-	 */
-	void assign(CoreObject obj){
-		if (obj instanceof Context){
-			this._provider_name = clone obj._provider_name;
-			this._factory_name = clone obj._factory_name;
-			this._type = clone obj._type;
-		}
-		
-		parent::assign(obj);
-	}
 	
 	
 	
 	/**
 	 * Constructor
 	 */
-	void constructor(string provider_name, string factory_name, int type){
+	void constructor(string provider_name, FactoryInterface factory, int type){
 		parent();
 		this._provider_name = provider_name;
-		this._factory_name = factory_name;
+		this._factory = factory;
 		this._type = type;
 	}
 	
@@ -62,8 +51,8 @@ class ProviderDescription extends CoreObject{
 	public string getProviderName(){
 		return this._provider_name;
 	}
-	public string getFactoryName(){
-		return this._factory_name;
+	public FactoryInterface getFactory(){
+		return this._factory;
 	}
 	public string getTypeName(){
 		return this._type;

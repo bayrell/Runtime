@@ -16,63 +16,26 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl;
+namespace BayrellRtl.Interfaces;
 
-use BayrellRtl.Lib.rtl;
+use BayrellRtl.CoreObject;
 
 
-class CoreObject{
-	
-	protected bool _is_destroyed = false;
-
+interface CloneableInterface{
 	
 	
 	/**
-	 * Get module name
+	 * Returns new Instance
 	 */
-	string getModuleName(){
-		return "BayrellRtl";
-	}
+	public CoreObject createNewInstance();
 	
 	
 	
 	/**
-	 * Get class name
+	 * Assign all data from other object
+	 * @param CoreObject obj
 	 */
-	string getClassName(){
-		return "BayrellRtl.CoreObject";
-	}
+	void assign(CoreObject obj);
 	
-	
-	
-	/** 
-	 * Constructor
-	 */
-	public void constructor(){
-		#switch
-		#case ifcode JAVASCRIPT then
-		this._init();
-		#endswitch
-	}
-	
-	
-	
-	#switch
-	#case ifcode JAVASCRIPT then
-	_init(){
-		this.__implements__ = new Array();
-	}
-	#endswitch
-	
-	
-	
-	#switch
-	#case ifcode JAVASCRIPT then
-	_del(){
-	}
-	#case ifcode PHP then
-	function __destruct() {
-		/*this._is_destroyed = true;*/
-	}
-	#endswitch
 }
+

@@ -173,7 +173,7 @@ export class rtl{
 	/**
 	 * Create object by class_name. If class name does not exists return null
 	 * @return Object
-	 */
+	 *
 	declare export static Object newInstanceByObject(Object obj);
 	
 	#switch
@@ -188,7 +188,7 @@ export class rtl{
 		return new f;
 	}
 	#endswitch
-	
+	*/
 	
 	
 	/**
@@ -245,7 +245,7 @@ export class rtl{
 	#case ifcode PHP then
 	static function _clone($val, $context=null){
 		if ($val == null) return null;
-		if ($val instanceof \BayrellRtl\CoreObject){
+		if ($val instanceof \BayrellRtl\Interfaces\CloneableInterface){
 			return $val._clone($context);
 		}
 		return clone $val;
@@ -284,20 +284,33 @@ export class rtl{
 		else if (typeof val == 'object'){
 			var res = {};
 			
+			var _rtl = null;
+			var _CloneableInterface = null;
+			if (isBrowser()){
+				_rtl = BayrellRtl.Lib.rtl;
+				_CloneableInterface = BayrellRtl.Interfaces.CloneableInterface;
+			}
+			else {
+				_rtl = rtl;
+				_CloneableInterface = require('../Interfaces/CloneableInterface.js');
+			}
+			
 			if (val.nodeType && typeof val.cloneNode == "function"){
 				return val.cloneNode(true);
 			}
-			else if (typeof val._clone == "function"){
-				return val._clone( context );
+			else if (_rtl.implements(val, _CloneableInterface)){
+				var res = val.createNewInstance();
+				res.assign(val);
+				return res;
 			}
 			else if (val.prototype){
 				res = new item.constructor();
 			}
-			
+			/*
 			for (var i in val){
 				res[i] = this._clone(val[i]);
 			}
-			
+			*/
 			return res;
 		}
 	}

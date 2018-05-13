@@ -67,6 +67,15 @@ class ContextObject extends CoreObject{
 	
 	
 	
+	/**
+	 * Get class name
+	 */
+	ContextObject newInstance(){
+		return new ContextObject(this._context);
+	}
+	
+	
+	
 	/** 
 	 * Constructor
 	 */
@@ -76,28 +85,6 @@ class ContextObject extends CoreObject{
 		if (not rtl::exists(this._context)){
 			this._context = rtl::globalContext();
 		}
-	}
-	
-	
-	
-	/**
-	 * Clone current object
-	 * @return CoreObject
-	 */
-	public CoreObject clone(ContextInterface context = null){
-		CoreObject res = rtl::newInstanceByObject(this);
-		
-		if (rtl::exists(context)){
-			res._context = context;
-		}
-		else{
-			res._context = this._context;
-		}
-		
-		/* Assign all values */
-		res.assign(this);
-		
-		return res;
 	}
 	
 	

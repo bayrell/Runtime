@@ -47,9 +47,9 @@ interface ContextInterface{
 	 * Returns global provider
 	 *
 	 * @params string provider_name
-	 * @return ContextObject
+	 * @return CoreObject
 	 */
-	public ContextObject getProvider(string provider_name);
+	public CoreObject getProvider(string provider_name);
 	
 	
 	
@@ -57,9 +57,9 @@ interface ContextInterface{
 	 * Returns global provider
 	 *
 	 * @params string provider_name
-	 * @return ContextObject
+	 * @return CoreObject
 	 */
-	public ContextObject createProvider(string provider_name);
+	public CoreObject createProvider(string provider_name);
 	
 	
 	
