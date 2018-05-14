@@ -147,7 +147,7 @@ export class rtl{
 	 * Create object by class_name. If class name does not exists return null
 	 * @return Object
 	 */
-	declare export static Object newInstance(string class_name, array args);
+	declare export static Object newInstance(string class_name, Vector<mixed> args);
 
 	#switch
 	#case ifcode PHP then
