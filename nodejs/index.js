@@ -34,6 +34,7 @@ module.exports = {
 		'MapInterface': require("./Interfaces/MapInterface.js"),
 		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),
 		'SerializeInterface': require("./Interfaces/SerializeInterface.js"),
+		'StringInterface': require("./Interfaces/StringInterface.js"),
 	},
 	'Providers': {
 		'AssertInterface': require("./Providers/AssertInterface.js"),

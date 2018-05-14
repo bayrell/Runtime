@@ -151,9 +151,12 @@ export class rtl{
 
 	#switch
 	#case ifcode PHP then
-	static function newInstance($class_name){
+	static function newInstance($class_name, $args = null){
 		$class_name = static::find_class($class_name);
-		return new $class_name();
+		if ($args == null)
+			return new $class_name();
+		$r = new \ReflectionClass($class_name);
+		return $r->newInstanceArgs($args->_getArr());
 	}
 	#case ifcode JAVASCRIPT then
 	static newInstance(class_name, args){
@@ -381,12 +384,17 @@ export class rtl{
 	#switch
 	#case ifcode PHP then
 	static function toString($value){
+		if ($value instanceof StringInterface) return $value->toString();
 		return (string)$value;
 	}
 	#case ifcode JAVASCRIPT then
 	static toString(value){
+		var _StringInterface = null;
+		if (isBrowser()) _StringInterface = BayrellRtl.Interfaces.StringInterface; 
+		else _StringInterface = StringInterface;
 		if (typeof value == 'string') return value;
 		if (value instanceof String) return value;
+		if (this.implements(value, _StringInterface)) return value.toString();
 		return new String(value);
 	}
 	#endswitch

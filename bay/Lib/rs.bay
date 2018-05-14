@@ -231,10 +231,13 @@ export class rs{
 	
 	#switch
 	#case ifcode PHP then
-	static function explode($s, $n, $limit = -1){
-		if ($limit < 0)
-			return explode($delimiter, $s);
-		return explode($delimiter, $s, $limit);
+	static function explode($delimiter, $s, $limit = -1){
+		$res = new Vector();
+		$arr = [];
+		if ($limit < 0) $arr = explode($delimiter, $s);
+		else $arr = explode($delimiter, $s, $limit);
+		$res->_assignArr($arr);
+		return $res;
 	}
 	#case ifcode JAVASCRIPT then
 	static explode(delimiter, s, limit){

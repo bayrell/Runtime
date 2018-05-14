@@ -34,6 +34,7 @@ $load([
 	"/assets/bayrell_rtl_es6/Interfaces/MapInterface.js",
 	"/assets/bayrell_rtl_es6/Interfaces/ModuleDescriptionInterface.js",
 	"/assets/bayrell_rtl_es6/Interfaces/SerializeInterface.js",
+	"/assets/bayrell_rtl_es6/Interfaces/StringInterface.js",
 	"/assets/bayrell_rtl_es6/Providers/AssertInterface.js",
 	"/assets/bayrell_rtl_es6/Providers/LogInterface.js",
 	"/assets/bayrell_rtl_es6/Providers/SerializeStringInterface.js",

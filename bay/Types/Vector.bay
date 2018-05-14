@@ -173,6 +173,12 @@ declare class Vector<T>{
 	 * Get last item
 	 */
 	declare public T getLastItem(T default_value);
+	
+	
+	/**
+	 * Remove value
+	 */
+	declare public void removeValue(T value);
 }
 
 
@@ -381,6 +387,17 @@ BayrellRtl.Types.Vector = class extends Array{
 		if (this.length == 0)
 			return default_value;
 		return this[this.length - 1];
+	}
+	
+	
+	
+	/**
+	 * Remove value
+	 */
+	removeValue(value){
+		var index = this.indexOf(value);
+		if (index != -1)
+			this.remove(index, 1);
 	}
 }
 
@@ -631,7 +648,17 @@ class Vector{
 		return isset($this->_arr[$c-1]) ? $this->_arr[$c-1] : $default_value;
 	}
 
-
+	
+	
+	/**
+	 * Remove value
+	 * @param mixed value
+	 */
+	public function removeValue($value){
+		$index = $this->indexOf($value);
+		if ($index != -1)
+			$this->remove($index, 1);
+	}
 }
 
 #endswitch
