@@ -30,9 +30,9 @@ module.exports = {
 		'CloneableInterface': require("./Interfaces/CloneableInterface.js"),
 		'ContextInterface': require("./Interfaces/ContextInterface.js"),
 		'FactoryInterface': require("./Interfaces/FactoryInterface.js"),
-		'LogInterface': require("./Interfaces/LogInterface.js"),
 		'MapInterface': require("./Interfaces/MapInterface.js"),
 		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),
+		'NewInstanceInterface': require("./Interfaces/NewInstanceInterface.js"),
 		'SerializeInterface': require("./Interfaces/SerializeInterface.js"),
 		'StringInterface': require("./Interfaces/StringInterface.js"),
 	},
@@ -58,6 +58,7 @@ module.exports = {
 	'ContextObject': require("./ContextObject.js"),
 	'CoreObject': require("./CoreObject.js"),
 	'ModuleDescription': require("./ModuleDescription.js"),
+	'NewInstanceContainer': require("./NewInstanceContainer.js"),
 	'ProviderDescription': require("./ProviderDescription.js"),
 	'RuntimeConstant': require("./RuntimeConstant.js"),
 };

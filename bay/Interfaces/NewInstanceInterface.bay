@@ -18,53 +18,45 @@
  
 namespace BayrellRtl.Interfaces;
 
-use BayrellRtl.CoreObject;
 use BayrellRtl.Types.Vector;
-use BayrellRtl.Interfaces.NewInstanceInterface;
+use BayrellRtl.Interfaces.ContextInterface;
 
 
-interface SerializeInterface{
+interface NewInstanceInterface{
+	
+	
+	/**
+	 * Returns context
+	 * @return ContextInterface
+	 */
+	public ContextInterface context();
 	
 	
 	
 	/**
-	 * Returns classname of the object
-	 * @return string
+	 * Set value
+	 * @params string key - key
+	 * @params mixed value - value
 	 */
-	public string getClassName();
+	void set(string key, mixed value);
 	
 	
 	
 	/**
-	 * Returns classname of the object
-	 * @return string
+	 * Get value by key
+	 * @params string key - key
+	 * @params mixed default_value - Default value if not exists
+	 * @return mixed value
 	 */
-	public static CoreObject createNewInstanceFromContainer(NewInstanceInterface container);
+	mixed get(string key, mixed default_value);
 	
 	
 	
 	/**
-	 * Returns name of variables to serialization
-	 * @return Vector<string>
+	 * Return true if key is exists
+	 * @params string key - Key
+	 * @return boolean
 	 */
-	public void getVariablesNames(Vector<string> names);
-	
-	
-	
-	/**
-	 * Returns instance of the value by variable name
-	 * @param string variable_name
-	 * @return var
-	 */
-	public var takeValue(string variable_name, var default_value = null);
-	
-	
-	
-	/**
-	 * Set new value instance by variable name
-	 * @param string variable_name
-	 * @param var value
-	 */
-	public void assignValue(string variable_name, var value);
+	boolean has(string key);
 	
 }

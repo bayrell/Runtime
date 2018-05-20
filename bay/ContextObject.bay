@@ -21,7 +21,6 @@ namespace BayrellRtl;
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.CoreObject;
 use BayrellRtl.Interfaces.ContextInterface;
-use BayrellRtl.Interfaces.LogInterface;
 
 
 class ContextObject extends CoreObject{
@@ -67,15 +66,6 @@ class ContextObject extends CoreObject{
 	
 	
 	
-	/**
-	 * Get class name
-	 */
-	ContextObject newInstance(){
-		return new ContextObject(this._context);
-	}
-	
-	
-	
 	/** 
 	 * Constructor
 	 */
@@ -87,40 +77,4 @@ class ContextObject extends CoreObject{
 		}
 	}
 	
-	
-	
-	/**
-	 * Register log
-	 */
-	int logRegister(string object_name){
-		LogInterface log = this.getProvider('default.log');
-		if (log){
-			return log.logRegister(this.getClassName(), object_name);
-		}
-		return -1;
-	}
-	
-	
-	
-	/**
-	 * Log message
-	 */
-	void log(int level, string object_name, string message){
-		LogInterface log = this.getProvider('default.log');
-		if (log){
-			log.log(level, this.getClassName(), object_name, message);
-		}
-	}
-	
-	
-	
-	/**
-	 * Log exception
-	 */
-	void logException(string level, string object_name, Object exception){
-		LogInterface log = this.getProvider('default.log');
-		if (log){
-			log.log(level, this.getClassName(), object_name, exception.toString());
-		}
-	}
 }
