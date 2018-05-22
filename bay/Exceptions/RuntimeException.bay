@@ -25,7 +25,11 @@ use BayrellRtl.Interfaces.ContextInterface;
 declare class ClassException{}
 
 #switch
-#case ifcode JAVASCRIPT then
+#case ifcode ES6 then
+if (typeof BayrellRtl == 'undefined') BayrellRtl = {};
+if (typeof BayrellRtl.Exceptions == 'undefined') BayrellRtl.Exceptions = {};
+BayrellRtl.Exceptions.ClassException = class extends Error { _init(){} }
+#case ifcode NODEJS then
 class ClassException extends Error { _init(){} }
 #case ifcode PHP then
 class ClassException extends \Exception {}
