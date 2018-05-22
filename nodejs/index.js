@@ -18,7 +18,7 @@
 
 
 module.exports = {
-	VERSION: '0.2.5',
+	VERSION: '0.2.6',
 	'Exceptions': {
 		'AssertError': require("./Exceptions/AssertError.js"),
 		'IndexOutOfRange': require("./Exceptions/IndexOutOfRange.js"),
@@ -32,7 +32,6 @@ module.exports = {
 		'FactoryInterface': require("./Interfaces/FactoryInterface.js"),
 		'MapInterface': require("./Interfaces/MapInterface.js"),
 		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),
-		'NewInstanceInterface': require("./Interfaces/NewInstanceInterface.js"),
 		'SerializeInterface': require("./Interfaces/SerializeInterface.js"),
 		'StringInterface': require("./Interfaces/StringInterface.js"),
 	},

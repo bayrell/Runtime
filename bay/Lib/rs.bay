@@ -265,7 +265,7 @@ export class rs{
 	#switch
 	#case ifcode PHP then
 	static function implode($s, $arr){
-		return "";
+		return implode($s, $arr->_getArr());
 	}
 	#case ifcode JAVASCRIPT then
 	static implode(ch, arr){

@@ -347,8 +347,42 @@ export class rtl{
 	 */
 	static bool isScalarValue(var value){
 		if (rtl::isString(value)) return true;
+		if (rtl::isNumber(value)) return true;
+		if (rtl::isBoolean(value)) return true;
 		return false;
 	}
+	
+	
+	/**
+	 * Return true if value is boolean
+	 * @param var value
+	 * @return boolean
+	 */
+	static boolean isBoolean(var value){
+		if (value === false or value === true) return true;
+		return false;
+	}
+	
+	
+	
+	/**
+	 * Return true if value is number
+	 * @param var value
+	 * @return boolean
+	 */
+	declare export static boolean isNumber(var value);
+
+	#switch
+	#case ifcode PHP then
+	static function isNumber($value){
+		return is_int($value) or is_float($value);
+	}
+	#case ifcode JAVASCRIPT then
+	static isNumber(value){
+		if (typeof value == "number") return true;
+		return false;
+	}
+	#endswitch
 	
 	
 	

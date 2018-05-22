@@ -22,6 +22,8 @@ use BayrellRtl.Lib.rtl;
 use BayrellRtl.Interfaces.ContextInterface;
 
 
+declare class ClassException{}
+
 #switch
 #case ifcode JAVASCRIPT then
 class ClassException extends Error { _init(){} }

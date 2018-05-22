@@ -54,7 +54,7 @@ class ProviderDescription extends CoreObject{
 	public FactoryInterface getFactory(){
 		return this._factory;
 	}
-	public string getTypeName(){
+	public string getType(){
 		return this._type;
 	}
 }

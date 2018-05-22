@@ -23,11 +23,9 @@ use BayrellRtl.CoreObject;
 use BayrellRtl.ContextObject;
 use BayrellRtl.Types.Map;
 use BayrellRtl.Types.Vector;
-use BayrellRtl.Interfaces.NewInstanceInterface;
 
 
-
-class NewInstanceContainer extends ContextObject implements NewInstanceInterface{
+class NewInstanceContainer extends ContextObject{
 	
 	protected Map<string, mixed> _values = null;
 	

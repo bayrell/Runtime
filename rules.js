@@ -21,7 +21,6 @@ module.exports = {
 		'Interfaces/FactoryInterface',
 		'Interfaces/MapInterface',
 		'Interfaces/ModuleDescriptionInterface',
-		'Interfaces/NewInstanceInterface',
 		'Interfaces/SerializeInterface',
 		'Interfaces/StringInterface',
 		'Providers/AssertInterface',

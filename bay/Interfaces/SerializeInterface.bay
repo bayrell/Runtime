@@ -20,7 +20,7 @@ namespace BayrellRtl.Interfaces;
 
 use BayrellRtl.CoreObject;
 use BayrellRtl.Types.Vector;
-use BayrellRtl.Interfaces.NewInstanceInterface;
+use BayrellRtl.NewInstanceContainer;
 
 
 interface SerializeInterface{
@@ -39,7 +39,7 @@ interface SerializeInterface{
 	 * Returns classname of the object
 	 * @return string
 	 */
-	public static CoreObject createNewInstanceFromContainer(NewInstanceInterface container);
+	public static CoreObject createNewInstanceFromContainer(NewInstanceContainer container);
 	
 	
 	

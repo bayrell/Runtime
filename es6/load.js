@@ -33,7 +33,6 @@ $load([
 	"/assets/BayrellRtl/Interfaces/FactoryInterface.js",
 	"/assets/BayrellRtl/Interfaces/MapInterface.js",
 	"/assets/BayrellRtl/Interfaces/ModuleDescriptionInterface.js",
-	"/assets/BayrellRtl/Interfaces/NewInstanceInterface.js",
 	"/assets/BayrellRtl/Interfaces/SerializeInterface.js",
 	"/assets/BayrellRtl/Interfaces/StringInterface.js",
 	"/assets/BayrellRtl/Providers/AssertInterface.js",
@@ -46,13 +45,16 @@ $load([
 	"/assets/BayrellRtl/ContextFactory.js",
 	"/assets/BayrellRtl/ContextObject.js",
 	"/assets/BayrellRtl/ModuleDescription.js",
-	"/assets/BayrellRtl/NewInstanceContainer.js",
 	"/assets/BayrellRtl/ProviderDescription.js",
 	"/assets/BayrellRtl/Lib/Utils.js",
 	"/assets/BayrellRtl/Exceptions/AssertError.js",
 	"/assets/BayrellRtl/Exceptions/IndexOutOfRange.js",
 	"/assets/BayrellRtl/Exceptions/KeyNotFound.js",
 	"/assets/BayrellRtl/Exceptions/UnknownError.js",
+])
+
+.load([
+	"/assets/BayrellRtl/NewInstanceContainer.js",
 ])
 
 .success(function(){
