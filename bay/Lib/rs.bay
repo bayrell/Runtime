@@ -41,7 +41,7 @@ export class rs{
 	#switch
 	#case ifcode PHP then
 	static function strlen(&$s){
-		return strlen($s);
+		return mb_strlen($s);
 	}
 	#case ifcode JAVASCRIPT then
 	static strlen(s){
@@ -65,7 +65,7 @@ export class rs{
 	#switch
 	#case ifcode PHP then
 	static function substr(&$s, $start, $length){
-		return substr($s, $start, $length);
+		return mb_substr($s, $start, $length);
 	}
 	#case ifcode JAVASCRIPT then
 	static substr(s, start, length){
@@ -107,7 +107,7 @@ export class rs{
 	#switch
 	#case ifcode PHP then
 	static function ord($s){
-		return ord($s);
+		return mb_ord($s);
 	}
 	#case ifcode JAVASCRIPT then
 	static ord(s){
@@ -177,7 +177,7 @@ export class rs{
 	#switch
 	#case ifcode PHP then
 	static function strpos($s, $search, $offset = 0){
-		$res = strpos($s, $search, $offset);
+		$res = mb_strpos($s, $search, $offset);
 		if ($res === false)
 			return -1;
 		return $res;

@@ -19,6 +19,9 @@
 namespace BayrellRtl.Providers;
 
 
+/**
+ * Provider "default:assert" 
+ */
 interface AssertInterface{
 	
 	

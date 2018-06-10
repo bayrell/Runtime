@@ -23,12 +23,42 @@ class RuntimeConstant{
 	
 		
 	/* Log level */
-	static const int LOG_FATAL_ERROR = 0;
-	static const int LOG_ERROR = 1;
-	static const int LOG_WARNING = 2;
-	static const int LOG_INFO = 3;
-	static const int LOG_DEBUG = 4;
-	static const int LOG_DEBUG2 = 5;
+	
+	/**
+	 * Fatal error. Application stoped
+	 */
+	static const int LOG_FATAL = 0;
+	
+	/**
+	 * Critical error. Application damaged, but works
+	 */	
+	static const int LOG_CRITICAL = 2;
+	
+	/**
+	 * Any Application error or exception
+	 */	
+	static const int LOG_ERROR = 4;
+	
+	/**
+	 * Log warning. Developer should attention to this
+	 */
+	static const int LOG_WARNING = 6;
+	
+	/**
+	 * Information about any event
+	 */
+	static const int LOG_INFO = 8;
+	
+	/**
+	 * Debug level 1
+	 */
+	static const int LOG_DEBUG = 10;
+	
+	/**
+	 * Debug level 2
+	 */	
+	static const int LOG_DEBUG2 = 12;
+	
 	
 	
 	/* Status codes */ 

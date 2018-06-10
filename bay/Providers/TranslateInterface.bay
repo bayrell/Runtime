@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library
+ *  Bayrell Common
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -18,28 +18,32 @@
 
 namespace BayrellRtl.Providers;
 
-use BayrellRtl.ContextObject;
-
 
 /**
- * Provider "default:log" 
+ * Provider "default:translate" 
  */
-interface LogInterface{
+interface TranslateInterface {
+	
+	
+	/**
+	 * Set application locale
+	 * @params string locale
+	 */
+	void setLocale(string locale);
+	
+	
+	
+	/**
+	 * Get application locale
+	 * @params string locale
+	 */
+	string getLocale();
 	
 	
 	
 	/**
 	 * Log message
 	 */
-	void log(int level, string module_name, string message);
-	
-	
-
-	/**
-	 * Log exception
-	 */
-	void logException(int level, string module_name, RuntimeException e);
-
+	public void translate(string message, Map<string, string> params = null, string locale = "");	
 	
 }
-

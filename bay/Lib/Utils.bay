@@ -161,4 +161,24 @@ export class Utils{
 		return res;
 	}
 	
+	
+	
+	/**
+	 * Convert bytes to string
+	 * @param Vector<byte> arr - vector of the bytes
+	 * @string charset - charset of the bytes vector. Default utf8
+	 * @return string
+	 */
+	public string bytesToString(Vector<byte> arr, string charset="utf8"){}
+	
+	
+	
+	/**
+	 * Convert string to bytes
+	 * @param string s - incoming string
+	 * @param Vector<byte> arr - output vector
+	 * @param charset - Result bytes charset. Default utf8
+	 */
+	public void stringToBytes(string s, Vector<byte> arr, string charset="utf8"){}
+	
 }
