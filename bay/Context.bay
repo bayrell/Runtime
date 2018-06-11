@@ -37,7 +37,7 @@ class Context extends CoreObject implements ContextInterface{
 	protected Vector<string> _modules = null;
 	protected Map<string, ProviderDescription> _providers_names = null;
 	protected Map<string, CoreObject> _current_providers = null;
-	protected Map<string, var> _values = null;
+	/*protected Map<string, var> _values = null;*/
 	
 	
 	/**
@@ -48,7 +48,7 @@ class Context extends CoreObject implements ContextInterface{
 		this._modules = new Vector<string>();
 		this._providers_names = new Map<string, ProviderDescription>();
 		this._current_providers = new Map<string, CoreObject>();
-		this._values = new Map<string, var>();
+		/*this._values = new Map<string, var>();*/
 	}
 	
 	
@@ -263,9 +263,9 @@ class Context extends CoreObject implements ContextInterface{
 	 * @params string attr_name - Attribute name
 	 * @params var value - value
 	 */
-	void setValue(string attr_name, var value){
+	/*void setValue(string attr_name, var value){
 		this._values.set(attr_name, value);
-	}
+	}*/
 	
 	
 	
@@ -275,9 +275,9 @@ class Context extends CoreObject implements ContextInterface{
 	 * @params var default_value - Default value if not exists
 	 * @return var value
 	 */
-	var getValue(string attr_name, var default_value){
+	/*var getValue(string attr_name, var default_value){
 		return this._values.get(attr_name, default_value);
-	}
+	}*/
 	
 	
 	
@@ -286,8 +286,8 @@ class Context extends CoreObject implements ContextInterface{
 	 * @params string attr_name - Attribute name
 	 * @return boolean
 	 */
-	boolean hasValue(string attr_name){
+	/*boolean hasValue(string attr_name){
 		return this._values.contains(attr_name);
-	}
+	}*/
 	
 }

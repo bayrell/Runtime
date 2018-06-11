@@ -95,7 +95,7 @@ interface ContextInterface{
 	 * @params string attr_name - Attribute name
 	 * @params var value - value
 	 */
-	void setValue(string attr_name, var value);
+	/*void setValue(string attr_name, var value);*/
 	
 	
 	/**
@@ -104,7 +104,7 @@ interface ContextInterface{
 	 * @params var default_value - Default value if not exists
 	 * @return var value
 	 */
-	var getValue(string attr_name, var default_value);
+	/*var getValue(string attr_name, var default_value);*/
 	
 	
 	/**
@@ -112,6 +112,6 @@ interface ContextInterface{
 	 * @params string attr_name - Attribute name
 	 * @return boolean
 	 */
-	boolean hasValue(string attr_name);
+	/*boolean hasValue(string attr_name);*/
 }
 
