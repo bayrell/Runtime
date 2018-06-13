@@ -179,6 +179,33 @@ declare class Vector<T>{
 	 * Remove value
 	 */
 	declare public void removeValue(T value);
+	
+	
+	/**
+	 * Map
+	 * @param func f
+	 * @return Vector
+	 */
+	Vector map(func f);
+	
+	
+	
+	/**
+	 * Filter items
+	 * @param func f
+	 * @return Vector
+	 */
+	Vector filter(func f);
+	
+	
+	
+	/**
+	 * Reduce
+	 * @param func f
+	 * @param mixed init_value
+	 * @return init_value
+	 */
+	mixed reduce(func f, mixed init_value);
 }
 
 
@@ -399,6 +426,41 @@ BayrellRtl.Types.Vector = class extends Array{
 		if (index != -1)
 			this.remove(index, 1);
 	}
+	
+	
+	
+	/**
+	 * Map
+	 * @param func f
+	 * @return Vector
+	 */
+	map(f){
+		return super.map(f);
+	}
+	
+	
+	
+	/**
+	 * Filter items
+	 * @param func f
+	 * @return Vector
+	 */
+	filter(f){
+		return super.filter(f);
+	}
+	
+	
+	
+	/**
+	 * Reduce
+	 * @param func f
+	 * @param mixed init_value
+	 * @return init_value
+	 */
+	reduce(f, init_value){
+		return super.reduce(f, init_value);
+	}
+	
 }
 
 #case ifcode NODEJS then
@@ -659,6 +721,45 @@ class Vector{
 		if ($index != -1)
 			$this->remove($index, 1);
 	}
+	
+	
+	
+	/**
+	 * Map
+	 * @param func f
+	 * @return Vector
+	 */
+	function map($f){
+		$arr2 = new Vector();
+		$arr2->_arr = array_map($f, $this->_arr);
+		return $arr2;
+	}
+	
+	
+	
+	/**
+	 * Filter items
+	 * @param func f
+	 * @return Vector
+	 */
+	function filter($f){
+		$arr2 = new Vector();
+		$arr2->_arr = array_filter($this->_arr, $f);
+		return $arr2;
+	}
+	
+	
+	
+	/**
+	 * Reduce
+	 * @param func f
+	 * @param mixed init_value
+	 * @return init_value
+	 */
+	function reduce($f, $init_value){
+		return array_reduce($this->_arr, $f, $init_value);
+	}
+	
 }
 
 #endswitch

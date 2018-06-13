@@ -1,3 +1,5 @@
+<?php
+
 /*!
  *  Bayrell Runtime Library
  *
@@ -16,19 +18,18 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl.Interfaces;
+namespace BayrellRtl\Types;
 
-use BayrellRtl.CoreObject;
-use BayrellRtl.Interfaces.ContextInterface;
-
-
-interface FactoryInterface{
+class Callback {
+	protected $obj;
+	protected $name;
 	
-	
-	/**
-	 * Returns new Instance
-	 */
-	public CoreObject newInstance(ContextInterface context);
-	
+	function __construct($obj, $name){
+		$this->obj = $obj;
+		$this->name = $name;
+	}
+		
+	function __invoke(){
+		return call_user_func_array([$this->obj, $this->name], func_get_args());
+	}
 }
-

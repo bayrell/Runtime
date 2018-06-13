@@ -19,7 +19,7 @@
 namespace BayrellRtl.Interfaces;
 
 use BayrellRtl.Interfaces.MapInterface;
-use BayrellRtl.ContextObject;
+use BayrellRtl.CoreObject;
 
 
 interface ContextInterface{
@@ -40,16 +40,6 @@ interface ContextInterface{
 	 * @param int type
 	 */
 	ContextInterface registerProvider(string provider_name, string factory_name, int type);
-	
-	
-	
-	/**
-	 * Returns global provider
-	 *
-	 * @params string provider_name
-	 * @return CoreObject
-	 */
-	public CoreObject getProvider(string provider_name);
 	
 	
 	
@@ -89,29 +79,5 @@ interface ContextInterface{
 	string translate(string message, MapInterface params = null, string locale = "");
 	
 	
-	
-	/**
-	 * Set attribute value
-	 * @params string attr_name - Attribute name
-	 * @params var value - value
-	 */
-	/*void setValue(string attr_name, var value);*/
-	
-	
-	/**
-	 * Get attribute value
-	 * @params string attr_name - Attribute name
-	 * @params var default_value - Default value if not exists
-	 * @return var value
-	 */
-	/*var getValue(string attr_name, var default_value);*/
-	
-	
-	/**
-	 * Return true if attr is exists
-	 * @params string attr_name - Attribute name
-	 * @return boolean
-	 */
-	/*boolean hasValue(string attr_name);*/
 }
 

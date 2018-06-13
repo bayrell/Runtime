@@ -36,8 +36,6 @@ class Context extends CoreObject implements ContextInterface{
 	protected string _locale = "";
 	protected Vector<string> _modules = null;
 	protected Map<string, ProviderDescription> _providers_names = null;
-	protected Map<string, CoreObject> _current_providers = null;
-	/*protected Map<string, var> _values = null;*/
 	
 	
 	/**
@@ -47,8 +45,6 @@ class Context extends CoreObject implements ContextInterface{
 		parent();
 		this._modules = new Vector<string>();
 		this._providers_names = new Map<string, ProviderDescription>();
-		this._current_providers = new Map<string, CoreObject>();
-		/*this._values = new Map<string, var>();*/
 	}
 	
 	
@@ -57,7 +53,6 @@ class Context extends CoreObject implements ContextInterface{
 	 * Destructor
 	 */
 	public void destructor(){
-		delete this._current_providers;
 		delete this._providers_classes_names;
 		delete this._modules;
 		parent();
@@ -172,42 +167,10 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
-	 * Returns standart provider
-	 *
-	 * @params string provider_name
-	 * @return ContextObject
-	 */
-	public CoreObject getProvider(string provider_name){
-	
-		if (this._providers_names.has(provider_name)){
-			ProviderDescription description = this._providers_names.item(provider_name);
-			
-			if (description.getType() == ProviderDescription::PROVIDER_REGULAR){
-				if (this._current_providers.has(provider_name))
-					return this._current_providers.item(provider_name);
-			}
-			
-			CoreObject obj = this.createProvider(provider_name);
-			if (obj == null)
-				return null;
-			
-			if (description.getType() == ProviderDescription::PROVIDER_REGULAR){
-				this._current_providers.set(provider_name, obj);
-			}
-			
-			return obj;
-		}
-		
-		return null;
-	}
-	
-	
-	
-	/**
 	 * Returns temporary provider
 	 *
 	 * @params string provider_name
-	 * @return ContextObject
+	 * @return CoreObject
 	 */
 	public CoreObject createProvider(string provider_name){
 		if (!this._providers_names.has(provider_name))
@@ -218,7 +181,7 @@ class Context extends CoreObject implements ContextInterface{
 			return null;
 			
 		FactoryInterface factory_obj = description.getFactory();
-		CoreObject obj = factory_obj.newInstance();
+		CoreObject obj = factory_obj.newInstance(this);
 		
 		return obj;
 	}
@@ -255,39 +218,5 @@ class Context extends CoreObject implements ContextInterface{
 	string translate(string message, MapInterface params = null, string locale = ""){
 		return message;
 	}
-	
-	
-	
-	/**
-	 * Set attribute value
-	 * @params string attr_name - Attribute name
-	 * @params var value - value
-	 */
-	/*void setValue(string attr_name, var value){
-		this._values.set(attr_name, value);
-	}*/
-	
-	
-	
-	/**
-	 * Get attribute value
-	 * @params string attr_name - Attribute name
-	 * @params var default_value - Default value if not exists
-	 * @return var value
-	 */
-	/*var getValue(string attr_name, var default_value){
-		return this._values.get(attr_name, default_value);
-	}*/
-	
-	
-	
-	/**
-	 * Return true if attr is exists
-	 * @params string attr_name - Attribute name
-	 * @return boolean
-	 */
-	/*boolean hasValue(string attr_name){
-		return this._values.contains(attr_name);
-	}*/
 	
 }

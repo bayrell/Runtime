@@ -15,20 +15,62 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+ 
+namespace BayrellRtl.Types;
 
-namespace BayrellRtl.Interfaces;
-
+use BayrellRtl.Types.Vector;
 use BayrellRtl.CoreObject;
-use BayrellRtl.Interfaces.ContextInterface;
 
 
-interface FactoryInterface{
+class Pipe extends CoreObject{
+	
+	protected Vector<func> pipe = null;
 	
 	
 	/**
-	 * Returns new Instance
+	 * Constructor
 	 */
-	public CoreObject newInstance(ContextInterface context);
+	public void constructor(){
+		parent();
+		this.pipe = new Vector<func>();
+	}
+	
+	
+	
+	/**
+	 * Constructor
+	 */
+	public void destructor(){
+		delete this.pipe;
+		parent();
+	}
+	
+	
+	
+	/**
+	 * Add function to pipe
+	 */
+	public Pipe then(func f){
+		this.pipe.push(f);
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Run pipe of functions
+	 * @param mixed obj - input value
+	 * @return mixed - the result
+	 */
+	public mixed run(mixed obj){
+		
+		return this.pipe.reduce( 
+			mixed (mixed res, func item){ 
+				return item(res); 
+			}, 
+			obj
+		);
+		
+	}
 	
 }
-

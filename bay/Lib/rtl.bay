@@ -285,8 +285,7 @@ export class rtl{
 			return res;
 		}
 		else if (typeof val == 'object'){
-			var res = {};
-			
+		
 			var _rtl = null;
 			var _CloneableInterface = null;
 			if (isBrowser()){
@@ -306,15 +305,8 @@ export class rtl{
 				res.assign(val);
 				return res;
 			}
-			else if (val.prototype){
-				res = new item.constructor();
-			}
-			/*
-			for (var i in val){
-				res[i] = this._clone(val[i]);
-			}
-			*/
-			return res;
+			
+			return val;
 		}
 	}
 	#endswitch
