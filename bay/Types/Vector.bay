@@ -186,7 +186,7 @@ declare class Vector<T>{
 	 * @param func f
 	 * @return Vector
 	 */
-	Vector map(func f);
+	declare Vector map(func f);
 	
 	
 	
@@ -195,7 +195,7 @@ declare class Vector<T>{
 	 * @param func f
 	 * @return Vector
 	 */
-	Vector filter(func f);
+	declare Vector filter(func f);
 	
 	
 	
@@ -205,7 +205,7 @@ declare class Vector<T>{
 	 * @param mixed init_value
 	 * @return init_value
 	 */
-	mixed reduce(func f, mixed init_value);
+	declare mixed reduce(func f, mixed init_value);
 }
 
 
