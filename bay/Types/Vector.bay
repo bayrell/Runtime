@@ -149,7 +149,7 @@ declare class Vector<T>{
 	
 	
 	/**
-	 * Append value to the end of array
+	 * Append value to the end of the vector
 	 * @param T value
 	 */
 	declare public Vector<T> append(T value);
@@ -157,10 +157,27 @@ declare class Vector<T>{
 	
 	
 	/**
-	 * Insert first value size_to array
+	 * Insert first value to begin of the vector
 	 * @return T value
 	 */
 	declare public Vector<T> prepend(T value);
+	
+	
+	
+	/**
+	 * Append vector to the end of the vector
+	 * @param Vector<T> arr
+	 */
+	declare public Vector<T> appendVector(Vector<T> arr);
+	
+	
+	
+	/**
+	 * Prepend vector to the begin of the vector
+	 * @param Vector<T> arr
+	 */
+	declare public Vector<T> prependVector(Vector<T> arr);
+	
 	
 	
 	/**
@@ -169,16 +186,19 @@ declare class Vector<T>{
 	declare public void length();
 	
 	
+	
 	/**
 	 * Get last item
 	 */
 	declare public T getLastItem(T default_value);
 	
 	
+	
 	/**
 	 * Remove value
 	 */
 	declare public void removeValue(T value);
+	
 	
 	
 	/**
@@ -214,6 +234,15 @@ declare class Vector<T>{
 	 * @param func f
 	 */
 	declare void each(func f);
+	
+	
+	
+	/**
+	 * Returns Vector
+	 * @param Vector<T> arr
+	 * @return Vector<T>
+	 */
+	declare Vector<T> concat(Vector<T> arr);
 }
 
 
@@ -394,7 +423,7 @@ BayrellRtl.Types.Vector = class extends Array{
 	
 	
 	/**
-	 * Append value to the end of array
+	 * Append value to the end of the vector
 	 * @param T value
 	 */
 	append(value){
@@ -405,12 +434,34 @@ BayrellRtl.Types.Vector = class extends Array{
 	
 	
 	/**
-	 * Insert first value size_to array
+	 * Insert first value to the begin of the vector
 	 * @return T value
 	 */
 	prepend(value){
 		this.unshift(value);
 		return this;
+	}
+	
+	
+	
+	/**
+	 * Append vector to the end of the vector
+	 * @param Vector<T> arr
+	 */
+	appendVector(arr){
+		function f(item){ this.push(item); };
+		arr.forEach(f.bind(this));
+	}
+	
+	
+	
+	/**
+	 * Prepend vector to the begin of the vector
+	 * @param Vector<T> arr
+	 */
+	prependVector(arr){
+		function f(item){ this.prepend(item); };
+		arr.forEach(f.bind(this));
 	}
 	
 	
@@ -479,6 +530,16 @@ BayrellRtl.Types.Vector = class extends Array{
 		super.forEach(f);
 	}
 	
+	
+	
+	/**
+	 * Returns Vector
+	 * @param Vector<T> arr
+	 * @return Vector<T>
+	 */
+	concat(arr){
+		return super.concat(arr);
+	}
 }
 
 #case ifcode NODEJS then
@@ -713,6 +774,30 @@ class Vector{
 	
 	
 	/**
+	 * Append vector to the end of the vector
+	 * @param Vector<T> arr
+	 */
+	public function appendVector($arr){
+		$arr->each(function($item) use ($this){
+			$this->append($item);
+		});
+	}
+	
+	
+	
+	/**
+	 * Prepend vector to the begin of the vector
+	 * @param Vector<T> arr
+	 */
+	public function prependVector($arr){
+		$arr->each(function($item) use ($this){
+			$this->prepend($item);
+		});
+	}
+	
+	
+	
+	/**
 	 * Returns count items in vector
 	 */
 	public function length(){
@@ -786,6 +871,19 @@ class Vector{
 	 */
 	function each($f){
 		array_walk($this->_arr, $f);
+	}
+	
+	
+	
+	/**
+	 * Returns new concated Vector
+	 * @param Vector v
+	 * @return Vector
+	 */
+	function concat($v){
+		$arr2 = new Vector();
+		$arr2->_arr = array_merge($this->arr, $v->_arr);
+		return $arr2;
 	}
 }
 
