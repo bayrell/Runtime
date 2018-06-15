@@ -206,6 +206,14 @@ declare class Vector<T>{
 	 * @return init_value
 	 */
 	declare mixed reduce(func f, mixed init_value);
+	
+	
+	
+	/**
+	 * Call function for each item
+	 * @param func f
+	 */
+	declare void each(func f);
 }
 
 
@@ -459,6 +467,16 @@ BayrellRtl.Types.Vector = class extends Array{
 	 */
 	reduce(f, init_value){
 		return super.reduce(f, init_value);
+	}
+	
+	
+	
+	/**
+	 * Call function for each item
+	 * @param func f
+	 */
+	each(f){
+		super.forEach(f);
 	}
 	
 }
@@ -760,6 +778,15 @@ class Vector{
 		return array_reduce($this->_arr, $f, $init_value);
 	}
 	
+	
+	
+	/**
+	 * Call function for each item
+	 * @param func f
+	 */
+	function each($f){
+		array_walk($this->_arr, $f);
+	}
 }
 
 #endswitch
