@@ -18,9 +18,9 @@
 
 namespace BayrellRtl;
 
-
 use BayrellRtl.Context;
 use BayrellRtl.CoreObject;
+use BayrellRtl.Lib.rtl;
 use BayrellRtl.Types.Vector;
 use BayrellRtl.Interfaces.ContextInterface;
 use BayrellRtl.Interfaces.FactoryInterface;
@@ -75,9 +75,37 @@ class ContextFactory extends CoreObject implements FactoryInterface{
 	/**
 	 * Register module
 	 */
-	ContextFactory registerModule(string module_name){
+	public ContextFactory registerModule(string module_name){
 		this._modules.push(module_name);
 		return this;
 	}
-
+	
+	
+	
+	/**
+	 * Register global interface
+	 * @params Vector<string> modules
+	 * @return ContextInterface
+	 */
+	public static ContextInterface createContext(Vector<string> modules){
+		ContextFactory factory = new ContextFactory();
+		modules.each(void (string module) use (factory){
+			factory.registerModule(module);
+		});
+		ContextInterface context = factory.newInstance();
+		return context;
+	}
+	
+	
+	
+	/**
+	 * Register global interface
+	 * @params Vector<string> modules
+	 * @return ContextInterface
+	 */
+	public static ContextInterface registerGlobalContext(Vector<string> modules){
+		ContextInterface context = self::createContext(modules);
+		rtl::setGlobalContext(context);
+		return context;
+	}
 }

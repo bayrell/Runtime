@@ -64,6 +64,17 @@ export class rtl{
 	}
 	
 	
+	
+	/**
+	 * Returns global context
+	 * @param ContextInterface context
+	 */
+	public static ContextInterface getGlobalContext(){
+		return self::globalContext();
+	}
+	
+	
+	
 	#switch
 	#case ifcode JAVASCRIPT then
 	static implements(obj, interface_name){
