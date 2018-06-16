@@ -164,6 +164,35 @@ export class Utils{
 	
 	
 	/**
+	 * Returns relative path of the filepath
+	 * @param string filepath
+	 * @param string basepath
+	 * @param string ch - Directory separator
+	 * @return string relative path
+	 */
+	public static string relativePath(string filepath, string basepath, string ch = "/"){
+		Vector<string> source = rs::explode(ch, filepath);
+		Vector<string> base = rs::explode(ch, basepath);
+		
+		source = source.filter(bool (string s){ return s != ""; });
+		base = base.filter(bool (string s){ return s != ""; });
+		
+		int i=0;
+		while (source.count() > 0 and base.count() > 0 and source.item(0) == base.item(0)){
+			source.shift();
+			base.shift();
+		}
+		
+		base.each(void (string s) use (source){
+			source.unshift("..");
+		});
+		
+		return rs::implode(ch, source);
+	}
+	
+	
+	
+	/**
 	 * Convert bytes to string
 	 * @param Vector<byte> arr - vector of the bytes
 	 * @string charset - charset of the bytes vector. Default utf8

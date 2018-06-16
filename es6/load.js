@@ -46,11 +46,12 @@ $load([
 	"/assets/BayrellRtl/ContextObject.js",
 	"/assets/BayrellRtl/ModuleDescription.js",
 	"/assets/BayrellRtl/ProviderDescription.js",
-	"/assets/BayrellRtl/Lib/Utils.js",
 	"/assets/BayrellRtl/Exceptions/AssertError.js",
 	"/assets/BayrellRtl/Exceptions/IndexOutOfRange.js",
 	"/assets/BayrellRtl/Exceptions/KeyNotFound.js",
 	"/assets/BayrellRtl/Exceptions/UnknownError.js",
+	"/assets/BayrellRtl/Lib/Utils.js",
+	"/assets/BayrellRtl/Types/Pipe.js",	
 ])
 
 .load([

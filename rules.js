@@ -33,6 +33,7 @@ module.exports = {
 		'Lib/Utils',
 		'Types/Map',
 		'Types/PathInfo',
+		'Types/Pipe',
 		'Types/Vector',		
 		'Context',
 		'ContextFactory',
