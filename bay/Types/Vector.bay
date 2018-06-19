@@ -778,7 +778,7 @@ class Vector{
 	 * @param Vector<T> arr
 	 */
 	public function appendVector($arr){
-		$arr->each(function($item) use ($this){
+		$arr->each(function($item){
 			$this->append($item);
 		});
 	}
@@ -790,7 +790,7 @@ class Vector{
 	 * @param Vector<T> arr
 	 */
 	public function prependVector($arr){
-		$arr->each(function($item) use ($this){
+		$arr->each(function($item){
 			$this->prepend($item);
 		});
 	}

@@ -35,6 +35,7 @@ class Context extends CoreObject implements ContextInterface{
 	
 	protected string _locale = "";
 	protected Vector<string> _modules = null;
+	protected Map<string, mixed> _values = null;
 	protected Map<string, ProviderDescription> _providers_names = null;
 	
 	
@@ -44,6 +45,7 @@ class Context extends CoreObject implements ContextInterface{
 	void constructor(){
 		parent();
 		this._modules = new Vector<string>();
+		this._values = new Map<string, mixed>();
 		this._providers_names = new Map<string, ProviderDescription>();
 	}
 	
@@ -184,6 +186,28 @@ class Context extends CoreObject implements ContextInterface{
 		CoreObject obj = factory_obj.newInstance(this);
 		
 		return obj;
+	}
+
+	
+	
+	/**
+	 * Set value
+	 * @param string name
+	 * @param mixed value
+	 */
+	public mixed setValue(string name, mixed value){
+		this._values.set(name, value);
+	}
+	
+
+
+	/**
+	 * Get value
+	 * @param string name
+	 * @param mixed value
+	 */
+	public mixed getValue(string name, mixed default_value = null){
+		return this._values.get(name, default_value);
 	}
 
 	
