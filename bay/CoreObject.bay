@@ -82,8 +82,7 @@ class CoreObject{
 	 * Returns name of variables to serialization
 	 * @return Vector<string>
 	 */
-	public void getVariablesNames(Vector<string> names){
-	}
+	public void getVariablesNames(Vector<string> names){}
 	
 	
 	
@@ -92,8 +91,7 @@ class CoreObject{
 	 * @param string variable_name
 	 * @return var
 	 */
-	public var takeValue(string variable_name, var default_value = null){
-	}
+	public var takeValue(string variable_name, var default_value = null){}
 	
 	
 	
@@ -102,6 +100,13 @@ class CoreObject{
 	 * @param string variable_name
 	 * @param var value
 	 */
-	public void assignValue(string variable_name, var value){
-	}
+	public void assignValue(string variable_name, var value){}
+	
+	
+	
+	/**
+	 * Assign all data from other object
+	 * @param CoreObject obj
+	 */
+	void assign(CoreObject obj){}
 }

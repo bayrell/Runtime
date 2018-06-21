@@ -24,7 +24,7 @@ use BayrellRtl.CoreObject;
 
 class Pipe extends CoreObject{
 	
-	protected Vector<func> pipe = null;
+	public Vector<func> pipe = null;
 	
 	
 	/**
@@ -58,19 +58,51 @@ class Pipe extends CoreObject{
 	
 	
 	/**
+	 * Add function to pipe
+	 */
+	public Pipe prepend(func f){
+		this.pipe.prepend(f);
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Prepend another pipe
+	 */
+	public Pipe prependPipe(Pipe p){
+		p.pipe.each(void (func item){
+			this.pipe.prepend(item);
+		});
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Append another pipe
+	 */
+	public Pipe appendPipe(Pipe p){
+		p.pipe.each(void (func item){
+			this.pipe.append(item);
+		});
+		return this;
+	}
+	
+	
+	
+	/**
 	 * Run pipe of functions
 	 * @param mixed obj - input value
 	 * @return mixed - the result
 	 */
 	public mixed run(mixed obj){
-		
 		return this.pipe.reduce( 
 			mixed (mixed res, func item){ 
 				return item(res); 
 			}, 
 			obj
 		);
-		
 	}
 	
 }
