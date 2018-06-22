@@ -20,17 +20,18 @@ namespace BayrellRtl;
 
 use BayrellRtl.Lib.rtl;
 use BayrellRtl.Types.Vector;
+use BayrellRtl.Interfaces.AssetsInterface;
 use BayrellRtl.Interfaces.ModuleDescriptionInterface;
 
 
-class ModuleDescription implements ModuleDescriptionInterface{
+class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface{
 
 	
 	/**
 	 * Returns module name
 	 * @return string
 	 */
-	public static string getModuleName(){
+	public static string getName(){
 		return "BayrellRtl";
 	}
 	
@@ -41,7 +42,7 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * @return string
 	 */
 	public static string getModuleVersion(){
-		return "0.2.7";
+		return "0.3.1";
 	}
 	
 	
@@ -70,8 +71,19 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 */	
 	public static Vector<string> getInterfaces(){
 		return [
+			'BayrellRtl.Interfaces.AssetsInterface',
 			'BayrellRtl.Interfaces.ModuleDescriptionInterface',
 		];
+	}
+	
+	
+	
+	/**
+	 * Returns required assets
+	 * @return Map<string, string>
+	 */	
+	public static Vector<string> getRequiredAssets(){
+		return null;
 	}
 	
 	
@@ -93,5 +105,63 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	public static Map<string, string> getRequiredDevModules(){
 		return null;
 	}
-
+	
+	
+	
+	/**
+	 * Returns sync loaded files
+	 */		
+	public static Vector<string> assetsSyncLoad(){
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns async loaded files
+	 */			
+	public static Vector<mixed> assetsAsyncLoad(){
+		return [
+			[
+				"/assets/BayrellRtl/Lib/fs.js",
+				"/assets/BayrellRtl/Lib/rs.js",
+				"/assets/BayrellRtl/Lib/re.js",
+				"/assets/BayrellRtl/Lib/rtl.js",
+				"/assets/BayrellRtl/Types/Map.js",
+				"/assets/BayrellRtl/Types/PathInfo.js",
+				"/assets/BayrellRtl/Types/Vector.js",
+				"/assets/BayrellRtl/CoreObject.js",
+				"/assets/BayrellRtl/RuntimeConstant.js",
+				"/assets/BayrellRtl/Exceptions/RuntimeException.js",
+				"/assets/BayrellRtl/Interfaces/CloneableInterface.js",
+				"/assets/BayrellRtl/Interfaces/ContextInterface.js",
+				"/assets/BayrellRtl/Interfaces/FactoryInterface.js",
+				"/assets/BayrellRtl/Interfaces/MapInterface.js",
+				"/assets/BayrellRtl/Interfaces/ModuleDescriptionInterface.js",
+				"/assets/BayrellRtl/Interfaces/SerializeInterface.js",
+				"/assets/BayrellRtl/Interfaces/StringInterface.js",
+				"/assets/BayrellRtl/Providers/AssertInterface.js",
+				"/assets/BayrellRtl/Providers/LogInterface.js",
+				"/assets/BayrellRtl/Providers/SerializeStringInterface.js",
+			],
+			[
+				"/assets/BayrellRtl/Context.js",
+				"/assets/BayrellRtl/ContextFactory.js",
+				"/assets/BayrellRtl/ContextObject.js",
+				"/assets/BayrellRtl/CoreAsset.js",
+				"/assets/BayrellRtl/ModuleDescription.js",
+				"/assets/BayrellRtl/ProviderDescription.js",
+				"/assets/BayrellRtl/Exceptions/AssertError.js",
+				"/assets/BayrellRtl/Exceptions/IndexOutOfRange.js",
+				"/assets/BayrellRtl/Exceptions/KeyNotFound.js",
+				"/assets/BayrellRtl/Exceptions/UnknownError.js",
+				"/assets/BayrellRtl/Lib/Utils.js",
+				"/assets/BayrellRtl/Types/Pipe.js",	
+			],
+			[
+				"/assets/BayrellRtl/NewInstanceContainer.js",
+			]
+		];
+	}
+	
 }

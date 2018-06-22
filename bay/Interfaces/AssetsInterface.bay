@@ -23,27 +23,11 @@ use BayrellRtl.Types.Vector;
 use BayrellRtl.Interfaces.ContextInterface;
 
 
-interface ModuleDescriptionInterface{
+interface AssetsInterface{
 	
 	
 	/**
-	 * Init context
-	 * @param ContextInterface context
-	 */
-	public static void initContext(ContextInterface context);
-	
-	
-	
-	/**
-	 * Called then module registed in context
-	 * @param ContextInterface context
-	 */
-	public static void onRegister(ContextInterface context);
-	
-	
-	
-	/**
-	 * Returns module name
+	 * Returns assets name
 	 * @return string
 	 */
 	public static string getName();
@@ -51,18 +35,10 @@ interface ModuleDescriptionInterface{
 	
 	
 	/**
-	 * Returns module name
-	 * @return string
-	 */	
-	public static string getModuleVersion();
-	
-	
-	
-	/**
-	 * Returns description interfaces of the current module
+	 * Returns required assets
 	 * @return Vector<string>
 	 */	
-	public static Vector<string> getInterfaces();
+	public static Vector<string> getRequiredAssets();
 	
 	
 	
@@ -75,9 +51,15 @@ interface ModuleDescriptionInterface{
 	
 	
 	/**
-	 * Returns required modules
-	 * @return Map<string, string>
-	 */	
-	public static Map<string, string> getRequiredDevModules();
+	 * Returns sync loaded files
+	 */		
+	public static Vector<string> assetsSyncLoad();
+	
+	
+	
+	/**
+	 * Returns async loaded files
+	 */			
+	public static Vector<mixed> assetsAsyncLoad();
 	
 }

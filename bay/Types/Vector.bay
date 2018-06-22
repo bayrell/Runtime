@@ -882,7 +882,7 @@ class Vector{
 	 */
 	function concat($v){
 		$arr2 = new Vector();
-		$arr2->_arr = array_merge($this->arr, $v->_arr);
+		$arr2->_arr = array_merge($this->_arr, $v->_arr);
 		return $arr2;
 	}
 }
