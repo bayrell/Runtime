@@ -134,6 +134,19 @@ Runtime.Map = class extends Map{
 	
 	
 	/**
+	 * Map constructor
+	 */
+	constructor(map){
+		super();
+		if (map != undefined && typeof map == 'object'){
+			for (var i in map){
+				super.set(i, map[i]);
+			}
+		}
+	}
+	
+	
+	/**
 	 * Returns value from position
 	 * @param T1 key
 	 * @param T2 default_value
@@ -291,8 +304,11 @@ class Map{
 	/**
 	 * Constructor
 	 */
-	public function __construct(){
+	public function __construct($map = []){
 		$this->_map = [];
+		foreach ($map as $key => $value){
+			$this->_map[$key] = $value;
+		}
 	}
 	
 	

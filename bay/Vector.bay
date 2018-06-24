@@ -555,8 +555,11 @@ class Vector{
 	/**
 	 * Constructor
 	 */
-	public function __construct(){
-		$this->_arr = [];
+	public function __construct($arr = null){
+		if ($arr == null)
+			$this->_arr = [];
+		else
+			$this->_arr = $arr;
 	}
 	
 	
