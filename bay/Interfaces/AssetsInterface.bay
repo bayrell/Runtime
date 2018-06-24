@@ -15,17 +15,50 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
+ 
 namespace Runtime.Interfaces;
 
+use Runtime.Map;
+use Runtime.Vector;
 
-interface StringInterface{
+
+interface AssetsInterface{
 	
 	
 	/**
-	 * Returns string
+	 * Returns assets name
+	 * @return string
 	 */
-	public string toString();
+	public static string getName();
+	
+	
+	
+	/**
+	 * Returns required assets
+	 * @return Vector<string>
+	 */	
+	public static Vector<string> getRequiredAssets();
+	
+	
+	
+	/**
+	 * Returns required modules
+	 * @return Map<string, string>
+	 */	
+	public static Map<string, string> getRequiredModules();
+	
+	
+	
+	/**
+	 * Returns sync loaded files
+	 */		
+	public static Vector<string> assetsSyncLoad();
+	
+	
+	
+	/**
+	 * Returns async loaded files
+	 */			
+	public static Vector<mixed> assetsAsyncLoad();
 	
 }
-

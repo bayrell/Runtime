@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.rtl;
 use Runtime.CoreObject;
+use Runtime.Utils;
 use Runtime.Interfaces.ContextInterface;
 
 
@@ -73,7 +74,7 @@ class ContextObject extends CoreObject{
 		parent();
 		this._context = context;
 		if (not rtl::exists(this._context)){
-			this._context = rtl::globalContext();
+			this._context = Utils::globalContext();
 		}
 	}
 	

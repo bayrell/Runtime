@@ -46,7 +46,7 @@ export class rs{
 	#case ifcode JAVASCRIPT then
 	static strlen(s){
 		if (isBrowser())
-			return BayrellRtl.Lib.rtl.toString(s).length;
+			return Runtime.rtl.toString(s).length;
 		return rtl.toString(s).length;
 	}
 	#endswitch
@@ -69,8 +69,8 @@ export class rs{
 	}
 	#case ifcode JAVASCRIPT then
 	static substr(s, start, length){
-		var _rtl = null; if (isBrowser()) _rtl = BayrellRtl.Lib.rtl; else _rtl = rtl;
-		var _rs = null; if (isBrowser()) _rs = BayrellRtl.Lib.rs; else _rs = rs;
+		var _rtl = null; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
+		var _rs = null; if (isBrowser()) _rs = Runtime.rs; else _rs = rs;
 		var end = start + length;
 		if (length < 0){
 			var sz = _rs.strlen(s);
@@ -112,7 +112,7 @@ export class rs{
 	#case ifcode JAVASCRIPT then
 	static ord(s){
 		if (isBrowser())
-			return BayrellRtl.Lib.rtl.toString(s).charCodeAt(0);
+			return Runtime.rtl.toString(s).charCodeAt(0);
 		return rtl.toString(s).charCodeAt(0);
 	}
 	#endswitch
@@ -134,7 +134,7 @@ export class rs{
 	#case ifcode JAVASCRIPT then
 	static strtolower(s){
 		if (isBrowser())
-			return BayrellRtl.Lib.rtl.toString(s).toLowerCase();
+			return Runtime.rtl.toString(s).toLowerCase();
 		return rtl.toString(s).toLowerCase();
 	}
 	#endswitch
@@ -156,7 +156,7 @@ export class rs{
 	#case ifcode JAVASCRIPT then
 	static strtoupper(s){
 		if (isBrowser())
-			return BayrellRtl.Lib.rtl.toString(s).toUpperCase();
+			return Runtime.rtl.toString(s).toUpperCase();
 		return rtl.toString(s).toUpperCase();
 	}
 	#endswitch
@@ -184,7 +184,7 @@ export class rs{
 	}
 	#case ifcode JAVASCRIPT then
 	static strpos(s, search, offset){
-		var _rtl; if (isBrowser()) _rtl = BayrellRtl.Lib.rtl; else _rtl = rtl;
+		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
 		if (!_rtl.exists(offset)) offset = 0;
 		var res = _rtl.toString(s).indexOf(search);
 		return res;
@@ -241,8 +241,8 @@ export class rs{
 	}
 	#case ifcode JAVASCRIPT then
 	static explode(delimiter, s, limit){
-		var _rtl; if (isBrowser()) _rtl = BayrellRtl.Lib.rtl; else _rtl = rtl;
-		var _Vector; if (isBrowser()) _Vector = BayrellRtl.Types.Vector; else _Vector = Vector;
+		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
+		var _Vector; if (isBrowser()) _Vector = Runtime.Vector; else _Vector = Vector;
 		var arr = null;
 		if (!_rtl.exists(limit))
 			arr = s.split(delimiter);
@@ -292,7 +292,7 @@ export class rs{
 	#case ifcode JAVASCRIPT then
 	static trim(s, ch){
 		if (ch == undefined) ch = "";
-		if (isBrowser()) s = BayrellRtl.Lib.rtl.toString(s);
+		if (isBrowser()) s = Runtime.rtl.toString(s);
 		else s = rtl.toString(s);
 		if (ch == ""){
 			return s.trim();

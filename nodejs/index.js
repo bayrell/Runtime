@@ -18,49 +18,33 @@
 
 
 module.exports = {
-	VERSION: '0.3.1',
+	VERSION: '0.4.0',
 	'Exceptions': {
-		'AssertError': require("./Exceptions/AssertError.js"),
 		'IndexOutOfRange': require("./Exceptions/IndexOutOfRange.js"),
-		'RuntimeException': require("./Exceptions/RuntimeException.js"),
 		'KeyNotFound': require("./Exceptions/KeyNotFound.js"),
+		'RuntimeException': require("./Exceptions/RuntimeException.js"),
 		'UnknownError': require("./Exceptions/UnknownError.js"),
 	},
 	'Interfaces': {
+		'AssetsInterface': require("./Interfaces/AssetsInterface.js"),
 		'CloneableInterface': require("./Interfaces/CloneableInterface.js"),
 		'ContextInterface': require("./Interfaces/ContextInterface.js"),
 		'FactoryInterface': require("./Interfaces/FactoryInterface.js"),
-		'MapInterface': require("./Interfaces/MapInterface.js"),
 		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),
 		'SerializeInterface': require("./Interfaces/SerializeInterface.js"),
 		'StringInterface': require("./Interfaces/StringInterface.js"),
 	},
-	'Providers': {
-		'AssertInterface': require("./Providers/AssertInterface.js"),
-		'LogInterface': require("./Providers/LogInterface.js"),
-		'SerializeStringInterface': require("./Providers/SerializeStringInterface.js"),
-	},
-	'Lib': {
-		'fs': require("./Lib/fs.js"),
-		're': require("./Lib/re.js"),
-		'rs': require("./Lib/rs.js"),
-		'rtl': require("./Lib/rtl.js"),
-		'Utils': require("./Lib/Utils.js"),
-	},
-	'Types': {
-		'Map': require("./Types/Map.js"),
-		'PathInfo': require("./Types/PathInfo.js"),
-		'Pipe': require("./Types/Pipe.js"),
-		'Vector': require("./Types/Vector.js"),
-	},
 	'Context': require("./Context.js"),
-	'ContextFactory': require("./ContextFactory.js"),
 	'ContextObject': require("./ContextObject.js"),
 	'CoreObject': require("./CoreObject.js"),
+	'Map': require("./Map.js"),
 	'ModuleDescription': require("./ModuleDescription.js"),
-	'NewInstanceContainer': require("./NewInstanceContainer.js"),
-	'ProviderDescription': require("./ProviderDescription.js"),
+	're': require("./re.js"),
+	'rs': require("./rs.js"),
+	'rtl': require("./rtl.js"),
 	'RuntimeConstant': require("./RuntimeConstant.js"),
+	'Utils': require("./Utils.js"),
+	'Vector': require("./Vector.js"),
 };
 
 

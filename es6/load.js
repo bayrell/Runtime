@@ -18,47 +18,33 @@
 
 
 $load([
-	"/assets/BayrellRtl/Lib/fs.js",
-	"/assets/BayrellRtl/Lib/rs.js",
-	"/assets/BayrellRtl/Lib/re.js",
-	"/assets/BayrellRtl/Lib/rtl.js",
-	"/assets/BayrellRtl/Types/Map.js",
-	"/assets/BayrellRtl/Types/PathInfo.js",
-	"/assets/BayrellRtl/Types/Vector.js",
-	"/assets/BayrellRtl/CoreObject.js",
-	"/assets/BayrellRtl/RuntimeConstant.js",
-	"/assets/BayrellRtl/Exceptions/RuntimeException.js",
-	"/assets/BayrellRtl/Interfaces/CloneableInterface.js",
-	"/assets/BayrellRtl/Interfaces/ContextInterface.js",
-	"/assets/BayrellRtl/Interfaces/FactoryInterface.js",
-	"/assets/BayrellRtl/Interfaces/MapInterface.js",
-	"/assets/BayrellRtl/Interfaces/ModuleDescriptionInterface.js",
-	"/assets/BayrellRtl/Interfaces/SerializeInterface.js",
-	"/assets/BayrellRtl/Interfaces/StringInterface.js",
-	"/assets/BayrellRtl/Providers/AssertInterface.js",
-	"/assets/BayrellRtl/Providers/LogInterface.js",
-	"/assets/BayrellRtl/Providers/SerializeStringInterface.js",
+	"/assets/Runtime/rs.js",
+	"/assets/Runtime/re.js",
+	"/assets/Runtime/rtl.js",
+	"/assets/Runtime/Map.js",
+	"/assets/Runtime/Utils.js",
+	"/assets/Runtime/Vector.js",
+	"/assets/Runtime/CoreObject.js",
+	"/assets/Runtime/RuntimeConstant.js",
+	"/assets/Runtime/Exceptions/RuntimeException.js",
+	"/assets/Runtime/Interfaces/CloneableInterface.js",
+	"/assets/Runtime/Interfaces/ContextInterface.js",
+	"/assets/Runtime/Interfaces/FactoryInterface.js",
+	"/assets/Runtime/Interfaces/ModuleDescriptionInterface.js",
+	"/assets/Runtime/Interfaces/SerializeInterface.js",
+	"/assets/Runtime/Interfaces/StringInterface.js",
 ])
 
 .load([
-	"/assets/BayrellRtl/Context.js",
-	"/assets/BayrellRtl/ContextFactory.js",
-	"/assets/BayrellRtl/ContextObject.js",
-	"/assets/BayrellRtl/ModuleDescription.js",
-	"/assets/BayrellRtl/ProviderDescription.js",
-	"/assets/BayrellRtl/Exceptions/AssertError.js",
-	"/assets/BayrellRtl/Exceptions/IndexOutOfRange.js",
-	"/assets/BayrellRtl/Exceptions/KeyNotFound.js",
-	"/assets/BayrellRtl/Exceptions/UnknownError.js",
-	"/assets/BayrellRtl/Lib/Utils.js",
-	"/assets/BayrellRtl/Types/Pipe.js",	
-])
-
-.load([
-	"/assets/BayrellRtl/NewInstanceContainer.js",
+	"/assets/Runtime/Context.js",
+	"/assets/Runtime/ContextObject.js",
+	"/assets/Runtime/ModuleDescription.js",
+	"/assets/Runtime/Exceptions/IndexOutOfRange.js",
+	"/assets/Runtime/Exceptions/KeyNotFound.js",
+	"/assets/Runtime/Exceptions/UnknownError.js",
 ])
 
 .success(function(){
-	$load.deliver('BayrellRtl_loaded');
+	$load.deliver('Runtime_loaded');
 });
 

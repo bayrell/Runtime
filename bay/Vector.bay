@@ -378,7 +378,7 @@ Runtime.Vector = class extends Array{
 	 */
 	item(pos){
 		if (pos < 0 || pos >= this.length){
-			if (isBrowser()) throw new BayrellRtl.Exceptions.IndexOutOfRange();
+			if (isBrowser()) throw new Runtime.Exceptions.IndexOutOfRange();
 			throw new IndexOutOfRange();
 		}
 		return this[pos];
@@ -393,7 +393,7 @@ Runtime.Vector = class extends Array{
 	 */
 	set(pos, value){
 		if (pos < 0 || pos >= this.length){
-			if (isBrowser()) throw new BayrellRtl.Exceptions.IndexOutOfRange();
+			if (isBrowser()) throw new Runtime.Exceptions.IndexOutOfRange();
 			throw new IndexOutOfRange();
 		}
 		this[pos] = value;

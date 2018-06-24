@@ -1,14 +1,11 @@
 {
-  "description": "Bayrell RTL",
+  "description": "Bayrell Runtime Library",
   "files": [
 	"Exceptions/*.js",
 	"Interfaces/*.js",
-	"Lib/*.js",
-	"Providers/*.js",
-	"Types/*.js",
     "*.js"
   ],
   "main": "index.js",
-  "name": "BayrellRtl",
-  "version": "0.3.1"
+  "name": "BayrellRuntime",
+  "version": "0.4.0"
 }

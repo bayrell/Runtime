@@ -18,7 +18,6 @@
 
 namespace Runtime.Interfaces;
 
-use Runtime.Interfaces.MapInterface;
 use Runtime.CoreObject;
 
 
@@ -76,7 +75,7 @@ interface ContextInterface{
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
-	string translate(string message, MapInterface params = null, string locale = "");
+	/*string translate(string message, Map params = null, string locale = "");*/
 	
 	
 }

@@ -20,8 +20,8 @@ namespace Runtime;
 
 use Runtime.rtl;
 use Runtime.Vector;
-use BayrellRtl.Interfaces.AssetsInterface;
-use BayrellRtl.Interfaces.ModuleDescriptionInterface;
+use Runtime.Interfaces.AssetsInterface;
+use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
 class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface{
@@ -127,6 +127,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface{
 				"/assets/Runtime/re.js",
 				"/assets/Runtime/rtl.js",
 				"/assets/Runtime/Map.js",
+				"/assets/Runtime/Utils.js",
 				"/assets/Runtime/Vector.js",
 				"/assets/Runtime/CoreObject.js",
 				"/assets/Runtime/RuntimeConstant.js",

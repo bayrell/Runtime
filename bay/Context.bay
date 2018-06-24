@@ -19,7 +19,6 @@
 namespace Runtime;
 
 use Runtime.rtl;
-use Runtime.ContextObject;
 use Runtime.CoreObject;
 use Runtime.Map;
 use Runtime.Vector;

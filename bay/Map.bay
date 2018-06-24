@@ -157,7 +157,7 @@ Runtime.Map = class extends Map{
 		var val = super.get(key);
 		if (val === null) return null;
 		if (val == undefined){
-			if (isBrowser()) throw new BayrellRtl.Exceptions.KeyNotFound(null, key);
+			if (isBrowser()) throw new Runtime.Exceptions.KeyNotFound(null, key);
 			throw new KeyNotFound(null, key);
 		}
 		return val;
@@ -237,7 +237,7 @@ Runtime.Map = class extends Map{
 	 */
 	keys(){
 		var it = super.keys();
-		var res = new BayrellRtl.Types.Vector();
+		var res = new Runtime.Vector();
 		var next = it.next();
 		while (!next.done){
 			res.push( next.value );
@@ -254,7 +254,7 @@ Runtime.Map = class extends Map{
 	 */
 	values(){
 		var it = super.values();
-		var res = new BayrellRtl.Types.Vector();
+		var res = new Runtime.Vector();
 		var next = it.next();
 		while (!next.done){
 			res.push( next.value );

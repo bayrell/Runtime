@@ -89,6 +89,9 @@ export class rtl{
 		var module_name = class_name_arr[0];
 		var last_name = class_name_arr[ class_name_arr.length - 1 ];
 		
+		if (module_name == 'Runtime') 
+			module_name = 'BayrellRuntime';
+		
 		var obj = require(module_name);
 		for (var i=1; i<class_name_arr.length - 1; i++){
 			if (!this.exists(obj[class_name_arr[i]])){
@@ -214,14 +217,14 @@ export class rtl{
 	#case ifcode PHP then
 	static function _clone($val, $context=null){
 		if ($val == null) return null;
-		if ($val instanceof \BayrellRtl\Interfaces\CloneableInterface){
+		if ($val instanceof \Runtime\Interfaces\CloneableInterface){
 			return $val._clone($context);
 		}
 		return clone $val;
 	}
 	#case ifcode JAVASCRIPT then
 	static clone(val, context){
-		if (isBrowser()) return BayrellRtl.Lib.rtl._clone(val, context);
+		if (isBrowser()) return Runtime.rtl._clone(val, context);
 		else return rtl._clone(val, context);
 	}
 	static _clone(val, context){
@@ -255,12 +258,12 @@ export class rtl{
 			var _rtl = null;
 			var _CloneableInterface = null;
 			if (isBrowser()){
-				_rtl = BayrellRtl.Lib.rtl;
-				_CloneableInterface = BayrellRtl.Interfaces.CloneableInterface;
+				_rtl = Runtime.rtl;
+				_CloneableInterface = Runtime.Interfaces.CloneableInterface;
 			}
 			else {
 				_rtl = rtl;
-				_CloneableInterface = require('../Interfaces/CloneableInterface.js');
+				_CloneableInterface = require('./Interfaces/CloneableInterface.js');
 			}
 			
 			if (val.nodeType && typeof val.cloneNode == "function"){
@@ -383,7 +386,7 @@ export class rtl{
 	#case ifcode JAVASCRIPT then
 	static toString(value){
 		var _StringInterface = null;
-		if (isBrowser()) _StringInterface = BayrellRtl.Interfaces.StringInterface; 
+		if (isBrowser()) _StringInterface = Runtime.Interfaces.StringInterface; 
 		else _StringInterface = StringInterface;
 		if (typeof value == 'string') return value;
 		if (value instanceof String) return value;

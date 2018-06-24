@@ -18,12 +18,19 @@
 
 namespace Runtime;
 
+use Runtime.Context;
+use Runtime.Map;
 use Runtime.rs;
 use Runtime.rtl;
+use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.FactoryInterface;
-use Runtime.Vector;
-use Runtime.Map;
+
+
+#switch
+#case ifcode JAVASCRIPT then
+var isBrowser=function(){return typeof window !== "undefined" && this === window;}
+#endswitch
 
 
 export class Utils{
@@ -41,8 +48,8 @@ export class Utils{
 		#case ifcode PHP then
 		return self::$_global_context;
 		#case ifcode JAVASCRIPT then
-		if (isBrowser()) return BayrellRtl.Lib.rtl._global_context;
-		return rtl._global_context;
+		if (isBrowser()) return Runtime.Utils._global_context;
+		return Utils._global_context;
 		#endswitch
 	}
 	
@@ -57,8 +64,8 @@ export class Utils{
 		#case ifcode PHP then
 		self::$_global_context = $context;
 		#case ifcode JAVASCRIPT then
-		if (isBrowser()) BayrellRtl.Lib.rtl._global_context = context;
-		else rtl._global_context = context;
+		if (isBrowser()) Runtime.Utils._global_context = context;
+		else Utils._global_context = context;
 		#endswitch
 		return context;
 	}
@@ -77,7 +84,7 @@ export class Utils{
 	/**
 	 * Register global Context
 	 */
-	public ContextInterface createContext(Vector<string> modules){
+	public static ContextInterface createContext(Vector<string> modules){
 		
 		ContextInterface context = new Context();
 		modules.each(void (string module) use (context){
@@ -92,7 +99,7 @@ export class Utils{
 	/**
 	 * Register global Context
 	 */
-	public ContextInterface registerGlobalContext(Vector<string> modules){
+	public static ContextInterface registerGlobalContext(Vector<string> modules){
 		ContextInterface context = self::createContext(modules);
 		self::setGlobalContext(context);
 		return context;
@@ -130,5 +137,33 @@ export class Utils{
 	 * @param charset - Result bytes charset. Default utf8
 	 */
 	public void stringToBytes(string s, Vector<byte> arr, string charset="utf8"){}
+	
+	
+	
+	/**
+	 * Translate message
+	 * @params string message - message need to be translated
+	 * @params MapInterface params - Messages params. Default null.
+	 * @params string locale - Different locale. Default "".
+	 * @return string - translated string
+	 */
+	public static string translate(string message, MapInterface params = null, string locale = "", 
+	Object context = null){
+			
+		if (context == null) context = self::globalContext();
+		if (context != null) {
+			Vector<var> args = (new Vector<var>())
+				.push(message)
+				.push(params)
+				.push(locale)
+			;
+			return rtl::callMethod(
+				context,
+				"translate",
+				args
+			);
+		}	
+		return message;
+	}
 	
 }

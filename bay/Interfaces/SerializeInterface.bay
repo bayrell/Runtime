@@ -21,7 +21,7 @@ namespace Runtime.Interfaces;
 use Runtime.CoreObject;
 use Runtime.Map;
 use Runtime.Vector;
-use Runtime.Interfaces.ContextInterfaces;
+use Runtime.Interfaces.ContextInterface;
 
 
 interface SerializeInterface{
@@ -38,11 +38,11 @@ interface SerializeInterface{
 	
 	/**
 	 * Returns new Instance
-	 * @param ContextInterfaces context
+	 * @param ContextInterface context
 	 * @param Map<string, mixed> values
 	 * @return CoreObject
 	 */
-	public static CoreObject createNewInstanceFromValues(ContextInterfaces context, Map<string, mixed> values);
+	public static CoreObject createNewInstanceFromValues(ContextInterface context, Map<string, mixed> values);
 	
 	
 	
