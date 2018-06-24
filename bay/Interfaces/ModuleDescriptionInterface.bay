@@ -16,11 +16,11 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl.Interfaces;
+namespace Runtime.Interfaces;
 
-use BayrellRtl.Types.Map;
-use BayrellRtl.Types.Vector;
-use BayrellRtl.Interfaces.ContextInterface;
+use Runtime.Map;
+use Runtime.Vector;
+use Runtime.Interfaces.ContextInterface;
 
 
 interface ModuleDescriptionInterface{

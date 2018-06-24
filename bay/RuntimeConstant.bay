@@ -16,12 +16,12 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl;
+namespace Runtime;
 
 
 class RuntimeConstant{
 	
-		
+	
 	/* Log level */
 	
 	/**

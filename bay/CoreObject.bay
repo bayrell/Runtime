@@ -16,31 +16,21 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl;
+namespace Runtime;
 
-use BayrellRtl.Lib.rtl;
+use Runtime.rtl;
 
 
 class CoreObject{
 	
 	protected bool _is_destroyed = false;
-
-	
-	
-	/**
-	 * Get module name
-	 */
-	string getModuleName(){
-		return "BayrellRtl";
-	}
-	
 	
 	
 	/**
 	 * Get class name
 	 */
 	string getClassName(){
-		return "BayrellRtl.CoreObject";
+		return "Runtime.CoreObject";
 	}
 	
 	

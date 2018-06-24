@@ -16,19 +16,19 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl.Exceptions;
+namespace Runtime.Exceptions;
 
-use BayrellRtl.Lib.rtl;
-use BayrellRtl.Interfaces.ContextInterface;
+use Runtime.rtl;
+use Runtime.Interfaces.ContextInterface;
 
 
 declare class ClassException{}
 
 #switch
 #case ifcode ES6 then
-if (typeof BayrellRtl == 'undefined') BayrellRtl = {};
-if (typeof BayrellRtl.Exceptions == 'undefined') BayrellRtl.Exceptions = {};
-BayrellRtl.Exceptions.ClassException = class extends Error { _init(){} }
+if (typeof Runtime == 'undefined') Runtime = {};
+if (typeof Runtime.Exceptions == 'undefined') Runtime.Exceptions = {};
+Runtime.Exceptions.ClassException = class extends Error { _init(){} }
 #case ifcode NODEJS then
 class ClassException extends Error { _init(){} }
 #case ifcode PHP then

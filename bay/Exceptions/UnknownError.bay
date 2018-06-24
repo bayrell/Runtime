@@ -16,13 +16,13 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl.Exceptions;
+namespace Runtime.Exceptions;
 
-use BayrellRtl.Lib.rtl;
-use BayrellRtl.Lib.Utils;
-use BayrellRtl.RuntimeConstant;
-use BayrellRtl.Exceptions.RuntimeException;
-use BayrellRtl.Interfaces.ContextInterface;
+use Runtime.rtl;
+use Runtime.Utils;
+use Runtime.RuntimeConstant;
+use Runtime.Exceptions.RuntimeException;
+use Runtime.Interfaces.ContextInterface;
 
 
 class UnknownError extends RuntimeException{

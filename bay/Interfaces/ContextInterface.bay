@@ -16,10 +16,10 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl.Interfaces;
+namespace Runtime.Interfaces;
 
-use BayrellRtl.Interfaces.MapInterface;
-use BayrellRtl.CoreObject;
+use Runtime.Interfaces.MapInterface;
+use Runtime.CoreObject;
 
 
 interface ContextInterface{
@@ -39,7 +39,7 @@ interface ContextInterface{
 	 * @param string factory_name
 	 * @param int type
 	 */
-	ContextInterface registerProvider(string provider_name, string factory_name, int type);
+	ContextInterface registerProvider(string provider_name, string factory_name);
 	
 	
 	

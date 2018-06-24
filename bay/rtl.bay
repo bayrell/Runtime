@@ -16,9 +16,9 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl.Lib;
+namespace Runtime;
 
-use BayrellRtl.Interfaces.StringInterface;
+use Runtime.Interfaces.StringInterface;
 
 
 #switch
@@ -28,51 +28,6 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 
 
 export class rtl{
-	
-	protected static var _global_context = null;
-	
-	
-	/**
-	 * Returns global context
-	 * @return ContextInterface
-	 */
-	public static ContextInterface globalContext(){
-		#switch
-		#case ifcode PHP then
-		return self::$_global_context;
-		#case ifcode JAVASCRIPT then
-		if (isBrowser()) return BayrellRtl.Lib.rtl._global_context;
-		return rtl._global_context;
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Set global context
-	 * @param ContextInterface context
-	 */
-	public static ContextInterface setGlobalContext(ContextInterface context){
-		#switch
-		#case ifcode PHP then
-		self::$_global_context = $context;
-		#case ifcode JAVASCRIPT then
-		if (isBrowser()) BayrellRtl.Lib.rtl._global_context = context;
-		else rtl._global_context = context;
-		#endswitch
-		return context;
-	}
-	
-	
-	
-	/**
-	 * Returns global context
-	 * @param ContextInterface context
-	 */
-	public static ContextInterface getGlobalContext(){
-		return self::globalContext();
-	}
-	
 	
 	
 	#switch

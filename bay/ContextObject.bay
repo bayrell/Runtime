@@ -16,11 +16,11 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl;
+namespace Runtime;
 
-use BayrellRtl.Lib.rtl;
-use BayrellRtl.CoreObject;
-use BayrellRtl.Interfaces.ContextInterface;
+use Runtime.rtl;
+use Runtime.CoreObject;
+use Runtime.Interfaces.ContextInterface;
 
 
 class ContextObject extends CoreObject{
@@ -36,7 +36,7 @@ class ContextObject extends CoreObject{
 	 * @params string provider_name
 	 * @return ContextObject
 	 */
-	public ContextObject getProvider(string provider_name){
+	public ContextObject createProvider(string provider_name){
 		return this._context.createProvider(provider_name);
 	}
 	
@@ -45,11 +45,11 @@ class ContextObject extends CoreObject{
 	/**
 	 * Translate message
 	 * @params string message - message need to be translated
-	 * @params MapInterface params - Messages params. Default null.
+	 * @params Map params - Messages params. Default null.
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
-	string translate(string message, MapInterface params = null, string locale = ""){
+	string translate(string message, Map params = null, string locale = ""){
 		return this._context.translate(message, params, locale);
 	}
 	

@@ -16,9 +16,9 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl.Types;
+namespace Runtime;
 
-use BayrellRtl.Exceptions.IndexOutOfRange;
+use Runtime.Exceptions.IndexOutOfRange;
 
 
 #switch
@@ -249,10 +249,9 @@ declare class Vector<T>{
 
 #switch
 #case ifcode JAVASCRIPT then
-if (typeof BayrellRtl == "undefined") BayrellRtl = {};
-if (typeof BayrellRtl.Types == "undefined") BayrellRtl.Types = {};
+if (typeof Runtime == "undefined") Runtime = {};
 
-BayrellRtl.Types.Vector = class extends Array{
+Runtime.Vector = class extends Array{
 	
 	
 	/**
@@ -543,7 +542,7 @@ BayrellRtl.Types.Vector = class extends Array{
 }
 
 #case ifcode NODEJS then
-module.exports = BayrellRtl.Types.Vector;
+module.exports = Runtime.Vector;
 
 
 #case ifcode PHP then

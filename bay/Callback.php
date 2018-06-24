@@ -18,7 +18,7 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl\Types;
+namespace Runtime;
 
 class Callback {
 	protected $obj;

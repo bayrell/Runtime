@@ -16,11 +16,12 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl.Interfaces;
+namespace Runtime.Interfaces;
 
-use BayrellRtl.CoreObject;
-use BayrellRtl.Types.Vector;
-use BayrellRtl.NewInstanceContainer;
+use Runtime.CoreObject;
+use Runtime.Map;
+use Runtime.Vector;
+use Runtime.Interfaces.ContextInterfaces;
 
 
 interface SerializeInterface{
@@ -36,10 +37,12 @@ interface SerializeInterface{
 	
 	
 	/**
-	 * Returns classname of the object
-	 * @return string
+	 * Returns new Instance
+	 * @param ContextInterfaces context
+	 * @param Map<string, mixed> values
+	 * @return CoreObject
 	 */
-	public static CoreObject createNewInstanceFromContainer(NewInstanceContainer container);
+	public static CoreObject createNewInstanceFromValues(ContextInterfaces context, Map<string, mixed> values);
 	
 	
 	

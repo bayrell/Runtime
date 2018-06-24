@@ -16,9 +16,9 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl.Interfaces;
+namespace Runtime.Interfaces;
 
-use BayrellRtl.CoreObject;
+use Runtime.CoreObject;
 
 
 interface CloneableInterface{

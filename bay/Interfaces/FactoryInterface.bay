@@ -16,10 +16,10 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl.Interfaces;
+namespace Runtime.Interfaces;
 
-use BayrellRtl.CoreObject;
-use BayrellRtl.Interfaces.ContextInterface;
+use Runtime.CoreObject;
+use Runtime.Interfaces.ContextInterface;
 
 
 interface FactoryInterface{

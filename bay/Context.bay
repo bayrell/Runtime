@@ -16,18 +16,16 @@
  *  limitations under the License.
  */
 
-namespace BayrellRtl;
+namespace Runtime;
 
-use BayrellRtl.Lib.rtl;
-use BayrellRtl.CoreObject;
-use BayrellRtl.Types.Map;
-use BayrellRtl.Types.Vector;
-use BayrellRtl.Interfaces.MapInterface;
-use BayrellRtl.Interfaces.ContextInterface;
-use BayrellRtl.Interfaces.FactoryInterface;
-use BayrellRtl.Interfaces.ModuleDescriptionInterface;
-use BayrellRtl.ContextObject;
-use BayrellRtl.ProviderDescription;
+use Runtime.rtl;
+use Runtime.ContextObject;
+use Runtime.CoreObject;
+use Runtime.Map;
+use Runtime.Vector;
+use Runtime.Interfaces.ContextInterface;
+use Runtime.Interfaces.FactoryInterface;
+use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
 class Context extends CoreObject implements ContextInterface{
@@ -36,7 +34,7 @@ class Context extends CoreObject implements ContextInterface{
 	protected string _locale = "";
 	protected Vector<string> _modules = null;
 	protected Map<string, mixed> _values = null;
-	protected Map<string, ProviderDescription> _providers_names = null;
+	protected Map<string, FactoryInterface> _providers_names = null;
 	
 	
 	/**
@@ -46,7 +44,7 @@ class Context extends CoreObject implements ContextInterface{
 		parent();
 		this._modules = new Vector<string>();
 		this._values = new Map<string, mixed>();
-		this._providers_names = new Map<string, ProviderDescription>();
+		this._providers_names = new Map<string, FactoryInterface>();
 	}
 	
 	
@@ -122,10 +120,9 @@ class Context extends CoreObject implements ContextInterface{
 	 * @param string factory_name
 	 * @param int type
 	 */
-	ContextInterface registerProvider(string provider_name, FactoryInterface factory, int type){
+	ContextInterface registerProvider(string provider_name, FactoryInterface factory){
 		if (not this._providers_names.has(provider_name)){
-			ProviderDescription description = new ProviderDescription(provider_name, factory, type);
-			this._providers_names.set(provider_name, description);
+			this._providers_names.set(provider_name, factory);
 		}
 		return this;
 	}
@@ -178,13 +175,11 @@ class Context extends CoreObject implements ContextInterface{
 		if (!this._providers_names.has(provider_name))
 			return null;
 			
-		ProviderDescription description = this._providers_names.item(provider_name);
-		if (description == null)
+		FactoryInterface factory_obj = this._providers_names.item(provider_name);
+		if (factory_obj == null)
 			return null;
-			
-		FactoryInterface factory_obj = description.getFactory();
-		CoreObject obj = factory_obj.newInstance(this);
 		
+		CoreObject obj = factory_obj.newInstance(this);
 		return obj;
 	}
 
@@ -235,11 +230,11 @@ class Context extends CoreObject implements ContextInterface{
 	/**
 	 * Translate message
 	 * @params string message - message need to be translated
-	 * @params MapInterface params - Messages params. Default null.
+	 * @params Map params - Messages params. Default null.
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
-	string translate(string message, MapInterface params = null, string locale = ""){
+	string translate(string message, Map params = null, string locale = ""){
 		return message;
 	}
 	

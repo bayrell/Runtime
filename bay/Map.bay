@@ -16,11 +16,10 @@
  *  limitations under the License.
  */
  
-namespace BayrellRtl.Types;
+namespace Runtime;
 
-use BayrellRtl.Types.Vector;
-use BayrellRtl.Interfaces.MapInterface;
-use BayrellRtl.Exceptions.KeyNotFound;
+use Runtime.Vector;
+use Runtime.Exceptions.KeyNotFound;
 
 #switch
 #case ifcode JAVASCRIPT then
@@ -28,7 +27,7 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 #endswitch
 
 
-declare class Map<T1, T2> implements MapInterface{
+declare class Map<T1, T2>{
 
 
 	/**
@@ -115,16 +114,23 @@ declare class Map<T1, T2> implements MapInterface{
 	 * @return Vector<T2>
 	 */
 	declare public Vector<T2> values();
+	
+	
+	
+	/**
+	 * Call function for each item
+	 * @param func f
+	 */
+	declare void each(func f);
 }
 
 
 
 #switch
 #case ifcode JAVASCRIPT then
-if (typeof BayrellRtl == "undefined") BayrellRtl = {};
-if (typeof BayrellRtl.Types == "undefined") BayrellRtl.Types = {};
+if (typeof Runtime == "undefined") Runtime = {};
 
-BayrellRtl.Types.Map = class extends Map{
+Runtime.Map = class extends Map{
 	
 	
 	/**
@@ -257,10 +263,20 @@ BayrellRtl.Types.Map = class extends Map{
 		return res;
 	}
 	
+	
+	
+	/**
+	 * Call function for each item
+	 * @param func f
+	 */
+	each(f){
+		var keys = this.keys();
+		keys.each(f);
+	}
 }
 
 #case ifcode NODEJS then
-module.exports = BayrellRtl.Types.Map;
+module.exports = Runtime.Map;
 
 
 
@@ -406,6 +422,16 @@ class Map{
 		return $res;
 	}
 	
+	
+	
+	/**
+	 * Call function for each item
+	 * @param func f
+	 */
+	function each($f){
+		$keys = array_keys($this->_map);
+		array_walk($keys, $f);
+	}
 }
 
 #endswitch
