@@ -122,6 +122,14 @@ declare class Map<T1, T2>{
 	 * @param func f
 	 */
 	declare void each(func f);
+	
+	
+	/**
+	 * Add values from other map
+	 * @param Map<T1, T2> map
+	 * @return self
+	 */
+	declare public Map<T1, T2> addMap(Map<T1, T2> map);
 }
 
 
@@ -285,6 +293,33 @@ Runtime.Map = class extends Map{
 	each(f){
 		var keys = this.keys();
 		keys.each(f);
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Add values from other map
+	 * @param Map<T1, T2> map
+	 * @return self
+	 */
+	addMap(map){
+		if (map != null)
+			map.each((key)=>{
+				this.set(key, map.item(key));
+			});
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Convert Map to Object
+	 */
+	toObject(){
+		var obj = {};
+		this.each((key)=>{obj[key]=this.get(key);});
+		return obj;
 	}
 }
 
@@ -401,6 +436,7 @@ class Map{
 	 */
 	public function clear(){
 		$this->_map = [];
+		return $this;
 	}
 
 	
@@ -447,6 +483,40 @@ class Map{
 	function each($f){
 		$keys = array_keys($this->_map);
 		array_walk($keys, $f);
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Add values from other map
+	 * @param Map<T1, T2> map
+	 * @return self
+	 */
+	function addMap($map){
+		if ($map != null)
+			$map->each(function ($key) use ($map){
+				$this->set($key, $map->item($key));
+			});
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Get and set methods
+	 */
+	function __set($name, $value){
+		return $this->set($name, $value);
+	}
+	function __get($name){
+		return $this->get($name, null);
+	}
+	function __isset($name){
+		return $this->has($name);
+	}
+	function __unset($name){
+		return $this->remove($name);
 	}
 }
 

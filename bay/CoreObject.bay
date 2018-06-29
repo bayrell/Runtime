@@ -23,16 +23,7 @@ use Runtime.rtl;
 
 class CoreObject{
 	
-	protected bool _is_destroyed = false;
-	
-	
-	/**
-	 * Get class name
-	 */
-	string getClassName(){
-		return "Runtime.CoreObject";
-	}
-	
+	protected bool _is_destroyed = false;	
 	
 	
 	/** 

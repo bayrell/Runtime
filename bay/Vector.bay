@@ -255,6 +255,29 @@ Runtime.Vector = class extends Array{
 	
 	
 	/**
+	 * Returns new Instance
+	 */
+	createNewInstance(){
+		if (isBrowser) return new Runtime.Vector();
+		return new Vector();
+	}
+	
+	
+	
+	/**
+	 * Assign all data from other object
+	 * @param Vector obj
+	 */
+	assign(obj){
+		this.clear();
+		obj.each((item)=>{
+			this.push(item);
+		});
+	}
+	
+	
+	
+	/**
 	 * Append value to the end of array
 	 * @param T value
 	 */
@@ -555,11 +578,9 @@ class Vector{
 	/**
 	 * Constructor
 	 */
-	public function __construct($arr = null){
-		if ($arr == null)
-			$this->_arr = [];
-		else
-			$this->_arr = $arr;
+	public function __construct(){
+		$arr = func_get_args();
+		$this->_arr = $arr;
 	}
 	
 	
@@ -589,6 +610,24 @@ class Vector{
 		return $this->_arr;
 	}
 	
+	
+	
+	/**
+	 * Returns new Instance
+	 */
+	public function createNewInstance(){
+		return new Vector();
+	}
+	
+	
+	
+	/**
+	 * Assign all data from other object
+	 * @param Vector obj
+	 */
+	public function assign($obj){
+		$this->_arr = $obj->_arr;
+	}
 	
 	
 	/**
@@ -835,8 +874,9 @@ class Vector{
 	 * @return Vector
 	 */
 	function map($f){
+		$keys = array_keys($this->_arr);
 		$arr2 = new Vector();
-		$arr2->_arr = array_map($f, $this->_arr);
+		$arr2->_arr = array_map($f, $this->_arr, $keys);
 		return $arr2;
 	}
 	

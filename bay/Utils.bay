@@ -121,6 +121,48 @@ export class Utils{
 	
 	
 	/**
+	 * Get value from object
+	 */
+	static mixed get(mixed obj, string key, mixed default_value = null){
+		if (obj instanceof Vector){
+			return obj.get(key, default_value);
+		}
+		if (obj instanceof Map){
+			return obj.get(key, default_value);
+		}
+		return default_value;
+	}
+	
+	
+	
+	/**
+	 * Set value to object
+	 */
+	static mixed set(mixed obj, string key, mixed value = null){
+		if (obj instanceof Vector){
+			obj.set(key, value);
+		}
+		if (obj instanceof Map){
+			obj.set(key, value);
+		}
+	}
+	
+	
+	
+	/**
+	 * Call each
+	 */
+	static mixed each(mixed obj, func f){
+		if (obj instanceof Vector){
+			obj.each(f);
+		}
+		if (obj instanceof Map){
+			obj.each(f);
+		}
+	}
+	
+	
+	/**
 	 * Convert bytes to string
 	 * @param Vector<byte> arr - vector of the bytes
 	 * @string charset - charset of the bytes vector. Default utf8

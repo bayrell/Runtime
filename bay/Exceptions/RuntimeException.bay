@@ -42,6 +42,7 @@ class RuntimeException extends ClassException{
 	
 	protected ContextInterface context = null;
 	protected Object prev = null;
+	protected string error_str = "";
 	protected string message = "";
 	protected int code = 0;
 	protected string file = "";
@@ -55,6 +56,7 @@ class RuntimeException extends ClassException{
 		if (context == null)
 			context = Utils::globalContext();
 		
+		this.error_str = message;
 		this.context = context;
 		this.message = message;
 		this.code = code;
@@ -100,21 +102,20 @@ class RuntimeException extends ClassException{
 		this.pos = pos;
 	}
 	
-	
 	public string toString(){
+		return this.message;
+	}
+
+	public string buildMessage(){
+		this.message = this.error_str;
 		
-		string s = this.message;
 		if (this.line != -1 and this.pos != -1){
-			s = s ~ " at Ln:" ~ this.line ~ ", Pos:" ~ this.pos;
+			this.message ~= " at Ln:" ~ this.line ~ ", Pos:" ~ this.pos;
 		}
 		if (this.file != ""){
-			s = s ~ " in file:'" ~ this.file ~ "'";
+			this.message ~= " in file:'" ~ this.file ~ "'";
 		}
-		
-		return s;
 	}
-	
-	
 	
 	#switch
 	#case ifcode PHP then

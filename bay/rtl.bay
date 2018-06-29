@@ -246,6 +246,17 @@ export class rtl{
 		else if (val instanceof Date){
 			return new Date(val);
 		}
+		else if (typeof val == 'object' && val.nodeType && typeof val.cloneNode == "function"){
+			return val.cloneNode(true);
+		}
+		else if (typeof val == 'object' && 
+			val.createNewInstance && typeof val.createNewInstance == "function" &&
+			val.assign && typeof val.assign == "function")
+		{
+			var res = val.createNewInstance();
+			res.assign(val);
+			return res;
+		}
 		else if (Array.isArray(val)){	
 			var res = [];
 			for (var i=0;i<val.length;i++){
@@ -253,30 +264,7 @@ export class rtl{
 			}
 			return res;
 		}
-		else if (typeof val == 'object'){
 		
-			var _rtl = null;
-			var _CloneableInterface = null;
-			if (isBrowser()){
-				_rtl = Runtime.rtl;
-				_CloneableInterface = Runtime.Interfaces.CloneableInterface;
-			}
-			else {
-				_rtl = rtl;
-				_CloneableInterface = require('./Interfaces/CloneableInterface.js');
-			}
-			
-			if (val.nodeType && typeof val.cloneNode == "function"){
-				return val.cloneNode(true);
-			}
-			else if (_rtl.implements(val, _CloneableInterface)){
-				var res = val.createNewInstance();
-				res.assign(val);
-				return res;
-			}
-			
-			return val;
-		}
 		return val;
 	}
 	#endswitch
