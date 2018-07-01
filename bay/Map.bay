@@ -146,9 +146,18 @@ Runtime.Map = class extends Map{
 	 */
 	constructor(map){
 		super();
-		if (map != undefined && typeof map == 'object'){
-			for (var i in map){
-				super.set(i, map[i]);
+		var _Map = null; if (isBrowser()) _Map = Runtime.Map; else _Map = Map;
+		if (map != undefined && typeof map == 'object'){		
+			if (map instanceof Map){
+				var keys = map.keys();
+				keys.each((key)=>{
+					super.set(key, map.item(key));
+				});		
+			}
+			else{
+				for (var i in map){
+					super.set(i, map[i]);
+				}
 			}
 		}
 	}
@@ -175,12 +184,12 @@ Runtime.Map = class extends Map{
 	 * @return T2
 	 */
 	item(key){
-		var val = super.get(key);
-		if (val === null) return null;
-		if (val == undefined){
+		if (!super.has(key)){
 			if (isBrowser()) throw new Runtime.Exceptions.KeyNotFound(null, key);
 			throw new KeyNotFound(null, key);
 		}
+		var val = super.get(key);
+		if (val === null || val == undefined) return null;
 		return val;
 	}
 	
@@ -339,10 +348,17 @@ class Map{
 	/**
 	 * Constructor
 	 */
-	public function __construct($map = []){
+	public function __construct($map = null){
 		$this->_map = [];
-		foreach ($map as $key => $value){
-			$this->_map[$key] = $value;
+		if ($map instanceof Map){
+			foreach ($map->_map as $key => $value){
+				$this->_map[$key] = $value;
+			}		
+		}
+		else if (is_array($map)){
+			foreach ($map as $key => $value){
+				$this->_map[$key] = $value;
+			}		
 		}
 	}
 	

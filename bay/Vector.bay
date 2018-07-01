@@ -242,7 +242,7 @@ declare class Vector<T>{
 	 * @param Vector<T> arr
 	 * @return Vector<T>
 	 */
-	declare Vector<T> concat(Vector<T> arr);
+	declare Vector<T> concat(Vector<T> arr = null);
 }
 
 
@@ -560,6 +560,9 @@ Runtime.Vector = class extends Array{
 	 * @return Vector<T>
 	 */
 	concat(arr){
+		if (arr == null && arr == undefined){
+			return arr.slice();
+		}
 		return super.concat(arr);
 	}
 }
@@ -922,7 +925,12 @@ class Vector{
 	 * @param Vector v
 	 * @return Vector
 	 */
-	function concat($v){
+	function concat($v = null){
+		if ($v == null){
+			$arr2 = new Vector();
+			$arr2->_arr = array_merge($this->_arr, []);
+			return $arr2;
+		}
 		$arr2 = new Vector();
 		$arr2->_arr = array_merge($this->_arr, $v->_arr);
 		return $arr2;
