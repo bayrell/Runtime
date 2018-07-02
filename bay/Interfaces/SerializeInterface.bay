@@ -22,6 +22,7 @@ use Runtime.CoreObject;
 use Runtime.Map;
 use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
+use Runtime.SerializeContainer;
 
 
 interface SerializeInterface{

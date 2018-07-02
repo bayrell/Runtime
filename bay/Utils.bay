@@ -25,6 +25,7 @@ use Runtime.rtl;
 use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.FactoryInterface;
+use Runtime.Interfaces.SerializeInterface;
 
 
 #switch
@@ -84,12 +85,14 @@ export class Utils{
 	/**
 	 * Register global Context
 	 */
-	public static ContextInterface createContext(Vector<string> modules){
+	public static ContextInterface createContext(Vector<string> modules = null){
 		
 		ContextInterface context = new Context();
-		modules.each(void (string module) use (context){
-			context.registerModule(module);
-		});
+		if (modules != null){
+			modules.each(void (string module) use (context){
+				context.registerModule(module);
+			});
+		}
 		
 		return context;
 	}
@@ -99,7 +102,7 @@ export class Utils{
 	/**
 	 * Register global Context
 	 */
-	public static ContextInterface registerGlobalContext(Vector<string> modules){
+	public static ContextInterface registerGlobalContext(Vector<string> modules = null){
 		ContextInterface context = self::createContext(modules);
 		self::setGlobalContext(context);
 		return context;
@@ -130,6 +133,15 @@ export class Utils{
 		if (obj instanceof Map){
 			return obj.get(key, default_value);
 		}
+		
+		#switch
+		#case ifcode JAVASCRIPT then
+		if (typeof obj == 'object'){
+			if (typeof obj[key] != undefined) 
+				return obj[key];
+		}
+		#endswitch
+		
 		return default_value;
 	}
 	
@@ -208,4 +220,192 @@ export class Utils{
 		return message;
 	}
 	
+	
+	
+	
+	/**
+	 * Returns object to primitive value
+	 * @param SerializeContainer container
+	 * @return mixed
+	 */
+	public static mixed toPrimitiveValue(mixed obj, SerializeContainer container = null){
+	
+		if (obj == null) return null;
+		if (rtl::isScalarValue(obj)) return obj;
+		if (obj instanceof Vector){
+			return obj.map(mixed (mixed value){
+				return self::toPrimitiveValue( value );
+			});
+		}
+		if (obj instanceof Map){
+			return obj.map(mixed (string key, mixed value){
+				return self::toPrimitiveValue( value );
+			});
+		}
+		if (obj instanceof SerializeInterface){
+			
+			Vector<string> names = new Vector();
+			Map<string, mixed> values = new Map();
+			obj.getVariablesNames(names);
+			
+			names.each(void (string variable_name) use (values, obj){
+				var value = obj.takeValue(variable_name, null);
+				var value = self::toPrimitiveValue( value );
+				values.set(variable_name, value);
+			});
+			
+			values.set("__class_name__", obj.getClassName());
+			
+			return values;
+		}
+		
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns object to primitive value
+	 * @param SerializeContainer container
+	 * @return mixed
+	 */
+	public static mixed fromPrimitiveValue(ContextInterface context, mixed obj){
+		
+		if (obj == null) return null;
+		if (rtl::isScalarValue(obj)) return obj;
+		
+		if (obj instanceof Vector){
+			return obj.map(mixed (mixed value) use (context){
+				return self::fromPrimitiveValue( context, value );
+			});
+		}
+		
+		if (obj instanceof Map){
+			
+			obj = obj.map(mixed (string key, mixed value) use (context){
+				return self::fromPrimitiveValue( context, value );
+			});
+			
+			if ( !obj.has("__class_name__") ) 
+				return obj;
+			
+			string class_name = obj.item("__class_name__");
+			Vector<string> names = new Vector();
+			SerializeInterface instance = rtl::callStaticMethod(
+				class_name, 
+				"createNewInstanceFromValues", 
+				[context, obj]
+			);
+			
+			instance.getVariablesNames(names);
+			names.each(void (string variable_name) use (instance, obj){
+				var value = obj.get(variable_name, null);
+				instance.assignValue(variable_name, value);
+			});
+			
+			return instance;
+		}
+		
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Json encode primitive values
+	 * @param mixed obj Primitive object
+	 * @param SerializeContainer container
+	 * @return string 
+	 */
+	declare export static string json_encode(mixed obj, SerializeContainer container = null);
+
+	#switch
+	#case ifcode PHP then
+	static function json_encode($obj){
+		return json_encode($obj, JSON_UNESCAPED_UNICODE);
+	}
+	#case ifcode JAVASCRIPT then
+	static json_encode(obj){
+		return JSON.stringify(obj, function (key, value){
+			var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
+			var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
+			var _rtl=null;if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
+			if (_rtl.isScalarValue(value)) return value;
+			if (value instanceof _Vector) return value;
+			if (value instanceof _Map) return value.toObject();
+			return undefined;
+		});
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Json decode to primitive values
+	 * @param string s Encoded string
+	 * @return mixed 
+	 */
+	declare export static mixed json_decode(string s);
+
+	#switch
+	#case ifcode PHP then
+	static function json_decode($obj){
+		$res = @json_decode($obj, true);
+		if (!$res)
+			return null;
+		return res;
+	}
+	#case ifcode JAVASCRIPT then
+	static json_decode(s){
+		try{
+			var obj = JSON.parse(s, function (key, value){
+				var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
+				var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
+				
+				if (Array.isArray(value)){
+					return new _Vector(value);
+				}
+				if (typeof value == 'object'){
+					return new _Map(value);
+				}
+				
+				return value;
+			});
+			return obj;
+		}
+		catch(e){
+			return null;
+		}
+	}
+	#endswitch
+	
+	
+	
+	#switch
+	#case ifcode JAVASCRIPT then
+	static toPrimitive(value){
+		
+		var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
+		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
+		var _Vector=null; if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
+		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
+		
+		if (Array.isArray(value)){
+			var new_value = (new _Vector()).concat(value);
+			new_value = new_value.map((val)=>{
+				return _Utils.toPrimitive(val);
+			});
+			return new_value;
+		}
+		if (typeof value == 'object'){
+			var new_value = new _Map(value);
+			new_value = new_value.map((key, val)=>{
+				return _Utils.toPrimitive(val);
+			});
+			return new_value;
+		}
+		
+		return value;
+	}
+	#endswitch
 }

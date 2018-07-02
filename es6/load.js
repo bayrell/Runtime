@@ -39,6 +39,8 @@ $load([
 	"/assets/Runtime/Context.js",
 	"/assets/Runtime/ContextObject.js",
 	"/assets/Runtime/ModuleDescription.js",
+	"/assets/Runtime/SerializeContainer.js",
+	"/assets/Runtime/VectorString.js",
 	"/assets/Runtime/Exceptions/IndexOutOfRange.js",
 	"/assets/Runtime/Exceptions/KeyNotFound.js",
 	"/assets/Runtime/Exceptions/UnknownError.js",

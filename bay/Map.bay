@@ -124,6 +124,16 @@ declare class Map<T1, T2>{
 	declare void each(func f);
 	
 	
+	
+	/**
+	 * Call function map
+	 * @param func f
+	 * @return Map
+	 */
+	declare Map map(func f);
+	
+	
+	
 	/**
 	 * Add values from other map
 	 * @param Map<T1, T2> map
@@ -308,6 +318,23 @@ Runtime.Map = class extends Map{
 	
 	
 	/**
+	 * Call function map
+	 * @param func f
+	 * @return Map
+	 */
+	map(f){
+		var _Map = null; if (isBrowser()) _Map = Runtime.Map; else _Map = Map;
+		var res = new _Map();
+		this.each((key)=>{
+			var value = this.item(key);
+			res.set(key, f(key, value));
+		});
+		return res;
+	}
+	
+	
+	
+	/**
 	 * Add values from other map
 	 * @param Map<T1, T2> map
 	 * @return self
@@ -339,7 +366,7 @@ module.exports = Runtime.Map;
 
 #case ifcode PHP then
 
-class Map{
+class Map implements \JsonSerializable{
 	
 	
 	protected $_map = null;
@@ -505,6 +532,22 @@ class Map{
 	
 	
 	/**
+	 * Call function map
+	 * @param func f
+	 * @return Map
+	 */
+	function map($f){
+		$res = new Map();
+		$this->each(function($key) use ($res, $f){
+			$value = $this->item($key);
+			$res->set($key, $f($key, $value));
+		});
+		return $res;
+	}
+	
+	
+	
+	/**
 	 * Add values from other map
 	 * @param Map<T1, T2> map
 	 * @return self
@@ -533,6 +576,15 @@ class Map{
 	}
 	function __unset($name){
 		return $this->remove($name);
+	}
+	
+	
+	
+	/**
+	 * JsonSerializable
+	 */
+	public function jsonSerialize(){
+		return $this->_map;
 	}
 }
 

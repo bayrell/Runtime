@@ -253,7 +253,7 @@ if (typeof Runtime == "undefined") Runtime = {};
 
 Runtime.Vector = class extends Array{
 	
-	
+
 	/**
 	 * Returns new Instance
 	 */
@@ -573,7 +573,7 @@ module.exports = Runtime.Vector;
 
 #case ifcode PHP then
 
-class Vector{
+class Vector implements \JsonSerializable{
 	
 	protected $_arr = null;
 	
@@ -934,6 +934,15 @@ class Vector{
 		$arr2 = new Vector();
 		$arr2->_arr = array_merge($this->_arr, $v->_arr);
 		return $arr2;
+	}
+	
+	
+	
+	/**
+	 * JsonSerializable
+	 */
+	public function jsonSerialize(){
+		return $this->_arr;
 	}
 }
 
