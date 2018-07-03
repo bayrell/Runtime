@@ -299,6 +299,8 @@ export class Utils{
 			
 			instance.getVariablesNames(names);
 			names.each(void (string variable_name) use (instance, obj){
+				if (variable_name == "__class_name__") 
+					return;
 				var value = obj.get(variable_name, null);
 				instance.assignValue(variable_name, value);
 			});
