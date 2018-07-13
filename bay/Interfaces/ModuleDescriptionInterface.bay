@@ -70,14 +70,6 @@ interface ModuleDescriptionInterface{
 	 * Returns required modules
 	 * @return Map<string, string>
 	 */	
-	public static Map<string, string> getRequiredModules();
-	
-	
-	
-	/**
-	 * Returns required modules
-	 * @return Map<string, string>
-	 */	
-	public static Map<string, string> getRequiredDevModules();
+	public static Map<string, string> getRequiredModules(ContextInterface context);
 	
 }

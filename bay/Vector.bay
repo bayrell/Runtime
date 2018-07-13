@@ -83,7 +83,7 @@ declare class Vector<T>{
 	
 	
 	/**
-	 * Insert value size_to position
+	 * Insert value to position
 	 * @param T value
 	 * @param int pos - position
 	 */
@@ -198,6 +198,13 @@ declare class Vector<T>{
 	 * Remove value
 	 */
 	declare public void removeValue(T value);
+	
+	
+	
+	/**
+	 * Remove value
+	 */
+	declare public void removeItem(T value);
 	
 	
 	
@@ -503,6 +510,17 @@ Runtime.Vector = class extends Array{
 	 * Remove value
 	 */
 	removeValue(value){
+		var index = this.indexOf(value);
+		if (index != -1)
+			this.remove(index, 1);
+	}
+	
+	
+	
+	/**
+	 * Remove value
+	 */
+	removeItem(value){
 		var index = this.indexOf(value);
 		if (index != -1)
 			this.remove(index, 1);
@@ -864,6 +882,18 @@ class Vector implements \JsonSerializable{
 	 * @param mixed value
 	 */
 	public function removeValue($value){
+		$index = $this->indexOf($value);
+		if ($index != -1)
+			$this->remove($index, 1);
+	}
+	
+	
+	
+	/**
+	 * Remove value
+	 * @param mixed value
+	 */
+	public function removeItem($value){
 		$index = $this->indexOf($value);
 		if ($index != -1)
 			$this->remove($index, 1);

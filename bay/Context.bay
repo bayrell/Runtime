@@ -81,7 +81,6 @@ class Context extends CoreObject implements ContextInterface{
 		/* Add module */
 		this._modules.push(module_description_class_name);
 		
-		
 		/* Call onRegister */
 		Vector<var> args = (new Vector()).push(this);
 		rtl::callStaticMethod(
@@ -89,13 +88,12 @@ class Context extends CoreObject implements ContextInterface{
 			"onRegister",
 			args
 		);
-		delete args;
-		
 		
 		/* Register required Modules*/
 		Map<string, string> modules = rtl::callStaticMethod(
 			module_description_class_name, 
-			"getRequiredModules"
+			"getRequiredModules",
+			args
 		);
 		if (modules != null){
 			Vector<string> keys = modules.keys();
@@ -107,6 +105,7 @@ class Context extends CoreObject implements ContextInterface{
 			delete keys;
 			delete modules;
 		}
+		delete args;
 		
 		return this;
 	}

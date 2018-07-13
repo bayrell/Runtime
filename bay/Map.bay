@@ -135,6 +135,16 @@ declare class Map<T1, T2>{
 	
 	
 	/**
+	 * Reduce
+	 * @param func f
+	 * @param mixed init_value
+	 * @return init_value
+	 */
+	declare mixed reduce(func f, mixed init_value);
+	
+	
+	
+	/**
 	 * Add values from other map
 	 * @param Map<T1, T2> map
 	 * @return self
@@ -311,7 +321,10 @@ Runtime.Map = class extends Map{
 	 */
 	each(f){
 		var keys = this.keys();
-		keys.each(f);
+		keys.each((key)=>{
+			var value = this.item(key);
+			f(key, value);
+		});
 		return this;
 	}
 	
@@ -325,9 +338,24 @@ Runtime.Map = class extends Map{
 	map(f){
 		var _Map = null; if (isBrowser()) _Map = Runtime.Map; else _Map = Map;
 		var res = new _Map();
-		this.each((key)=>{
-			var value = this.item(key);
+		this.each((key, value)=>{
 			res.set(key, f(key, value));
+		});
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Reduce
+	 * @param func f
+	 * @param mixed init_value
+	 * @return init_value
+	 */
+	reduce(f, init_value){
+		var res = init_value;
+		this.each((key, value) => {
+			res = f(res, key, value);
 		});
 		return res;
 	}
@@ -354,7 +382,7 @@ Runtime.Map = class extends Map{
 	 */
 	toObject(){
 		var obj = {};
-		this.each((key)=>{obj[key]=this.get(key);});
+		this.each((key)=>{obj[key]=this.get(key, null);});
 		return obj;
 	}
 }
@@ -417,7 +445,7 @@ class Map implements \JsonSerializable{
 	 * @return T2
 	 */
 	public function item($key){	
-		if (!isset($this->_map[$key])){
+		if (!array_key_exists($key, $this->_map)){
 			throw new KeyNotFound(null, $key);
 		}
 		return $this->_map[$key];
@@ -525,7 +553,10 @@ class Map implements \JsonSerializable{
 	 */
 	function each($f){
 		$keys = array_keys($this->_map);
-		array_walk($keys, $f);
+		array_walk($keys, function($key) use ($f){
+			$value = $this->item($key);
+			$f($key, $value);
+		});
 		return $this;
 	}
 	
@@ -541,6 +572,22 @@ class Map implements \JsonSerializable{
 		$this->each(function($key) use ($res, $f){
 			$value = $this->item($key);
 			$res->set($key, $f($key, $value));
+		});
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Reduce
+	 * @param func f
+	 * @param mixed init_value
+	 * @return init_value
+	 */
+	function reduce($f, $init_value){
+		$res = $init_value;
+		$this->each(function ($key, $value) use (&$res, $f){
+			$res = $f($res, $key, $value);
 		});
 		return $res;
 	}

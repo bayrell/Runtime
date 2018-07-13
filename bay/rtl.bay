@@ -167,6 +167,25 @@ export class rtl{
 	 * Call method
 	 * @return Object
 	 */
+	declare export static var call(callback f, Vector args);
+	
+	#switch
+	#case ifcode PHP then
+	static function call($f, $args){
+		return call_user_func_array($f, $args);
+	}
+	#case ifcode JAVASCRIPT then
+	static call(f, args){
+		return f.apply(null, args);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Call method
+	 * @return Object
+	 */
 	declare export static var callMethod(Object obj, string method_name, Vector args);
 	
 	#switch
@@ -407,9 +426,10 @@ export class rtl{
 	
 	/**
 	 * Returns unique value
+	 * @param bool flag If true returns as text. Default true
 	 * @return string
 	 */
-	declare export static string unique();
+	declare export static string unique(bool flag = true);
 	
 	
 	#switch
@@ -418,8 +438,74 @@ export class rtl{
 		return uniqid();
 	}
 	#case ifcode JAVASCRIPT then
-	static unique(){
-		return "" + (new Date).getTime() + Math.floor((Math.random() * 899999 + 100000));
+	static unique(flag){
+		if (flag == undefined) flag = true;
+		if (flag)
+			return "" + (new Date).getTime() + Math.floor((Math.random() * 899999 + 100000));
+		return Symbol();
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Round up
+	 * @param double value
+	 * @return int
+	 */
+	declare export static string ceil(double value);
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function ceil($value){
+		return ceil($value);
+	}
+	#case ifcode JAVASCRIPT then
+	static ceil(value){
+		return Math.ceil(value);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Round down
+	 * @param double value
+	 * @return int
+	 */
+	declare export static string floor(double value);
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function floor($value){
+		return floor($value);
+	}
+	#case ifcode JAVASCRIPT then
+	static floor(value){
+		return Math.floor(value);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Round down
+	 * @param double value
+	 * @return int
+	 */
+	declare export static string round(double value);
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function round($value){
+		return round($value);
+	}
+	#case ifcode JAVASCRIPT then
+	static round(value){
+		return Math.round(value);
 	}
 	#endswitch
 }

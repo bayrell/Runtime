@@ -76,21 +76,4 @@ class RuntimeConstant{
 	static const int ERROR_STOP_ITERATION = -4;
 	static const int ERROR_ASSERT = -5;
 	
-	
-	/* Modules error */
-	static const int ERROR_MODULE_CONTEXT = -1000;
-	static const int ERROR_MODULE_LANG = -2000;
-	static const int ERROR_MODULE_UNIT = -3000;
-	static const int ERROR_MODULE_BUS = -4100;
-	static const int ERROR_MODULE_PARSER = -5000;
-	static const int ERROR_USER = -100000;
-	
-	
-	/* Bus errors */
-	static const int ERROR_BUS_CONNECTION = -4001;
-	static const int ERROR_BUS_RUNTIME = -4002;
-	static const int ERROR_BUS_UNKNOWN_COMMAND = -4003;
-	static const int ERROR_BUS_WRONG_ANSWER = -4005;
-	static const int ERROR_BUS_TIMEOUT = -4006;
-	
 }

@@ -111,6 +111,25 @@ export class Utils{
 	
 	
 	/**
+	 * Returns parents class names
+	 * @return Vector<string>
+	 */
+	public static Vector<string> getParents(string class_name){
+		Vector<string> res = new Vector();
+		
+		while (class_name != ""){
+			class_name = rtl::callStaticMethod(class_name, "getParentClassName");
+			if (class_name != ""){
+				res.push(class_name);
+			}
+		}
+		
+		return res;
+	}
+	
+	
+	
+	/**
 	 * Returns true if value is primitive value
 	 * @return boolean 
 	 */
@@ -157,6 +176,13 @@ export class Utils{
 		if (obj instanceof Map){
 			obj.set(key, value);
 		}
+		
+		#switch
+		#case ifcode JAVASCRIPT then
+		if (typeof obj == 'object'){
+			obj[key] = value;
+		}
+		#endswitch
 	}
 	
 	
@@ -225,24 +251,24 @@ export class Utils{
 	
 	/**
 	 * Returns object to primitive value
-	 * @param SerializeContainer container
+	 * @param mixed obj
 	 * @return mixed
 	 */
-	public static mixed toPrimitiveValue(mixed obj, SerializeContainer container = null){
+	public static mixed ObjectToPrimitive(mixed obj){
 	
 		if (obj == null) return null;
 		if (rtl::isScalarValue(obj)) return obj;
 		if (obj instanceof Vector){
 			return obj.map(mixed (mixed value){
-				return self::toPrimitiveValue( value );
+				return self::ObjectToPrimitive( value );
 			});
 		}
 		if (obj instanceof Map){
 			return obj.map(mixed (string key, mixed value){
-				return self::toPrimitiveValue( value );
+				return self::ObjectToPrimitive( value );
 			});
 		}
-		if (obj instanceof SerializeInterface){
+		if (obj implements SerializeInterface){
 			
 			Vector<string> names = new Vector();
 			Map<string, mixed> values = new Map();
@@ -250,7 +276,7 @@ export class Utils{
 			
 			names.each(void (string variable_name) use (values, obj){
 				var value = obj.takeValue(variable_name, null);
-				var value = self::toPrimitiveValue( value );
+				var value = self::ObjectToPrimitive( value );
 				values.set(variable_name, value);
 			});
 			
@@ -269,21 +295,21 @@ export class Utils{
 	 * @param SerializeContainer container
 	 * @return mixed
 	 */
-	public static mixed fromPrimitiveValue(ContextInterface context, mixed obj){
+	public static mixed PrimitiveToObject(ContextInterface context, mixed obj){
 		
 		if (obj == null) return null;
 		if (rtl::isScalarValue(obj)) return obj;
 		
 		if (obj instanceof Vector){
 			return obj.map(mixed (mixed value) use (context){
-				return self::fromPrimitiveValue( context, value );
+				return self::PrimitiveToObject( context, value );
 			});
 		}
 		
 		if (obj instanceof Map){
 			
 			obj = obj.map(mixed (string key, mixed value) use (context){
-				return self::fromPrimitiveValue( context, value );
+				return self::PrimitiveToObject( context, value );
 			});
 			
 			if ( !obj.has("__class_name__") ) 
@@ -385,7 +411,7 @@ export class Utils{
 	
 	#switch
 	#case ifcode JAVASCRIPT then
-	static toPrimitive(value){
+	static NativeToPrimitive(value){
 		
 		var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
 		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
@@ -395,18 +421,48 @@ export class Utils{
 		if (Array.isArray(value)){
 			var new_value = (new _Vector()).concat(value);
 			new_value = new_value.map((val)=>{
-				return _Utils.toPrimitive(val);
+				return _Utils.NativeToPrimitive(val);
 			});
 			return new_value;
 		}
 		if (typeof value == 'object'){
 			var new_value = new _Map(value);
 			new_value = new_value.map((key, val)=>{
-				return _Utils.toPrimitive(val);
+				return _Utils.NativeToPrimitive(val);
 			});
 			return new_value;
 		}
 		
+		return value;
+	}
+	static PrimitiveToNative(value){
+		
+		var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
+		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
+		var _Vector=null; if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
+		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
+		
+		if (value instanceof _Vector){
+			var arr = [];
+			value.each((v)=>{
+				arr.push( _Utils.PrimitiveToNative(v) );
+			});
+			return arr;
+		}
+		if (value instanceof _Map){
+			var obj = {};
+			value.each((k, v)=>{
+				obj[k] = _Utils.PrimitiveToNative(v);
+			});
+			return obj;
+		}
+		
+		return value;
+	}
+	static ObjectToNative(value){
+		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
+		value = _Utils.ObjectToPrimitive(value);
+		value = _Utils.PrimitiveToNative(value);
 		return value;
 	}
 	#endswitch

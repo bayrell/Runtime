@@ -37,7 +37,7 @@ interface AssetsInterface{
 	 * Returns required assets
 	 * @return Vector<string>
 	 */	
-	public static Vector<string> getRequiredAssets();
+	public static Vector<string> getRequiredAssets(ContextInterface context);
 	
 	
 	
@@ -45,20 +45,20 @@ interface AssetsInterface{
 	 * Returns required modules
 	 * @return Map<string, string>
 	 */	
-	public static Map<string, string> getRequiredModules();
+	public static Map<string, string> getRequiredModules(ContextInterface context);
 	
 	
 	
 	/**
 	 * Returns sync loaded files
 	 */		
-	public static Vector<string> assetsSyncLoad();
+	public static Vector<string> assetsSyncLoad(ContextInterface context);
 	
 	
 	
 	/**
 	 * Returns async loaded files
 	 */			
-	public static Vector<mixed> assetsAsyncLoad();
+	public static Vector<mixed> assetsAsyncLoad(ContextInterface context);
 	
 }

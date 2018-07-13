@@ -21,6 +21,7 @@ namespace Runtime;
 use Runtime.rtl;
 use Runtime.Vector;
 use Runtime.Interfaces.AssetsInterface;
+use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
@@ -82,7 +83,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface{
 	 * Returns required assets
 	 * @return Map<string, string>
 	 */	
-	public static Vector<string> getRequiredAssets(){
+	public static Vector<string> getRequiredAssets(ContextInterface context){
 		return null;
 	}
 	
@@ -92,17 +93,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface{
 	 * Returns required modules
 	 * @return Map<string, string>
 	 */	
-	public static Map<string, string> getRequiredModules(){
-		return null;
-	}
-	
-	
-	
-	/**
-	 * Returns required modules
-	 * @return Map<string, string>
-	 */	
-	public static Map<string, string> getRequiredDevModules(){
+	public static Map<string, string> getRequiredModules(ContextInterface context){
 		return null;
 	}
 	
@@ -111,7 +102,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface{
 	/**
 	 * Returns sync loaded files
 	 */		
-	public static Vector<string> assetsSyncLoad(){
+	public static Vector<string> assetsSyncLoad(ContextInterface context){
 		return null;
 	}
 	
@@ -120,7 +111,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface{
 	/**
 	 * Returns async loaded files
 	 */			
-	public static Vector<mixed> assetsAsyncLoad(){
+	public static Vector<mixed> assetsAsyncLoad(ContextInterface context){
 		return [
 			[
 				"/assets/Runtime/rs.js",
