@@ -64,7 +64,7 @@ class Context extends CoreObject implements ContextInterface{
 	 * @return Vector<string>
 	 */
 	Vector<string> getModules(){
-		return this._modules.copy();
+		return this._modules.concat();
 	}
 	
 	

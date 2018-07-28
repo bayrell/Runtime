@@ -191,6 +191,8 @@ export class rtl{
 	#switch
 	#case ifcode PHP then
 	static function callMethod($obj, $method_name, $args){
+		if ($args != null)
+			return call_user_func_array([$obj, $method_name], $args->_getArr());
 		return call_user_func_array([$obj, $method_name], $args);
 	}
 	#case ifcode JAVASCRIPT then
@@ -218,6 +220,9 @@ export class rtl{
 	static callStaticMethod(class_name, method_name, args){
 		var obj = this.find_class(class_name);
 		var f = obj[method_name];
+		if (f == null || f == undefined){
+			throw new Error(class_name + "." + method_name + " not found");
+		}
 		return f.apply(obj, args);
 	}
 	#endswitch
@@ -506,6 +511,27 @@ export class rtl{
 	#case ifcode JAVASCRIPT then
 	static round(value){
 		return Math.round(value);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Round down
+	 * @param double value
+	 * @return int
+	 */
+	declare export static string dump(var value);
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function dump($value){
+		return var_dump($value);
+	}
+	#case ifcode JAVASCRIPT then
+	static dump(value){
+		return console.log(value);
 	}
 	#endswitch
 }

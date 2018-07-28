@@ -107,7 +107,9 @@ export class rs{
 	#switch
 	#case ifcode PHP then
 	static function ord($s){
-		return mb_ord($s);
+		$result = unpack('V', mb_convert_encoding($s, 'UCS-4LE'));
+		if ($result) return $result[1];
+		return ord($s);
 	}
 	#case ifcode JAVASCRIPT then
 	static ord(s){

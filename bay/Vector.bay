@@ -579,7 +579,7 @@ Runtime.Vector = class extends Array{
 	 */
 	concat(arr){
 		if (arr == null && arr == undefined){
-			return arr.slice();
+			return super.slice();
 		}
 		return super.concat(arr);
 	}
