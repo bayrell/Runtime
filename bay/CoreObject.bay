@@ -19,6 +19,8 @@
 namespace Runtime;
 
 use Runtime.rtl;
+use Runtime.Map;
+use Runtime.Vector;
 
 
 class CoreObject{
@@ -86,10 +88,59 @@ class CoreObject{
 	
 	
 	/**
+	 * Set new value instance by variable name
+	 * @param string variable_name
+	 * @param var value
+	 */
+	public void assignValues(Map<string, mixed> values = null){
+		if (values == null)
+			return;
+		Vector<string> names = new Vector();
+		this.getVariablesNames(names);
+		names.each(void (string name) use (values){
+			mixed value = values.get(name, null);
+			this.assignValue(name, value);
+		});
+		delete names;
+	}
+	
+	
+	
+	/**
+	 * Set new value instance by variable name
+	 * @param string variable_name
+	 * @param var value
+	 */
+	public void takeValues(){
+		Map<string, mixed> values = new Map();
+		Vector<string> names = new Vector();
+		this.getVariablesNames(names);
+		names.each(void (string name) use (values){
+			mixed value = this.takeValue(name, null);
+			values.set(name, value);
+		});
+		return values;
+	}
+	
+	
+	
+	
+	/**
 	 * Assign all data from other object
 	 * @param CoreObject obj
 	 */
 	void assign(CoreObject obj){}
 	
 	
+	
+	/**
+	 * Call static method of the current class
+	 * @param string method_name
+	 * @param Vector args
+	 * @return mixed
+	 */
+	public mixed callStaticMethod(string method_name, Vector args = null){
+		string class_name = this.getClassName();
+		return rtl::callStaticMethod(class_name, method_name, args);
+	}
 }
