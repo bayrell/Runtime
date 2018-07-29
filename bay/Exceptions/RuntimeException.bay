@@ -120,7 +120,7 @@ class RuntimeException extends ClassException{
 	#switch
 	#case ifcode PHP then
 	public function __toString (){
-		$this->toString();
+		return $this->toString();
 	}
 	#endswitch
 	

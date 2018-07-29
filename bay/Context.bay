@@ -32,7 +32,8 @@ class Context extends CoreObject implements ContextInterface{
 	
 	protected string _locale = "";
 	protected Vector<string> _modules = null;
-	protected Map<string, mixed> _values = null;
+	protected Map<string, mixed> _managers = null;
+	protected Map<string, FactoryInterface> _managers_names = null;
 	protected Map<string, FactoryInterface> _providers_names = null;
 	
 	
@@ -42,8 +43,9 @@ class Context extends CoreObject implements ContextInterface{
 	void constructor(){
 		parent();
 		this._modules = new Vector<string>();
-		this._values = new Map<string, mixed>();
 		this._providers_names = new Map<string, FactoryInterface>();
+		this._managers_names = new Map<string, FactoryInterface>();
+		this._managers = new Map<string, mixed>();
 	}
 	
 	
@@ -115,12 +117,25 @@ class Context extends CoreObject implements ContextInterface{
 	/**
 	 * Register module
 	 * @param string provider_name
-	 * @param string factory_name
-	 * @param int type
+	 * @param FactoryInterface factory
 	 */
 	ContextInterface registerProvider(string provider_name, FactoryInterface factory){
 		if (not this._providers_names.has(provider_name)){
 			this._providers_names.set(provider_name, factory);
+		}
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Register worker
+	 * @param string manager_name
+	 * @param FactoryInterface factory
+	 */
+	ContextInterface registerManager(string manager_name, FactoryInterface factory){
+		if (not this._managers_names.has(manager_name)){
+			this._managers_names.set(manager_name, factory);
 		}
 		return this;
 	}
@@ -150,27 +165,13 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
-	 * Returns provider description by name. If provider does not exists returns null.
-	 * @param string provider_name
-	 * @return ProviderDescription 
-	 */
-	public ProviderDescription getProviderDescription(string provider_name){
-		if (not this._providers_names.has(provider_name))
-			return null;
-		
-		return this._providers_names.item(provider_name);
-	}
-	
-	
-	
-	/**
-	 * Returns temporary provider
+	 * Returns provider
 	 *
 	 * @params string provider_name
 	 * @return CoreObject
 	 */
 	public CoreObject createProvider(string provider_name){
-		if (!this._providers_names.has(provider_name))
+		if (not this._providers_names.has(provider_name))
 			return null;
 			
 		FactoryInterface factory_obj = this._providers_names.item(provider_name);
@@ -184,25 +185,25 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
-	 * Set value
-	 * @param string name
-	 * @param mixed value
+	 * Returns worker
+	 *
+	 * @params string manager_name
+	 * @return CoreObject
 	 */
-	public mixed setValue(string name, mixed value){
-		this._values.set(name, value);
+	public CoreObject getManager(string manager_name){
+		if (this._managers.has(manager_name))
+			return this._managers.item(manager_name);
+			
+		FactoryInterface factory_obj = this._managers_names.item(manager_name);
+		if (factory_obj == null)
+			return null;
+		
+		CoreObject obj = factory_obj.newInstance(this);
+		this._managers.set(manager_name, obj);
+		
+		return obj;
 	}
 	
-
-
-	/**
-	 * Get value
-	 * @param string name
-	 * @param mixed value
-	 */
-	public mixed getValue(string name, mixed default_value = null){
-		return this._values.get(name, default_value);
-	}
-
 	
 	
 	/**
