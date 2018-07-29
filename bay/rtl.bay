@@ -111,6 +111,27 @@ export class rtl{
 	
 	
 	
+	/**
+	 * Returns true if class exists
+	 * @return bool
+	 */
+	declare export static bool class_exists(string class_name);
+	
+	#switch
+	#case ifcode PHP then
+	static function class_exists($class_name){
+		$class_name = static::find_class($class_name);
+		return class_exists($class_name);
+	}
+	#case ifcode JAVASCRIPT then
+	static class_exists(class_name){
+		var obj = this.find_class(class_name);
+		if (!this.exists(obj)) return false;
+		return null;
+	}
+	#endswitch
+	
+	
 	
 	/**
 	 * Create object by class_name. If class name does not exists return null
@@ -214,6 +235,9 @@ export class rtl{
 	#case ifcode PHP then
 	static function callStaticMethod($class_name, $method_name, $args=null){
 		$class_name = static::find_class($class_name);
+		if (!class_exists($class_name)){
+			throw new \Exception($class_name . " not found ");
+		}
 		return call_user_func_array([$class_name, $method_name], ($args!=null)?$args->_getArr():[]);
 	}
 	#case ifcode JAVASCRIPT then

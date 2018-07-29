@@ -620,6 +620,7 @@ class Vector implements \JsonSerializable{
 	 */
 	public function _assignArr(&$arr){
 		$this->_arr = $arr;
+		return $this;
 	}
 	
 	
