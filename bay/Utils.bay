@@ -418,6 +418,9 @@ export class Utils{
 		var _Vector=null; if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
 		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
 		
+		if (value == null)
+			return null;
+		
 		if (Array.isArray(value)){
 			var new_value = (new _Vector()).concat(value);
 			new_value = new_value.map((val)=>{
@@ -441,6 +444,9 @@ export class Utils{
 		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
 		var _Vector=null; if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
 		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
+		
+		if (value == null)
+			return null;
 		
 		if (value instanceof _Vector){
 			var arr = [];
