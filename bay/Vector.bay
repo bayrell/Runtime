@@ -250,6 +250,13 @@ declare class Vector<T>{
 	 * @return Vector<T>
 	 */
 	declare Vector<T> concat(Vector<T> arr = null);
+	
+	
+	/**
+	 * Reverse array
+	 * @return Vector<T>
+	 */
+	declare public Vector<T> reverse();
 }
 
 
@@ -582,6 +589,15 @@ Runtime.Vector = class extends Array{
 			return super.slice();
 		}
 		return super.concat(arr);
+	}
+	
+	
+	/**
+	 * Reverse array
+	 * @return Vector
+	 */
+	reverse(){
+		return super.reverse();
 	}
 }
 
@@ -974,6 +990,18 @@ class Vector implements \JsonSerializable{
 	 */
 	public function jsonSerialize(){
 		return $this->_arr;
+	}
+	
+	
+	
+	/**
+	 * Reverse array
+	 * @return Vector
+	 */
+	public function reverse(){
+		$arr2 = new Vector();
+		$arr2->_arr = array_reverse($this->_arr);
+		return $arr2;
 	}
 }
 
