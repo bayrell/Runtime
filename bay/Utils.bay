@@ -264,9 +264,13 @@ export class Utils{
 			});
 		}
 		if (obj instanceof Map){
-			return obj.map(mixed (string key, mixed value){
+			obj = obj.map(mixed (string key, mixed value){
 				return self::ObjectToPrimitive( value );
 			});
+			if (not obj.has("__class_name__")){
+				obj.set("__class_name__", "Runtime.Map");
+			}
+			return obj;
 		}
 		if (obj implements SerializeInterface){
 			
@@ -313,8 +317,11 @@ export class Utils{
 				return self::PrimitiveToObject( value, context );
 			});
 			
-			if ( !obj.has("__class_name__") ) 
+			if ( !obj.has("__class_name__") ) return obj;
+			if ( obj.get("__class_name__") == "Runtime.Map" ){
+				obj.remove("__class_name__");
 				return obj;
+			}
 			
 			string class_name = obj.item("__class_name__");
 			if (not rtl::class_exists(class_name)){
@@ -434,15 +441,7 @@ export class Utils{
 		if (is_array($value)){
 			$is_vector = false;
 			if (!isset($value['__class_name__'])){
-				$pos = 0;
 				$is_vector = true;
-				foreach ($value as $key => &$val){
-					if ($key != $pos){
-						$is_vector = false;
-						break;
-					}
-					$pos++;
-				}
 			}
 			if ($is_vector){
 				$arr = array_values($value);
