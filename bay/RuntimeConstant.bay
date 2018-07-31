@@ -74,7 +74,11 @@ class RuntimeConstant{
 	static const int ERROR_INDEX_OUT_OF_RANGE = -2;
 	static const int ERROR_KEY_NOT_FOUND = -3;
 	static const int ERROR_STOP_ITERATION = -4;
-	static const int ERROR_DOES_NOT_EXISTS = -5;
+	static const int ERROR_OBJECT_DOES_NOT_EXISTS = -5;
 	static const int ERROR_ASSERT = -6;
+	static const int ERROR_REQUEST = -7;
+	static const int ERROR_RESPONSE = -8;
+	static const int ERROR_CSRF_TOKEN = -9;
+	static const int ERROR_RUNTIME = -10;
 	
 }

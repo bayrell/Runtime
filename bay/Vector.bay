@@ -775,7 +775,7 @@ class Vector implements \JsonSerializable{
 	 * @param int pos - position
 	 */
 	public function item($pos){
-		if (!isset($this->_arr[$pos]))
+		if (!array_key_exists($pos, $this->_arr))
 			throw new IndexOutOfRange();
 		return $this->_arr[$pos];
 	}
@@ -788,7 +788,7 @@ class Vector implements \JsonSerializable{
 	 * @param T value 
 	 */
 	public function set($pos, $value){
-		if (!isset($this->_arr[$pos]))
+		if (!array_key_exists($pos, $this->_arr))
 			throw new IndexOutOfRange();
 		$this->_arr[$pos] = $value;
 		return this;

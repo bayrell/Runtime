@@ -127,10 +127,34 @@ export class rtl{
 	static class_exists(class_name){
 		var obj = this.find_class(class_name);
 		if (!this.exists(obj)) return false;
-		return null;
+		return true;
 	}
 	#endswitch
 	
+	
+	
+	/**
+	 * Returns true if class exists
+	 * @return bool
+	 */
+	declare export static bool method_exists(string class_name, string method_name);
+	
+	#switch
+	#case ifcode PHP then
+	static function method_exists($class_name, $method_name){
+		$class_name = static::find_class($class_name);
+		if (!class_exists($class_name)) return false;
+		if (!method_exists($class_name, $method_name)) return false;
+		return true;
+	}
+	#case ifcode JAVASCRIPT then
+	static method_exists(class_name, method_name){
+		var obj = this.find_class(class_name);
+		if (!this.exists(obj)) return false;
+		if (!this.exists(obj[method_name]) && !this.exists(obj.prototype[method_name])) return false;
+		return true;
+	}
+	#endswitch
 	
 	
 	/**
@@ -344,6 +368,7 @@ export class rtl{
 	 * @return boolean 
 	 */
 	static bool isScalarValue(var value){
+		if (value == null) return true;
 		if (rtl::isString(value)) return true;
 		if (rtl::isNumber(value)) return true;
 		if (rtl::isBoolean(value)) return true;
