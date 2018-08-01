@@ -421,7 +421,7 @@ export class Utils{
 				
 				return value;
 			});
-			return _Utils.PrimitiveToObject(context, obj);
+			return _Utils.PrimitiveToObject(obj,context);
 		}
 		catch(e){
 			return null;
@@ -522,6 +522,12 @@ export class Utils{
 		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
 		value = _Utils.ObjectToPrimitive(value);
 		value = _Utils.PrimitiveToNative(value);
+		return value;
+	}
+	static NativeToObject(value){
+		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
+		value = _Utils.NativeToPrimitive(value);
+		value = _Utils.PrimitiveToObject(value);
 		return value;
 	}
 	#endswitch

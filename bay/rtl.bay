@@ -30,6 +30,15 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 export class rtl{
 	
 	
+	static bool isBrowser(){
+		#switch
+		#case ifcode JAVASCRIPT then
+		return typeof window !== "undefined";
+		#endswitch
+		return false;
+	}
+	
+	
 	#switch
 	#case ifcode JAVASCRIPT then
 	static implements(obj, interface_name){
