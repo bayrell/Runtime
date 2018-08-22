@@ -18,6 +18,7 @@
  
 namespace Runtime;
 
+use Runtime.rtl;
 use Runtime.Vector;
 use Runtime.Exceptions.KeyNotFound;
 
@@ -159,6 +160,33 @@ declare class Map<T1, T2>{
 if (typeof Runtime == "undefined") Runtime = {};
 
 Runtime.Map = class extends Map{
+	
+	
+	/**
+	 * Returns new Instance
+	 * @param ContextInterface context
+	 * @param Map<string, mixed> values
+	 * @return CoreObject
+	 */
+	createNewInstance(){
+		if (isBrowser) return new Runtime.Map();
+		return new Runtime.Map();
+	}
+	
+	
+	
+	/**
+	 * Assign objects
+	 */
+	assign(obj){
+		if (obj instanceof Runtime.Map){
+			obj.each((key, value) => {
+				if (isBrowser) this.set(key, Runtime.rtl._clone(value));
+				else this.set(key, rtl._clone(value));
+			})
+		}
+	}
+	
 	
 	
 	/**

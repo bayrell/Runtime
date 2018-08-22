@@ -248,6 +248,27 @@ export class Utils{
 	
 	
 	
+	/**
+	 * Compare 2 Vectors, Returns true if arr1 and arr2 have same class names
+	 * @param Vector<string> arr1
+	 * @param Vector<string> arr2
+	 * @return bool
+	 */
+	public static bool equalsVectors(Vector<string> arr1, Vector<string> arr2){
+		for (int i=0; i<arr1.count(); i++){
+			string item = arr1.item(i);
+			if (arr2.indexOf(item) == -1)
+				return false;
+		}
+		for (int i=0; i<arr2.count(); i++){
+			string item = arr2.item(i);
+			if (arr1.indexOf(item) == -1)
+				return false;
+		}
+		return true;
+	}
+	
+	
 	
 	/**
 	 * Returns object to primitive value
@@ -318,7 +339,7 @@ export class Utils{
 			});
 			
 			if ( !obj.has("__class_name__") ) return obj;
-			if ( obj.get("__class_name__") == "Runtime.Map" ){
+			if ( obj.item("__class_name__") == "Runtime.Map" ){
 				obj.remove("__class_name__");
 				return obj;
 			}
@@ -402,7 +423,7 @@ export class Utils{
 		$res = @json_decode($obj, true);
 		if (!$res)
 			return null;
-		return self::NativeToPrimitive($res);
+		return self::NativeToObject($res);
 	}
 	#case ifcode JAVASCRIPT then
 	static json_decode(s, context){
@@ -518,17 +539,17 @@ export class Utils{
 		
 		return value;
 	}
-	static ObjectToNative(value){
-		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
-		value = _Utils.ObjectToPrimitive(value);
-		value = _Utils.PrimitiveToNative(value);
-		return value;
-	}
-	static NativeToObject(value){
-		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
-		value = _Utils.NativeToPrimitive(value);
-		value = _Utils.PrimitiveToObject(value);
-		return value;
-	}
 	#endswitch
+	
+	
+	static var ObjectToNative(var value){
+		value = self::ObjectToPrimitive(value);
+		value = self::PrimitiveToNative(value);
+		return value;
+	}
+	static var NativeToObject(var value){
+		value = self::NativeToPrimitive(value);
+		value = self::PrimitiveToObject(value);
+		return value;
+	}	
 }

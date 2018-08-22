@@ -18,6 +18,7 @@
  
 namespace Runtime;
 
+use Runtime.rtl;
 use Runtime.Exceptions.IndexOutOfRange;
 
 
@@ -249,7 +250,18 @@ declare class Vector<T>{
 	 * @param Vector<T> arr
 	 * @return Vector<T>
 	 */
-	declare Vector<T> concat(Vector<T> arr = null);
+	declare Vector<T> concat(Vector<T> arr);
+	
+	
+	
+	/**
+	 * Returns Vector
+	 * @param int b begin
+	 * @param int e end
+	 * @return Vector<T>
+	 */
+	declare Vector<T> slice(int b = -1, int e = -1);
+	
 	
 	
 	/**
@@ -267,7 +279,7 @@ if (typeof Runtime == "undefined") Runtime = {};
 
 Runtime.Vector = class extends Array{
 	
-
+	
 	/**
 	 * Returns new Instance
 	 */
@@ -285,7 +297,8 @@ Runtime.Vector = class extends Array{
 	assign(obj){
 		this.clear();
 		obj.each((item)=>{
-			this.push(item);
+			if (isBrowser) this.push( Runtime.rtl._clone(item) );
+			else this.push( rtl._clone(item) );
 		});
 	}
 	
@@ -340,7 +353,11 @@ Runtime.Vector = class extends Array{
 	 * @return  int
 	 */
 	indexOf(value){
-		return super.indexOf(value);
+		for (var i=0; i<this.count(); i++){
+			if (this[i] == value)
+				return i;
+		}
+		return -1;
 	}
 	
 	
@@ -590,6 +607,20 @@ Runtime.Vector = class extends Array{
 		}
 		return super.concat(arr);
 	}
+	
+	
+	
+	/**
+	 * Returns Vector
+	 * @param int b begin
+	 * @param int e end
+	 * @return Vector<T>
+	 */
+	slice(b, e){
+		return super.slice(b, e);
+	}
+	
+	
 	
 	
 	/**
@@ -972,14 +1003,29 @@ class Vector implements \JsonSerializable{
 	 * @param Vector v
 	 * @return Vector
 	 */
-	function concat($v = null){
-		if ($v == null){
+	function concat($v){
+		$arr2 = new Vector();
+		$arr2->_arr = array_merge($this->_arr, $v->_arr);
+		return $arr2;
+	}
+	
+	
+	
+	/**
+	 * Returns Vector
+	 * @param int b begin
+	 * @param int e end
+	 * @return Vector<T>
+	 */
+	function slice($b = -1, $e = -1){
+		if ($e == -1) $e = null;
+		if ($b >= 0){
 			$arr2 = new Vector();
-			$arr2->_arr = array_merge($this->_arr, []);
+			$arr2->_arr = array_slice($this->_arr, $b, $e);
 			return $arr2;
 		}
 		$arr2 = new Vector();
-		$arr2->_arr = array_merge($this->_arr, $v->_arr);
+		$arr2->_arr = array_merge($this->_arr, []);
 		return $arr2;
 	}
 	

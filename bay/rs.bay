@@ -64,7 +64,7 @@ export class rs{
 	 
 	#switch
 	#case ifcode PHP then
-	static function substr(&$s, $start, $length){
+	static function substr(&$s, $start, $length = null){
 		return mb_substr($s, $start, $length);
 	}
 	#case ifcode JAVASCRIPT then
@@ -72,6 +72,9 @@ export class rs{
 		var _rtl = null; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
 		var _rs = null; if (isBrowser()) _rs = Runtime.rs; else _rs = rs;
 		var end = start + length;
+		if (length == undefined){
+			return _rtl.toString(s).substring(start);
+		}
 		if (length < 0){
 			var sz = _rs.strlen(s);
 			end = sz + length;

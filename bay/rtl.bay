@@ -76,7 +76,7 @@ export class rtl{
 		for (var i=0; i<arr.length; i++){
 			var key = arr[i];
 			if (obj[key] == undefined)
-				return false;
+				return null;
 			obj = obj[key];
 		}
 		
@@ -160,7 +160,11 @@ export class rtl{
 	static method_exists(class_name, method_name){
 		var obj = this.find_class(class_name);
 		if (!this.exists(obj)) return false;
-		if (!this.exists(obj[method_name]) && !this.exists(obj.prototype[method_name])) return false;
+		if (
+			!this.exists(obj[method_name]) && 
+			!this.exists(obj.prototype) && 
+			!this.exists(obj.prototype[method_name])
+		) return false;
 		return true;
 	}
 	#endswitch
@@ -315,13 +319,13 @@ export class rtl{
 		if (val == null)
 			return null;
 		
-		else if (val instanceof Number){
+		else if (val instanceof Number || typeof val == "number"){
 			return new Number(val);
 		}
-		else if (val instanceof String){
+		else if (val instanceof String || typeof val == "string"){
 			return new String(val);
 		}
-		else if (val instanceof Boolean){
+		else if (val instanceof Boolean || typeof val == "boolean"){
 			return new Boolean(val);
 		}
 		else if (val instanceof Date){
@@ -346,7 +350,7 @@ export class rtl{
 			return res;
 		}
 		
-		return val;
+		return null;
 	}
 	#endswitch
 	
