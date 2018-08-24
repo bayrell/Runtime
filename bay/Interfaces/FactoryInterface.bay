@@ -28,7 +28,7 @@ interface FactoryInterface{
 	/**
 	 * Returns new Instance
 	 */
-	public CoreObject newInstance();
+	public CoreObject newInstance(ContextInterface context = null);
 	
 }
 

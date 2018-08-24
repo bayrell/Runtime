@@ -23,10 +23,10 @@ interface SubscribeInterface{
 	
 	
 	/**
-	 * Receive event
+	 * Handler event
 	 * var e
 	 */
-	public void onEvent(var e);
+	public void handlerEvent(var e);
 	
 	
 }

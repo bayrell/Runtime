@@ -33,22 +33,38 @@ interface ContextInterface{
 	
 	
 	/**
-	 * Register module
+	 * Register provider
 	 * @param string provider_name
-	 * @param string factory_name
-	 * @param int type
+	 * @param FactoryInterface factory
 	 */
-	ContextInterface registerProvider(string provider_name, string factory_name);
+	ContextInterface registerProviderFactory(string provider_name, FactoryInterface factory);
 	
 	
 	
 	/**
-	 * Returns global provider
-	 *
+	 * Register manager
+	 * @param string manager_name
+	 * @param CoreObject obj
+	 */
+	ContextInterface registerManager(string manager_name, CoreObject obj);
+	
+	
+	
+	/**
+	 * Returns provider
 	 * @params string provider_name
 	 * @return CoreObject
 	 */
 	public CoreObject createProvider(string provider_name);
+	
+	
+	
+	/**
+	 * Returns manager
+	 * @params string manager_name
+	 * @return CoreObject
+	 */
+	public CoreObject getManager(string manager_name);
 	
 	
 	

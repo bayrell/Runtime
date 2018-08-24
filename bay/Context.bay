@@ -33,7 +33,6 @@ class Context extends CoreObject implements ContextInterface{
 	protected string _locale = "";
 	protected Vector<string> _modules = null;
 	protected Map<string, mixed> _managers = null;
-	protected Map<string, FactoryInterface> _managers_names = null;
 	protected Map<string, FactoryInterface> _providers_names = null;
 	
 	
@@ -44,7 +43,6 @@ class Context extends CoreObject implements ContextInterface{
 		parent();
 		this._modules = new Vector<string>();
 		this._providers_names = new Map<string, FactoryInterface>();
-		this._managers_names = new Map<string, FactoryInterface>();
 		this._managers = new Map<string, mixed>();
 	}
 	
@@ -119,7 +117,7 @@ class Context extends CoreObject implements ContextInterface{
 	 * @param string provider_name
 	 * @param FactoryInterface factory
 	 */
-	ContextInterface registerProvider(string provider_name, FactoryInterface factory){
+	ContextInterface registerProviderFactory(string provider_name, FactoryInterface factory){
 		if (not this._providers_names.has(provider_name)){
 			this._providers_names.set(provider_name, factory);
 		}
@@ -129,13 +127,13 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
-	 * Register worker
+	 * Register manager
 	 * @param string manager_name
 	 * @param FactoryInterface factory
 	 */
-	ContextInterface registerManager(string manager_name, FactoryInterface factory){
-		if (not this._managers_names.has(manager_name)){
-			this._managers_names.set(manager_name, factory);
+	ContextInterface registerManager(string manager_name, CoreObject obj){
+		if (not this._managers.has(manager_name)){
+			this._managers.set(manager_name, obj);
 		}
 		return this;
 	}
@@ -185,7 +183,7 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
-	 * Returns worker
+	 * Returns manager
 	 *
 	 * @params string manager_name
 	 * @return CoreObject
@@ -194,14 +192,7 @@ class Context extends CoreObject implements ContextInterface{
 		if (this._managers.has(manager_name))
 			return this._managers.item(manager_name);
 			
-		FactoryInterface factory_obj = this._managers_names.item(manager_name);
-		if (factory_obj == null)
-			return null;
-		
-		CoreObject obj = factory_obj.newInstance(this);
-		this._managers.set(manager_name, obj);
-		
-		return obj;
+		return null;
 	}
 	
 	
