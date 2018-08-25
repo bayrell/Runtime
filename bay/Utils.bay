@@ -104,6 +104,7 @@ export class Utils{
 	 */
 	public static ContextInterface registerGlobalContext(Vector<string> modules = null){
 		ContextInterface context = self::createContext(modules);
+		context.init();
 		self::setGlobalContext(context);
 		return context;
 	}
@@ -551,5 +552,34 @@ export class Utils{
 		value = self::NativeToPrimitive(value);
 		value = self::PrimitiveToObject(value);
 		return value;
-	}	
+	}
+
+	
+	
+	/*
+	 * Generate password
+	 *
+	 * @param int length The lenght of the password
+	 * @param string options What kinds of the char can be in password
+	 *   a - lower case chars
+	 *   b - upper case chars
+	 *   c - numbers
+	 *   d - special chars !@#$%^&?*_-+=~(){}[]<>|/,.:;\\
+	 *   e - quotes `"'
+	 */	
+	public static string randomString(int length=16, string options="abc"){
+		string s = "";
+		if (rs::strpos(options, "a") >= 0) s ~= "abcdefghjkmnpqrstuvwxyz";
+		if (rs::strpos(options, "b") >= 0) s ~= "ABCDEFGHJKMNPQRSTUVWXYZ";
+		if (rs::strpos(options, "c") >= 0) s ~= "1234567890";
+		if (rs::strpos(options, "d") >= 0) s ~= "!@#$%^&?*_-+=~(){}[]<>|/,.:;\\";
+		if (rs::strpos(options, "e") >= 0) s ~= "`\"\'";
+		string res = "";
+		int c = rs::strlen(s);
+		for (int i=0; i<length; i++){
+			int k = rtl::random(0, c-1);
+			res ~= s[k];
+		}
+		return res;
+	}
 }

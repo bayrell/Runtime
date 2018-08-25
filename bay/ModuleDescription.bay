@@ -18,6 +18,8 @@
 
 namespace Runtime;
 
+use Runtime.Emitter;
+use Runtime.Map;
 use Runtime.rtl;
 use Runtime.Vector;
 use Runtime.Interfaces.AssetsInterface;
@@ -62,6 +64,8 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface{
 	 * @param ContextInterface context
 	 */
 	public static void onRegister(ContextInterface context){
+		context.registerManager("Runtime.Dispatcher", new Emitter());
+		context.registerManager("Runtime.Config", new Map<string, string>());
 	}
 	
 	
