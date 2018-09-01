@@ -39,12 +39,32 @@ export class rtl{
 	}
 	
 	
+	
+	/**
+	 * Returns true if class exists
+	 * @return bool
+	 */
+	declare export static bool class_implements(string class_name, string interface_name);
+	
+	
+	
 	#switch
+	#case ifcode PHP then
+	static function class_implements($class_name, $interface_name){
+		$arr = class_implements($class_name);
+		if (array_search($interface_name, $arr) !== false){
+			return true;
+		}
+		return false;
+	}
 	#case ifcode JAVASCRIPT then
 	static implements(obj, interface_name){
 		if (obj == undefined) return false;
 		if (obj.__implements__ == undefined) return false;
 		return obj.__implements__.indexOf(interface_name) != -1;
+	}
+	static class_implements(class_name, interface_name){
+		var obj = find_class(class_name);
 	}
 	#endswitch
 	

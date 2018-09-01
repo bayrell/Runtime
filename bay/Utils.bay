@@ -131,6 +131,26 @@ export class Utils{
 	
 	
 	/**
+	 * Returns true if class exists
+	 * @return bool
+	 */
+	declare public static Vector<string> get_intefaces(string class_name);
+	
+	#switch
+	#case ifcode PHP then
+	static function get_intefaces($class_name){
+		$arr = class_implements($class_name);
+		return (new Vector())->_assignArr($arr);
+	}
+	#case ifcode JAVASCRIPT then
+	static get_intefaces(class_name){
+		return new Vector();
+	}
+	#endswitch
+	
+	
+	
+	/**
 	 * Returns true if value is primitive value
 	 * @return boolean 
 	 */
@@ -289,9 +309,6 @@ export class Utils{
 			obj = obj.map(mixed (string key, mixed value){
 				return self::ObjectToPrimitive( value );
 			});
-			if (not obj.has("__class_name__")){
-				obj.set("__class_name__", "Runtime.Map");
-			}
 			return obj;
 		}
 		if (obj implements SerializeInterface){
@@ -349,17 +366,15 @@ export class Utils{
 			if (not rtl::class_exists(class_name)){
 				return null;
 			}
-			if (not rtl::method_exists(class_name, "createNewInstanceFromValues")){
+			if (not rtl::class_implements(class_name, "Runtime.Interfaces.SerializeInterface")){
 				return null;
 			}
 			
-			Vector<string> names = new Vector();
-			SerializeInterface instance = rtl::callStaticMethod(
-				class_name, 
-				"createNewInstanceFromValues", 
-				[context, obj]
-			);
+			/* New instance */
+			SerializeInterface instance = rtl::newInstance(class_name, null);
 			
+			/* Assign values */
+			Vector<string> names = new Vector();
 			instance.getVariablesNames(names);
 			names.each(void (string variable_name) use (instance, obj){
 				if (variable_name == "__class_name__") 
@@ -421,7 +436,7 @@ export class Utils{
 	#switch
 	#case ifcode PHP then
 	static function json_decode($obj){
-		$res = @json_decode($obj, true);
+		$res = @json_decode($obj, false);
 		if (!$res)
 			return null;
 		return self::NativeToObject($res);
@@ -460,23 +475,21 @@ export class Utils{
 		if ($value === null)
 			return null;
 			
+		if (is_object($value)){
+			$values = get_object_vars($value);
+			$res = new \Runtime\Map($values);
+			$res = $res->map(function ($key, $val){
+				return self::NativeToPrimitive($val);
+			});
+			return $res;
+		}
+		
 		if (is_array($value)){
-			$is_vector = false;
-			if (!isset($value['__class_name__'])){
-				$is_vector = true;
-			}
 			if ($is_vector){
 				$arr = array_values($value);
 				$res = (new \Runtime\Vector())->_assignArr($arr);
 				$res = $res->map(function ($item){
 					return self::NativeToPrimitive($item);
-				});
-				return $res;
-			}
-			else{
-				$res = new \Runtime\Map($value);
-				$res = $res->map(function ($key, $val){
-					return self::NativeToPrimitive($val);
 				});
 				return $res;
 			}

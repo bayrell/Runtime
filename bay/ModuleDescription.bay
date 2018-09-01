@@ -22,12 +22,11 @@ use Runtime.Emitter;
 use Runtime.Map;
 use Runtime.rtl;
 use Runtime.Vector;
-use Runtime.Interfaces.AssetsInterface;
 use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
-class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface{
+class ModuleDescription implements ModuleDescriptionInterface{
 
 	
 	/**
@@ -68,85 +67,5 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface{
 		context.registerManager("Runtime.Config", new Map<string, string>());
 	}
 	
-	
-	
-	/**
-	 * Returns description interfaces of the current module
-	 * @return Vector<string>
-	 */	
-	public static Vector<string> getInterfaces(){
-		return [
-			'Runtime.Interfaces.AssetsInterface',
-			'Runtime.Interfaces.ModuleDescriptionInterface',
-		];
-	}
-	
-	
-	
-	/**
-	 * Returns required assets
-	 * @return Map<string, string>
-	 */	
-	public static Vector<string> getRequiredAssets(ContextInterface context){
-		return null;
-	}
-	
-	
-	
-	/**
-	 * Returns required modules
-	 * @return Map<string, string>
-	 */	
-	public static Map<string, string> getRequiredModules(ContextInterface context){
-		return null;
-	}
-	
-	
-	
-	/**
-	 * Returns sync loaded files
-	 */		
-	public static Vector<string> assetsSyncLoad(ContextInterface context){
-		return null;
-	}
-	
-	
-	
-	/**
-	 * Returns async loaded files
-	 */			
-	public static Vector<mixed> assetsAsyncLoad(ContextInterface context){
-		return [
-			[
-				"/assets/Runtime/rs.js",
-				"/assets/Runtime/re.js",
-				"/assets/Runtime/rtl.js",
-				"/assets/Runtime/CoreObject.js",
-				"/assets/Runtime/Emitter.js",
-				"/assets/Runtime/Map.js",
-				"/assets/Runtime/Utils.js",
-				"/assets/Runtime/Vector.js",
-				"/assets/Runtime/RuntimeConstant.js",
-				"/assets/Runtime/Exceptions/RuntimeException.js",
-				"/assets/Runtime/Interfaces/CloneableInterface.js",
-				"/assets/Runtime/Interfaces/ContextInterface.js",
-				"/assets/Runtime/Interfaces/FactoryInterface.js",
-				"/assets/Runtime/Interfaces/ModuleDescriptionInterface.js",
-				"/assets/Runtime/Interfaces/SerializeInterface.js",
-				"/assets/Runtime/Interfaces/StringInterface.js",
-				"/assets/Runtime/Interfaces/SubscribeInterface.js",
-			],
-			[
-				"/assets/Runtime/Context.js",
-				"/assets/Runtime/ContextObject.js",
-				"/assets/Runtime/ModuleDescription.js",
-				"/assets/Runtime/SerializeContainer.js",
-				"/assets/Runtime/VectorString.js",
-				"/assets/Runtime/Exceptions/IndexOutOfRange.js",
-				"/assets/Runtime/Exceptions/KeyNotFound.js",
-				"/assets/Runtime/Exceptions/UnknownError.js",
-			]
-		];
-	}
 	
 }

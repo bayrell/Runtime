@@ -22,7 +22,6 @@ use Runtime.CoreObject;
 use Runtime.Map;
 use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
-use Runtime.SerializeContainer;
 
 
 interface SerializeInterface{
@@ -38,20 +37,27 @@ interface SerializeInterface{
 	
 	
 	/**
-	 * Returns new Instance
-	 * @param ContextInterface context
-	 * @param Map<string, mixed> values
-	 * @return CoreObject
-	 */
-	public static CoreObject createNewInstanceFromValues(ContextInterface context, Map<string, mixed> values);
-	
-	
-	
-	/**
 	 * Returns name of variables to serialization
 	 * @return Vector<string>
 	 */
 	public void getVariablesNames(Vector<string> names);
+	
+	
+	
+	/**
+	 * Assign and clone data from other object
+	 * @param CoreObject obj
+	 */
+	void assignObject(CoreObject obj);
+	
+	
+	
+	/**
+	 * Set new value instance by variable name
+	 * @param string variable_name
+	 * @param var value
+	 */
+	public void assignValue(string variable_name, var value);
 	
 	
 	
@@ -62,13 +68,5 @@ interface SerializeInterface{
 	 */
 	public var takeValue(string variable_name, var default_value = null);
 	
-	
-	
-	/**
-	 * Set new value instance by variable name
-	 * @param string variable_name
-	 * @param var value
-	 */
-	public void assignValue(string variable_name, var value);
 	
 }
