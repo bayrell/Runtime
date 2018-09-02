@@ -332,21 +332,18 @@ export class rtl{
 		if (isBrowser()) return Runtime.rtl._clone(val, context);
 		else return rtl._clone(val, context);
 	}
-	static _clone(val, context){
-		if (context == undefined)
-			context = null;
-		
+	static _clone(val){
 		if (val == null)
 			return null;
 		
 		else if (val instanceof Number || typeof val == "number"){
-			return new Number(val);
+			return val;
 		}
 		else if (val instanceof String || typeof val == "string"){
-			return new String(val);
+			return (new String(val)).toString();
 		}
 		else if (val instanceof Boolean || typeof val == "boolean"){
-			return new Boolean(val);
+			return val;
 		}
 		else if (val instanceof Date){
 			return new Date(val);
@@ -365,7 +362,8 @@ export class rtl{
 		else if (Array.isArray(val)){	
 			var res = [];
 			for (var i=0;i<val.length;i++){
-				res[i] = this.clone(val[i]);
+				if (isBrowser()) res[i] = Runtime.rtl._clone(val[i]);
+				else res[i] = rtl._clone(val[i]);
 			}
 			return res;
 		}

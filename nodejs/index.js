@@ -18,7 +18,7 @@
 
 
 module.exports = {
-	VERSION: '0.4.0',
+	VERSION: '0.4.2',
 	'Exceptions': {
 		'IndexOutOfRange': require("./Exceptions/IndexOutOfRange.js"),
 		'KeyNotFound': require("./Exceptions/KeyNotFound.js"),
@@ -27,21 +27,23 @@ module.exports = {
 	},
 	'Interfaces': {
 		'AssetsInterface': require("./Interfaces/AssetsInterface.js"),
-		'CloneableInterface': require("./Interfaces/CloneableInterface.js"),
 		'ContextInterface': require("./Interfaces/ContextInterface.js"),
 		'FactoryInterface': require("./Interfaces/FactoryInterface.js"),
 		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),
 		'SerializeInterface': require("./Interfaces/SerializeInterface.js"),
 		'StringInterface': require("./Interfaces/StringInterface.js"),
+		'SubscribeInterface': require("./Interfaces/SubscribeInterface.js"),
 	},
 	'Context': require("./Context.js"),
 	'ContextObject': require("./ContextObject.js"),
 	'CoreObject': require("./CoreObject.js"),
+	'Emitter': require("./Emitter.js"),
 	'Map': require("./Map.js"),
 	'ModuleDescription': require("./ModuleDescription.js"),
 	're': require("./re.js"),
 	'rs': require("./rs.js"),
 	'rtl': require("./rtl.js"),
+	'RuntimeAssets': require("./RuntimeAssets.js"),
 	'RuntimeConstant': require("./RuntimeConstant.js"),
 	'Utils': require("./Utils.js"),
 	'Vector': require("./Vector.js"),
