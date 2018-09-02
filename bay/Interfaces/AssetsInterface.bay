@@ -35,14 +35,6 @@ interface AssetsInterface{
 	
 	
 	/**
-	 * Returns required modules
-	 * @return Map<string, string>
-	 */	
-	public static Map<string, string> getRequiredModules(ContextInterface context);
-	
-	
-	
-	/**
 	 * Returns sync loaded files
 	 */		
 	public static Vector<string> assetsSyncLoad(ContextInterface context);

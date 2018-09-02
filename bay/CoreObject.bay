@@ -33,6 +33,8 @@ class CoreObject{
 	 */
 	public void constructor(){
 		#switch
+		#case ifcode PHP then
+		$this->_init();
 		#case ifcode JAVASCRIPT then
 		this._init();
 		#endswitch
@@ -41,6 +43,8 @@ class CoreObject{
 	
 	
 	#switch
+	#case ifcode PHP then
+	protected function _init(){}
 	#case ifcode JAVASCRIPT then
 	_init(){
 		this.__implements__ = new Array();

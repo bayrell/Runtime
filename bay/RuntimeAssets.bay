@@ -39,16 +39,6 @@ class RuntimeAssets implements AssetsInterface{
 	
 	
 	/**
-	 * Returns required modules
-	 * @return Map<string, string>
-	 */	
-	public static Map<string, string> getRequiredModules(ContextInterface context){
-		return null;
-	}
-	
-	
-	
-	/**
 	 * Returns sync loaded files
 	 */		
 	public static Vector<string> assetsSyncLoad(ContextInterface context){

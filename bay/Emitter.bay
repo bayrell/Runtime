@@ -48,9 +48,10 @@ class Emitter extends CoreObject{
 	/**
 	 * Add method
 	 * @param callback f
+	 * @param Vector<string> events
 	 * @return callback
 	 */
-	callback addMethod(callback f){
+	callback addMethod(callback f, Vector<string> events = null){
 		this.methods.push(f);
 		return f;
 	}
@@ -70,8 +71,9 @@ class Emitter extends CoreObject{
 	/**
 	 * Add object
 	 * @param SubscribeInterface f
+	 * @param Vector<string> events
 	 */
-	void addObject(SubscribeInterface f){
+	void addObject(SubscribeInterface f, Vector<string> events = null){
 		this.subscribers.push(f);
 	}
 	

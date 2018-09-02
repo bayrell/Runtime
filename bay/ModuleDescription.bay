@@ -50,6 +50,16 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	
 	
 	/**
+	 * Returns required modules
+	 * @return Map<string, string>
+	 */	
+	public static Map<string, string> getRequiredModules(ContextInterface context){
+		return null;
+	}
+	
+	
+	
+	/**
 	 * Init context
 	 * @param ContextInterface context
 	 */
