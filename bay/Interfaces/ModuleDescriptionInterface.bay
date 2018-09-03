@@ -59,14 +59,6 @@ interface ModuleDescriptionInterface{
 	
 	
 	/**
-	 * Returns description interfaces of the current module
-	 * @return Vector<string>
-	 */	
-	public static Vector<string> getInterfaces();
-	
-	
-	
-	/**
 	 * Returns required modules
 	 * @return Map<string, string>
 	 */	

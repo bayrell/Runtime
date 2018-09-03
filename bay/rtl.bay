@@ -295,6 +295,9 @@ export class rtl{
 		if (!class_exists($class_name)){
 			throw new \Exception($class_name . " not found ");
 		}
+		if (!method_exists($class_name, $method_name)){
+			throw new \Exception("Method '" . $method_name . "' not found in " . $class_name);
+		}
 		return call_user_func_array([$class_name, $method_name], ($args!=null)?$args->_getArr():[]);
 	}
 	#case ifcode JAVASCRIPT then

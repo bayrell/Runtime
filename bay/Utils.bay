@@ -132,18 +132,22 @@ export class Utils{
 	
 	/**
 	 * Returns true if class exists
-	 * @return bool
+	 * @return Vector<string>
 	 */
-	declare public static Vector<string> get_intefaces(string class_name);
+	declare public static Vector<string> getInterfaces(string class_name);
 	
 	#switch
 	#case ifcode PHP then
-	static function get_intefaces($class_name){
-		$arr = class_implements($class_name);
-		return (new Vector())->_assignArr($arr);
+	static function getInterfaces($class_name){
+		$arr = array_values(class_implements(rtl::find_class($class_name)));
+		$v = (new Vector())->_assignArr($arr);
+		$v = $v->map(function ($s){
+			return str_replace("\\", ".", $s);
+		});
+		return $v;
 	}
 	#case ifcode JAVASCRIPT then
-	static get_intefaces(class_name){
+	static getInterfaces(class_name){
 		return new Vector();
 	}
 	#endswitch

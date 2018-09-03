@@ -83,6 +83,14 @@ class CoreObject{
 	
 	
 	/**
+	 * Assign and clone data from other object
+	 * @param CoreObject obj
+	 */
+	void assignObject(CoreObject obj){}
+	
+	
+	
+	/**
 	 * Set new value instance by variable name
 	 * @param string variable_name
 	 * @param var value
