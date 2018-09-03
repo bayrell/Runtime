@@ -331,4 +331,33 @@ export class rs{
 	#endswitch
 	
 	
+	
+	/**
+	 * Escape HTML special chars
+	 * @param string s
+	 * @return string
+	 */
+	declare export static string htmlEscape(string s);
+
+	#switch
+	#case ifcode PHP then
+	static function htmlEscape($s){
+		return htmlspecialchars($s, ENT_QUOTES | ENT_HTML401);
+	}
+	#case ifcode JAVASCRIPT then
+	static htmlEscape(s){
+		var obj = {
+			"<":"&lt;",
+			">": "&gt;", 
+			"&": "&amp;",
+			'"': '&quot;',
+			"'": '&#39;',
+			'`': '&#x60;',
+			'=': '&#x3D;'
+		};
+		return (new String(s)).replace(/[<>&"'`=]/g, function(v){ return obj[v]; });
+	}
+	#endswitch
+	
+	
 }

@@ -25,7 +25,6 @@ $load([
 	"/assets/Runtime/Utils.js",
 	"/assets/Runtime/Vector.js",
 	"/assets/Runtime/CoreObject.js",
-	"/assets/Runtime/Emitter.js",
 	"/assets/Runtime/RuntimeConstant.js",
 	"/assets/Runtime/Exceptions/RuntimeException.js",
 	"/assets/Runtime/Interfaces/ContextInterface.js",
@@ -38,12 +37,16 @@ $load([
 .load([
 	"/assets/Runtime/Context.js",
 	"/assets/Runtime/ContextObject.js",
-	"/assets/Runtime/ModuleDescription.js",
+	"/assets/Runtime/Emitter.js",
 	"/assets/Runtime/SerializeContainer.js",
 	"/assets/Runtime/VectorString.js",
 	"/assets/Runtime/Exceptions/IndexOutOfRange.js",
 	"/assets/Runtime/Exceptions/KeyNotFound.js",
 	"/assets/Runtime/Exceptions/UnknownError.js",
+])
+
+.load([
+	"/assets/Runtime/ModuleDescription.js",
 ])
 
 .success(function(){
