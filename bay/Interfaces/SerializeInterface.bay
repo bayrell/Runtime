@@ -28,13 +28,6 @@ interface SerializeInterface{
 	
 	
 	/**
-	 * Returns new Instance
-	 */
-	public CoreObject createNewInstance();
-	
-	
-	
-	/**
 	 * Returns classname of the object
 	 * @return string
 	 */
