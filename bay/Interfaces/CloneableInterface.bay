@@ -24,7 +24,8 @@ use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
 
 
-interface SerializeInterface{
+interface CloneableInterface{
+	
 	
 	
 	/**
@@ -35,44 +36,10 @@ interface SerializeInterface{
 	
 	
 	/**
-	 * Returns classname of the object
-	 * @return string
-	 */
-	public string getClassName();
-	
-	
-	
-	/**
-	 * Returns name of variables to serialization
-	 * @return Vector<string>
-	 */
-	public void getVariablesNames(Vector<string> names);
-	
-	
-	
-	/**
 	 * Assign and clone data from other object
 	 * @param CoreObject obj
 	 */
 	void assignObject(CoreObject obj);
-	
-	
-	
-	/**
-	 * Set new value instance by variable name
-	 * @param string variable_name
-	 * @param var value
-	 */
-	public void assignValue(string variable_name, var value);
-	
-	
-	
-	/**
-	 * Returns instance of the value by variable name
-	 * @param string variable_name
-	 * @return var
-	 */
-	public var takeValue(string variable_name, var default_value = null);
 	
 	
 }

@@ -596,4 +596,52 @@ export class Utils{
 		}
 		return res;
 	}
+	
+	
+	
+	/**
+	 * Base64 encode
+	 * @param string s
+	 * @return string 
+	 */
+	declare export static string base64_encode(string s);
+	
+	#switch
+	#case ifcode PHP then
+	static function base64_encode($s){
+		return base64_encode($s);
+	}
+	#case ifcode ES6 then
+	static base64_encode(s){
+		return window.btoa($s);
+	}
+	#case ifcode NODEJS then
+	static base64_encode(s){
+		return Buffer.from(s).toString('base64');
+	}
+	#endswitch
+	
+	
+	/**
+	 * Base64 decode
+	 * @param string s
+	 * @return string 
+	 */
+	declare export static string base64_decode(string s);
+	
+	#switch
+	#case ifcode PHP then
+	static function base64_decode($s){
+		return base64_decode($s);
+	}
+	#case ifcode ES6 then
+	static base64_decode(s){
+		return window.atob($s);
+	}
+	#case ifcode NODEJS then
+	static base64_decode(s){
+		return Buffer.from(s, 'base64').toString('ascii');
+	}
+	#endswitch
+	
 }

@@ -27,6 +27,7 @@ module.exports = {
 	},
 	'Interfaces': {
 		'AssetsInterface': require("./Interfaces/AssetsInterface.js"),
+		'CloneableInterface': require("./Interfaces/CloneableInterface.js"),
 		'ContextInterface': require("./Interfaces/ContextInterface.js"),
 		'FactoryInterface': require("./Interfaces/FactoryInterface.js"),
 		'ModuleDescriptionInterface': require("./Interfaces/ModuleDescriptionInterface.js"),

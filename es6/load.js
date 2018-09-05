@@ -27,11 +27,14 @@ $load([
 	"/assets/Runtime/CoreObject.js",
 	"/assets/Runtime/RuntimeConstant.js",
 	"/assets/Runtime/Exceptions/RuntimeException.js",
+	"/assets/Runtime/Interfaces/AssetsInterface.js",
+	"/assets/Runtime/Interfaces/CloneableInterface.js",
 	"/assets/Runtime/Interfaces/ContextInterface.js",
 	"/assets/Runtime/Interfaces/FactoryInterface.js",
 	"/assets/Runtime/Interfaces/ModuleDescriptionInterface.js",
 	"/assets/Runtime/Interfaces/SerializeInterface.js",
 	"/assets/Runtime/Interfaces/StringInterface.js",
+	"/assets/Runtime/Interfaces/SubscribeInterface.js",
 ])
 
 .load([
