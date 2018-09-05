@@ -480,8 +480,7 @@ export class Utils{
 			return null;
 			
 		if (is_object($value)){
-			$values = get_object_vars($value);
-			$res = new \Runtime\Map($values);
+			$res = new \Runtime\Map($value);
 			$res = $res->map(function ($key, $val){
 				return self::NativeToPrimitive($val);
 			});
@@ -489,14 +488,12 @@ export class Utils{
 		}
 		
 		if (is_array($value)){
-			if ($is_vector){
-				$arr = array_values($value);
-				$res = (new \Runtime\Vector())->_assignArr($arr);
-				$res = $res->map(function ($item){
-					return self::NativeToPrimitive($item);
-				});
-				return $res;
-			}
+			$arr = array_values($value);
+			$res = (new \Runtime\Vector())->_assignArr($arr);
+			$res = $res->map(function ($item){
+				return self::NativeToPrimitive($item);
+			});
+			return $res;
 		}
 		
 		return $value;

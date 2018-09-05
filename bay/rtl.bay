@@ -39,37 +39,6 @@ export class rtl{
 	}
 	
 	
-	
-	/**
-	 * Returns true if class exists
-	 * @return bool
-	 */
-	declare export static bool class_implements(string class_name, string interface_name);
-	
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function class_implements($class_name, $interface_name){
-		$arr = class_implements($class_name);
-		if (array_search($interface_name, $arr) !== false){
-			return true;
-		}
-		return false;
-	}
-	#case ifcode JAVASCRIPT then
-	static implements(obj, interface_name){
-		if (obj == undefined) return false;
-		if (obj.__implements__ == undefined) return false;
-		return obj.__implements__.indexOf(interface_name) != -1;
-	}
-	static class_implements(class_name, interface_name){
-		var obj = find_class(class_name);
-	}
-	#endswitch
-	
-	
-	
 	#switch
 	#case ifcode PHP then
 	
@@ -141,6 +110,55 @@ export class rtl{
 	
 	
 	/**
+	 * Returns true if class instanceof class_name
+	 * @return bool
+	 */
+	declare export static bool is_instanceof(var obj, string class_name);
+	
+	#switch
+	#case ifcode PHP then
+	static function is_instanceof($obj, $class_name){
+		$class_name = self::find_class($class_name);
+		if (is_subclass_of($obj, $class_name)) return true;
+		return is_a($obj, $class_name);
+	}
+	#case ifcode JAVASCRIPT then
+	static is_instanceof(obj, class_name){
+		var c = this.find_class(class_name);
+		if (c == null) return false;
+		return c.prototype.isPrototypeOf(obj);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Returns true if obj implements interface_name
+	 * @return bool
+	 */
+	declare export static bool is_implements(var obj, string interface_name);
+	
+	#switch
+	#case ifcode PHP then
+	static function is_implements($obj, $interface_name){
+		$class_name = get_class($obj);
+		$interface_name = self::find_class($interface_name);
+		return self::class_implements($class_name, $interface_name);
+	}
+	#case ifcode JAVASCRIPT then
+	static implements(obj, interface_name){
+		if (obj == undefined) return false;
+		if (obj.__implements__ == undefined) return false;
+		return obj.__implements__.indexOf(interface_name) != -1;
+	}
+	static is_implements(obj, interface_name){
+		return this.implements(obj, interface_name);
+	}
+	#endswitch
+	
+	
+	
+	/**
 	 * Returns true if class exists
 	 * @return bool
 	 */
@@ -157,6 +175,35 @@ export class rtl{
 		var obj = this.find_class(class_name);
 		if (!this.exists(obj)) return false;
 		return true;
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Returns true if class exists
+	 * @return bool
+	 */
+	declare export static bool class_implements(string class_name, string interface_name);
+	
+	#switch
+	#case ifcode PHP then
+	static function class_implements($class_name, $interface_name){
+		$class_name = self::find_class($class_name);
+		$interface_name = self::find_class($interface_name);
+		$arr = @class_implements($class_name, true);
+		if ($arr == false){
+			return false;
+		}
+		foreach ($arr as $name){
+			if ($name == $interface_name or "\\" . $name == $interface_name)
+				return true;
+		}
+		return false;
+	}
+	#case ifcode JAVASCRIPT then
+	static class_implements(class_name, interface_name){
+		var obj = find_class(class_name);
 	}
 	#endswitch
 	
@@ -190,6 +237,7 @@ export class rtl{
 	#endswitch
 	
 	
+	
 	/**
 	 * Create object by class_name. If class name does not exists return null
 	 * @return Object
@@ -218,27 +266,6 @@ export class rtl{
 	}
 	#endswitch
 	
-	
-	
-	/**
-	 * Create object by class_name. If class name does not exists return null
-	 * @return Object
-	 *
-	declare export static Object newInstanceByObject(Object obj);
-	
-	#switch
-	#case ifcode PHP then
-	static function newInstanceByObject($obj){
-		$class_name = get_class($obj);
-		return new $class_name();
-	}
-	#case ifcode JAVASCRIPT then
-	static newInstanceByObject(obj){
-		var f = Function.prototype.bind.apply(obj.constructor, [null]);
-		return new f;
-	}
-	#endswitch
-	*/
 	
 	
 	/**
@@ -314,6 +341,60 @@ export class rtl{
 	
 	
 	/**
+	 * Returns value if value instanceof type_value, else returns def_value
+	 * @param var value
+	 * @param string type_value
+	 * @param var def_value
+	 * @param var type_template
+	 * @return var
+	 */
+	static var correct(var value, string type_value, var def_value = null, string type_template = ""){
+		
+		/* check value */
+		if (self::checkValue(value, type_value)){
+			if ( (type_value == "Runtime.Vector" or type_value == "Runtime.Map") and type_template != ""){
+				#switch
+				#case ifcode PHP then
+				return $value->_correctItemsByType($type_template);
+				#case ifcode JAVASCRIPT then
+				return value._correctItemsByType($type_template);
+				#endswitch
+				
+			}
+			return value;
+		}
+		
+		/* check def_value */
+		if (not self::checkValue(def_value, type_value)){
+			if (type_value == "int" or type_value == "float" or type_value == "double") def_value = 0;
+			else if (type_value == "string") def_value = "";
+			else if (type_value == "bool" or type_value == "boolean") def_value = false;
+			else def_value = null;
+		}
+		
+		return def_value;
+	}
+	
+	
+	
+	/**
+	 * Returns true if value instanceof tp
+	 * @param var value
+	 * @param string tp
+	 * @return bool
+	 */
+	static var checkValue(var value, string tp){
+		if (tp == "int") return self::isInt(value);
+		if (tp == "float" or tp == "double") return self::isDouble(value);
+		if (tp == "string") return self::isString(value);
+		if (tp == "bool" or tp == "boolean") return self::isBool(value);
+		if (rtl::is_instanceof(value, tp)) return true;
+		return false;
+	}
+	
+	
+	
+	/**
 	 * Clone var
 	 * @param {var} value - Variable
 	 * @return {var} result
@@ -356,10 +437,10 @@ export class rtl{
 		}
 		else if (typeof val == 'object' && 
 			val.createNewInstance && typeof val.createNewInstance == "function" &&
-			val.assign && typeof val.assign == "function")
+			val.assignObject && typeof val.assignObject == "function")
 		{
 			var res = val.createNewInstance();
-			res.assign(val);
+			res.assignObject(val);
 			return res;
 		}
 		else if (Array.isArray(val)){	
@@ -410,6 +491,7 @@ export class rtl{
 	}
 	
 	
+	
 	/**
 	 * Return true if value is boolean
 	 * @param var value
@@ -419,6 +501,49 @@ export class rtl{
 		if (value === false or value === true) return true;
 		return false;
 	}
+	
+	
+	
+	/**
+	 * Return true if value is number
+	 * @param var value
+	 * @return boolean
+	 */
+	declare export static boolean isInt(var value);
+
+	#switch
+	#case ifcode PHP then
+	static function isInt($value){
+		return is_int($value);
+	}
+	#case ifcode JAVASCRIPT then
+	static isInt(value){
+		if (typeof value != "number") return false;
+		if (value % 1 !== 0) return false;
+		return true;
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Return true if value is number
+	 * @param var value
+	 * @return boolean
+	 */
+	declare export static boolean isDouble(var value);
+
+	#switch
+	#case ifcode PHP then
+	static function isDouble($value){
+		return is_int($value) or is_float($value);
+	}
+	#case ifcode JAVASCRIPT then
+	static isDouble(value){
+		if (typeof value == "number") return true;
+		return false;
+	}
+	#endswitch
 	
 	
 	
