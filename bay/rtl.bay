@@ -350,6 +350,9 @@ export class rtl{
 	 */
 	static var correct(var value, string type_value, var def_value = null, string type_template = ""){
 		
+		if (type_value == "mixed" or type_value == "var")
+			return value;
+		
 		/* check value */
 		if (self::checkValue(value, type_value)){
 			if ( (type_value == "Runtime.Vector" or type_value == "Runtime.Map") and type_template != ""){
@@ -440,8 +443,13 @@ export class rtl{
 			val.assignObject && typeof val.assignObject == "function")
 		{
 			var res = null;
-			if (isBrowser()) res = Runtime.rtl.newInstance( val.getClassName() );
-			else res = rtl.newInstance( val.getClassName() );
+			if (val.createNewInstance && typeof val.createNewInstance == "function"){
+				res = val.createNewInstance();
+			}
+			else{
+				if (isBrowser()) res = Runtime.rtl.newInstance( val.getClassName() );
+				else res = rtl.newInstance( val.getClassName() );
+			}
 			if (res) res.assignObject(val);
 			return res;
 		}

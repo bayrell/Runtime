@@ -27,7 +27,13 @@ use Runtime.Interfaces.ContextInterface;
 interface CloneableInterface{
 	
 	
+	/**
+	 * Returns new Instance
+	 */
+	/* public CoreObject createNewInstance(); */
 	
+	
+
 	/**
 	 * Assign and clone data from other object
 	 * @param CoreObject obj
