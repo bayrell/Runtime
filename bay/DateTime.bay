@@ -19,7 +19,7 @@
 namespace Runtime;
 
 use Runtime.rtl;
-
+use Runtime.CoreObject;
 
 class DateTime extends CoreObject{
 	
