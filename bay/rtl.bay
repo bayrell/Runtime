@@ -90,6 +90,7 @@ export class rtl{
 		if (module_name == 'Runtime') 
 			module_name = 'BayrellRuntime';
 		
+		module_name = rtl.convertNodeJSModuleName(module_name);
 		var obj = require(module_name);
 		for (var i=1; i<class_name_arr.length - 1; i++){
 			if (!this.exists(obj[class_name_arr[i]])){
@@ -801,5 +802,73 @@ export class rtl{
 		return Math.round((new Date()).getTime() / 1000);
 	}
 	#endswitch
+	
+	
+	
+	/**
+	 * Convert module name to node js package
+	 */
+	declare export static string convertNodeJSModuleName(string name);
+	
+	#switch
+	#case ifcode PHP then
+	static function convertNodeJSModuleName($name){
+		$arr = "qazwsxedcrfvtgbyhnujmikolp0123456789";
+		$res = "";
+		$sz = mb_strlen($name);
+		$previsbig = false;
+		for ($i = 0; $i < $sz; $i++){
+			$ch = mb_substr($name, $i, 1);
+			$ch2 = mb_strtoupper($ch);
+			$ch3 = mb_strtolower($ch);
+			$isAlphaNum = mb_strpos($arr, $ch3) !== false;
+			if ($i > 0 && $ch == $ch2 && !$previsbig && $isAlphaNum){
+				$res .= "-";
+			}
+			$res .= $ch3;
+			if ($ch == $ch2 && $isAlphaNum){
+				$previsbig = true;
+			}
+			else {
+				$previsbig = false;
+			}
+			if (!$isAlphaNum){
+				$previsbig = true;
+			}
+		}
+		$res .= "-nodejs";
+		return $res;
+	}
+	#case ifcode JAVASCRIPT then
+	static convertNodeJSModuleName(name){
+		name = new String(name);
+		var arr = "qazwsxedcrfvtgbyhnujmikolp0123456789";
+		var res = "";
+		var sz = name.length;
+		var previsbig = false;
+		for (var i = 0; i < sz; i++){
+			var ch = name[i];
+			var ch2 = ch.toUpperCase();
+			var ch3 = ch.toLowerCase();
+			var isAlphaNum = arr.indexOf(ch3) != -1;
+			if (i > 0 && ch == ch2 && !previsbig && isAlphaNum){
+				res += "-";
+			}
+			res += ch3;
+			if (ch == ch2 && isAlphaNum){
+				previsbig = true;
+			}
+			else {
+				previsbig = false;
+			}
+			if (!isAlphaNum){
+				previsbig = true;
+			}
+		}
+		res += "-nodejs";
+		return res;
+	}
+	#endswitch
+	
 	
 }
