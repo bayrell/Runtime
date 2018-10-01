@@ -1,0 +1,197 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+ 
+namespace Runtime;
+
+use Runtime.rtl;
+use Runtime.AsyncTask;
+use Runtime.CoreObject;
+use Runtime.Vector;
+
+
+class AsyncThread extends CoreObject{
+	
+	
+	protected int _jump = 0;
+	protected mixed _res = null;
+	protected mixed _err = null;
+	protected Vector<AsyncTask> _f = null;
+	
+	
+	/**
+	 * Constructor
+	 */
+	void constructor(){
+		super();
+		this.reset();
+	}
+	
+	
+	
+	/**
+	 * Reset AsyncThread
+	 */
+	void reset(){
+		this._jump = 0;
+		this._res = null;
+		this._err = null;
+		this._f = new Vector<AsyncTask>();
+	}
+	
+	
+	
+	/**
+	 * Set jump position
+	 * @param int jump
+	 */
+	void jump(int pos){
+		this._jump = pos;
+	}
+	
+	
+	
+	/**
+	 * Returns current jump position
+	 * @return int
+	 */
+	int current(){
+		return this._jump;
+	}
+	
+	
+	
+	/**
+	 * Returns result of the prev function
+	 * @return mixed
+	 */
+	mixed getResult(){
+		return this._res;
+	}
+	
+	
+	
+	/**
+	 * Returns error of the prev function
+	 * @return mixed
+	 */
+	mixed getError(){
+		return this._err;
+	}
+	
+	
+	
+	/**
+	 * Resolve thread with result
+	 * @param mixed res
+	 */
+	void resolve(mixed res){
+		this._res = res;
+		this.next();
+	}
+	
+	
+	
+	/**
+	 * Resolve Exception
+	 * @param mixed res
+	 */
+	void error(mixed err){
+		this._err = err;
+		this.next(true);
+	}
+	
+	
+	
+	/**
+	 * Call next
+	 */
+	void next(bool is_error = false){
+		
+		if (this._f.count() == 0){
+			return;
+		}
+		
+		AsyncTask task = this._f.pop();
+		
+		/* Restore jump */
+		this._jump = task.jump;
+		if (is_error){
+			this._jump = -1;
+		}
+		
+		/* Call forward */
+		this.forward();
+	}
+	
+	
+	
+	/**
+	 * Forward call
+	 */
+	void forward(){
+		#switch
+		#case ifcode JAVASCRIPT then
+		setTimeout( ()=>{ this.call(); }, 1);
+		#endif
+	}
+	
+	
+	
+	/**
+	 * Call current
+	 */
+	void call(){
+		if (this._f.count() == 0){
+			this.end();
+			return;
+		}
+		
+		AsyncTask task = this._f.last();
+		
+		/* Call task function */
+		var res = rtl::call(task.f, [this]);
+		
+		/* If return next async function */
+		if (res instanceof Function){
+			AsyncTask task2 = new AsyncTask();
+			task2.jump = this._jump;
+			task2.f = res;
+			this.forward();
+		}
+	}
+	
+	
+	
+	/**
+	 * Run async await
+	 */
+	void run(f){
+		this.reset();
+		AsyncTask task = new AsyncTask();
+		task.jump = 0;
+		task.f = f;
+		this.forward();
+	}
+	
+	
+	
+	/**
+	 * Call if thread is ended
+	 */
+	void end(){}
+}
