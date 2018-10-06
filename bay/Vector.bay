@@ -192,6 +192,7 @@ declare class Vector<T>{
 	 * Get last item
 	 */
 	declare public T getLastItem(T default_value);
+	declare public T last(T default_value);
 	
 	
 	
@@ -547,6 +548,7 @@ Runtime.Vector = class extends Array{
 			return default_value;
 		return this[this.length - 1];
 	}
+	last(default_value){ return this.getLastItem(default_value); }
 	
 	
 	
@@ -973,14 +975,16 @@ class Vector implements \JsonSerializable{
 	}
 	
 	
+	
 	/**
 	 * Get last item
 	 */
-	public function getLastItem($default_value){
+	public function getLastItem($default_value = null){
 		$c = count($this->_arr);
 		return isset($this->_arr[$c-1]) ? $this->_arr[$c-1] : $default_value;
 	}
-
+	public function last($default_value = null){ return this.getLastItem($default_value); }
+	
 	
 	
 	/**

@@ -31,6 +31,7 @@ class AsyncThread extends CoreObject{
 	protected mixed _res = null;
 	protected mixed _err = null;
 	protected Vector<AsyncTask> _f = null;
+	protected Vector<string> _catch_stack = null;
 	
 	
 	/**
@@ -51,6 +52,7 @@ class AsyncThread extends CoreObject{
 		this._res = null;
 		this._err = null;
 		this._f = new Vector<AsyncTask>();
+		this._catch_stack = new Vector<string>();
 	}
 	
 	
@@ -111,8 +113,34 @@ class AsyncThread extends CoreObject{
 	 * @param mixed res
 	 */
 	void error(mixed err){
-		this._err = err;
-		this.next(true);
+		if (this._catch_stack.count() == 0){
+			this._err = err;
+			this.next(true);
+		}
+		else{
+			this._err = err;
+			this._jump = this._catch_stack.pop();
+			this.forward();
+		}
+	}
+	
+	
+	
+	/**
+	 * Push catch
+	 * @param string jump
+	 */
+	void catchPush(string jump){
+		this._catch_stack.push(jump);
+	}
+	
+	
+	
+	/**
+	 * Pop catch
+	 */
+	void catchPop(){
+		this._catch_stack.pop();
 	}
 	
 	
@@ -126,6 +154,7 @@ class AsyncThread extends CoreObject{
 			return;
 		}
 		
+		this._catch_stack.clear();
 		AsyncTask task = this._f.pop();
 		
 		/* Restore jump */
@@ -164,7 +193,14 @@ class AsyncThread extends CoreObject{
 		AsyncTask task = this._f.last();
 		
 		/* Call task function */
-		var res = rtl::call(task.f, [this]);
+		var res = null;
+		try{
+			res = rtl::call(task.f, [this]);
+		}
+		catch (var e){
+			res = null;
+			this.error(e);
+		}
 		
 		/* If return next async function */
 		if (res instanceof Function){

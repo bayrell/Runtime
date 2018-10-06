@@ -23,7 +23,7 @@ use Runtime.CoreObject;
 
 class AsyncTask extends CoreObject{
 	
-	int jump = null;
+	string jump = null;
 	callback f = null;
 	
 }

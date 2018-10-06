@@ -37,7 +37,7 @@ declare class Map<T>{
 	 * @param T default_value
 	 * @return T
 	 */
-	declare public T get(string key, T default_value);
+	declare public T get(string key, T default_value, string type_value = "mixed", string type_template = "");
 	
 	
 	
@@ -46,7 +46,7 @@ declare class Map<T>{
 	 * @param string key - position
 	 * @return T
 	 */
-	declare public T item(string key);
+	declare public T item(string key, string type_value, string type_template = "");
 	
 	
 	
@@ -533,7 +533,7 @@ class Map implements \JsonSerializable{
 	 * @param T default_value
 	 * @return T
 	 */
-	public function get($key, $default_value){
+	public function get($key, $default_value, $type_value = "mixed", $type_template = ""){
 		$key = rtl::toString($key);
 		return isset($this->_map[$key]) ? $this->_map[$key] : $default_value;
 	}
@@ -545,7 +545,7 @@ class Map implements \JsonSerializable{
 	 * @param T key - position
 	 * @return T
 	 */
-	public function item($key){
+	public function item($key, $type_value = "mixed", $type_template = ""){
 		$key = rtl::toString($key);
 		if (!array_key_exists($key, $this->_map)){
 			throw new KeyNotFound(null, $key);
