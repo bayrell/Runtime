@@ -813,7 +813,8 @@ export class rtl{
 	#switch
 	#case ifcode PHP then
 	static function convertNodeJSModuleName($name){
-		$arr = "qazwsxedcrfvtgbyhnujmikolp0123456789";
+		$arr1 = "qazwsxedcrfvtgbyhnujmikolp";
+		$arr2 = "0123456789";
 		$res = "";
 		$sz = mb_strlen($name);
 		$previsbig = false;
@@ -821,8 +822,9 @@ export class rtl{
 			$ch = mb_substr($name, $i, 1);
 			$ch2 = mb_strtoupper($ch);
 			$ch3 = mb_strtolower($ch);
-			$isAlphaNum = mb_strpos($arr, $ch3) !== false;
-			if ($i > 0 && $ch == $ch2 && !$previsbig && $isAlphaNum){
+			$isAlpha = mb_strpos($arr1, $ch3) !== false;
+			$isNum = mb_strpos($arr2, $ch3) !== false;
+			if ($i > 0 && $ch == $ch2 && !$previsbig && $isAlpha){
 				$res .= "-";
 			}
 			$res .= $ch3;
@@ -832,7 +834,7 @@ export class rtl{
 			else {
 				$previsbig = false;
 			}
-			if (!$isAlphaNum){
+			if (!$isAlphaNum && !$isNum){
 				$previsbig = true;
 			}
 		}
@@ -842,7 +844,8 @@ export class rtl{
 	#case ifcode JAVASCRIPT then
 	static convertNodeJSModuleName(name){
 		name = new String(name);
-		var arr = "qazwsxedcrfvtgbyhnujmikolp0123456789";
+		var arr1 = "qazwsxedcrfvtgbyhnujmikolp";
+		var arr2 = "01234567890";
 		var res = "";
 		var sz = name.length;
 		var previsbig = false;
@@ -850,18 +853,19 @@ export class rtl{
 			var ch = name[i];
 			var ch2 = ch.toUpperCase();
 			var ch3 = ch.toLowerCase();
-			var isAlphaNum = arr.indexOf(ch3) != -1;
-			if (i > 0 && ch == ch2 && !previsbig && isAlphaNum){
+			var isAlpha = arr1.indexOf(ch3) != -1;
+			var isNum = arr2.indexOf(ch3) != -1;
+			if (i > 0 && ch == ch2 && !previsbig && isAlpha){
 				res += "-";
 			}
 			res += ch3;
-			if (ch == ch2 && isAlphaNum){
+			if (ch == ch2 && isAlpha){
 				previsbig = true;
 			}
 			else {
 				previsbig = false;
 			}
-			if (!isAlphaNum){
+			if (!isAlpha && !isNum){
 				previsbig = true;
 			}
 		}
