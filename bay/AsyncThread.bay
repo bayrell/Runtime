@@ -176,7 +176,7 @@ class AsyncThread extends CoreObject{
 		#switch
 		#case ifcode JAVASCRIPT then
 		setTimeout( ()=>{ this.call(); }, 1);
-		#endif
+		#endswitch
 	}
 	
 	
@@ -216,7 +216,7 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Run async await
 	 */
-	void run(f){
+	void run(callback f){
 		this.reset();
 		AsyncTask task = new AsyncTask();
 		task.jump = 0;
