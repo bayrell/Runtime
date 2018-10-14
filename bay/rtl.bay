@@ -204,7 +204,7 @@ export class rtl{
 	}
 	#case ifcode JAVASCRIPT then
 	static class_implements(class_name, interface_name){
-		var obj = find_class(class_name);
+		var obj = this.find_class(class_name);
 	}
 	#endswitch
 	
@@ -349,6 +349,20 @@ export class rtl{
 	 * @param var type_template
 	 * @return var
 	 */
+	static var convert(var value, string type_value, var def_value = null, string type_template = ""){
+		return self::correct(value, type_value, def_value, type_template);
+	}
+	
+	
+	
+	/**
+	 * Returns value if value instanceof type_value, else returns def_value
+	 * @param var value
+	 * @param string type_value
+	 * @param var def_value
+	 * @param var type_template
+	 * @return var
+	 */
 	static var correct(var value, string type_value, var def_value = null, string type_template = ""){
 		
 		if (type_value == "mixed" or type_value == "var")
@@ -391,7 +405,7 @@ export class rtl{
 		if (tp == "int") return self::isInt(value);
 		if (tp == "float" or tp == "double") return self::isDouble(value);
 		if (tp == "string") return self::isString(value);
-		if (tp == "bool" or tp == "boolean") return self::isBool(value);
+		if (tp == "bool" or tp == "boolean") return self::isBoolean(value);
 		if (rtl::is_instanceof(value, tp)) return true;
 		return false;
 	}
