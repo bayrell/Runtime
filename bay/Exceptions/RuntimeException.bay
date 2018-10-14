@@ -19,7 +19,7 @@
 namespace Runtime.Exceptions;
 
 use Runtime.rtl;
-use Runtime.Utils;
+use Runtime.RuntimeUtils;
 use Runtime.Interfaces.ContextInterface;
 
 
@@ -50,11 +50,11 @@ class RuntimeException extends ClassException{
 	protected int pos = -1;
 	
 	
-	void constructor(ContextInterface context = null, string message = "", int code = 0, Object prev = null){
+	void constructor(string message = "", int code = 0, ContextInterface context = null, Object prev = null){
 		parent(message, code, prev);
 		
 		if (context == null)
-			context = Utils::globalContext();
+			context = RuntimeUtils::globalContext();
 		
 		this.error_str = message;
 		this.context = context;

@@ -19,8 +19,8 @@
 namespace Runtime.Exceptions;
 
 use Runtime.rtl;
-use Runtime.Utils;
 use Runtime.RuntimeConstant;
+use Runtime.RuntimeUtils;
 use Runtime.Exceptions.RuntimeException;
 use Runtime.Interfaces.ContextInterface;
 
@@ -30,9 +30,9 @@ class UnknownError extends RuntimeException{
 	void constructor(ContextInterface context = null, Object prev = null){
 		
 		parent(
-			context, 
-			Utils::translate("ERROR_UNKNOWN", null, "", context), 
+			RuntimeUtils::translate("ERROR_UNKNOWN", null, "", context), 
 			RuntimeConstant::ERROR_UNKNOWN, 
+			context, 
 			prev
 		);
 	}

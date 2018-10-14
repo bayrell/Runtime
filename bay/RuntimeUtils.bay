@@ -34,7 +34,7 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 #endswitch
 
 
-export class Utils{
+export class RuntimeUtils{
 	
 	
 	protected static var _global_context = null;
@@ -49,8 +49,8 @@ export class Utils{
 		#case ifcode PHP then
 		return self::$_global_context;
 		#case ifcode JAVASCRIPT then
-		if (isBrowser()) return Runtime.Utils._global_context;
-		return Utils._global_context;
+		if (isBrowser()) return Runtime.RuntimeUtils._global_context;
+		return RuntimeUtils._global_context;
 		#endswitch
 	}
 	
@@ -65,8 +65,8 @@ export class Utils{
 		#case ifcode PHP then
 		self::$_global_context = $context;
 		#case ifcode JAVASCRIPT then
-		if (isBrowser()) Runtime.Utils._global_context = context;
-		else Utils._global_context = context;
+		if (isBrowser()) Runtime.RuntimeUtils._global_context = context;
+		else RuntimeUtils._global_context = context;
 		#endswitch
 		return context;
 	}
@@ -414,7 +414,7 @@ export class Utils{
 	#case ifcode JAVASCRIPT then
 	static json_encode(value, convert){
 		if (convert == undefined) convert = true;
-		var _Utils=null;if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
+		var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
 		var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
 		var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
 		var _rtl=null;if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
@@ -449,7 +449,7 @@ export class Utils{
 	static json_decode(s, context){
 		if (context == undefined) context = null;
 		try{
-			var _Utils=null;if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
+			var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
 			var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
 			var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;			
 			var obj = JSON.parse(s, function (key, value){
@@ -503,7 +503,7 @@ export class Utils{
 	static NativeToPrimitive(value){
 		
 		var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
-		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
+		var _Utils = null; if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
 		var _Vector=null; if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
 		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
 		
@@ -530,7 +530,7 @@ export class Utils{
 	static PrimitiveToNative(value){
 		
 		var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
-		var _Utils = null; if (isBrowser()) _Utils=Runtime.Utils; else _Utils=Utils;
+		var _Utils = null; if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=Utils;
 		var _Vector=null; if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
 		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
 		
