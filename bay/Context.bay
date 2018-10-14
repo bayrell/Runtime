@@ -141,9 +141,34 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
+	 * Read config
+	 */
+	ContextInterface readConfig(Map<mixed> config){
+		Vector<var> args = new Vector();
+		args.push(this);	
+		args.push(config);	
+		
+		int sz = this._modules.count();
+		for (int i=0; i<sz; i++){
+			string module_description_class_name = this._modules.item(i);
+			rtl::callStaticMethod(
+				module_description_class_name, 
+				"onReadConfig",
+				args
+			);
+		}
+		
+		delete args;
+		
+		return this;
+	}
+	
+	
+	
+	/**
 	 * Init context
 	 */
-	void init(){
+	ContextInterface init(){
 		Vector<var> args = new Vector();
 		args.push(this);	
 	
@@ -158,6 +183,8 @@ class Context extends CoreObject implements ContextInterface{
 		}
 		
 		delete args;
+		
+		return this;
 	}
 	
 	
