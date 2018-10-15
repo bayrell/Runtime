@@ -677,7 +677,7 @@ module.exports = Runtime.Vector;
 
 class Vector implements \JsonSerializable{
 	
-	protected $_arr = null;
+	protected $_arr = [];
 	
 	
 	/**
@@ -1093,7 +1093,8 @@ class Vector implements \JsonSerializable{
 	 */
 	function copy(){
 		$arr2 = new Vector();
-		$arr2->_arr = array_slice($this->_arr);
+		if ($this->_arr == null) $arr2->_arr = [];
+		else $arr2->_arr = array_slice($this->_arr, 0);
 		return $arr2;
 	}
 	
