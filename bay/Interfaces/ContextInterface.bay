@@ -94,5 +94,36 @@ interface ContextInterface{
 	/*string translate(string message, Map params = null, string locale = "");*/
 	
 	
+	
+	/**
+	 * For current context
+	 * @return ContextInterface
+	 */
+	ContextInterface fork();
+	
+	
+	
+	/**
+	 * Realease context resources
+	 */
+	void release();
+	
+	
+	
+	/**
+	 * Returns context value
+	 * @param string name
+	 * @return mixed
+	 */
+	mixed getValue(string name, mixed default_value = null, string type_value = "mixed", string type_template = "");
+	
+	
+	
+	/**
+	 * Set context value
+	 * @param string name
+	 */
+	void setValue(string name, mixed value);
+	
 }
 

@@ -30,10 +30,10 @@ use Runtime.Interfaces.ModuleDescriptionInterface;
 class Context extends CoreObject implements ContextInterface{
 	
 	
-	protected string _locale = "";
 	protected Vector<string> _modules = null;
-	protected Map<string, mixed> _managers = null;
-	protected Map<string, FactoryInterface> _providers_names = null;
+	protected Map<mixed> _values = null;
+	protected Map<mixed> _managers = null;
+	protected Map<FactoryInterface> _providers_names = null;
 	
 	
 	/**
@@ -42,8 +42,9 @@ class Context extends CoreObject implements ContextInterface{
 	void constructor(){
 		parent();
 		this._modules = new Vector<string>();
-		this._providers_names = new Map<string, FactoryInterface>();
-		this._managers = new Map<string, mixed>();
+		this._providers_names = new Map<FactoryInterface>();
+		this._managers = new Map<mixed>();
+		this._values = new Map<mixed>();
 	}
 	
 	
@@ -54,6 +55,7 @@ class Context extends CoreObject implements ContextInterface{
 	public void destructor(){
 		delete this._providers_classes_names;
 		delete this._modules;
+		delete this._values;
 		parent();
 	}
 	
@@ -229,7 +231,7 @@ class Context extends CoreObject implements ContextInterface{
 	 * @params string locale
 	 */
 	void setLocale(string locale){
-		this._locale = locale;
+		this._values.set("default.locale", locale);
 	}
 	
 	
@@ -239,7 +241,7 @@ class Context extends CoreObject implements ContextInterface{
 	 * @params string locale
 	 */
 	string getLocale(){
-		return this._locale;
+		return this._values.get("default.locale", "en", "string");
 	}
 	
 	
@@ -255,4 +257,60 @@ class Context extends CoreObject implements ContextInterface{
 		return message;
 	}
 	
+	
+	
+	/**
+	 * Fork current context
+	 * @return ContextInterface
+	 */
+	ContextInterface fork(){
+		string class_name = this.getClassName();
+		ContextInterface obj = rtl::newInstance(class_name);
+		
+		/* Add modules */
+		this._modules.each( void (string item) use (obj){
+			obj._modules.push(item);
+		});
+		
+		/* Add managers */
+		this._managers.each( void (string key, mixed value) use (obj){
+			obj._managers.set(key, value);
+		});
+		
+		/* Add provider names */
+		this._providers_names.each( void (string key, FactoryInterface value) use (obj){
+			obj._providers_names.set(key, value);
+		});
+		
+		return obj;
+	}
+	
+	
+	
+	/**
+	 * Realease context resources
+	 */
+	void release(){}
+	
+	
+	
+	/**
+	 * Returns context value
+	 * @param string name
+	 * @return mixed
+	 */
+	mixed getValue(string name, mixed default_value = null, string type_value = "mixed", string type_template = ""){
+		return this._values.get(name, default_value, type_value, type_template);
+	}
+	
+	
+	
+	/**
+	 * Set context value
+	 * @param string name
+	 * @param mixed value
+	 */
+	void setValue(string name, mixed value){
+		this._values.set(name, value);
+	}
 }
