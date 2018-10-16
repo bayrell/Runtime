@@ -110,7 +110,7 @@ class Emitter extends CoreObject{
 		/* Call methods */
 		Vector methods = this.methods.slice();
 		methods.each(void (callback f) use (e){
-			rtl::call(f, e);
+			rtl::call(f, [e]);
 		});
 		
 		/* Call subscribers */
@@ -126,6 +126,6 @@ class Emitter extends CoreObject{
 	/**
 	 * Handler Event
 	 */
-	protected void handlerEvent(var e){
+	public void handlerEvent(var e){
 	}
 }
