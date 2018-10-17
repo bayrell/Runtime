@@ -19,6 +19,7 @@
 namespace Runtime;
 
 use Runtime.rtl;
+use Runtime.CoreEvent;
 use Runtime.CoreObject;
 use Runtime.Vector;
 use Runtime.Interfaces.SubscribeInterface;
@@ -90,9 +91,9 @@ class Emitter extends CoreObject{
 	
 	/**
 	 * Dispatch event
-	 * @param var e
+	 * @param CoreEvent e
 	 */
-	void emit(var e){
+	void emit(CoreEvent e){
 		this.dispatch(e);
 	}
 	
@@ -100,9 +101,9 @@ class Emitter extends CoreObject{
 	
 	/**
 	 * Dispatch event
-	 * @param var e
+	 * @param CoreEvent e
 	 */
-	void dispatch(var e){
+	void dispatch(CoreEvent e){
 		
 		/* Call self handler */
 		this.handlerEvent(e);
