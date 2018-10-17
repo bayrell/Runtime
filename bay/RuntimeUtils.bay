@@ -342,22 +342,21 @@ export class RuntimeUtils{
 	 * @param SerializeContainer container
 	 * @return mixed
 	 */
-	public static mixed PrimitiveToObject(mixed obj, ContextInterface context = null){
+	public static mixed PrimitiveToObject(mixed obj){
 		
 		if (obj === null) return null;
 		if (rtl::isScalarValue(obj)) return obj;
-		if (context == null) context = self::globalContext();
 		
 		if (obj instanceof Vector){
-			return obj.map(mixed (mixed value) use (context){
-				return self::PrimitiveToObject( value, context );
+			return obj.map(mixed (mixed value){
+				return self::PrimitiveToObject(value);
 			});
 		}
 		
 		if (obj instanceof Map){
 			
-			obj = obj.map(mixed (string key, mixed value) use (context){
-				return self::PrimitiveToObject( value, context );
+			obj = obj.map(mixed (string key, mixed value){
+				return self::PrimitiveToObject(value);
 			});
 			
 			if ( !obj.has("__class_name__") ) return obj;

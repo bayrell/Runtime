@@ -303,7 +303,7 @@ Runtime.Vector = class extends Array{
 	 * Correct items
 	 */
 	_correctItemsByType(type){
-		return this.map((value) =>{
+		return this.map((item) =>{
 			if (isBrowser()) return Runtime.rtl.correct(item, type, null);
 			return rtl.correct(item, type, null);
 		});

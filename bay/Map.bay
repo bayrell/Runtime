@@ -750,7 +750,7 @@ class Map implements \JsonSerializable{
 	 * JsonSerializable
 	 */
 	public function jsonSerialize(){
-		return $this->_map;
+		return (object) $this->_map;
 	}
 }
 

@@ -63,6 +63,8 @@ class RuntimeAssets implements AssetsInterface{
 				"/assets/bayrell-runtime-es6/RuntimeConstant.js",
 				"/assets/bayrell-runtime-es6/RuntimeUtils.js",
 				"/assets/bayrell-runtime-es6/Exceptions/RuntimeException.js",
+				"/assets/bayrell-runtime-es6/Interfaces/AssetsInterface.js",
+				"/assets/bayrell-runtime-es6/Interfaces/CloneableInterface.js",
 				"/assets/bayrell-runtime-es6/Interfaces/ContextInterface.js",
 				"/assets/bayrell-runtime-es6/Interfaces/FactoryInterface.js",
 				"/assets/bayrell-runtime-es6/Interfaces/ModuleDescriptionInterface.js",

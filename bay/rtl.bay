@@ -205,6 +205,13 @@ export class rtl{
 	#case ifcode JAVASCRIPT then
 	static class_implements(class_name, interface_name){
 		var obj = this.find_class(class_name);
+		var obj2 = this.find_class(interface_name);
+		
+		if (obj.__static_implements__.indexOf( obj2 ) == -1 ){
+			return false;
+		}
+		
+		return true;
 	}
 	#endswitch
 	
@@ -375,7 +382,7 @@ export class rtl{
 				#case ifcode PHP then
 				return $value->_correctItemsByType($type_template);
 				#case ifcode JAVASCRIPT then
-				return value._correctItemsByType($type_template);
+				return value._correctItemsByType(type_template);
 				#endswitch
 				
 			}
