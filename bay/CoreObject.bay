@@ -86,7 +86,18 @@ class CoreObject{
 	 * Assign and clone data from other object
 	 * @param CoreObject obj
 	 */
-	void assignObject(CoreObject obj){}
+	void assignObject(CoreObject obj){
+		this.assignObjectAfter(obj);
+	}
+	
+	
+	
+	/**
+	 * Assign and clone data from other object
+	 * @param CoreObject obj
+	 */
+	void assignObjectAfter(CoreObject obj){
+	}
 	
 	
 	
