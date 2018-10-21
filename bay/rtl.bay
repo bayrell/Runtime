@@ -461,17 +461,20 @@ export class rtl{
 			return val.cloneNode(true);
 		}
 		else if (typeof val == 'object' && 
+			val.createNewInstance && typeof val.createNewInstance == "function" &&
+			val.assignObject && typeof val.assignObject == "function")
+		{
+			var res = val.createNewInstance();
+			if (res) res.assignObject(val);
+			return res;
+		}
+		else if (typeof val == 'object' && 
 			val.getClassName && typeof val.getClassName == "function" &&
 			val.assignObject && typeof val.assignObject == "function")
 		{
 			var res = null;
-			if (val.createNewInstance && typeof val.createNewInstance == "function"){
-				res = val.createNewInstance();
-			}
-			else{
-				if (isBrowser()) res = Runtime.rtl.newInstance( val.getClassName() );
-				else res = rtl.newInstance( val.getClassName() );
-			}
+			if (isBrowser()) res = Runtime.rtl.newInstance( val.getClassName() );
+			else res = rtl.newInstance( val.getClassName() );
 			if (res) res.assignObject(val);
 			return res;
 		}

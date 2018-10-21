@@ -52,7 +52,9 @@ class Emitter extends CoreObject{
 	 * @return callback
 	 */
 	callback addMethod(callback f, Vector<string> events = null){
-		this.methods.push(f);
+		if (this.methods.indexOf(f) == -1){
+			this.methods.push(f);
+		}
 		return f;
 	}
 	
@@ -74,7 +76,9 @@ class Emitter extends CoreObject{
 	 * @param Vector<string> events
 	 */
 	void addObject(SubscribeInterface f, Vector<string> events = null){
-		this.subscribers.push(f);
+		if (this.subscribers.indexOf(f) == -1){
+			this.subscribers.push(f);
+		}
 	}
 	
 	

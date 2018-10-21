@@ -290,16 +290,6 @@ Runtime.Vector = class extends Array{
 	
 	
 	/**
-	 * Returns new Instance
-	 */
-	createNewInstance(){
-		if (isBrowser()) return new Runtime.Vector();
-		return new Vector();
-	}
-	
-	
-	
-	/**
 	 * Correct items
 	 */
 	_correctItemsByType(type){
@@ -312,10 +302,20 @@ Runtime.Vector = class extends Array{
 	
 	
 	/**
+	 * Returns new Instance
+	 */
+	createNewInstance(){
+		if (isBrowser()) return new Runtime.Vector();
+		return new Vector();
+	}
+	
+	
+	
+	/**
 	 * Assign all data from other object
 	 * @param Vector obj
 	 */
-	assign(obj){
+	assignObject(obj){
 		this.clear();
 		obj.each((item)=>{
 			if (isBrowser()) this.push( Runtime.rtl._clone(item) );
