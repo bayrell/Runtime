@@ -275,9 +275,16 @@ declare class Vector<T>{
 	
 	/**
 	 * Reverse array
-	 * @return Vector<T>
 	 */
-	declare public Vector<T> reverse();
+	declare public void reverse();
+	
+	
+	
+	/**
+	 * Sort vector
+	 * @param callback f - Sort user function
+	 */
+	declare public void sort(callback f = null);
 }
 
 
@@ -662,10 +669,20 @@ Runtime.Vector = class extends Array{
 	
 	/**
 	 * Reverse array
-	 * @return Vector
 	 */
 	reverse(){
-		return super.reverse();
+		super.reverse();
+	}
+	
+	
+	
+	/**
+	 * Returns sorted vector
+	 * @param callback f - Sort user function
+	 */
+	sort(f){
+		if (f == undefined) super.sort();
+		super.sort(f);
 	}
 }
 
@@ -745,7 +762,8 @@ class Vector implements \JsonSerializable{
 	 * Returns new Instance
 	 */
 	public function createNewInstance(){
-		return new Vector();
+		$class_name = get_class($this);
+		return new $class_name();
 	}
 	
 	
@@ -1018,7 +1036,7 @@ class Vector implements \JsonSerializable{
 	 */
 	function map($f){
 		$keys = array_keys($this->_arr);
-		$arr2 = new Vector();
+		$arr2 = $this->createNewInstance();
 		$arr2->_arr = array_map($f, $this->_arr, $keys);
 		return $arr2;
 	}
@@ -1031,7 +1049,7 @@ class Vector implements \JsonSerializable{
 	 * @return Vector
 	 */
 	function filter($f){
-		$arr2 = new Vector();
+		$arr2 = $this->createNewInstance();
 		$arr2->_arr = array_filter($this->_arr, $f);
 		return $arr2;
 	}
@@ -1066,7 +1084,7 @@ class Vector implements \JsonSerializable{
 	 * @return Vector
 	 */
 	function concat($v){
-		$arr2 = new Vector();
+		$arr2 = $this->createNewInstance();
 		$arr2->_arr = array_merge($this->_arr, $v->_arr);
 		return $arr2;
 	}
@@ -1080,7 +1098,7 @@ class Vector implements \JsonSerializable{
 	 * @return Vector<T>
 	 */
 	function slice($offset = 0, $length = null){
-		$arr2 = new Vector();
+		$arr2 = $this->createNewInstance();
 		$arr2->_arr = array_slice($this->_arr, $offset, $length);
 		return $arr2;
 	}
@@ -1092,7 +1110,7 @@ class Vector implements \JsonSerializable{
 	 * @return Vector<T>
 	 */
 	function copy(){
-		$arr2 = new Vector();
+		$arr2 = $this->createNewInstance();
 		if ($this->_arr == null) $arr2->_arr = [];
 		else $arr2->_arr = array_slice($this->_arr, 0);
 		return $arr2;
@@ -1111,12 +1129,23 @@ class Vector implements \JsonSerializable{
 	
 	/**
 	 * Reverse array
-	 * @return Vector
 	 */
 	public function reverse(){
-		$arr2 = new Vector();
-		$arr2->_arr = array_reverse($this->_arr);
-		return $arr2;
+		array_reverse($this->_arr);
+	}
+	
+	
+	/**
+	 * Sort vector
+	 * @param callback f - Sort user function
+	 */
+	public function sort($f = null){
+		if ($f == null){
+			asort($this->_arr);
+		}
+		else{
+			usort($this->_arr, $f);
+		}
 	}
 }
 
