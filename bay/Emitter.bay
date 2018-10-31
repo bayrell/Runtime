@@ -21,14 +21,15 @@ namespace Runtime;
 use Runtime.rtl;
 use Runtime.CoreEvent;
 use Runtime.CoreObject;
+use Runtime.Map;
 use Runtime.Vector;
 use Runtime.Interfaces.SubscribeInterface;
 
 
 class Emitter extends CoreObject{
 	
-	protected Vector methods = null;
-	protected Vector subscribers = null;
+	protected Map<Vector> methods = null;
+	protected Map<Vector> subscribers = null;
 	
 	
 	/**
@@ -36,10 +37,27 @@ class Emitter extends CoreObject{
 	 */
 	void constructor(callback val = null){
 		parent();
-		this.methods = new Vector();
-		this.subscribers = new Vector();
+		this.methods = new Map<Vector>();
+		this.subscribers = new Map<Vector>();
 		if (val != null){
-			this.methods.push(val);
+			this.addMethod(val);
+		}
+	}
+	
+	
+	
+	/**
+	 * Add method by name
+	 * @param callback f
+	 * @param string name
+	 */
+	void addMethodByName(callback f, string name){
+		if (not this.methods.has(name)){
+			this.methods.set(name, new Vector());
+		}
+		Vector v = this.methods.item(name);
+		if (v.indexOf(f) == -1){
+			v.push(f);
 		}
 	}
 	
@@ -52,8 +70,13 @@ class Emitter extends CoreObject{
 	 * @return callback
 	 */
 	callback addMethod(callback f, Vector<string> events = null){
-		if (this.methods.indexOf(f) == -1){
-			this.methods.push(f);
+		if (events == null){
+			this.addMethodByName(f, "");
+		}
+		else{
+			events.each(void (string item) use (f){
+				this.addMethodByName(f, item);
+			});
 		}
 		return f;
 	}
@@ -64,8 +87,32 @@ class Emitter extends CoreObject{
 	 * Remove method
 	 * @param callback f
 	 */
-	void removeMethod(callback f){
-		this.methods.removeItem(f);
+	void removeMethod(callback f, Vector<string> events = null){
+		if (events == null){
+			events = this.methods.keys();
+		}
+		events.each(void (string name) use (f){
+			Vector v = this.methods.get(name, null);
+			if (v == null) return;
+			v.removeItem(f);
+		});
+	}
+	
+	
+	
+	/**
+	 * Add object by name
+	 * @param callback f
+	 * @param string name
+	 */
+	void addObjectByName(callback f, string name){
+		if (not this.subscribers.has(name)){
+			this.subscribers.set(name, new Vector());
+		}
+		Vector v = this.subscribers.item(name);
+		if (v.indexOf(f) == -1){
+			v.push(f);
+		}
 	}
 	
 	
@@ -76,9 +123,15 @@ class Emitter extends CoreObject{
 	 * @param Vector<string> events
 	 */
 	void addObject(SubscribeInterface f, Vector<string> events = null){
-		if (this.subscribers.indexOf(f) == -1){
-			this.subscribers.push(f);
+		if (events == null){
+			this.addObjectByName(f, "");
 		}
+		else{
+			events.each(void (string item) use (f){
+				this.addObjectByName(f, item);
+			});
+		}
+		return f;
 	}
 	
 	
@@ -88,7 +141,14 @@ class Emitter extends CoreObject{
 	 * @param SubscribeInterface f
 	 */
 	void removeObject(SubscribeInterface f){
-		this.subscribers.removeItem(f);
+		if (events == null){
+			events = this.subscribers.keys();
+		}
+		events.each(void (string name) use (f){
+			Vector v = this.subscribers.get(name, null);
+			if (v == null) return;
+			v.removeItem(f);
+		});
 	}
 	
 	
@@ -108,20 +168,28 @@ class Emitter extends CoreObject{
 	 * @param CoreEvent e
 	 */
 	void dispatch(CoreEvent e){
-		
+
+		/* Copy items */
+		Map<Vector> methods = this.methods.map( Vector (string key, Vector items) { return items.slice(); });
+		Map<Vector> subscribers = this.subscribers.map( Vector (string key, Vector items) { return items.slice(); });
+	
 		/* Call self handler */
 		this.handlerEvent(e);
 		
 		/* Call methods */
-		Vector methods = this.methods.slice();
-		methods.each(void (callback f) use (e){
-			rtl::call(f, [e]);
+		methods.each(void (string key, Vector items) use (e){
+			if (key != "" and e.getClassName() != key ) return;
+			items.each(void (callback f) use (e){
+				rtl::call(f, [e]);
+			});
 		});
 		
 		/* Call subscribers */
-		Vector<SubscribeInterface> subscribers = this.subscribers.slice();
-		subscribers.each(void (SubscribeInterface obj) use (e){
-			obj.handlerEvent(e);
+		subscribers.each(void (string key, Vector items) use (e){
+			if (key != "" and e.getClassName() != key ) return;
+			items.each(void (SubscribeInterface obj) use (e){
+				obj.handlerEvent(e);
+			});
 		});
 		
 	}
