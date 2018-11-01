@@ -22,4 +22,7 @@ use Runtime.CoreObject;
 
 
 class CoreEvent extends CoreObject{
+	
+	public CoreObject sender = null;
+	
 }

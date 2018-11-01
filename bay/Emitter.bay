@@ -140,7 +140,7 @@ class Emitter extends CoreObject{
 	 * Remove object
 	 * @param SubscribeInterface f
 	 */
-	void removeObject(SubscribeInterface f){
+	void removeObject(SubscribeInterface f, Vector<string> events = null){
 		if (events == null){
 			events = this.subscribers.keys();
 		}
