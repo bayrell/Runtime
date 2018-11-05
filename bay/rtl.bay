@@ -349,6 +349,25 @@ export class rtl{
 	
 	
 	/**
+	 * Call async method
+	 * @return Object
+	 */
+	declare export static void awaitRun(callback f);
+	
+	#switch
+	#case ifcode PHP then
+	static function awaitRun($f){
+	}
+	#case ifcode ES6 then
+	static awaitRun(f){
+		var thread = new Runtime.AsyncThread();
+		thread.run(f);
+	}
+	#endswitch
+	
+	
+	
+	/**
 	 * Returns value if value instanceof type_value, else returns def_value
 	 * @param var value
 	 * @param string type_value

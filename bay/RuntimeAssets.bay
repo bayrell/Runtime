@@ -73,6 +73,8 @@ class RuntimeAssets implements AssetsInterface{
 				"/assets/bayrell-runtime-es6/Interfaces/SubscribeInterface.js",
 			],
 			[
+				"/assets/bayrell-runtime-es6/AsyncTask.js",
+				"/assets/bayrell-runtime-es6/AsyncThread.js",
 				"/assets/bayrell-runtime-es6/Context.js",
 				"/assets/bayrell-runtime-es6/ContextObject.js",
 				"/assets/bayrell-runtime-es6/CoreEvent.js",

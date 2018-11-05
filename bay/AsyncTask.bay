@@ -19,11 +19,13 @@
 namespace Runtime;
 
 use Runtime.CoreObject;
+use Runtime.Vector;
 
 
 class AsyncTask extends CoreObject{
 	
-	string jump = null;
+	string pos = null;
 	callback f = null;
+	Vector<string> catch_stack = null;
 	
 }

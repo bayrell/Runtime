@@ -27,11 +27,12 @@ use Runtime.Vector;
 class AsyncThread extends CoreObject{
 	
 	
-	protected int _jump = 0;
-	protected mixed _res = null;
-	protected mixed _err = null;
-	protected Vector<AsyncTask> _f = null;
-	protected Vector<string> _catch_stack = null;
+	protected callback f = null;
+	protected string pos = "0";
+	protected mixed res = null;
+	protected mixed err = null;
+	protected Vector<AsyncTask> run_stack = null;
+	protected Vector<string> catch_stack = null;
 	
 	
 	/**
@@ -48,32 +49,21 @@ class AsyncThread extends CoreObject{
 	 * Reset AsyncThread
 	 */
 	void reset(){
-		this._jump = 0;
-		this._res = null;
-		this._err = null;
-		this._f = new Vector<AsyncTask>();
-		this._catch_stack = new Vector<string>();
+		this.pos = "0";
+		this.res = null;
+		this.err = null;
+		this.run_stack = new Vector<AsyncTask>();
+		this.catch_stack = new Vector<string>();
 	}
 	
 	
 	
 	/**
-	 * Set jump position
-	 * @param int jump
+	 * Returns current position
+	 * @return string
 	 */
-	string jump(int pos){
-		this._jump = pos;
-		return "forward";
-	}
-	
-	
-	
-	/**
-	 * Returns current jump position
-	 * @return int
-	 */
-	int current(){
-		return this._jump;
+	string current(){
+		return this.pos;
 	}
 	
 	
@@ -82,8 +72,8 @@ class AsyncThread extends CoreObject{
 	 * Returns result of the prev function
 	 * @return mixed
 	 */
-	mixed getResult(){
-		return this._res;
+	mixed result(){
+		return this.res;
 	}
 	
 	
@@ -93,7 +83,16 @@ class AsyncThread extends CoreObject{
 	 * @return mixed
 	 */
 	mixed getError(){
-		return this._err;
+		return this.err;
+	}
+
+	
+	
+	/**
+	 * Clear error
+	 */
+	void clearError(){
+		this.err = null;
 	}
 	
 	
@@ -103,9 +102,21 @@ class AsyncThread extends CoreObject{
 	 * @param mixed res
 	 */
 	string resolve(mixed res){
-		this._res = res;
+		this.res = res;
 		this.next();
+		this.forward();
 		return "resolve";
+	}
+	
+	
+	
+	/**
+	 * Set position
+	 * @param string pos
+	 */
+	string jump(string pos){
+		this.pos = pos;
+		return "jump";
 	}
 	
 	
@@ -115,15 +126,15 @@ class AsyncThread extends CoreObject{
 	 * @param mixed res
 	 */
 	string error(mixed err){
-		if (this._catch_stack.count() == 0){
-			this._err = err;
+		if (this.catch_stack.count() == 0){
+			this.err = err;
 			this.next(true);
 		}
 		else{
-			this._err = err;
-			this._jump = this._catch_stack.pop();
-			this.forward();
+			this.err = err;
+			this.pos = this.catch_stack.pop();
 		}
+		this.forward();
 		return "error";
 	}
 	
@@ -131,10 +142,10 @@ class AsyncThread extends CoreObject{
 	
 	/**
 	 * Push catch
-	 * @param string jump
+	 * @param string pos
 	 */
-	void catchPush(string jump){
-		this._catch_stack.push(jump);
+	void catchPush(string pos){
+		this.catch_stack.push(pos);
 	}
 	
 	
@@ -143,7 +154,7 @@ class AsyncThread extends CoreObject{
 	 * Pop catch
 	 */
 	void catchPop(){
-		this._catch_stack.pop();
+		this.catch_stack.pop();
 	}
 	
 	
@@ -151,23 +162,30 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Call next
 	 */
-	void next(bool is_error = false){
+	string next(bool is_error = false){
 		
-		if (this._f.count() == 0){
+		if (this.run_stack.count() == 0){
+			this.pos = "-1";
 			return;
 		}
 		
-		this._catch_stack.clear();
-		AsyncTask task = this._f.pop();
+		AsyncTask task = this.run_stack.pop();
 		
-		/* Restore jump */
-		this._jump = task.jump;
+		/* Restore pos */
+		this.f = task.f;
+		this.pos = task.pos;
+		this.catch_stack = task.catch_stack;
+		
 		if (is_error){
-			this._jump = -1;
+			if (this.catch_stack.count() == 0){
+				this.pos = "-1";
+			}
+			else{
+				this.pos = this.catch_stack.pop();
+			}
 		}
 		
-		/* Call forward */
-		this.forward();
+		return "next";
 	}
 	
 	
@@ -175,46 +193,58 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Forward call
 	 */
-	void forward(){
+	string forward(){
+		
+		bool is_browser = rtl::isBrowser();
+		
 		#switch
 		#case ifcode JAVASCRIPT then
-		setTimeout( ()=>{ this.call(); }, 1);
+		var _rtl; if (is_browser) _rtl = Runtime.rtl; else _rtl = rtl;
+		var _AsyncTask; if (is_browser) _AsyncTask = Runtime.AsyncTask; else _AsyncTask = AsyncTask;
+		var _Vector; if (is_browser) _Vector = Runtime.Vector; else _Vector = Vector;
+		setTimeout( 
+			()=>{
+				if (this.pos == "-1"){
+					if (this.err != null){
+						throw this.err;
+					}
+					return;
+				}
+				
+				/* Call task function */
+				var res = null;
+				try{
+					res = _rtl.call(this.f, [this]);
+				}
+				catch (e){
+					res = null;
+					this.error(e);
+				}
+				
+				/* If can forward */
+				if (res != null){
+				
+					/* If return next async function */
+					if (res instanceof Function){
+						var task = new _AsyncTask();
+						task.f = this.f;
+						task.pos = this.pos;
+						task.catch_stack = this.catch_stack;
+						this.run_stack.push(task);
+						this.catch_stack = new _Vector();
+						this.pos = "0";
+						this.f = res;
+					}
+					
+					/* Call forward */
+					if (res != "error" && res != "resolve"){
+						this.forward();
+					}
+				}
+			}, 1);
 		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Call current
-	 */
-	void call(){
-		if (this._f.count() == 0){
-			this.end();
-			return;
-		}
 		
-		AsyncTask task = this._f.last();
-		
-		/* Call task function */
-		var res = null;
-		try{
-			res = rtl::call(task.f, [this]);
-		}
-		catch (var e){
-			res = null;
-			this.error(e);
-		}
-		
-		/* If return next async function */
-		if (res instanceof Function){
-			AsyncTask task2 = new AsyncTask();
-			task2.jump = this._jump;
-			task2.f = res;
-			this.forward();
-		}
-		else if (res == "forward"){
-			this.forward();
-		}
+		return "forward";
 	}
 	
 	
@@ -223,10 +253,8 @@ class AsyncThread extends CoreObject{
 	 * Run async await
 	 */
 	void run(callback f){
-		this.reset();
-		AsyncTask task = new AsyncTask();
-		task.jump = 0;
-		task.f = f;
+		this.pos = "0";
+		this.f = f;
 		this.forward();
 	}
 	
@@ -235,5 +263,8 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Call if thread is ended
 	 */
-	void end(){}
+	string end(){
+		this.pos = "-1";
+		return "end";
+	}
 }
