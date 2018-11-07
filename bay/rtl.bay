@@ -120,7 +120,9 @@ export class rtl{
 	#case ifcode PHP then
 	static function is_instanceof($obj, $class_name){
 		$class_name = self::find_class($class_name);
-		if (is_subclass_of($obj, $class_name)) return true;
+		if ($obj == null) return false;
+		if (gettype($obj) != "object") return false;
+		if (is_subclass_of($obj, $class_name)){ return true;}
 		return is_a($obj, $class_name);
 	}
 	#case ifcode JAVASCRIPT then
@@ -415,7 +417,6 @@ export class rtl{
 			else if (type_value == "bool" or type_value == "boolean") def_value = false;
 			else def_value = null;
 		}
-		
 		return def_value;
 	}
 	
@@ -432,7 +433,7 @@ export class rtl{
 		if (tp == "float" or tp == "double") return self::isDouble(value);
 		if (tp == "string") return self::isString(value);
 		if (tp == "bool" or tp == "boolean") return self::isBoolean(value);
-		if (rtl::is_instanceof(value, tp)) return true;
+		if (rtl::is_instanceof(value, tp)){ return true;}
 		return false;
 	}
 	
@@ -789,11 +790,11 @@ export class rtl{
 	#switch
 	#case ifcode PHP then
 	static function dump($value){
-		return var_dump($value);
+		var_dump($value);
 	}
 	#case ifcode JAVASCRIPT then
 	static dump(value){
-		return console.log(value);
+		console.log(value);
 	}
 	#endswitch
 	

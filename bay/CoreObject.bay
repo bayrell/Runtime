@@ -106,7 +106,29 @@ class CoreObject{
 	 * @param string variable_name
 	 * @param var value
 	 */
-	public void assignValue(string variable_name, var value){}
+	public void assignValue(string variable_name, var value){
+		this.assignValueAfter(variable_name, value);
+	}
+	
+	
+	
+	/**
+	 * Calls after assign new value
+	 * @param string variable_name
+	 * @param var value
+	 */
+	void assignValueAfter(string variable_name, var value){
+	}
+	
+	
+	
+	/**
+	 * Calls after assign new value
+	 * @param string variable_name
+	 */
+	void assignAfter(string variable_name){
+		this.assignValueAfter(variable_name, this.takeValue(variable_name));
+	}
 	
 	
 	
