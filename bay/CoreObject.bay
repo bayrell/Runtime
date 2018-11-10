@@ -133,11 +133,10 @@ class CoreObject{
 	
 	
 	/**
-	 * Set new value instance by variable name
-	 * @param string variable_name
-	 * @param var value
+	 * Set new values instance by Map
+	 * @param Map<mixed> map
 	 */
-	public void assignValues(Map<string, mixed> values = null){
+	public void assignMap(Map<mixed> values = null){
 		if (values == null)
 			return;
 		Vector<string> names = new Vector();
@@ -152,12 +151,11 @@ class CoreObject{
 	
 	
 	/**
-	 * Set new value instance by variable name
-	 * @param string variable_name
-	 * @param var value
+	 * Dump serializable object to Map
+	 * @return Map<mixed>
 	 */
-	public void takeValues(){
-		Map<string, mixed> values = new Map();
+	public Map<mixed> takeMap(){
+		Map<mixed> values = new Map();
 		Vector<string> names = new Vector();
 		this.getVariablesNames(names);
 		names.each(void (string name) use (values){
@@ -166,15 +164,6 @@ class CoreObject{
 		});
 		return values;
 	}
-	
-	
-	
-	
-	/**
-	 * Assign all data from other object
-	 * @param CoreObject obj
-	 */
-	void assign(CoreObject obj){}
 	
 	
 	

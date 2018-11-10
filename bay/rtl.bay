@@ -209,11 +209,16 @@ export class rtl{
 		var obj = this.find_class(class_name);
 		var obj2 = this.find_class(interface_name);
 		
-		if (obj.__static_implements__.indexOf( obj2 ) == -1 ){
-			return false;
+		while (obj != null){
+			if (obj.__static_implements__){
+				if (obj.__static_implements__.indexOf( obj2 ) > -1 ){
+					return true;
+				}
+			}
+			obj = obj.__proto__;
 		}
 		
-		return true;
+		return false;
 	}
 	#endswitch
 	
@@ -301,14 +306,14 @@ export class rtl{
 	 * Call method
 	 * @return Object
 	 */
-	declare export static var callMethod(Object obj, string method_name, Vector args);
+	declare export static var callMethod(Object obj, string method_name, Vector args = null);
 	
 	#switch
 	#case ifcode PHP then
-	static function callMethod($obj, $method_name, $args){
+	static function callMethod($obj, $method_name, $args = null){
 		if ($args != null)
 			return call_user_func_array([$obj, $method_name], $args->_getArr());
-		return call_user_func_array([$obj, $method_name], $args);
+		return call_user_func([$obj, $method_name]);
 	}
 	#case ifcode JAVASCRIPT then
 	static callMethod(obj, method_name, args){
