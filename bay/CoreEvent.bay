@@ -19,9 +19,11 @@
 namespace Runtime;
 
 use Runtime.CoreObject;
+use Runtime.Interfaces.CloneableInterface;
+use Runtime.Interfaces.SerializeInterface;
 
 
-class CoreEvent extends CoreObject{
+class CoreEvent extends CoreObject  implements CloneableInterface, SerializeInterface{
 	
 	public CoreObject sender = null;
 	

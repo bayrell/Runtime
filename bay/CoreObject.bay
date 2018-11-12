@@ -135,8 +135,9 @@ class CoreObject{
 	/**
 	 * Set new values instance by Map
 	 * @param Map<mixed> map
+	 * @return CoreObject
 	 */
-	public void assignMap(Map<mixed> values = null){
+	public CoreObject assignMap(Map<mixed> values = null){
 		if (values == null)
 			return;
 		Vector<string> names = new Vector();
@@ -146,6 +147,7 @@ class CoreObject{
 			this.assignValue(name, value);
 		});
 		delete names;
+		return this;
 	}
 	
 	
