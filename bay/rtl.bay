@@ -287,15 +287,17 @@ export class rtl{
 	 * Call method
 	 * @return Object
 	 */
-	declare export static var call(callback f, Vector args);
+	declare export static var call(callback f, Vector args = null);
 	
 	#switch
 	#case ifcode PHP then
-	static function call($f, $args){
+	static function call($f, $args = null){
+		if ($args == null) return call_user_func($f);
 		return call_user_func_array($f, $args);
 	}
 	#case ifcode JAVASCRIPT then
 	static call(f, args){
+		if (args == undefined) return f.apply(null);
 		return f.apply(null, args);
 	}
 	#endswitch
@@ -382,8 +384,8 @@ export class rtl{
 	 * @param var type_template
 	 * @return var
 	 */
-	static var convert(var value, string type_value, var def_value = null, string type_template = ""){
-		return self::correct(value, type_value, def_value, type_template);
+	static var correct(var value, string type_value, var def_value = null, string type_template = ""){
+		return self::convert(value, type_value, def_value, type_template);
 	}
 	
 	
@@ -396,13 +398,13 @@ export class rtl{
 	 * @param var type_template
 	 * @return var
 	 */
-	static var correct(var value, string type_value, var def_value = null, string type_template = ""){
+	static var convert(var value, string type_value, var def_value = null, string type_template = ""){
 		
 		if (type_value == "mixed" or type_value == "var")
 			return value;
 		
 		/* check value */
-		if (self::checkValue(value, type_value)){
+		if (value != null and self::checkValue(value, type_value)){
 			if ( (type_value == "Runtime.Vector" or type_value == "Runtime.Map") and type_template != ""){
 				#switch
 				#case ifcode PHP then
@@ -415,7 +417,32 @@ export class rtl{
 			return value;
 		}
 		
-		/* check def_value */
+		/* Try to convert */
+		else{
+			bool is_string = rtl::isString(value);
+			bool is_number = rtl::isNumber(value);
+			bool is_bool = rtl::isBoolean(value);
+			if (is_string or is_bool or is_number){
+				string s_value = rtl::toString(value);
+				try{
+					if (type_value == "int"){
+						int val = rtl::toInt(value);
+						return val;
+					}
+					else if (type_value == "float" or type_value == "double"){
+						int val = rtl::toFloat(value);
+						return val;
+					}
+					else if (type_value == "bool"){
+						int val = rtl::toBool(value);
+						return val;
+					}
+				}
+				catch (var e){}
+			}
+		}
+		
+		/* Check def_value */
 		if (not self::checkValue(def_value, type_value)){
 			if (type_value == "int" or type_value == "float" or type_value == "double") def_value = 0;
 			else if (type_value == "string") def_value = "";
@@ -680,18 +707,89 @@ export class rtl{
 	/**
 	 * Convert value to int
 	 * @param var value
-	 * @return string
+	 * @return int
 	 */
 	declare export static int toInt(var val);
 
 	#switch
 	#case ifcode PHP then
 	static function toInt($val){
-		return (int)$val;
+		$res = (int)$val;
+		$s_res = (string)$res;
+		$s_val = (string)$val;
+		if ($s_res == $s_val)
+			return $res;
+		throw new \Exception("Error convert to int");
 	}
 	#case ifcode JAVASCRIPT then
 	static toInt(val){
-		return parseInt(val);
+		var res = parseInt(val);
+		var s_res = new String(res);
+		var s_val = new String(val);
+		if ( s_res ==  s_val)
+			return res;
+		throw new Error("Error convert to int");
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Convert value to boolean
+	 * @param var value
+	 * @return bool
+	 */
+	declare export static bool toBool(var val);
+
+	#switch
+	#case ifcode PHP then
+	static function toBool($val){
+		$res = (bool)$val;
+		$s_res = (string)$res;
+		$s_val = (string)$val;
+		if ($s_res == $s_val)
+			return $res;
+		throw new \Exception("Error convert to boolean");
+	}
+	#case ifcode JAVASCRIPT then
+	static toBool(val){
+		var res = false;
+		if (val == 'true') res = true;
+		var s_res = new String(res);
+		var s_val = new String(val);
+		if (s_res ==  s_val)
+			return res;
+		throw new Error("Error convert to boolean");
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Convert value to float
+	 * @param var value
+	 * @return float
+	 */
+	declare export static bool toFloat(var val);
+
+	#switch
+	#case ifcode PHP then
+	static function toFloat($val){
+		$res = floatval($val);
+		$s_res = (string)$res;
+		$s_val = (string)$val;
+		if ($s_res == $s_val)
+			return $res;
+		throw new \Exception("Error convert to float");
+	}
+	#case ifcode JAVASCRIPT then
+	static toFloat(val){
+		var res = parseFloat(val);
+		var s_res = new String(res);
+		var s_val = new String(val);
+		if (s_res ==  s_val)
+			return res;
+		throw new Error("Error convert to float");
 	}
 	#endswitch
 	
