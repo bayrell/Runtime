@@ -304,33 +304,57 @@ export class RuntimeUtils{
 	
 		if (obj === null) return null;
 		if (rtl::isScalarValue(obj)) return obj;
-		if (obj instanceof Vector){
-			return obj.map(mixed (mixed value) use (force_class_name){
-				return self::ObjectToPrimitive( value, force_class_name );
-			});
-		}
-		if (obj instanceof Map){
-			obj = obj.map(mixed (string key, mixed value) use (force_class_name){
-				return self::ObjectToPrimitive( value, force_class_name );
-			});
-			if (force_class_name){
-				obj.set("__class_name__", classof Map);
+		
+		if (obj instanceof Vector)
+		{
+			Vector<mixed> res = new Vector();
+			for (int i=0; i<obj.count(); i++)
+			{
+				mixed value = obj.item(i);
+				value = self::ObjectToPrimitive( value, force_class_name );
+				res.push(value);
 			}
-			return obj;
+			return res;
 		}
+		
+		if (obj instanceof Map)
+		{
+			Map<mixed> res = new Map();
+			Vector<string> keys = obj.keys();
+		
+			for (int i=0; i<keys.count(); i++)
+			{
+				string key = keys.item(i);
+				mixed value = obj.item(key);
+				value = self::ObjectToPrimitive( value, force_class_name );
+				res.set(key, value);
+			}
+			
+			delete keys;
+			if (force_class_name){
+				res.set("__class_name__", classof Map);
+			}
+			
+			return res;
+		}
+		
+		
 		if (obj implements SerializeInterface){
 			
 			Vector<string> names = new Vector();
 			Map<string, mixed> values = new Map();
 			obj.getVariablesNames(names);
 			
-			names.each(void (string variable_name) use (values, obj, force_class_name){
+			for (int i=0; i<names.count(); i++)
+			{
+				string variable_name = names.item(i);
 				var value = obj.takeValue(variable_name, null);
 				var value = self::ObjectToPrimitive( value, force_class_name );
 				values.set(variable_name, value);
-			});
+			}
 			
 			values.set("__class_name__", obj.getClassName());
+			delete names;
 			
 			return values;
 		}
@@ -350,25 +374,40 @@ export class RuntimeUtils{
 		if (obj === null) return null;
 		if (rtl::isScalarValue(obj)) return obj;
 		
-		if (obj instanceof Vector){
-			return obj.map(mixed (mixed value){
-				return self::PrimitiveToObject(value);
-			});
+		if (obj instanceof Vector)
+		{
+			Vector<mixed> res = new Vector();
+			for (int i=0; i<obj.count(); i++)
+			{
+				mixed value = obj.item(i);
+				value = self::PrimitiveToObject(value);
+				res.push(value);
+			}
+			return res;
 		}
 		
-		if (obj instanceof Map){
-			
-			obj = obj.map(mixed (string key, mixed value){
-				return self::PrimitiveToObject(value);
-			});
-			
-			if ( !obj.has("__class_name__") ) return obj;
-			if ( obj.item("__class_name__") == "Runtime.Map" ){
-				obj.remove("__class_name__");
-				return obj;
+		if (obj instanceof Map)
+		{
+			Map<mixed> res = new Map();
+			Vector<string> keys = obj.keys();
+		
+			for (int i=0; i<keys.count(); i++)
+			{
+				string key = keys.item(i);
+				mixed value = obj.item(key);
+				value = self::PrimitiveToObject(value);
+				res.set(key, value);
 			}
 			
-			string class_name = obj.item("__class_name__");
+			delete keys;
+			
+			if ( !res.has("__class_name__") ) return res;
+			if ( res.item("__class_name__") == "Runtime.Map" ){
+				res.remove("__class_name__");
+				return res;
+			}
+			
+			string class_name = res.item("__class_name__");
 			if (not rtl::class_exists(class_name)){
 				return null;
 			}
@@ -382,12 +421,17 @@ export class RuntimeUtils{
 			/* Assign values */
 			Vector<string> names = new Vector();
 			instance.getVariablesNames(names);
-			names.each(void (string variable_name) use (instance, obj){
-				if (variable_name == "__class_name__") 
-					return;
-				var value = obj.get(variable_name, null);
-				instance.assignValue(variable_name, value);
-			});
+			for (int i=0; i<names.count(); i++)
+			{
+				string variable_name = names.item(i);
+				if (variable_name != "__class_name__") 
+				{
+					var value = res.get(variable_name, null);
+					instance.assignValue(variable_name, value);
+				}
+			}
+			
+			delete res;
 			
 			return instance;
 		}

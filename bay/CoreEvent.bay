@@ -27,4 +27,10 @@ class CoreEvent extends CoreObject  implements CloneableInterface, SerializeInte
 	
 	public CoreObject sender = null;
 	
+	
+	void constructor(CoreObject sender = null){
+		parent();
+		this.sender = sender;
+	}
+	
 }
