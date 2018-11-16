@@ -157,18 +157,10 @@ class Emitter extends CoreObject{
 	 * Dispatch event
 	 * @param CoreEvent e
 	 */
-	void emit(CoreEvent e){
-		this.dispatch(e);
-	}
-	
-	
-	
-	/**
-	 * Dispatch event
-	 * @param CoreEvent e
-	 */
 	void dispatch(CoreEvent e){
 
+		Vector<string> keys = null;
+		
 		/* Copy items */
 		Map<Vector> methods = this.methods.map( Vector (string key, Vector items) { return items.slice(); });
 		Map<Vector> subscribers = this.subscribers.map( Vector (string key, Vector items) { return items.slice(); });
@@ -177,20 +169,34 @@ class Emitter extends CoreObject{
 		this.handlerEvent(e);
 		
 		/* Call methods */
-		methods.each(void (string key, Vector items) use (e){
-			if (key != "" and e.getClassName() != key ) return;
-			items.each(void (callback f) use (e){
+		keys = methods.keys();
+		for (int i=0; i<keys.count(); i++){
+			string key = keys.item(i);
+			Vector items = methods.item(key);
+			
+			if (key != "" and e.getClassName() != key)
+				continue;
+			
+			for (int j=0; j<items.count(); j++){
+				callback f = items.item(j);
 				rtl::call(f, [e]);
-			});
-		});
+			}
+		}
 		
 		/* Call subscribers */
-		subscribers.each(void (string key, Vector items) use (e){
-			if (key != "" and e.getClassName() != key ) return;
-			items.each(void (SubscribeInterface obj) use (e){
+		keys = subscribers.keys();
+		for (int i=0; i<keys.count(); i++){
+			string key = keys.item(i);
+			Vector items = subscribers.item(key);
+			
+			if (key != "" and e.getClassName() != key)
+				continue;
+			
+			for (int j=0; j<items.count(); j++){
+				SubscribeInterface obj = items.item(j);
 				obj.handlerEvent(e);
-			});
-		});
+			}
+		}
 		
 	}
 	
