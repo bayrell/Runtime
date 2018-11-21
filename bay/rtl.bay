@@ -726,7 +726,7 @@ export class rtl{
 		var res = parseInt(val);
 		var s_res = new String(res);
 		var s_val = new String(val);
-		if ( s_res ==  s_val)
+		if (s_res.localeCompare(s_val) == 0)
 			return res;
 		throw new Error("Error convert to int");
 	}
@@ -757,7 +757,7 @@ export class rtl{
 		if (val == 'true') res = true;
 		var s_res = new String(res);
 		var s_val = new String(val);
-		if (s_res ==  s_val)
+		if (s_res.localeCompare(s_val) == 0)
 			return res;
 		throw new Error("Error convert to boolean");
 	}
@@ -787,7 +787,7 @@ export class rtl{
 		var res = parseFloat(val);
 		var s_res = new String(res);
 		var s_val = new String(val);
-		if (s_res ==  s_val)
+		if (s_res.localeCompare(s_val) == 0)
 			return res;
 		throw new Error("Error convert to float");
 	}
