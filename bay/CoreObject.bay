@@ -21,6 +21,7 @@ namespace Runtime;
 use Runtime.rtl;
 use Runtime.Map;
 use Runtime.Vector;
+use Runtime.Introspection.ItemInfo;
 
 
 class CoreObject{
@@ -66,19 +67,26 @@ class CoreObject{
 	
 	
 	/**
-	 * Returns name of variables to serialization
-	 * @return Vector<string>
+	 * Returns instance of the value by variable name
+	 * @param string variable_name
+	 * @param string default_value
+	 * @return var
 	 */
-	public void getVariablesNames(Vector<string> names){}
+	public var takeValue(string variable_name, var default_value = null){
+		return this.takeVirtualValue(variable_name, default_value);
+	}
 	
 	
 	
 	/**
-	 * Returns instance of the value by variable name
+	 * Returns virtual values
 	 * @param string variable_name
+	 * @param string default_value
 	 * @return var
 	 */
-	public var takeValue(string variable_name, var default_value = null){}
+	void takeVirtualValue(string variable_name, var default_value = null){
+		return default_value;
+	}
 	
 	
 	
@@ -126,7 +134,7 @@ class CoreObject{
 	 * Calls after assign new value
 	 * @param string variable_name
 	 */
-	void assignAfter(string variable_name){
+	void callAssignAfter(string variable_name){
 		this.assignValueAfter(variable_name, this.takeValue(variable_name));
 	}
 	
@@ -179,4 +187,146 @@ class CoreObject{
 		string class_name = this.getClassName();
 		return rtl::callStaticMethod(class_name, method_name, args);
 	}
+	
+	
+	
+	/**
+	 * Returns field info by field_name
+	 * @param string field_name
+	 * @return ItemInfo
+	 */
+	public static ItemInfo getFieldInfoByName(string field_name){
+	}
+	
+	
+	
+	/**
+	 * Returns virtual field info by field_name
+	 * @param string field_name
+	 * @return ItemInfo
+	 */
+	public static ItemInfo getVirtualFieldInfo(string field_name){
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns public fields list
+	 * @param Vector<string> names
+	 */
+	public static void getFieldsList(Vector<string> names){
+	}
+	
+	
+	
+	/**
+	 * Returns public virtual fields names
+	 * @param Vector<string> names
+	 */
+	public static void getVirtualFieldsList(Vector<string> names){
+	}
+	
+	
+	
+	/**
+	 * Returns info of the public method by name
+	 * @param string method_name
+	 * @return ItemInfo
+	 */
+	public static ItemInfo getMethodInfoByName(string method_name){
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns list of the public methods
+	 * @param Vector<string> methods
+	 */
+	public static void getMethodsList(Vector<string> methods){
+	}
+	
+	
+	
+	/**
+	 * Returns names of variables to serialization
+	 * @param Vector<string>
+	 */
+	public void getVariablesNames(Vector<string> names){
+		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
+		for (int i=0; i<classes.count(); i++){
+			string class_name = classes.item(i);
+			rtl::callStaticMethod(class_name, "getFieldsList", [names]);
+			try{ rtl::callStaticMethod(class_name, "getVirtualFieldsList", [names]); } catch (var e) {}
+		}
+	}
+	
+	
+	
+	/**
+	 * Returns names of variables to serialization
+	 * @param Vector<string>
+	 */
+	public void getFieldsNames(Vector<string> names){
+		this.getVariablesNames(names);
+	}
+	
+	
+	
+	/**
+	 * Returns info of the public variable by name
+	 * @param string variable_name
+	 * @return ItemInfo
+	 */
+	public void getFieldInfo(string variable_name){
+		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
+		for (int i=0; i<classes.count(); i++){
+			string class_name = classes.item(i);
+			ItemInfo info = rtl::callStaticMethod(class_name, "getFieldInfoByName", [variable_name]);
+			if (info != null  and item.kind == ItemInfo::ITEM_FIELD)
+				return info;
+			try{ 
+				ItemInfo info = rtl::callStaticMethod(class_name, "getVirtualFieldInfo", [variable_name]); 
+				if (info != null  and item.kind == ItemInfo::ITEM_FIELD)
+					return info;
+			} 
+			catch (var e) {}
+		}
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns names of methods
+	 * @param Vector<string>
+	 */
+	public void getMethodsNames(Vector<string> names){
+		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
+		for (int i=0; i<classes.count(); i++){
+			string class_name = classes.item(i);
+			rtl::callStaticMethod(class_name, "getMethodsList", [names]);
+		}
+	}
+	
+	
+	
+	/**
+	 * Returns info of the public method by name
+	 * @param string method_name
+	 * @return ItemInfo
+	 */
+	public void getMethodInfo(string method_name){
+		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
+		for (int i=0; i<classes.count(); i++){
+			string class_name = classes.item(i);
+			ItemInfo info = rtl::callStaticMethod(class_name, "getMethodInfoByName", [method_name]);
+			if (info != null and item.kind == ItemInfo::ITEM_METHOD)
+				return info;
+		}
+		return null;
+	}
+	
+	
 }
