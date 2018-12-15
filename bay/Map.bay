@@ -467,8 +467,19 @@ Runtime.Map = class extends Map{
 }
 
 #case ifcode NODEJS then
+
+if (false){
+
+module.exports = {
+	"Map": Runtime.Map
+}
+
+}
+else{
+
 module.exports = Runtime.Map;
 
+}
 
 
 #case ifcode PHP then

@@ -727,8 +727,19 @@ Runtime.Vector = class extends Array{
 }
 
 #case ifcode NODEJS then
+
+if (false){
+
+module.exports = {
+	"Vector": Runtime.Vector
+}
+
+}
+else{
+
 module.exports = Runtime.Vector;
 
+}
 
 #case ifcode PHP then
 

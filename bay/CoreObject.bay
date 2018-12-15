@@ -21,7 +21,6 @@ namespace Runtime;
 use Runtime.rtl;
 use Runtime.Map;
 use Runtime.Vector;
-use Runtime.Introspection.ItemInfo;
 
 
 class CoreObject{
@@ -193,9 +192,9 @@ class CoreObject{
 	/**
 	 * Returns field info by field_name
 	 * @param string field_name
-	 * @return ItemInfo
+	 * @return IntrospectionInfo
 	 */
-	public static ItemInfo getFieldInfoByName(string field_name){
+	public static IntrospectionInfo getFieldInfoByName(string field_name){
 	}
 	
 	
@@ -203,9 +202,9 @@ class CoreObject{
 	/**
 	 * Returns virtual field info by field_name
 	 * @param string field_name
-	 * @return ItemInfo
+	 * @return IntrospectionInfo
 	 */
-	public static ItemInfo getVirtualFieldInfo(string field_name){
+	public static IntrospectionInfo getVirtualFieldInfo(string field_name){
 		return null;
 	}
 	
@@ -232,9 +231,9 @@ class CoreObject{
 	/**
 	 * Returns info of the public method by name
 	 * @param string method_name
-	 * @return ItemInfo
+	 * @return IntrospectionInfo
 	 */
-	public static ItemInfo getMethodInfoByName(string method_name){
+	public static IntrospectionInfo getMethodInfoByName(string method_name){
 		return null;
 	}
 	
@@ -277,18 +276,18 @@ class CoreObject{
 	/**
 	 * Returns info of the public variable by name
 	 * @param string variable_name
-	 * @return ItemInfo
+	 * @return IntrospectionInfo
 	 */
 	public void getFieldInfo(string variable_name){
 		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
 		for (int i=0; i<classes.count(); i++){
 			string class_name = classes.item(i);
-			ItemInfo info = rtl::callStaticMethod(class_name, "getFieldInfoByName", [variable_name]);
-			if (info != null  and item.kind == ItemInfo::ITEM_FIELD)
+			IntrospectionInfo info = rtl::callStaticMethod(class_name, "getFieldInfoByName", [variable_name]);
+			if (info != null  and item.kind == IntrospectionInfo::ITEM_FIELD)
 				return info;
 			try{ 
-				ItemInfo info = rtl::callStaticMethod(class_name, "getVirtualFieldInfo", [variable_name]); 
-				if (info != null  and item.kind == ItemInfo::ITEM_FIELD)
+				IntrospectionInfo info = rtl::callStaticMethod(class_name, "getVirtualFieldInfo", [variable_name]); 
+				if (info != null  and item.kind == IntrospectionInfo::ITEM_FIELD)
 					return info;
 			} 
 			catch (var e) {}
@@ -315,14 +314,14 @@ class CoreObject{
 	/**
 	 * Returns info of the public method by name
 	 * @param string method_name
-	 * @return ItemInfo
+	 * @return IntrospectionInfo
 	 */
-	public void getMethodInfo(string method_name){
+	public IntrospectionInfo getMethodInfo(string method_name){
 		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
 		for (int i=0; i<classes.count(); i++){
 			string class_name = classes.item(i);
-			ItemInfo info = rtl::callStaticMethod(class_name, "getMethodInfoByName", [method_name]);
-			if (info != null and item.kind == ItemInfo::ITEM_METHOD)
+			IntrospectionInfo info = rtl::callStaticMethod(class_name, "getMethodInfoByName", [method_name]);
+			if (info != null and item.kind == IntrospectionInfo::ITEM_METHOD)
 				return info;
 		}
 		return null;

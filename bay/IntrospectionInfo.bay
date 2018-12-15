@@ -16,11 +16,10 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Introspection;
+namespace Runtime;
 
 use Runtime.CoreStruct;
 use Runtime.Vector;
-use Runtime.Introspection.Annotation;
 
 
 class IntrospectionInfo extends CoreStruct{
