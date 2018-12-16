@@ -21,6 +21,7 @@ namespace Runtime;
 use Runtime.rtl;
 use Runtime.Map;
 use Runtime.Vector;
+use Runtime.RuntimeUtils;
 
 
 class CoreObject{
@@ -254,11 +255,15 @@ class CoreObject{
 	 */
 	public void getVariablesNames(Vector<string> names){
 		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
+		classes.prepend( this.getClassName() );
+		classes.removeDublicates();
 		for (int i=0; i<classes.count(); i++){
 			string class_name = classes.item(i);
 			rtl::callStaticMethod(class_name, "getFieldsList", [names]);
+			/*try{ rtl::callStaticMethod(class_name, "getFieldsList", [names]); } catch (var e) {}*/
 			try{ rtl::callStaticMethod(class_name, "getVirtualFieldsList", [names]); } catch (var e) {}
 		}
+		names.removeDublicates();
 	}
 	
 	

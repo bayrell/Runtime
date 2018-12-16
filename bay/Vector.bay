@@ -293,6 +293,12 @@ declare class Vector<T>{
 	 * @params int index2 - item2 position. If index2 = -1, insert as last item
 	 */
 	declare public void swap(int index1, int index2);
+	
+	
+	/**
+	 * Remove dublicate values
+	 */
+	declare public void removeDublicates();
 }
 
 
@@ -722,6 +728,20 @@ Runtime.Vector = class extends Array{
 			this.remove(index2 + 1, 1);
 			this.insert(index1, item2);
 			this.remove(index1 + 1, 1);			
+		}
+	}
+	
+	
+	/**
+	 * Remove dublicate values
+	 */
+	removeDublicates(){
+		var arr = this.copy();
+		this.clear();		
+		for (var i=0; i<arr.length; i++){
+			if (this.indexOf(arr[i]) == -1){
+				this.push(arr[i]);
+			}
 		}
 	}
 }
@@ -1186,6 +1206,7 @@ class Vector implements \JsonSerializable{
 	}
 	
 	
+	
 	/**
 	 * Sort vector
 	 * @param callback f - Sort user function
@@ -1229,6 +1250,23 @@ class Vector implements \JsonSerializable{
 			$this->insert($index1, $item2);
 			$this->remove($index1 + 1, 1);			
 		}
+	}
+	
+	
+	
+	/**
+	 * Remove dublicate values
+	 */
+	public function removeDublicates(){
+		$arr = [];
+		for ($i=0; $i<$this->count();$i++){			
+			$value = $this->item($i);
+			$pos = array_search($value, $arr, true);
+			if ($pos === false){
+				$arr[] = $value;
+			}
+		}
+		$this->_arr = $arr;
 	}
 }
 
