@@ -18,18 +18,70 @@
 
 namespace Runtime;
 
+use Runtime.CoreObject;
 use Runtime.CoreStruct;
+use Runtime.rtl;
 use Runtime.Vector;
 
 
 class IntrospectionInfo extends CoreStruct{
 	
+	const string ITEM_CLASS = "class";
 	const string ITEM_FIELD = "field";
 	const string ITEM_METHOD = "method";
 	
-	public string kind = "";
-	public string name = "";
-	public Vector<Annotation> annotations = null;
+	public serializable string class_name = "";
+	public serializable string kind = "";
+	public serializable string name = "";
+	public serializable Vector<CoreObject> annotations = null;
+	
+	
+	
+	/**
+	 * Returns true if has annotations by class_name
+	 * @string class_name
+	 * @return bool
+	 */
+	bool hasAnnotation(string class_name)
+	{
+		if (this.annotations == null)
+		{
+			return false;
+		}
+		
+		for (int i=0; i<this.annotations.count(); i++)
+		{
+			CoreObject item = this.annotations.item(i);
+			if (rtl::is_instanceof(item, class_name))
+			{
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	
+	/**
+	 * Returns true if has annotations by class_name
+	 * @string class_name
+	 * @return bool
+	 */
+	Vector<CoreObject> filterAnnotations(string class_name)
+	{
+		if (this.annotations == null)
+		{
+			return null;
+		}
+		
+		return this.annotations.filter(
+			bool (CoreObject item) use (class_name)
+			{
+				return rtl::is_instanceof(item, class_name);
+			}
+		);
+	}
 	
 }
 

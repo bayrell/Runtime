@@ -161,6 +161,27 @@ class CoreObject{
 	
 	
 	/**
+	 * Set new values instance by Map
+	 * @param Map<mixed> map
+	 * @return CoreObject
+	 */
+	public CoreObject setMap(Map<mixed> values = null){
+		if (values == null)
+			return;
+		
+		values.each(
+			void (string key, mixed value)
+			{
+				this.assignValue(key, value);
+			}
+		);
+		
+		return this;
+	}
+	
+	
+	
+	/**
 	 * Dump serializable object to Map
 	 * @return Map<mixed>
 	 */

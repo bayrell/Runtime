@@ -155,6 +155,108 @@ export class RuntimeUtils{
 	
 	
 	/**
+	 * Returns Introspection of the class name
+	 * @param string class_name
+	 * @return Vector<IntrospectionInfo>
+	 */
+	static Vector<IntrospectionInfo> getIntrospection(string class_name)
+	{
+		Vector<IntrospectionInfo> res = new Vector();
+		Vector<string> class_names = self::getParents(class_name);
+		class_names.prepend(class_name);
+		
+		class_names.each(
+			void (string item_class_name) use (res)
+			{
+				Vector<string> names = new Vector();
+				
+				
+				/* Get fields introspection */
+				try{ rtl::callStaticMethod(item_class_name, "getFieldsList", [names]); } catch (var e) {}
+				names.each(
+					void (string field_name) use (res, item_class_name)
+					{
+						IntrospectionInfo info = null;
+						try
+						{ 
+							info = rtl::callStaticMethod(item_class_name, "getFieldInfoByName", [field_name]);
+						}
+						catch (var e) { info = null; }
+						
+						if (info != null)
+						{
+							info.class_name = item_class_name;
+							res.push(info);
+						}
+					}
+				);
+				
+				
+				/* Get virtual fields introspection */
+				names.clear();
+				try{ rtl::callStaticMethod(item_class_name, "getVirtualFieldsList", [names]); } catch (var e) {}
+				names.each(
+					void (string field_name) use (res, item_class_name)
+					{
+						IntrospectionInfo info = null;
+						try
+						{ 
+							info = rtl::callStaticMethod(item_class_name, "getVirtualFieldInfo", [field_name]);
+						}
+						catch (var e) { info = null; }
+						
+						if (info != null)
+						{
+							info.class_name = item_class_name;
+							res.push(info);
+						}
+					}
+				);
+				
+				
+				/* Get methods introspection */
+				names.clear();
+				try{ rtl::callStaticMethod(item_class_name, "getMethodsList", [names]); } catch (var e) {}
+				names.each(
+					void (string method_name) use (res, item_class_name)
+					{
+						IntrospectionInfo info = null;
+						try
+						{ 
+							info = rtl::callStaticMethod(item_class_name, "getMethodInfoByName", [method_name]);
+						}
+						catch (var e) { info = null; }
+						
+						if (info != null)
+						{
+							info.class_name = item_class_name;
+							res.push(info);
+						}
+					}
+				);
+				
+				
+				/* Get class introspection */
+				try
+				{ 
+					info = rtl::callStaticMethod(item_class_name, "getClassInfo", []);
+				}
+				catch (var e) { info = null; }
+				if (info != null)
+				{
+					info.class_name = item_class_name;
+					res.push(info);
+				}
+				
+			}
+		);
+		
+		return res;
+	}
+	
+	
+	
+	/**
 	 * Returns true if value is primitive value
 	 * @return boolean 
 	 */

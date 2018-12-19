@@ -20,29 +20,46 @@ namespace Runtime;
 
 use Runtime.CoreObject;
 use Runtime.Map;
+use Runtime.rtl;
 use Runtime.Interfaces.SerializeInterface;
 
 
-class CoreStruct extends CoreObject implements SerializeInterface{
+class CoreStruct extends CoreObject implements SerializeInterface
+{
 	
 	
 	/** 
 	 * Constructor
 	 */
-	public void constructor(Map obj = null){
+	public void constructor(Map obj = null)
+	{
 		parent();
 		this.assignMap(obj);
+		this.onCreated();
 	}
 	
 	
 	
 	/**
-	 * Clone this object
+	 * Struct created 
+	 */
+	public void onCreated()
+	{
+	}	
+	
+	
+	
+	/**
+	 * Clone this object with new values
+	 * @param Map obj = null
 	 * @return CoreStruct
 	 */
-	public CoreStruct clone(){
+	public CoreStruct clone(Map obj = null)
+	{
 		CoreStruct instance = rtl::newInstance( this.getClassName() );
 		instance.assignObject( this );
+		if (obj != null) instance.setMap(obj);
+		instance.onCreated();
 		return instance;
 	}	
 	
