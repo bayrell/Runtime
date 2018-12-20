@@ -18,14 +18,41 @@
 
 namespace Runtime;
 
-use Runtime.CoreObject;
+use Runtime.CoreStruct;
+use Runtime.Map;
+use Runtime.Vector;
 
 
-class SerializeContainer extends CoreObject{
+struct readonly UIElement extends CoreStruct
+{
 	
-	public boolean display_class_name = true;
-	public string indent = "  ";
-	public string space = " ";
-	public string crlf = "\n";
-		
+	public bool is_component = false;
+	public string id = "";
+	public string key = "";
+	public string name = "";
+	public Map<mixed> props = null;
+	public Vector<mixed> children = null;
+	
+	
+	/**
+	 * Returns true if component
+	 * @return bool
+	 */
+	public bool isComponent(){
+		return this.is_component;
+	}
+	
+	
+	
+	/**
+	 * Returns true if component and name == class_name
+	 * @param string class_name
+	 * @return bool
+	 */
+	public bool instanceOf(string class_name){
+		if (this.is_component and this.name == class_name)
+			return true;
+		return false;
+	}
+	
 }

@@ -80,14 +80,13 @@ class RuntimeAssets implements AssetsInterface{
 				"/assets/bayrell-runtime-es6/CoreStruct.js",
 				"/assets/bayrell-runtime-es6/CoreEvent.js",
 				"/assets/bayrell-runtime-es6/ModuleDescription.js",
-				"/assets/bayrell-runtime-es6/SerializeContainer.js",
-				"/assets/bayrell-runtime-es6/VectorString.js",
 				"/assets/bayrell-runtime-es6/Exceptions/IndexOutOfRange.js",
 				"/assets/bayrell-runtime-es6/Exceptions/KeyNotFound.js",
 				"/assets/bayrell-runtime-es6/Exceptions/UnknownError.js",
 			],
 			[
 				"/assets/bayrell-runtime-es6/IntrospectionInfo.js",
+				"/assets/bayrell-runtime-es6/UIElement.js",
 			]
 		];
 	}
