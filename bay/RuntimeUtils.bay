@@ -82,6 +82,7 @@ export class RuntimeUtils{
 	}
 	
 	
+	
 	/**
 	 * Register global Context
 	 */
@@ -542,6 +543,8 @@ export class RuntimeUtils{
 	}
 	
 	
+	const int JSON_PRETTY = 1;
+	
 	
 	/**
 	 * Json encode serializable values
@@ -549,18 +552,21 @@ export class RuntimeUtils{
 	 * @param SerializeContainer container
 	 * @return string 
 	 */
-	declare export static string json_encode(mixed value, bool convert = true);
+	declare export static string json_encode(mixed value, int flags = 0, bool convert = true);
 
 	#switch
 	#case ifcode PHP then
-	static function json_encode($value, $convert = true){
+	static function json_encode($value, $flags = 0, $convert = true){
 		if ($convert){
 			$value = self::ObjectToPrimitive($value);
 		}
-		return json_encode($value, JSON_UNESCAPED_UNICODE);
+		$json_flags = JSON_UNESCAPED_UNICODE;
+		if ( ($flags & 1) == 1 ) $json_flags = $json_flags | JSON_PRETTY_PRINT;
+		return json_encode($value, $json_flags);
 	}
 	#case ifcode JAVASCRIPT then
-	static json_encode(value, convert){
+	static json_encode(value, flags, convert){
+		if (flags == undefined) flags = 0;
 		if (convert == undefined) convert = true;
 		var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
 		var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
@@ -583,7 +589,7 @@ export class RuntimeUtils{
 	 * @param string s Encoded string
 	 * @return mixed 
 	 */
-	declare export static mixed json_decode(string s, ContextInterface context = null);
+	declare export static mixed json_decode(string s);
 
 	#switch
 	#case ifcode PHP then
@@ -595,7 +601,6 @@ export class RuntimeUtils{
 	}
 	#case ifcode JAVASCRIPT then
 	static json_decode(s, context){
-		if (context == undefined) context = null;
 		try{
 			var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
 			var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
@@ -610,7 +615,7 @@ export class RuntimeUtils{
 				
 				return value;
 			});
-			return _Utils.PrimitiveToObject(obj,context);
+			return _Utils.PrimitiveToObject(obj);
 		}
 		catch(e){
 			return null;

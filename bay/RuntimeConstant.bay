@@ -62,9 +62,9 @@ class RuntimeConstant{
 	
 	
 	/* Status codes */ 
-	static const int STATUS_DONE = 0;
-	static const int STATUS_PLAN = 1;
-	static const int STATUS_PROCESS = 2;
+	static const int STATUS_PLAN = 0;
+	static const int STATUS_DONE = 1;
+	static const int STATUS_PROCESS = 100;
 	static const int STATUS_FAIL = -1;
 	
 	
@@ -85,5 +85,7 @@ class RuntimeConstant{
 	static const int ERROR_CSRF_TOKEN = -10;
 	static const int ERROR_RUNTIME = -11;
 	static const int ERROR_VALIDATION = -12;
+	static const int ERROR_PARSE_SERIALIZATION_ERROR = -14;
+	static const int ERROR_FATAL = -15;
 	
 }

@@ -1121,7 +1121,7 @@ class Vector implements \JsonSerializable{
 	 */
 	function filter($f){
 		$arr2 = $this->createNewInstance();
-		$arr2->_arr = array_filter($this->_arr, $f);
+		$arr2->_arr = array_values(array_filter($this->_arr, $f));
 		return $arr2;
 	}
 	
