@@ -18,6 +18,7 @@
 
 namespace Runtime;
 
+use Runtime.rs;
 use Runtime.rtl;
 use Runtime.CoreObject;
 use Runtime.Map;
@@ -27,23 +28,25 @@ use Runtime.Interfaces.FactoryInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
-class Context extends CoreObject implements ContextInterface{
+class Context extends CoreObject implements ContextInterface
+{
 	
 	
 	protected Vector<string> _modules = null;
 	protected Map<mixed> _values = null;
-	protected Map<mixed> _managers = null;
+	protected Map<mixed> _drivers = null;
 	protected Map<FactoryInterface> _providers_names = null;
 	
 	
 	/**
 	 * Constructor
 	 */
-	void constructor(){
+	void constructor()
+	{
 		parent();
 		this._modules = new Vector<string>();
 		this._providers_names = new Map<FactoryInterface>();
-		this._managers = new Map<mixed>();
+		this._drivers = new Map<mixed>();
 		this._values = new Map<mixed>();
 	}
 	
@@ -52,7 +55,8 @@ class Context extends CoreObject implements ContextInterface{
 	/**
 	 * Destructor
 	 */
-	public void destructor(){
+	public void destructor()
+	{
 		delete this._providers_classes_names;
 		delete this._modules;
 		delete this._values;
@@ -65,7 +69,8 @@ class Context extends CoreObject implements ContextInterface{
 	 * Returns registed modules
 	 * @return Vector<string>
 	 */
-	Vector<string> getModules(){
+	Vector<string> getModules()
+	{
 		return this._modules.slice();
 	}
 	
@@ -74,7 +79,8 @@ class Context extends CoreObject implements ContextInterface{
 	/**
 	 * Register module
 	 */
-	ContextInterface registerModule(string module_name){
+	ContextInterface registerModule(string module_name)
+	{
 		
 		string module_description_class_name = module_name ~ ".ModuleDescription";
 		if (this._modules.indexOf(module_description_class_name) != -1)
@@ -97,10 +103,12 @@ class Context extends CoreObject implements ContextInterface{
 			"getRequiredModules",
 			args
 		);
-		if (modules != null){
+		if (modules != null)
+		{
 			Vector<string> keys = modules.keys();
 			int sz = keys.count();
-			for (int i=0; i<sz; i++){
+			for (int i=0; i<sz; i++)
+			{
 				string module_name = keys.item(i);
 				this.registerModule(module_name);
 			}
@@ -119,8 +127,10 @@ class Context extends CoreObject implements ContextInterface{
 	 * @param string provider_name
 	 * @param FactoryInterface factory
 	 */
-	ContextInterface registerProviderFactory(string provider_name, FactoryInterface factory){
-		if (not this._providers_names.has(provider_name)){
+	ContextInterface registerProviderFactory(string provider_name, FactoryInterface factory)
+	{
+		if (not this._providers_names.has(provider_name))
+		{
 			this._providers_names.set(provider_name, factory);
 		}
 		return this;
@@ -129,13 +139,15 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
-	 * Register manager
-	 * @param string manager_name
+	 * Register driver
+	 * @param string driver_name
 	 * @param FactoryInterface factory
 	 */
-	ContextInterface registerManager(string manager_name, CoreObject obj){
-		if (not this._managers.has(manager_name)){
-			this._managers.set(manager_name, obj);
+	ContextInterface registerDriver(string driver_name, CoreObject obj)
+	{
+		if (not this._drivers.has(driver_name))
+		{
+			this._drivers.set(driver_name, obj);
 		}
 		return this;
 	}
@@ -145,13 +157,15 @@ class Context extends CoreObject implements ContextInterface{
 	/**
 	 * Read config
 	 */
-	ContextInterface readConfig(Map<mixed> config){
+	ContextInterface readConfig(Map<mixed> config)
+	{
 		Vector<var> args = new Vector();
 		args.push(this);	
 		args.push(config);	
 		
 		int sz = this._modules.count();
-		for (int i=0; i<sz; i++){
+		for (int i=0; i<sz; i++)
+		{
 			string module_description_class_name = this._modules.item(i);
 			rtl::callStaticMethod(
 				module_description_class_name, 
@@ -170,12 +184,14 @@ class Context extends CoreObject implements ContextInterface{
 	/**
 	 * Init context
 	 */
-	ContextInterface init(){
+	ContextInterface init()
+	{
 		Vector<var> args = new Vector();
 		args.push(this);	
 	
 		int sz = this._modules.count();
-		for (int i=0; i<sz; i++){
+		for (int i=0; i<sz; i++)
+		{
 			string module_description_class_name = this._modules.item(i);
 			rtl::callStaticMethod(
 				module_description_class_name, 
@@ -192,12 +208,30 @@ class Context extends CoreObject implements ContextInterface{
 	
 	
 	/**
+	 * Returns provider or driver
+	 *
+	 * @params string name
+	 * @return CoreObject
+	 */
+	public CoreObject get(string name, Map<mixed> params = null)
+	{
+		bool is_provider = rs::strpos(name, "provider.") === 0;
+		bool is_driver = rs::strpos(name, "driver.") === 0;
+		if (is_provider) return this.createProvider(name, params);
+		if (is_driver) return this.getDriver(name);
+		return null;
+	}
+	
+	
+	
+	/**
 	 * Returns provider
 	 *
 	 * @params string provider_name
 	 * @return CoreObject
 	 */
-	public CoreObject createProvider(string provider_name){
+	public CoreObject createProvider(string provider_name, Map<mixed> params = null)
+	{
 		if (not this._providers_names.has(provider_name))
 			return null;
 			
@@ -205,21 +239,22 @@ class Context extends CoreObject implements ContextInterface{
 		if (factory_obj == null)
 			return null;
 		
-		CoreObject obj = factory_obj.newInstance(this);
+		CoreObject obj = factory_obj.newInstance(this, params);
 		return obj;
 	}
 
 	
 	
 	/**
-	 * Returns manager
+	 * Returns driver
 	 *
-	 * @params string manager_name
+	 * @params string driver_name
 	 * @return CoreObject
 	 */
-	public CoreObject getManager(string manager_name){
-		if (this._managers.has(manager_name))
-			return this._managers.item(manager_name);
+	public CoreObject getDriver(string driver_name)
+	{
+		if (this._drivers.has(driver_name))
+			return this._drivers.item(driver_name);
 			
 		return null;
 	}
@@ -230,7 +265,8 @@ class Context extends CoreObject implements ContextInterface{
 	 * Set application locale
 	 * @params string locale
 	 */
-	void setLocale(string locale){
+	void setLocale(string locale)
+	{
 		this._values.set("default.locale", locale);
 	}
 	
@@ -240,7 +276,8 @@ class Context extends CoreObject implements ContextInterface{
 	 * Get application locale
 	 * @params string locale
 	 */
-	string getLocale(){
+	string getLocale()
+	{
 		return this._values.get("default.locale", "en", "string");
 	}
 	
@@ -263,24 +300,34 @@ class Context extends CoreObject implements ContextInterface{
 	 * Fork current context
 	 * @return ContextInterface
 	 */
-	ContextInterface fork(){
+	ContextInterface fork()
+	{
 		string class_name = this.getClassName();
 		ContextInterface obj = rtl::newInstance(class_name);
 		
 		/* Add modules */
-		this._modules.each( void (string item) use (obj){
-			obj._modules.push(item);
-		});
+		this._modules.each( 
+			void (string item) use (obj)
+			{
+				obj._modules.push(item);
+			}
+		);
 		
-		/* Add managers */
-		this._managers.each( void (string key, mixed value) use (obj){
-			obj._managers.set(key, value);
-		});
+		/* Add services */
+		this._drivers.each( 
+			void (string key, mixed value) use (obj)
+			{
+				obj._drivers.set(key, value);
+			}
+		);
 		
 		/* Add provider names */
-		this._providers_names.each( void (string key, FactoryInterface value) use (obj){
-			obj._providers_names.set(key, value);
-		});
+		this._providers_names.each( 
+			void (string key, FactoryInterface value) use (obj)
+			{
+				obj._providers_names.set(key, value);
+			}
+		);
 		
 		return obj;
 	}
@@ -299,7 +346,8 @@ class Context extends CoreObject implements ContextInterface{
 	 * @param string name
 	 * @return mixed
 	 */
-	mixed getValue(string name, mixed default_value = null, string type_value = "mixed", string type_template = ""){
+	mixed getValue(string name, mixed default_value = null, string type_value = "mixed", string type_template = "")
+	{
 		return this._values.get(name, default_value, type_value, type_template);
 	}
 	
@@ -310,7 +358,8 @@ class Context extends CoreObject implements ContextInterface{
 	 * @param string name
 	 * @param mixed value
 	 */
-	void setValue(string name, mixed value){
+	void setValue(string name, mixed value)
+	{
 		this._values.set(name, value);
 	}
 }

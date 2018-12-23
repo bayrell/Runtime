@@ -42,11 +42,11 @@ interface ContextInterface{
 	
 	
 	/**
-	 * Register manager
-	 * @param string manager_name
+	 * Register driver
+	 * @param string driver_name
 	 * @param CoreObject obj
 	 */
-	ContextInterface registerManager(string manager_name, CoreObject obj);
+	ContextInterface registerDriver(string driver_name, CoreObject obj);
 	
 	
 	
@@ -60,11 +60,11 @@ interface ContextInterface{
 	
 	
 	/**
-	 * Returns manager
-	 * @params string manager_name
+	 * Returns driver
+	 * @params string driver_name
 	 * @return CoreObject
 	 */
-	public CoreObject getManager(string manager_name);
+	public CoreObject getDriver(string driver_name);
 	
 	
 	

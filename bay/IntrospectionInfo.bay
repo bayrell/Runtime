@@ -18,7 +18,6 @@
 
 namespace Runtime;
 
-use Runtime.CoreObject;
 use Runtime.CoreStruct;
 use Runtime.rtl;
 use Runtime.Vector;
@@ -33,7 +32,7 @@ class IntrospectionInfo extends CoreStruct{
 	public serializable string class_name = "";
 	public serializable string kind = "";
 	public serializable string name = "";
-	public serializable Vector<CoreObject> annotations = null;
+	public serializable Vector<CoreStruct> annotations = null;
 	
 	
 	
@@ -51,7 +50,7 @@ class IntrospectionInfo extends CoreStruct{
 		
 		for (int i=0; i<this.annotations.count(); i++)
 		{
-			CoreObject item = this.annotations.item(i);
+			CoreStruct item = this.annotations.item(i);
 			if (rtl::is_instanceof(item, class_name))
 			{
 				return true;
@@ -68,7 +67,7 @@ class IntrospectionInfo extends CoreStruct{
 	 * @string class_name
 	 * @return bool
 	 */
-	Vector<CoreObject> filterAnnotations(string class_name)
+	Vector<CoreStruct> filterAnnotations(string class_name)
 	{
 		if (this.annotations == null)
 		{
@@ -76,7 +75,7 @@ class IntrospectionInfo extends CoreStruct{
 		}
 		
 		return this.annotations.filter(
-			bool (CoreObject item) use (class_name)
+			bool (CoreStruct item) use (class_name)
 			{
 				return rtl::is_instanceof(item, class_name);
 			}

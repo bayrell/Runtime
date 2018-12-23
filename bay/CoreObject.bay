@@ -145,15 +145,18 @@ class CoreObject{
 	 * @param Map<mixed> map
 	 * @return CoreObject
 	 */
-	public CoreObject assignMap(Map<mixed> values = null){
+	public CoreObject assignMap(Map<mixed> values = null)
+	{
 		if (values == null)
 			return;
 		Vector<string> names = new Vector();
 		this.getVariablesNames(names);
-		names.each(void (string name) use (values){
-			mixed value = values.get(name, null);
-			this.assignValue(name, value);
-		});
+		names.each(
+			void (string name) use (values)
+			{
+				this.assignValue(name, values.get(name, null));
+			}
+		);
 		delete names;
 		return this;
 	}
@@ -165,7 +168,8 @@ class CoreObject{
 	 * @param Map<mixed> map
 	 * @return CoreObject
 	 */
-	public CoreObject setMap(Map<mixed> values = null){
+	public CoreObject setMap(Map<mixed> values = null)
+	{
 		if (values == null)
 			return;
 		
@@ -185,14 +189,17 @@ class CoreObject{
 	 * Dump serializable object to Map
 	 * @return Map<mixed>
 	 */
-	public Map<mixed> takeMap(){
+	public Map<mixed> takeMap()
+	{
 		Map<mixed> values = new Map();
 		Vector<string> names = new Vector();
 		this.getVariablesNames(names);
-		names.each(void (string name) use (values){
-			mixed value = this.takeValue(name, null);
-			values.set(name, value);
-		});
+		names.each(
+			void (string name) use (values)
+			{
+				values.set(name, this.takeValue(name, null));
+			}
+		);
 		return values;
 	}
 	
@@ -204,9 +211,9 @@ class CoreObject{
 	 * @param Vector args
 	 * @return mixed
 	 */
-	public mixed callStaticMethod(string method_name, Vector args = null){
-		string class_name = this.getClassName();
-		return rtl::callStaticMethod(class_name, method_name, args);
+	public mixed callStaticMethod(string method_name, Vector args = null)
+	{
+		return rtl::callStaticMethod(this.getClassName(), method_name, args);
 	}
 	
 	
@@ -274,28 +281,11 @@ class CoreObject{
 	 * Returns names of variables to serialization
 	 * @param Vector<string>
 	 */
-	public void getVariablesNames(Vector<string> names){
-		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
-		classes.prepend( this.getClassName() );
-		classes.removeDublicates();
-		for (int i=0; i<classes.count(); i++){
-			string class_name = classes.item(i);
-			rtl::callStaticMethod(class_name, "getFieldsList", [names]);
-			/*try{ rtl::callStaticMethod(class_name, "getFieldsList", [names]); } catch (var e) {}*/
-			try{ rtl::callStaticMethod(class_name, "getVirtualFieldsList", [names]); } catch (var e) {}
-		}
-		names.removeDublicates();
+	public void getVariablesNames(Vector<string> names)
+	{
+		RuntimeUtils::getVariablesNames( this.getClassName(), names );
 	}
 	
-	
-	
-	/**
-	 * Returns names of variables to serialization
-	 * @param Vector<string>
-	 */
-	public void getFieldsNames(Vector<string> names){
-		this.getVariablesNames(names);
-	}
 	
 	
 	

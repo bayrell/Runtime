@@ -64,7 +64,7 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * @param ContextInterface context
 	 */
 	public static void onRegister(ContextInterface context){
-		context.registerManager("Runtime.Config", new Map<string, string>());
+		context.registerDriver("driver.runtime.config", new Map<string, string>());
 	}
 	
 	
