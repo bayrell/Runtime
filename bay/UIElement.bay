@@ -26,11 +26,16 @@ use Runtime.Vector;
 
 struct readonly UIElement extends CoreStruct
 {
+	const string TYPE_ELEMENT = "element";
+	const string TYPE_COMPONENT = "component";
+	const string TYPE_STRING = "string";
+	const string TYPE_RAW = "raw";
 	
-	public bool is_component = false;
 	public string id = "";
 	public string key = "";
 	public string name = "";
+	public string kind = "element";
+	public string content = "";
 	public Map<mixed> props = null;
 	public Vector<mixed> children = null;
 	
@@ -40,7 +45,17 @@ struct readonly UIElement extends CoreStruct
 	 * @return bool
 	 */
 	public bool isComponent(){
-		return this.is_component;
+		return this.kind == self::TYPE_COMPONENT;
+	}
+	
+	
+	
+	/**
+	 * Returns true if string
+	 * @return bool
+	 */
+	public bool isString(){
+		return this.kind == self::TYPE_STRING or this.kind == self::TYPE_RAW;
 	}
 	
 	
