@@ -86,7 +86,7 @@ class RuntimeAssets implements AssetsInterface{
 			],
 			[
 				"/assets/bayrell-runtime-es6/IntrospectionInfo.js",
-				"/assets/bayrell-runtime-es6/UIElement.js",
+				"/assets/bayrell-runtime-es6/UIStruct.js",
 			]
 		];
 	}

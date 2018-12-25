@@ -211,6 +211,13 @@ declare class Vector<T>{
 	
 	
 	/**
+	 * Remove value
+	 */
+	declare public void removeItems(Vector<T> values);
+	
+	
+	
+	/**
 	 * Map
 	 * @param func f
 	 * @return Vector
@@ -546,6 +553,7 @@ Runtime.Vector = class extends Array{
 	appendVector(arr){
 		function f(item){ this.push(item); };
 		arr.forEach(f.bind(this));
+		return this;
 	}
 	
 	
@@ -557,6 +565,7 @@ Runtime.Vector = class extends Array{
 	prependVector(arr){
 		function f(item){ this.prepend(item); };
 		arr.forEach(f.bind(this));
+		return this;
 	}
 	
 	
@@ -580,6 +589,7 @@ Runtime.Vector = class extends Array{
 		var index = this.indexOf(value);
 		if (index != -1)
 			this.remove(index, 1);
+		return this;
 	}
 	
 	
@@ -591,6 +601,21 @@ Runtime.Vector = class extends Array{
 		var index = this.indexOf(value);
 		if (index != -1)
 			this.remove(index, 1);
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Remove values
+	 */
+	removeItems(values)
+	{
+		for (var i=0; i<values.count(); i++)
+		{
+			this.removeItem( values.item(i) );
+		}
+		return this;
 	}
 	
 	
@@ -635,6 +660,7 @@ Runtime.Vector = class extends Array{
 	 */
 	each(f){
 		super.forEach(f);
+		return this;
 	}
 	
 	
@@ -686,6 +712,7 @@ Runtime.Vector = class extends Array{
 	 */
 	reverse(){
 		super.reverse();
+		return this;
 	}
 	
 	
@@ -697,6 +724,7 @@ Runtime.Vector = class extends Array{
 	sort(f){
 		if (f == undefined) super.sort();
 		super.sort(f);
+		return this;
 	}
 	
 	
@@ -729,6 +757,7 @@ Runtime.Vector = class extends Array{
 			this.insert(index1, item2);
 			this.remove(index1 + 1, 1);			
 		}
+		return this;
 	}
 	
 	
@@ -743,6 +772,7 @@ Runtime.Vector = class extends Array{
 				this.push(arr[i]);
 			}
 		}
+		return this;
 	}
 }
 
@@ -987,7 +1017,7 @@ class Vector implements \JsonSerializable{
 		if (!array_key_exists($pos, $this->_arr))
 			throw new IndexOutOfRange();
 		$this->_arr[$pos] = $value;
-		return this;
+		return $this;
 	}
 	
 	
@@ -997,6 +1027,7 @@ class Vector implements \JsonSerializable{
 	 */
 	public function clear(){
 		$this->_arr = [];
+		return $this;
 	}
 	
 	
@@ -1040,6 +1071,7 @@ class Vector implements \JsonSerializable{
 		$arr->each(function($item){
 			$this->append($item);
 		});
+		return $this;
 	}
 	
 	
@@ -1052,6 +1084,7 @@ class Vector implements \JsonSerializable{
 		$arr->each(function($item){
 			$this->prepend($item);
 		});
+		return $this;
 	}
 	
 	
@@ -1084,6 +1117,7 @@ class Vector implements \JsonSerializable{
 		$index = $this->indexOf($value);
 		if ($index != -1)
 			$this->remove($index, 1);
+		return $this;
 	}
 	
 	
@@ -1096,6 +1130,22 @@ class Vector implements \JsonSerializable{
 		$index = $this->indexOf($value);
 		if ($index != -1)
 			$this->remove($index, 1);
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Remove values
+	 * @param mixed values
+	 */
+	public function removeItems($values)
+	{
+		for ($i=0; $i<$values->count(); $i++)
+		{
+			$this->removeItem( $values->item(i) );
+		}
+		return $this;
 	}
 	
 	
@@ -1145,6 +1195,7 @@ class Vector implements \JsonSerializable{
 	 */
 	function each($f){
 		array_walk($this->_arr, $f);
+		return $this;
 	}
 	
 	
@@ -1203,6 +1254,7 @@ class Vector implements \JsonSerializable{
 	 */
 	public function reverse(){
 		array_reverse($this->_arr);
+		return $this;
 	}
 	
 	
@@ -1218,6 +1270,7 @@ class Vector implements \JsonSerializable{
 		else{
 			usort($this->_arr, $f);
 		}
+		return $this;
 	}
 	
 	
@@ -1250,6 +1303,7 @@ class Vector implements \JsonSerializable{
 			$this->insert($index1, $item2);
 			$this->remove($index1 + 1, 1);			
 		}
+		return $this;
 	}
 	
 	
@@ -1267,6 +1321,7 @@ class Vector implements \JsonSerializable{
 			}
 		}
 		$this->_arr = $arr;
+		return $this;
 	}
 }
 
