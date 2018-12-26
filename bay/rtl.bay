@@ -700,9 +700,9 @@ export class rtl{
 		if (isBrowser()) _StringInterface = Runtime.Interfaces.StringInterface; 
 		else _StringInterface = StringInterface;
 		if (typeof value == 'string') return value;
-		if (value instanceof String) return value;
+		if (value instanceof String) return ""+value;
 		if (this.implements(value, _StringInterface)) return value.toString();
-		return new String(value);
+		return ""+value;
 	}
 	#endswitch
 	

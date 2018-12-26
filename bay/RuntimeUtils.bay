@@ -164,15 +164,15 @@ export class RuntimeUtils{
 	 * Returns names of variables to serialization
 	 * @param Vector<string>
 	 */
-	public static void getVariablesNames(string class_name, Vector<string> names)
+	public static void getVariablesNames(string class_name, Vector<string> names, int flag=0)
 	{
 		Vector<string> classes = self::getParents(class_name);
 		classes.prepend(class_name);
 		classes.each(
-			void (string class_name) use (names)
+			void (string class_name) use (names, flag)
 			{
-				try{ rtl::callStaticMethod(class_name, "getFieldsList", [names]); } catch (var e) {}
-				try{ rtl::callStaticMethod(class_name, "getVirtualFieldsList", [names]); } catch (var e) {}
+				try{ rtl::callStaticMethod(class_name, "getFieldsList", [names, flag]); } catch (var e) {}
+				try{ rtl::callStaticMethod(class_name, "getVirtualFieldsList", [names, flag]); } catch (var e) {}
 			}
 		);
 		names.removeDublicates();
@@ -347,7 +347,7 @@ export class RuntimeUtils{
 			
 			Vector<string> names = new Vector();
 			Map<string, mixed> values = new Map();
-			obj.getVariablesNames(names);
+			obj.getVariablesNames(names, 1);
 			
 			for (int i=0; i<names.count(); i++)
 			{
@@ -424,7 +424,7 @@ export class RuntimeUtils{
 			
 			/* Assign values */
 			Vector<string> names = new Vector();
-			instance.getVariablesNames(names);
+			instance.getVariablesNames(names, 1);
 			for (int i=0; i<names.count(); i++)
 			{
 				string variable_name = names.item(i);

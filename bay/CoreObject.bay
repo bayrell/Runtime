@@ -150,7 +150,7 @@ class CoreObject{
 		if (values == null)
 			return;
 		Vector<string> names = new Vector();
-		this.getVariablesNames(names);
+		this.getVariablesNames(names, 2);
 		names.each(
 			void (string name) use (values)
 			{
@@ -189,11 +189,11 @@ class CoreObject{
 	 * Dump serializable object to Map
 	 * @return Map<mixed>
 	 */
-	public Map<mixed> takeMap()
+	public Map<mixed> takeMap(int flag=2)
 	{
 		Map<mixed> values = new Map();
 		Vector<string> names = new Vector();
-		this.getVariablesNames(names);
+		this.getVariablesNames(names, flag);
 		names.each(
 			void (string name) use (values)
 			{
@@ -243,7 +243,7 @@ class CoreObject{
 	 * Returns public fields list
 	 * @param Vector<string> names
 	 */
-	public static void getFieldsList(Vector<string> names){
+	public static void getFieldsList(Vector<string> names, int flag=0){
 	}
 	
 	
@@ -252,7 +252,7 @@ class CoreObject{
 	 * Returns public virtual fields names
 	 * @param Vector<string> names
 	 */
-	public static void getVirtualFieldsList(Vector<string> names){
+	public static void getVirtualFieldsList(Vector<string> names, int flag=0){
 	}
 	
 	
@@ -281,9 +281,9 @@ class CoreObject{
 	 * Returns names of variables to serialization
 	 * @param Vector<string>
 	 */
-	public void getVariablesNames(Vector<string> names)
+	public void getVariablesNames(Vector<string> names, int flag=0)
 	{
-		RuntimeUtils::getVariablesNames( this.getClassName(), names );
+		RuntimeUtils::getVariablesNames( this.getClassName(), names, flag );
 	}
 	
 	
