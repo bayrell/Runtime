@@ -19,15 +19,43 @@
 namespace Runtime;
 
 use Runtime.CoreStruct;
-use Runtime.rtl;
-use Runtime.Interfaces.CloneableInterface;
-use Runtime.Interfaces.SerializeInterface;
+use Runtime.Emitter;
+use Runtime.Events.ModelChangeEvent;
 
 
-struct CoreEvent extends CoreStruct
+class CoreModel extends CoreStruct
 {
 	
-	public CoreObject sender = null;
+	protected Emitter emitter = new Emitter();
 	
+	
+	/**
+	 * Calls after assign new value
+	 * @param string variable_name
+	 * @param var value
+	 */
+	void assignValueAfter(string variable_name, var value)
+	{
+		this.emitter.dispatch(
+			new ModelChangeEvent(
+				{
+					"sender": this,
+					"name": variable_name,
+					"value": value,
+				}
+			)
+		);
+	}
+	
+	
+	
+	/**
+	 * Returns model emitter
+	 * @return Emitter
+	 */
+	public Emitter getEmitter()
+	{
+		return this.emitter;
+	}
 	
 }

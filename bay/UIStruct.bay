@@ -24,7 +24,7 @@ use Runtime.rtl;
 use Runtime.Vector;
 
 
-struct readonly UIStruct extends CoreStruct
+struct UIStruct extends CoreStruct
 {
 	const string TYPE_ELEMENT = "element";
 	const string TYPE_COMPONENT = "component";

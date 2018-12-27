@@ -81,21 +81,14 @@ class Context extends CoreObject implements ContextInterface
 	 */
 	ContextInterface registerModule(string module_name)
 	{
-		
-		string module_description_class_name = module_name ~ ".ModuleDescription";
-		if (this._modules.indexOf(module_description_class_name) != -1)
+		if (this._modules.indexOf(module_name) != -1)
 			return;
 		
-		/* Add module */
-		this._modules.push(module_description_class_name);
+		Vector<var> args = [this];
+		string module_description_class_name = module_name ~ ".ModuleDescription";
 		
-		/* Call onRegister */
-		Vector<var> args = (new Vector()).push(this);
-		rtl::callStaticMethod(
-			module_description_class_name, 
-			"onRegister",
-			args
-		);
+		/* Add module */
+		this._modules.push(module_name);
 		
 		/* Register required Modules*/
 		Map<string, string> modules = rtl::callStaticMethod(
@@ -116,6 +109,13 @@ class Context extends CoreObject implements ContextInterface
 			delete modules;
 		}
 		delete args;
+		
+		/* Call onRegister */
+		rtl::callStaticMethod(
+			module_description_class_name, 
+			"onRegister",
+			args
+		);
 		
 		return this;
 	}
@@ -166,7 +166,8 @@ class Context extends CoreObject implements ContextInterface
 		int sz = this._modules.count();
 		for (int i=0; i<sz; i++)
 		{
-			string module_description_class_name = this._modules.item(i);
+			string module_name = this._modules.item(i);
+			string module_description_class_name = module_name ~ ".ModuleDescription";
 			rtl::callStaticMethod(
 				module_description_class_name, 
 				"onReadConfig",
@@ -192,7 +193,8 @@ class Context extends CoreObject implements ContextInterface
 		int sz = this._modules.count();
 		for (int i=0; i<sz; i++)
 		{
-			string module_description_class_name = this._modules.item(i);
+			string module_name = this._modules.item(i);
+			string module_description_class_name = module_name ~ ".ModuleDescription";
 			rtl::callStaticMethod(
 				module_description_class_name, 
 				"initContext",

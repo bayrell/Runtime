@@ -131,16 +131,6 @@ class CoreObject{
 	
 	
 	/**
-	 * Calls after assign new value
-	 * @param string variable_name
-	 */
-	void callAssignAfter(string variable_name){
-		this.assignValueAfter(variable_name, this.takeValue(variable_name));
-	}
-	
-	
-	
-	/**
 	 * Set new values instance by Map
 	 * @param Map<mixed> map
 	 * @return CoreObject

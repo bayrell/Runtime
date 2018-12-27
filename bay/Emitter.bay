@@ -26,20 +26,23 @@ use Runtime.Vector;
 use Runtime.Interfaces.SubscribeInterface;
 
 
-class Emitter extends CoreObject{
+class Emitter extends CoreObject
+{
 	
 	protected Map<Vector> methods = null;
-	protected Map<Vector> subscribers = null;
+	protected Vector<Emitter> emitters = null;
 	
 	
 	/**
 	 * Constructor
 	 */
-	void constructor(callback val = null){
+	void constructor(callback val = null)
+	{
 		parent();
 		this.methods = new Map<Vector>();
-		this.subscribers = new Map<Vector>();
-		if (val != null){
+		this.emitters = new Vector<Emitter>();
+		if (val != null)
+		{
 			this.addMethod(val);
 		}
 	}
@@ -50,11 +53,12 @@ class Emitter extends CoreObject{
 	 * Assign and clone data from other object
 	 * @param CoreObject obj
 	 */
-	void assignObject(CoreObject obj){
+	void assignObject(CoreObject obj)
+	{
 		if (obj instanceof Emitter)
 		{
 			this.methods = obj.methods;
-			this.subscribers = obj.subscribers;
+			this.emitters = obj.emitters;
 		}
 		parent(obj);
 	}
@@ -66,12 +70,15 @@ class Emitter extends CoreObject{
 	 * @param callback f
 	 * @param string name
 	 */
-	void addMethodByName(callback f, string name){
-		if (not this.methods.has(name)){
+	void addMethodByName(callback f, string name)
+	{
+		if (not this.methods.has(name))
+		{
 			this.methods.set(name, new Vector());
 		}
 		Vector v = this.methods.item(name);
-		if (v.indexOf(f) == -1){
+		if (v.indexOf(f) == -1)
+		{
 			v.push(f);
 		}
 	}
@@ -84,14 +91,19 @@ class Emitter extends CoreObject{
 	 * @param Vector<string> events
 	 * @return callback
 	 */
-	callback addMethod(callback f, Vector<string> events = null){
-		if (events == null){
+	callback addMethod(callback f, Vector<string> events = null)
+	{
+		if (events == null)
+		{
 			this.addMethodByName(f, "");
 		}
-		else{
-			events.each(void (string item) use (f){
-				this.addMethodByName(f, item);
-			});
+		else
+		{
+			events.each(
+				void (string item) use (f){
+					this.addMethodByName(f, item);
+				}
+			);
 		}
 		return f;
 	}
@@ -102,68 +114,42 @@ class Emitter extends CoreObject{
 	 * Remove method
 	 * @param callback f
 	 */
-	void removeMethod(callback f, Vector<string> events = null){
-		if (events == null){
+	void removeMethod(callback f, Vector<string> events = null)
+	{
+		if (events == null)
+		{
 			events = this.methods.keys();
 		}
-		events.each(void (string name) use (f){
-			Vector v = this.methods.get(name, null);
-			if (v == null) return;
-			v.removeItem(f);
-		});
-	}
-	
-	
-	
-	/**
-	 * Add object by name
-	 * @param callback f
-	 * @param string name
-	 */
-	void addObjectByName(callback f, string name){
-		if (not this.subscribers.has(name)){
-			this.subscribers.set(name, new Vector());
-		}
-		Vector v = this.subscribers.item(name);
-		if (v.indexOf(f) == -1){
-			v.push(f);
-		}
+		events.each(
+			void (string name) use (f){
+				Vector v = this.methods.get(name, null);
+				if (v == null) return;
+				v.removeItem(f);
+			}
+		);
 	}
 	
 	
 	
 	/**
 	 * Add object
-	 * @param SubscribeInterface f
-	 * @param Vector<string> events
+	 * @param Emitter emitter
 	 */
-	void addObject(SubscribeInterface f, Vector<string> events = null){
-		if (events == null){
-			this.addObjectByName(f, "");
-		}
-		else{
-			events.each(void (string item) use (f){
-				this.addObjectByName(f, item);
-			});
-		}
-		return f;
+	Emitter addEmitter(Emitter emitter)
+	{
+		this.emitters.push(emitter);
+		return emitter;
 	}
 	
 	
 	
 	/**
 	 * Remove object
-	 * @param SubscribeInterface f
+	 * @param Emitter emitter
 	 */
-	void removeObject(SubscribeInterface f, Vector<string> events = null){
-		if (events == null){
-			events = this.subscribers.keys();
-		}
-		events.each(void (string name) use (f){
-			Vector v = this.subscribers.get(name, null);
-			if (v == null) return;
-			v.removeItem(f);
-		});
+	void removeEmitter(Emitter emitter)
+	{
+		this.emitters.removeItem(emitter);
 	}
 	
 	
@@ -172,45 +158,40 @@ class Emitter extends CoreObject{
 	 * Dispatch event
 	 * @param CoreEvent e
 	 */
-	void dispatch(CoreEvent e){
+	void dispatch(CoreEvent e)
+	{
 
 		Vector<string> keys = null;
 		
 		/* Copy items */
 		Map<Vector> methods = this.methods.map( Vector (string key, Vector items) { return items.slice(); });
-		Map<Vector> subscribers = this.subscribers.map( Vector (string key, Vector items) { return items.slice(); });
 	
 		/* Call self handler */
 		this.handlerEvent(e);
 		
 		/* Call methods */
 		keys = methods.keys();
-		for (int i=0; i<keys.count(); i++){
+		for (int i=0; i<keys.count(); i++)
+		{
 			string key = keys.item(i);
 			Vector items = methods.item(key);
 			
 			if (key != "" and e.getClassName() != key)
 				continue;
 			
-			for (int j=0; j<items.count(); j++){
+			for (int j=0; j<items.count(); j++)
+			{
 				callback f = items.item(j);
 				rtl::call(f, [e]);
 			}
 		}
 		
-		/* Call subscribers */
-		keys = subscribers.keys();
-		for (int i=0; i<keys.count(); i++){
-			string key = keys.item(i);
-			Vector items = subscribers.item(key);
-			
-			if (key != "" and e.getClassName() != key)
-				continue;
-			
-			for (int j=0; j<items.count(); j++){
-				SubscribeInterface obj = items.item(j);
-				obj.handlerEvent(e);
-			}
+		/* Call emitters */
+		Vector<Emitter> emitters = this.emitters.copy();
+		for (int i=0; i<emitters.count(); i++)
+		{
+			Emitter emitter = this.emitters.item(i);
+			emitter.dispatch(e);
 		}
 		
 	}
@@ -220,6 +201,7 @@ class Emitter extends CoreObject{
 	/**
 	 * Handler Event
 	 */
-	public void handlerEvent(var e){
+	public void handlerEvent(var e)
+	{
 	}
 }

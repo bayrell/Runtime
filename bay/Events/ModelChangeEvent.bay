@@ -15,35 +15,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
- 
-namespace Runtime.Interfaces;
 
-use Runtime.Map;
-use Runtime.Vector;
+namespace Runtime.Events;
+
+use Runtime.CoreEvent;
 
 
-interface AssetsInterface{
+struct ModelChangeEvent extends CoreEvent
+{
 	
-	
-	
-	/**
-	 * Returns required assets
-	 * @return Vector<string>
-	 */	
-	public static Vector<string> getRequiredAssets(ContextInterface context);
-	
-	
-	
-	/**
-	 * Returns sync loaded files
-	 */		
-	public static Vector<string> assetsSyncLoad(ContextInterface context);
-	
-	
-	
-	/**
-	 * Returns async loaded files
-	 */			
-	public static Vector<mixed> assetsAsyncLoad(ContextInterface context);
+	public string name = "";
+	public mixed value = null;
 	
 }
+

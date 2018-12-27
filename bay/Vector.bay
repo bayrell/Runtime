@@ -551,6 +551,7 @@ Runtime.Vector = class extends Array{
 	 * @param Vector<T> arr
 	 */
 	appendVector(arr){
+		if (!arr) return this;
 		function f(item){ this.push(item); };
 		arr.forEach(f.bind(this));
 		return this;
@@ -1068,6 +1069,7 @@ class Vector implements \JsonSerializable{
 	 * @param Vector<T> arr
 	 */
 	public function appendVector($arr){
+		if (!$arr) return $this;
 		$arr->each(function($item){
 			$this->append($item);
 		});
