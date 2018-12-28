@@ -23,12 +23,12 @@ use Runtime.CoreObject;
 use Runtime.rtl;
 
 
-struct ModelChangeEvent extends CoreEvent
+struct StructVariableChangeEvent extends CoreEvent
 {
 	
-	public string name = "";
+	public string varname = "";
 	public mixed value = null;
-	public CoreObject model = null;
+	public CoreObject obj = null;
 	
 }
 

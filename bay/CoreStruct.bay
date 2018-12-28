@@ -25,8 +25,7 @@ use Runtime.Interfaces.SerializeInterface;
 
 
 class CoreStruct extends CoreObject implements SerializeInterface
-{
-	
+{	
 	
 	/** 
 	 * Constructor
@@ -62,6 +61,5 @@ class CoreStruct extends CoreObject implements SerializeInterface
 		instance.onCreated();
 		return instance;
 	}	
-	
 	
 }

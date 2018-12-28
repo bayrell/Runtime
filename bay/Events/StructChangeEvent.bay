@@ -16,49 +16,17 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Models;
+namespace Runtime.Events;
 
-use Runtime.CoreStruct;
-use Runtime.Emitter;
-use Runtime.Map;
-use Runtime.Events.VectorChangeEvent;
+use Runtime.CoreEvent;
+use Runtime.CoreObject;
+use Runtime.rtl;
 
 
-class VectorModel extends Vector
+struct StructChangeEvent extends CoreEvent
 {
 	
-	protected Emitter emitter = new Emitter();
-	
-	
-	/**
-	 * Send VectorChangeEvent
-	 * @param string variable_name
-	 * @param var value
-	 */
-	public void change(CoreObject sender)
-	{
-		if (sender != null)
-		{
-			this.emitter.dispatch(
-				new VectorChangeEvent(
-					{
-						"sender": sender,
-						"model": this,
-					}
-				)
-			);
-		}
-	}
-	
-	
-	
-	/**
-	 * Returns model emitter
-	 * @return Emitter
-	 */
-	public Emitter getEmitter()
-	{
-		return this.emitter;
-	}
+	public CoreObject obj = null;
 	
 }
+

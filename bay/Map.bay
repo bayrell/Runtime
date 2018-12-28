@@ -173,11 +173,23 @@ Runtime.Map = class extends Map{
 	/**
 	 * Correct items
 	 */
-	_correctItemsByType(type){
-		return this.map((key, value) =>{
-			if (isBrowser()) return Runtime.rtl.correct(value, type, null);
-			return rtl.correct(value, type, null);
-		});
+	_correctItemsByType(type)
+	{
+		
+		var obj={};
+		var it = super.keys();
+		var next = it.next();
+		while (!next.done){
+			var key = next.value;
+			var val = super.get(key);
+			if (isBrowser()) val = Runtime.rtl.correct(val, type, null);
+			else val = rtl.correct(val, type, null);
+			obj[key] = val;
+			next = it.next();
+		}
+		
+		var _Map = null; if (isBrowser()) _Map = Runtime.Map; else _Map = Map;
+		return new _Map(obj);
 	}
 	
 	
@@ -267,8 +279,8 @@ Runtime.Map = class extends Map{
 	item(key){
 		key = this.toString(key);
 		if (!super.has(key)){
-			if (isBrowser()) throw new Runtime.Exceptions.KeyNotFound(null, key);
-			throw new KeyNotFound(null, key);
+			if (isBrowser()) throw new Runtime.Exceptions.KeyNotFound(key);
+			throw new KeyNotFound(key);
 		}
 		var val = super.get(key);
 		if (val === null || val == undefined) return null;
@@ -561,7 +573,7 @@ class Map implements \JsonSerializable{
 	public function item($key, $type_value = "mixed", $type_template = ""){
 		$key = rtl::toString($key);
 		if (!array_key_exists($key, $this->_map)){
-			throw new KeyNotFound(null, $key);
+			throw new KeyNotFound($key);
 		}
 		return $this->_map[$key];
 	}

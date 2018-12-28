@@ -42,6 +42,7 @@ export class RuntimeUtils{
 	
 	
 	protected static var _global_context = null;
+	protected static Map _variables_names = null;
 	
 	
 	/**
@@ -166,6 +167,15 @@ export class RuntimeUtils{
 	 */
 	public static void getVariablesNames(string class_name, Vector<string> names, int flag=0)
 	{
+		if (RuntimeUtils::_variables_names==null) RuntimeUtils::_variables_names = new Map();
+		if (RuntimeUtils::_variables_names.has(class_name))
+		{
+			Map m = RuntimeUtils::_variables_names;
+			Vector v = m.item(class_name);
+			names.appendVector(v);
+			return;
+		}
+		
 		Vector<string> classes = self::getParents(class_name);
 		classes.prepend(class_name);
 		classes.each(
@@ -176,6 +186,7 @@ export class RuntimeUtils{
 			}
 		);
 		names.removeDublicates();
+		RuntimeUtils::_variables_names.set(class_name, names.copy());
 	}
 	
 	

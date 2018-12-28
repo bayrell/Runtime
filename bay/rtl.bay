@@ -59,6 +59,9 @@ export class rtl{
 		if (class_name instanceof Function)
 			return class_name;
 		
+		if (Runtime.rtl._classes==undefined) Runtime.rtl._classes = {};
+		if (Runtime.rtl._classes[class_name]!=undefined) return Runtime.rtl._classes[class_name];
+		
 		var arr = class_name.split('.');
 		var obj = window;
 		
@@ -69,6 +72,7 @@ export class rtl{
 			obj = obj[key];
 		}
 		
+		Runtime.rtl._classes[class_name] = obj;
 		return obj;
 	}
 	#case ifcode NODEJS then
@@ -398,7 +402,73 @@ export class rtl{
 	 * @param var type_template
 	 * @return var
 	 */
-	static var convert(var value, string type_value, var def_value = null, string type_template = ""){
+	static var convert(var value, string type_value, var def_value = null, string type_template = "")
+	{
+		if (type_value == "mixed" or type_value == "var")
+			return value;
+		
+		if (type_value == "")
+			return def_value;
+		
+		if (value != null)
+		{
+		
+			/* Is scalar value */
+			if (
+				type_value == "int" or type_value == "float" or 
+				type_value == "double" or type_value == "bool" or type_value == "string"
+			){
+				try{
+					if (type_value == "int"){
+						int val = rtl::toInt(value);
+						return val;
+					}
+					else if (type_value == "float" or type_value == "double"){
+						int val = rtl::toFloat(value);
+						return val;
+					}
+					else if (type_value == "bool"){
+						int val = rtl::toBool(value);
+						return val;
+					}
+					else if (type_value == "string"){
+						int val = rtl::toString(value);
+						return val;
+					}
+				}
+				catch (var e){}
+			}
+			
+			/* Is Vector or Map */
+			else if ( (type_value == "Runtime.Vector" or type_value == "Runtime.Map") and type_template != "")
+			{
+				#switch
+				#case ifcode PHP then
+				return $value->_correctItemsByType($type_template);
+				#case ifcode JAVASCRIPT then
+				return value._correctItemsByType(type_template);
+				#endswitch
+			}
+			
+			/* Is instanceof object */
+			else if (rtl::is_instanceof(value, type_value))
+			{
+				return value;
+			}
+		
+		}
+		/*
+		if (type_value == "int" and not rtl::isInt(def_value)) def_value = 0;
+		else if ((type_value == "float" or type_value == "double") and not rtl::isDouble(def_value)) def_value = 0;
+		else if (type_value == "string" and not rtl::isString(def_value)) def_value = "";
+		else if ((type_value == "bool" or type_value == "boolean") and not rtl::isBoolean(def_value)) 
+			def_value = false;
+		else def_value = null;
+		*/
+		return def_value;
+	}
+	
+	static var convert2(var value, string type_value, var def_value = null, string type_template = ""){
 		
 		if (type_value == "mixed" or type_value == "var")
 			return value;

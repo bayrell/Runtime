@@ -192,7 +192,7 @@ declare class Vector<T>{
 	 * Get last item
 	 */
 	declare public T getLastItem(T default_value);
-	declare public T last(T default_value);
+	declare public T last(T default_value, int pos = -1);
 	
 	
 	
@@ -331,10 +331,13 @@ Runtime.Vector = class extends Array{
 	 * Correct items
 	 */
 	_correctItemsByType(type){
-		return this.map((item) =>{
-			if (isBrowser()) return Runtime.rtl.correct(item, type, null);
-			return rtl.correct(item, type, null);
-		});
+		var arr = this.slice();
+		for (var i=0; i<arr.length; i++)
+		{
+			if (isBrowser()) arr[i] = Runtime.rtl.correct(arr[i], type, null);
+			else arr[i] = rtl.correct(arr[i], type, null);
+		}
+		return arr;
 	}
 	
 	
@@ -562,8 +565,7 @@ Runtime.Vector = class extends Array{
 	 */
 	appendVector(arr){
 		if (!arr) return this;
-		function f(item){ this.push(item); };
-		arr.forEach(f.bind(this));
+		for (var i=0; i<arr.length; i++) super.push(arr[i]);
 		return this;
 	}
 	
@@ -574,8 +576,7 @@ Runtime.Vector = class extends Array{
 	 * @param Vector<T> arr
 	 */
 	prependVector(arr){
-		function f(item){ this.prepend(item); };
-		arr.forEach(f.bind(this));
+		for (var i=0; i<arr.length; i++) super.unshift(arr[i]);
 		return this;
 	}
 	
@@ -584,12 +585,18 @@ Runtime.Vector = class extends Array{
 	/**
 	 * Get last item
 	 */
-	getLastItem(default_value){
+	getLastItem(default_value, pos){
+		if (pos == undefined) pos = -1;
 		if (this.length == 0)
 			return default_value;
-		return this[this.length - 1];
+		if (this.length + pos + 1 == 0)
+			return default_value;	
+		return this[this.length + pos];
 	}
-	last(default_value){ return this.getLastItem(default_value); }
+	last(default_value, pos){
+		if (pos == undefined) pos = -1;
+		return this.getLastItem(default_value, pos); 
+	}
 	
 	
 	
@@ -1127,11 +1134,13 @@ class Vector implements \JsonSerializable{
 	/**
 	 * Get last item
 	 */
-	public function getLastItem($default_value = null){
+	public function getLastItem($default_value = null, $pos=-1){
 		$c = count($this->_arr);
-		return isset($this->_arr[$c-1]) ? $this->_arr[$c-1] : $default_value;
+		if ($c == 0) return $default_value;
+		if ($c + pos + 1 == 0) return $default_value;
+		return isset($this->_arr[$c+$pos]) ? $this->_arr[$c+$pos] : $default_value;
 	}
-	public function last($default_value = null){ return this.getLastItem($default_value); }
+	public function last($default_value = null, $pos=-1){ return this.getLastItem($default_value, $pos); }
 	
 	
 	

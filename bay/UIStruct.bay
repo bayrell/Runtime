@@ -24,7 +24,7 @@ use Runtime.rtl;
 use Runtime.Vector;
 
 
-struct UIStruct extends CoreStruct
+class UIStruct extends CoreStruct
 {
 	const string TYPE_ELEMENT = "element";
 	const string TYPE_COMPONENT = "component";
@@ -38,6 +38,30 @@ struct UIStruct extends CoreStruct
 	public string content = "";
 	public Map<mixed> props = null;
 	public Vector<mixed> children = null;
+	
+	
+	
+	/** 
+	 * Constructor
+	 */
+	public void constructor(Map obj = null)
+	{
+		parent();
+		obj.each(
+			void (string key, mixed value)
+			{
+				if (key == "id") this.id = value;
+				else if (key == "key") this.key = value;
+				else if (key == "name") this.name = value;
+				else if (key == "kind") this.kind = value;
+				else if (key == "content") this.content = value;
+				else if (key == "props") this.props = value;
+				else if (key == "children") this.children = value;
+			}
+		);
+		this.onCreated();
+	}
+	
 	
 	
 	/**
