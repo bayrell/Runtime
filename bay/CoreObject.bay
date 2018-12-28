@@ -114,8 +114,8 @@ class CoreObject{
 	 * @param string variable_name
 	 * @param var value
 	 */
-	public void assignValue(string variable_name, var value){
-		this.assignValueAfter(variable_name, value);
+	public void assignValue(string variable_name, var value, CoreObject sender = null){
+		this.assignValueAfter(variable_name, value, sender);
 	}
 	
 	
@@ -125,7 +125,7 @@ class CoreObject{
 	 * @param string variable_name
 	 * @param var value
 	 */
-	void assignValueAfter(string variable_name, var value){
+	void assignValueAfter(string variable_name, var value, CoreObject sender = null){
 	}
 	
 	

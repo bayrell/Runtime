@@ -199,21 +199,21 @@ declare class Vector<T>{
 	/**
 	 * Remove value
 	 */
-	declare public void removeValue(T value);
+	declare public Vector<T> removeValue(T value);
 	
 	
 	
 	/**
 	 * Remove value
 	 */
-	declare public void removeItem(T value);
+	declare public Vector<T> removeItem(T value);
 	
 	
 	
 	/**
 	 * Remove value
 	 */
-	declare public void removeItems(Vector<T> values);
+	declare public Vector<T> removeItems(Vector<T> values);
 	
 	
 	
@@ -231,7 +231,7 @@ declare class Vector<T>{
 	 * @param func f
 	 * @return Vector
 	 */
-	declare Vector filter(func f);
+	declare Vector<T> filter(func f);
 	
 	
 	
@@ -249,7 +249,17 @@ declare class Vector<T>{
 	 * Call function for each item
 	 * @param func f
 	 */
-	declare void each(func f);
+	declare Vector<T> each(func f);
+	
+	
+	
+	/**
+	 * Each item recursive
+	 * @param func f
+	 * @param func childs Returns childs items
+	 * @param func kind. 1 - Node item first, -1 - Node item last
+	 */
+	declare Vector<T> recurse(func f, func childs, int kind = 1);
 	
 	
 	
@@ -263,7 +273,7 @@ declare class Vector<T>{
 	
 	
 	/**
-	 * Returns Vector
+	 * Returns new Vector
 	 * @param int offset
 	 * @param int lenght
 	 * @return Vector<T>
@@ -283,15 +293,15 @@ declare class Vector<T>{
 	/**
 	 * Reverse array
 	 */
-	declare public void reverse();
+	declare public Vector<T> reverse();
 	
 	
 	
 	/**
 	 * Sort vector
-	 * @param callback f - Sort user function
+	 * @param func f - Sort user function
 	 */
-	declare public void sort(callback f = null);
+	declare public Vector<T> sort(func f = null);
 	
 	
 	/**
@@ -299,13 +309,13 @@ declare class Vector<T>{
 	 * @params int index1 - item1 position
 	 * @params int index2 - item2 position. If index2 = -1, insert as last item
 	 */
-	declare public void swap(int index1, int index2);
+	declare public Vector<T> swap(int index1, int index2);
 	
 	
 	/**
 	 * Remove dublicate values
 	 */
-	declare public void removeDublicates();
+	declare public Vector<T> removeDublicates();
 }
 
 
@@ -667,6 +677,20 @@ Runtime.Vector = class extends Array{
 	
 	
 	/**
+	 * Each item recursive
+	 * @param func f
+	 * @param func childs Returns childs items
+	 * @param func kind. 1 - Node item first, -1 - Node item last
+	 */
+	recurse(f, childs, kind)
+	{
+		if (kind == undefined) kind=1;
+		return this;
+	}
+	
+	
+	
+	/**
 	 * Returns Vector
 	 * @param Vector<T> arr
 	 * @return Vector<T>
@@ -720,7 +744,7 @@ Runtime.Vector = class extends Array{
 	
 	/**
 	 * Returns sorted vector
-	 * @param callback f - Sort user function
+	 * @param func f - Sort user function
 	 */
 	sort(f){
 		if (f == undefined) super.sort();
@@ -1203,6 +1227,19 @@ class Vector implements \JsonSerializable{
 	
 	
 	/**
+	 * Each item recursive
+	 * @param func f
+	 * @param func childs Returns childs items
+	 * @param func kind. 1 - Node item first, -1 - Node item last
+	 */
+	function recurse($f, $childs, $kind=1)
+	{
+		return $this;
+	}
+	
+	
+	
+	/**
 	 * Returns new concated Vector
 	 * @param Vector v
 	 * @return Vector
@@ -1263,7 +1300,7 @@ class Vector implements \JsonSerializable{
 	
 	/**
 	 * Sort vector
-	 * @param callback f - Sort user function
+	 * @param func f - Sort user function
 	 */
 	public function sort($f = null){
 		if ($f == null){

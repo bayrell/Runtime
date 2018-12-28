@@ -16,41 +16,38 @@
  *  limitations under the License.
  */
 
-namespace Runtime;
+namespace Runtime.Models;
 
 use Runtime.CoreStruct;
 use Runtime.Emitter;
 use Runtime.Map;
-use Runtime.Events.ModelChangeEvent;
+use Runtime.Events.VectorChangeEvent;
 
 
-class CoreModel extends CoreStruct
+class VectorModel extends Vector
 {
 	
 	protected Emitter emitter = new Emitter();
 	
 	
 	/**
-	 * Calls after assign new value
+	 * Send VectorChangeEvent
 	 * @param string variable_name
 	 * @param var value
 	 */
-	void assignValueAfter(string variable_name, var value, CoreObject sender = null)
+	public void change(CoreObject sender)
 	{
 		if (sender != null)
 		{
 			this.emitter.dispatch(
-				new ModelChangeEvent(
+				new VectorChangeEvent(
 					{
 						"sender": sender,
 						"model": this,
-						"name": variable_name,
-						"value": value,
 					}
 				)
 			);
 		}
-		parent(variable_name, value, sender);
 	}
 	
 	

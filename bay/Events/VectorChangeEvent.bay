@@ -19,16 +19,14 @@
 namespace Runtime.Events;
 
 use Runtime.CoreEvent;
-use Runtime.CoreObject;
 use Runtime.rtl;
+use Runtime.Vector;
 
 
-struct ModelChangeEvent extends CoreEvent
+struct VectorChangeEvent extends CoreEvent
 {
 	
-	public string name = "";
-	public mixed value = null;
-	public CoreObject model = null;
+	public Vector model = null;
 	
 }
 
