@@ -176,7 +176,7 @@ class Emitter extends CoreObject
 			string key = keys.item(i);
 			Vector items = methods.item(key);
 			
-			if (key != "" and e.getClassName() != key)
+			if (key != "" and e.getClassName() != key and not rtl::is_instanceof(e, key))
 				continue;
 			
 			for (int j=0; j<items.count(); j++)
