@@ -21,6 +21,7 @@ namespace Runtime;
 use Runtime.CoreObject;
 use Runtime.Map;
 use Runtime.rtl;
+use Runtime.Vector;
 use Runtime.Interfaces.SerializeInterface;
 
 
@@ -30,11 +31,11 @@ class CoreStruct extends CoreObject implements SerializeInterface
 	/** 
 	 * Constructor
 	 */
-	public void constructor(Map obj = null)
+	public void constructor(Map obj = null, bool can_call_created = true)
 	{
 		parent();
 		this.assignMap(obj);
-		this.onCreated();
+		if (can_call_created) this.onCreated();
 	}
 	
 	
@@ -49,16 +50,54 @@ class CoreStruct extends CoreObject implements SerializeInterface
 	
 	
 	/**
-	 * Clone this object with new values
+	 * Clone this struct with new values
 	 * @param Map obj = null
 	 * @return CoreStruct
 	 */
 	public CoreStruct clone(Map obj = null)
 	{
-		CoreStruct instance = rtl::newInstance( this.getClassName() );
+		CoreStruct instance = rtl::newInstance( this.getClassName(), [null, false] );
+		
+		/* Clone values */
 		instance.assignObject( this );
+		
+		/* Assign new values */
 		if (obj != null) instance.setMap(obj);
+		
+		/* Call created */
 		instance.onCreated();
+		
+		/* Return object */
+		return instance;
+	}
+	
+	
+	
+	/**
+	 * Copy this struct with new values
+	 * @param Map obj = null
+	 * @return CoreStruct
+	 */
+	public CoreStruct copy(Map obj = null)
+	{
+		CoreStruct instance = rtl::newInstance( this.getClassName(), [null, false] );
+		
+		/* copy values without clone */
+		Vector<string> names = new Vector();
+		this.getVariablesNames(names, 2);
+		for (int i=0; i<names.count(); i++)
+		{
+			string name = names.item(i);
+			instance.assignValue(name, this.takeValue(name));
+		}
+		
+		/* Assign new values */
+		if (obj != null) instance.setMap(obj);
+		
+		/* Call created */
+		instance.onCreated();
+		
+		/* Return object */
 		return instance;
 	}	
 	

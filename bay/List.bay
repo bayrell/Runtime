@@ -28,14 +28,14 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 #endswitch
 
 
-declare class Vector<T>{
+declare class List<T>{
 	
 	
 	/**
-	 * Append value to the end of array
+	 * Append value to the end of the list and return new list
 	 * @param T value
 	 */
-	declare public Vector<T> push(T value);
+	declare public List<T> pushIm(T value);
 	
 	
 	
@@ -43,7 +43,7 @@ declare class Vector<T>{
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	declare public Vector<T> unshift(T value);
+	declare public List<T> unshiftIm(T value);
 	
 	
 	
@@ -51,7 +51,7 @@ declare class Vector<T>{
 	 * Extract last value from array
 	 * @return T value
 	 */
-	declare public T pop();
+	declare public T popIm();
 	
 	
 	
@@ -59,7 +59,7 @@ declare class Vector<T>{
 	 * Extract first value from array
 	 * @return T value
 	 */
-	declare public T shift();
+	declare public T shiftIm();
 	
 	
 	
@@ -88,7 +88,7 @@ declare class Vector<T>{
 	 * @param T value
 	 * @param int pos - position
 	 */
-	declare public Vector<T> insert(int pos, T value);
+	declare public Vector<T> insertIm(int pos, T value);
 	
 	
 	
@@ -97,7 +97,7 @@ declare class Vector<T>{
 	 * @param int pos - position
 	 * @param int count - count remove items
 	 */
-	declare public Vector<T> remove(int pos, int count = 1);
+	declare public Vector<T> removeIm(int pos, int count = 1);
 	
 	
 	
@@ -106,7 +106,7 @@ declare class Vector<T>{
 	 * @param int pos_begin - start position
 	 * @param int pos_end - end position
 	 */
-	declare public Vector<T> removeRange(int pos_begin, int pos_end);
+	declare public Vector<T> removeRangeIm(int pos_begin, int pos_end);
 	
 	
 	
@@ -131,14 +131,7 @@ declare class Vector<T>{
 	 * @param int pos - position
 	 * @param T value 
 	 */
-	declare public T set(int pos, T value);
-	
-	
-	
-	/**
-	 * Clear all values from vector
-	 */
-	declare public Vector<T> clear();
+	declare public List<T> setIm(int pos, T value);
 	
 	
 	
@@ -153,7 +146,7 @@ declare class Vector<T>{
 	 * Append value to the end of the vector
 	 * @param T value
 	 */
-	declare public Vector<T> append(T value);
+	declare public List<T> appendIm(T value);
 	
 	
 	
@@ -161,7 +154,7 @@ declare class Vector<T>{
 	 * Insert first value to begin of the vector
 	 * @return T value
 	 */
-	declare public Vector<T> prepend(T value);
+	declare public List<T> prependIm(T value);
 	
 	
 	
@@ -169,7 +162,7 @@ declare class Vector<T>{
 	 * Append vector to the end of the vector
 	 * @param Vector<T> arr
 	 */
-	declare public Vector<T> appendVector(Vector<T> arr);
+	declare public List<T> appendListIm(Vector<T> arr);
 	
 	
 	
@@ -177,7 +170,7 @@ declare class Vector<T>{
 	 * Prepend vector to the begin of the vector
 	 * @param Vector<T> arr
 	 */
-	declare public Vector<T> prependVector(Vector<T> arr);
+	declare public List<T> prependListIm(Vector<T> arr);
 	
 	
 	
@@ -199,21 +192,21 @@ declare class Vector<T>{
 	/**
 	 * Remove value
 	 */
-	declare public Vector<T> removeValue(T value);
+	declare public List<T> removeValueIm(T value);
 	
 	
 	
 	/**
 	 * Remove value
 	 */
-	declare public Vector<T> removeItem(T value);
+	declare public List<T> removeItemIm(T value);
 	
 	
 	
 	/**
 	 * Remove value
 	 */
-	declare public Vector<T> removeItems(Vector<T> values);
+	declare public List<T> removeItemsIm(List<T> values);
 	
 	
 	
@@ -231,7 +224,7 @@ declare class Vector<T>{
 	 * @param func f
 	 * @return Vector
 	 */
-	declare Vector<T> filter(func f);
+	declare List<T> filter(func f);
 	
 	
 	
@@ -249,7 +242,7 @@ declare class Vector<T>{
 	 * Call function for each item
 	 * @param func f
 	 */
-	declare Vector<T> each(func f);
+	declare List<T> each(func f);
 	
 	
 	
@@ -259,7 +252,7 @@ declare class Vector<T>{
 	 * @param func childs Returns childs items
 	 * @param func kind. 1 - Node item first, -1 - Node item last
 	 */
-	declare Vector<T> recurse(func f, func childs, int kind = 1);
+	declare List<T> recurse(func f, func childs, int kind = 1);
 	
 	
 	
@@ -268,7 +261,7 @@ declare class Vector<T>{
 	 * @param Vector<T> arr
 	 * @return Vector<T>
 	 */
-	declare Vector<T> concat(Vector<T> arr);
+	declare List<T> concatIm(List<T> arr);
 	
 	
 	
@@ -276,9 +269,9 @@ declare class Vector<T>{
 	 * Returns new Vector
 	 * @param int offset
 	 * @param int lenght
-	 * @return Vector<T>
+	 * @return List<T>
 	 */
-	declare Vector<T> slice(int offset, int lenght = null);
+	declare List<T> sliceIm(int offset, int lenght = null);
 	
 	
 	
@@ -286,14 +279,14 @@ declare class Vector<T>{
 	 * Copy Vector
 	 * @return Vector<T>
 	 */
-	declare Vector<T> copy();
+	declare List<T> copy();
 	
 	
 	
 	/**
 	 * Reverse array
 	 */
-	declare public Vector<T> reverse();
+	declare public List<T> reverseIm();
 	
 	
 	
@@ -301,7 +294,7 @@ declare class Vector<T>{
 	 * Sort vector
 	 * @param func f - Sort user function
 	 */
-	declare public Vector<T> sort(func f = null);
+	declare public List<T> sortIm(func f = null);
 	
 	
 	/**
@@ -309,13 +302,13 @@ declare class Vector<T>{
 	 * @params int index1 - item1 position
 	 * @params int index2 - item2 position. If index2 = -1, insert as last item
 	 */
-	declare public Vector<T> swap(int index1, int index2);
+	declare public List<T> swapIm(int index1, int index2);
 	
 	
 	/**
 	 * Remove dublicate values
 	 */
-	declare public Vector<T> removeDublicates();
+	declare public List<T> removeDublicatesIm();
 }
 
 

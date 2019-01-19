@@ -24,7 +24,8 @@ use Runtime.Vector;
 use Runtime.RuntimeUtils;
 
 
-class CoreObject{
+class CoreObject
+{
 	
 	protected bool _is_destroyed = false;	
 	
@@ -72,7 +73,8 @@ class CoreObject{
 	 * @param string default_value
 	 * @return var
 	 */
-	public var takeValue(string variable_name, var default_value = null){
+	public var takeValue(string variable_name, var default_value = null)
+	{
 		return this.takeVirtualValue(variable_name, default_value);
 	}
 	
@@ -84,7 +86,8 @@ class CoreObject{
 	 * @param string default_value
 	 * @return var
 	 */
-	void takeVirtualValue(string variable_name, var default_value = null){
+	void takeVirtualValue(string variable_name, var default_value = null)
+	{
 		return default_value;
 	}
 	
@@ -94,7 +97,8 @@ class CoreObject{
 	 * Assign and clone data from other object
 	 * @param CoreObject obj
 	 */
-	void assignObject(CoreObject obj){
+	void assignObject(CoreObject obj)
+	{
 		this.assignObjectAfter(obj);
 	}
 	
@@ -104,7 +108,8 @@ class CoreObject{
 	 * Assign and clone data from other object
 	 * @param CoreObject obj
 	 */
-	void assignObjectAfter(CoreObject obj){
+	void assignObjectAfter(CoreObject obj)
+	{
 	}
 	
 	
@@ -114,7 +119,8 @@ class CoreObject{
 	 * @param string variable_name
 	 * @param var value
 	 */
-	public void assignValue(string variable_name, var value, CoreObject sender = null){
+	public void assignValue(string variable_name, var value, CoreObject sender = null)
+	{
 		this.assignValueAfter(variable_name, value, sender);
 	}
 	
@@ -125,7 +131,8 @@ class CoreObject{
 	 * @param string variable_name
 	 * @param var value
 	 */
-	void assignValueAfter(string variable_name, var value, CoreObject sender = null){
+	void assignValueAfter(string variable_name, var value, CoreObject sender = null)
+	{
 	}
 	
 	
@@ -213,7 +220,8 @@ class CoreObject{
 	 * @param string field_name
 	 * @return IntrospectionInfo
 	 */
-	public static IntrospectionInfo getFieldInfoByName(string field_name){
+	public static IntrospectionInfo getFieldInfoByName(string field_name)
+	{
 	}
 	
 	
@@ -223,7 +231,8 @@ class CoreObject{
 	 * @param string field_name
 	 * @return IntrospectionInfo
 	 */
-	public static IntrospectionInfo getVirtualFieldInfo(string field_name){
+	public static IntrospectionInfo getVirtualFieldInfo(string field_name)
+	{
 		return null;
 	}
 	
@@ -233,7 +242,8 @@ class CoreObject{
 	 * Returns public fields list
 	 * @param Vector<string> names
 	 */
-	public static void getFieldsList(Vector<string> names, int flag=0){
+	public static void getFieldsList(Vector<string> names, int flag=0)
+	{
 	}
 	
 	
@@ -242,7 +252,8 @@ class CoreObject{
 	 * Returns public virtual fields names
 	 * @param Vector<string> names
 	 */
-	public static void getVirtualFieldsList(Vector<string> names, int flag=0){
+	public static void getVirtualFieldsList(Vector<string> names, int flag=0)
+	{
 	}
 	
 	
@@ -252,7 +263,8 @@ class CoreObject{
 	 * @param string method_name
 	 * @return IntrospectionInfo
 	 */
-	public static IntrospectionInfo getMethodInfoByName(string method_name){
+	public static IntrospectionInfo getMethodInfoByName(string method_name)
+	{
 		return null;
 	}
 	
@@ -262,7 +274,8 @@ class CoreObject{
 	 * Returns list of the public methods
 	 * @param Vector<string> methods
 	 */
-	public static void getMethodsList(Vector<string> methods){
+	public static void getMethodsList(Vector<string> methods)
+	{
 	}
 	
 	
@@ -284,14 +297,17 @@ class CoreObject{
 	 * @param string variable_name
 	 * @return IntrospectionInfo
 	 */
-	public void getFieldInfo(string variable_name){
+	public void getFieldInfo(string variable_name)
+	{
 		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
-		for (int i=0; i<classes.count(); i++){
+		for (int i=0; i<classes.count(); i++)
+		{
 			string class_name = classes.item(i);
 			IntrospectionInfo info = rtl::callStaticMethod(class_name, "getFieldInfoByName", [variable_name]);
 			if (info != null  and item.kind == IntrospectionInfo::ITEM_FIELD)
 				return info;
-			try{ 
+			try
+			{ 
 				IntrospectionInfo info = rtl::callStaticMethod(class_name, "getVirtualFieldInfo", [variable_name]); 
 				if (info != null  and item.kind == IntrospectionInfo::ITEM_FIELD)
 					return info;
@@ -307,9 +323,11 @@ class CoreObject{
 	 * Returns names of methods
 	 * @param Vector<string>
 	 */
-	public void getMethodsNames(Vector<string> names){
+	public void getMethodsNames(Vector<string> names)
+	{
 		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
-		for (int i=0; i<classes.count(); i++){
+		for (int i=0; i<classes.count(); i++)
+		{
 			string class_name = classes.item(i);
 			rtl::callStaticMethod(class_name, "getMethodsList", [names]);
 		}
@@ -322,9 +340,11 @@ class CoreObject{
 	 * @param string method_name
 	 * @return IntrospectionInfo
 	 */
-	public IntrospectionInfo getMethodInfo(string method_name){
+	public IntrospectionInfo getMethodInfo(string method_name)
+	{
 		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
-		for (int i=0; i<classes.count(); i++){
+		for (int i=0; i<classes.count(); i++)
+		{
 			string class_name = classes.item(i);
 			IntrospectionInfo info = rtl::callStaticMethod(class_name, "getMethodInfoByName", [method_name]);
 			if (info != null and item.kind == IntrospectionInfo::ITEM_METHOD)

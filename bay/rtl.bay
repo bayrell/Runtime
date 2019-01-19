@@ -297,6 +297,7 @@ export class rtl{
 	#case ifcode PHP then
 	static function call($f, $args = null){
 		if ($args == null) return call_user_func($f);
+		if ($args instanceof \Runtime\Vector) $args = $args->_getArr();
 		return call_user_func_array($f, $args);
 	}
 	#case ifcode JAVASCRIPT then

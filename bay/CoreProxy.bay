@@ -27,11 +27,11 @@ use Runtime.Events.StructVariableChangeEvent;
 use Runtime.Interfaces.SerializeInterface;
 
 
-class CoreProxy extends CoreStruct
+class CoreProxy<T> extends CoreObject
 {
 
 	protected Emitter emitter = new Emitter();
-	
+	protected T data = null;
 	
 	
 	/**

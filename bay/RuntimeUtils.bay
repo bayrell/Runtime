@@ -167,14 +167,20 @@ export class RuntimeUtils{
 	 */
 	public static void getVariablesNames(string class_name, Vector<string> names, int flag=0)
 	{
-		if (RuntimeUtils::_variables_names==null) RuntimeUtils::_variables_names = new Map();
+		
+		var variables_names = RuntimeUtils::_variables_names;
+		if (variables_names == null) RuntimeUtils::_variables_names = new Map();
 		if (RuntimeUtils::_variables_names.has(class_name))
 		{
 			Map m = RuntimeUtils::_variables_names;
-			Vector v = m.item(class_name);
-			names.appendVector(v);
-			return;
+			Map v = m.item(class_name);
+			if ( v.has(flag) )
+			{
+				names.appendVector( v.item(flag) );
+				return;
+			}
 		}
+		
 		
 		Vector<string> classes = self::getParents(class_name);
 		classes.prepend(class_name);
@@ -186,7 +192,18 @@ export class RuntimeUtils{
 			}
 		);
 		names.removeDublicates();
-		RuntimeUtils::_variables_names.set(class_name, names.copy());
+		
+		var variables_names = RuntimeUtils::_variables_names;
+		if (not RuntimeUtils::_variables_names.has(class_name))
+		{
+			RuntimeUtils::_variables_names.set(class_name, {});
+		}
+		
+		var v = RuntimeUtils::_variables_names.item(class_name);
+		v.set(flag, names.copy());
+		RuntimeUtils::_variables_names.set(class_name, v);
+		
+		/*RuntimeUtils::_variables_names.set(class_name, names.copy());*/
 	}
 	
 	

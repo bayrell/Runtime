@@ -32,4 +32,9 @@ class Callback {
 	function __invoke(){
 		return call_user_func_array([$this->obj, $this->name], func_get_args());
 	}
+	
+	function invokeArgs($args)
+	{
+		return call_user_func_array([$this->obj, $this->name], $args);
+	}
 }

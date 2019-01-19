@@ -44,22 +44,24 @@ class UIStruct extends CoreStruct
 	/** 
 	 * Constructor
 	 */
-	public void constructor(Map obj = null)
+	public void constructor(Map obj = null, bool can_call_created = true)
 	{
 		parent();
-		obj.each(
-			void (string key, mixed value)
-			{
-				if (key == "id") this.id = value;
-				else if (key == "key") this.key = value;
-				else if (key == "name") this.name = value;
-				else if (key == "kind") this.kind = value;
-				else if (key == "content") this.content = value;
-				else if (key == "props") this.props = value;
-				else if (key == "children") this.children = value;
-			}
-		);
-		this.onCreated();
+		if (obj){
+			obj.each(
+				void (string key, mixed value)
+				{
+					if (key == "id") this.id = value;
+					else if (key == "key") this.key = value;
+					else if (key == "name") this.name = value;
+					else if (key == "kind") this.kind = value;
+					else if (key == "content") this.content = value;
+					else if (key == "props") this.props = value;
+					else if (key == "children") this.children = value;
+				}
+			);
+		}
+		if (can_call_created) this.onCreated();
 	}
 	
 	
@@ -68,7 +70,8 @@ class UIStruct extends CoreStruct
 	 * Returns true if component
 	 * @return bool
 	 */
-	public bool isComponent(){
+	public bool isComponent()
+	{
 		return this.kind == self::TYPE_COMPONENT;
 	}
 	
@@ -78,7 +81,8 @@ class UIStruct extends CoreStruct
 	 * Returns true if string
 	 * @return bool
 	 */
-	public bool isString(){
+	public bool isString()
+	{
 		return this.kind == self::TYPE_STRING or this.kind == self::TYPE_RAW;
 	}
 	
@@ -89,10 +93,22 @@ class UIStruct extends CoreStruct
 	 * @param string class_name
 	 * @return bool
 	 */
-	public bool instanceOf(string class_name){
+	public bool instanceOf(string class_name)
+	{
 		if (this.is_component and this.name == class_name)
 			return true;
 		return false;
 	}
 	
+	
+	
+	/**
+	 * Returns props value
+	 * @return mixed
+	 */
+	public mixed getProps(string key, mixed default_value, string type_value = "mixed", string type_template = "")
+	{
+		if (this.props == null) return default_value;
+		return this.props.get(key, default_value, type_value, type_template);
+	}
 }
