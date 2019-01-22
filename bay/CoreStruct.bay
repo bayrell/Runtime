@@ -31,44 +31,10 @@ class CoreStruct extends CoreObject implements SerializeInterface
 	/** 
 	 * Constructor
 	 */
-	public void constructor(Map obj = null, bool can_call_created = true)
+	public void constructor(Map obj = null)
 	{
 		parent();
 		this.assignMap(obj);
-		if (can_call_created) this.onCreated();
-	}
-	
-	
-	
-	/**
-	 * Struct created 
-	 */
-	public void onCreated()
-	{
-	}	
-	
-	
-	
-	/**
-	 * Clone this struct with new values
-	 * @param Map obj = null
-	 * @return CoreStruct
-	 */
-	public CoreStruct clone(Map obj = null)
-	{
-		CoreStruct instance = rtl::newInstance( this.getClassName(), [null, false] );
-		
-		/* Clone values */
-		instance.assignObject( this );
-		
-		/* Assign new values */
-		if (obj != null) instance.setMap(obj);
-		
-		/* Call created */
-		instance.onCreated();
-		
-		/* Return object */
-		return instance;
 	}
 	
 	
@@ -93,9 +59,6 @@ class CoreStruct extends CoreObject implements SerializeInterface
 		
 		/* Assign new values */
 		if (obj != null) instance.setMap(obj);
-		
-		/* Call created */
-		instance.onCreated();
 		
 		/* Return object */
 		return instance;

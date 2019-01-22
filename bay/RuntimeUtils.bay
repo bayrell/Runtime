@@ -773,7 +773,7 @@ export class RuntimeUtils{
 		string message, MapInterface params = null, string locale = "", 
 		Object context = null
 	){
-		if (context == null) context = self::globalContext();
+		if (context == null) context = self::getContext();
 		if (context != null) {
 			Vector<var> args = (new Vector<var>())
 				.push(message)
