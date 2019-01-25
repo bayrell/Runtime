@@ -33,7 +33,8 @@ class CoreObject
 	/** 
 	 * Constructor
 	 */
-	public void constructor(){
+	public void constructor()
+	{
 		#switch
 		#case ifcode PHP then
 		$this->_init();
@@ -119,19 +120,7 @@ class CoreObject
 	 * @param string variable_name
 	 * @param var value
 	 */
-	public void assignValue(string variable_name, var value, CoreObject sender = null)
-	{
-		this.assignValueAfter(variable_name, value, sender);
-	}
-	
-	
-	
-	/**
-	 * Calls after assign new value
-	 * @param string variable_name
-	 * @param var value
-	 */
-	void assignValueAfter(string variable_name, var value, CoreObject sender = null)
+	public void assignValue(string variable_name, var value)
 	{
 	}
 	

@@ -24,46 +24,28 @@ use Runtime.rtl;
 use Runtime.Vector;
 
 
-class UIStruct extends CoreStruct
+struct UIStruct extends CoreStruct
 {
 	const string TYPE_ELEMENT = "element";
 	const string TYPE_COMPONENT = "component";
 	const string TYPE_STRING = "string";
 	const string TYPE_RAW = "raw";
 	
-	public string id = "";
+	
 	public string key = "";
 	public string name = "";
 	public string kind = "element";
 	public string content = "";
-	public Map<mixed> props = null;
-	public Vector<mixed> children = null;
+	public string ref = "";
+	public string control = "";
+	public string signal_in = "";
+	public string signal_out = "";
+	public Map<primitive> props = null;
+	public Vector<UIStruct> children = null;
 	
 	
 	
-	/** 
-	 * Constructor
-	 */
-	public void constructor(Map obj = null, bool can_call_created = true)
-	{
-		parent();
-		if (obj){
-			obj.each(
-				void (string key, mixed value)
-				{
-					if (key == "id") this.id = value;
-					else if (key == "key") this.key = value;
-					else if (key == "name") this.name = value;
-					else if (key == "kind") this.kind = value;
-					else if (key == "content") this.content = value;
-					else if (key == "props") this.props = value;
-					else if (key == "children") this.children = value;
-				}
-			);
-		}
-		if (can_call_created) this.onCreated();
-	}
-	
+	/* TODO: Rewrite to lambda functions */
 	
 	
 	/**
@@ -93,7 +75,7 @@ class UIStruct extends CoreStruct
 	 * @param string class_name
 	 * @return bool
 	 */
-	public bool instanceOf(string class_name)
+	public bool isClass(string class_name)
 	{
 		if (this.is_component and this.name == class_name)
 			return true;

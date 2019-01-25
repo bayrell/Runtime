@@ -27,7 +27,7 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 #endswitch
 
 
-export class rtl{
+class rtl{
 	
 	
 	static bool isBrowser(){
@@ -118,7 +118,7 @@ export class rtl{
 	 * Returns true if class instanceof class_name
 	 * @return bool
 	 */
-	declare export static bool is_instanceof(var obj, string class_name);
+	declare static bool is_instanceof(var obj, string class_name);
 	
 	#switch
 	#case ifcode PHP then
@@ -143,7 +143,7 @@ export class rtl{
 	 * Returns true if obj implements interface_name
 	 * @return bool
 	 */
-	declare export static bool is_implements(var obj, string interface_name);
+	declare static bool is_implements(var obj, string interface_name);
 	
 	#switch
 	#case ifcode PHP then
@@ -169,7 +169,7 @@ export class rtl{
 	 * Returns true if class exists
 	 * @return bool
 	 */
-	declare export static bool class_exists(string class_name);
+	declare static bool class_exists(string class_name);
 	
 	#switch
 	#case ifcode PHP then
@@ -191,7 +191,7 @@ export class rtl{
 	 * Returns true if class exists
 	 * @return bool
 	 */
-	declare export static bool class_implements(string class_name, string interface_name);
+	declare static bool class_implements(string class_name, string interface_name);
 	
 	#switch
 	#case ifcode PHP then
@@ -232,7 +232,7 @@ export class rtl{
 	 * Returns true if class exists
 	 * @return bool
 	 */
-	declare export static bool method_exists(string class_name, string method_name);
+	declare static bool method_exists(string class_name, string method_name);
 	
 	#switch
 	#case ifcode PHP then
@@ -261,7 +261,7 @@ export class rtl{
 	 * Create object by class_name. If class name does not exists return null
 	 * @return Object
 	 */
-	declare export static Object newInstance(string class_name, Vector<mixed> args);
+	declare static Object newInstance(string class_name, Vector<mixed> args);
 
 	#switch
 	#case ifcode PHP then
@@ -291,7 +291,7 @@ export class rtl{
 	 * Call method
 	 * @return Object
 	 */
-	declare export static var call(callback f, Vector args = null);
+	declare static var call(callback f, Vector args = null);
 	
 	#switch
 	#case ifcode PHP then
@@ -310,55 +310,10 @@ export class rtl{
 	
 	
 	/**
-	 * Call method
-	 * @return Object
+	 * Returns callback
+	 * @return fun
 	 */
-	declare export static var callMethod(Object obj, string method_name, Vector args = null);
-	
-	#switch
-	#case ifcode PHP then
-	static function callMethod($obj, $method_name, $args = null){
-		if ($args != null)
-			return call_user_func_array([$obj, $method_name], $args->_getArr());
-		return call_user_func([$obj, $method_name]);
-	}
-	#case ifcode JAVASCRIPT then
-	static callMethod(obj, method_name, args){
-		var f = obj[method_name];
-		return f.apply(obj, args);
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Call method
-	 * @return Object
-	 */
-	declare export static var callStaticMethod(string class_name, string method_name, Vector args = null);
-	
-	#switch
-	#case ifcode PHP then
-	static function callStaticMethod($class_name, $method_name, $args=null){
-		$class_name = static::find_class($class_name);
-		if (!class_exists($class_name)){
-			throw new \Exception($class_name . " not found ");
-		}
-		if (!method_exists($class_name, $method_name)){
-			throw new \Exception("Method '" . $method_name . "' not found in " . $class_name);
-		}
-		return call_user_func_array([$class_name, $method_name], ($args!=null)?$args->_getArr():[]);
-	}
-	#case ifcode JAVASCRIPT then
-	static callStaticMethod(class_name, method_name, args){
-		var obj = this.find_class(class_name);
-		var f = obj[method_name];
-		if (f == null || f == undefined){
-			throw new Error(class_name + "." + method_name + " not found");
-		}
-		return f.apply(obj, args);
-	}
-	#endswitch
+	declare static fun method(mixed obj, string method_name);
 	
 	
 	
@@ -366,14 +321,14 @@ export class rtl{
 	 * Call async method
 	 * @return Object
 	 */
-	declare export static void awaitRun(callback f);
+	declare static void callAwait(callback f);
 	
 	#switch
 	#case ifcode PHP then
-	static function awaitRun($f){
+	static function callAwait($f){
 	}
 	#case ifcode ES6 then
-	static awaitRun(f){
+	static callAwait(f){
 		var thread = new Runtime.AsyncThread();
 		thread.run(f);
 	}
@@ -458,68 +413,7 @@ export class rtl{
 			}
 		
 		}
-		/*
-		if (type_value == "int" and not rtl::isInt(def_value)) def_value = 0;
-		else if ((type_value == "float" or type_value == "double") and not rtl::isDouble(def_value)) def_value = 0;
-		else if (type_value == "string" and not rtl::isString(def_value)) def_value = "";
-		else if ((type_value == "bool" or type_value == "boolean") and not rtl::isBoolean(def_value)) 
-			def_value = false;
-		else def_value = null;
-		*/
-		return def_value;
-	}
-	
-	static var convert2(var value, string type_value, var def_value = null, string type_template = ""){
 		
-		if (type_value == "mixed" or type_value == "var")
-			return value;
-		
-		/* check value */
-		if (value != null and self::checkValue(value, type_value)){
-			if ( (type_value == "Runtime.Vector" or type_value == "Runtime.Map") and type_template != ""){
-				#switch
-				#case ifcode PHP then
-				return $value->_correctItemsByType($type_template);
-				#case ifcode JAVASCRIPT then
-				return value._correctItemsByType(type_template);
-				#endswitch
-				
-			}
-			return value;
-		}
-		
-		/* Try to convert */
-		else{
-			bool is_string = rtl::isString(value);
-			bool is_number = rtl::isNumber(value);
-			bool is_bool = rtl::isBoolean(value);
-			if (is_string or is_bool or is_number){
-				string s_value = rtl::toString(value);
-				try{
-					if (type_value == "int"){
-						int val = rtl::toInt(value);
-						return val;
-					}
-					else if (type_value == "float" or type_value == "double"){
-						int val = rtl::toFloat(value);
-						return val;
-					}
-					else if (type_value == "bool"){
-						int val = rtl::toBool(value);
-						return val;
-					}
-				}
-				catch (var e){}
-			}
-		}
-		
-		/* Check def_value */
-		if (not self::checkValue(def_value, type_value)){
-			if (type_value == "int" or type_value == "float" or type_value == "double") def_value = 0;
-			else if (type_value == "string") def_value = "";
-			else if (type_value == "bool" or type_value == "boolean") def_value = false;
-			else def_value = null;
-		}
 		return def_value;
 	}
 	
@@ -625,7 +519,7 @@ export class rtl{
 	 * @param var value
 	 * @return boolean
 	 */
-	declare export static boolean exists(var value);
+	declare static boolean exists(var value);
 
 	#switch
 	#case ifcode PHP then
@@ -671,7 +565,7 @@ export class rtl{
 	 * @param var value
 	 * @return boolean
 	 */
-	declare export static boolean isInt(var value);
+	declare static boolean isInt(var value);
 
 	#switch
 	#case ifcode PHP then
@@ -693,7 +587,7 @@ export class rtl{
 	 * @param var value
 	 * @return boolean
 	 */
-	declare export static boolean isDouble(var value);
+	declare static boolean isDouble(var value);
 
 	#switch
 	#case ifcode PHP then
@@ -714,7 +608,7 @@ export class rtl{
 	 * @param var value
 	 * @return boolean
 	 */
-	declare export static boolean isNumber(var value);
+	declare static boolean isNumber(var value);
 
 	#switch
 	#case ifcode PHP then
@@ -735,7 +629,7 @@ export class rtl{
 	 * @param var value
 	 * @return boolean
 	 */
-	declare export static boolean isString(var value);
+	declare static boolean isString(var value);
 
 	#switch
 	#case ifcode PHP then
@@ -757,7 +651,7 @@ export class rtl{
 	 * @param var value
 	 * @return string
 	 */
-	declare export static string toString(var value);
+	declare static string toString(var value);
 
 	#switch
 	#case ifcode PHP then
@@ -784,7 +678,7 @@ export class rtl{
 	 * @param var value
 	 * @return int
 	 */
-	declare export static int toInt(var val);
+	declare static int toInt(var val);
 
 	#switch
 	#case ifcode PHP then
@@ -814,7 +708,7 @@ export class rtl{
 	 * @param var value
 	 * @return bool
 	 */
-	declare export static bool toBool(var val);
+	declare static bool toBool(var val);
 
 	#switch
 	#case ifcode PHP then
@@ -845,7 +739,7 @@ export class rtl{
 	 * @param var value
 	 * @return float
 	 */
-	declare export static bool toFloat(var val);
+	declare static bool toFloat(var val);
 
 	#switch
 	#case ifcode PHP then
@@ -871,35 +765,11 @@ export class rtl{
 	
 	
 	/**
-	 * Returns unique value
-	 * @param bool flag If true returns as text. Default true
-	 * @return string
-	 */
-	declare export static string unique(bool flag = true);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function unique(){
-		return uniqid();
-	}
-	#case ifcode JAVASCRIPT then
-	static unique(flag){
-		if (flag == undefined) flag = true;
-		if (flag)
-			return "" + (new Date).getTime() + Math.floor((Math.random() * 899999 + 100000));
-		return Symbol();
-	}
-	#endswitch
-	
-	
-	
-	/**
 	 * Round up
 	 * @param double value
 	 * @return int
 	 */
-	declare export static string ceil(double value);
+	declare static string ceil(double value);
 	
 	
 	#switch
@@ -920,7 +790,7 @@ export class rtl{
 	 * @param double value
 	 * @return int
 	 */
-	declare export static string floor(double value);
+	declare static string floor(double value);
 	
 	
 	#switch
@@ -941,7 +811,7 @@ export class rtl{
 	 * @param double value
 	 * @return int
 	 */
-	declare export static string round(double value);
+	declare static string round(double value);
 	
 	
 	#switch
@@ -958,79 +828,9 @@ export class rtl{
 	
 	
 	/**
-	 * Round down
-	 * @param double value
-	 * @return int
-	 */
-	declare export static string dump(var value);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function dump($value){
-		var_dump($value);
-	}
-	#case ifcode JAVASCRIPT then
-	static dump(value){
-		console.log(value);
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Returns random value x, where a <= x <= b
-	 * @param int a
-	 * @param int b
-	 * @return int
-	 */
-	declare export static int random(int a, int b);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function random($a, $b){
-		if (PHP_VERSION_ID < 70000) return mt_rand($a, $b);
-		return random_int($a, $b);
-	}
-	#case ifcode JAVASCRIPT then
-	static random(a, b){
-		if (window != undefined && window.crypto != undefined && window.crypto.getRandomValues != undefined)
-		{
-			var s = new Uint32Array(1);
-			window.crypto.getRandomValues(s);
-			return Math.floor(s[0] / 4294967296 * (b - a + 1) + a);
-		}
-		return Math.floor(Math.random() * (b - a + 1) + a);
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Returns current unix time in seconds
-	 * @return int
-	 */
-	declare export static int time();
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function time(){
-		return time();
-	}
-	#case ifcode JAVASCRIPT then
-	static time(){
-		return Math.round((new Date()).getTime() / 1000);
-	}
-	#endswitch
-	
-	
-	
-	/**
 	 * Convert module name to node js package
 	 */
-	declare export static string convertNodeJSModuleName(string name);
+	declare static string convertNodeJSModuleName(string name);
 	
 	#switch
 	#case ifcode PHP then
@@ -1096,5 +896,206 @@ export class rtl{
 	}
 	#endswitch
 	
+	
+	
+	
+	/* ================ Unsafe functions ================ */
+	
+	
+	
+	/**
+	 * Returns unique value
+	 * @param bool flag If true returns as text. Default true
+	 * @return string
+	 */
+	declare static string unique(bool flag = true);
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function unique(){
+		return uniqid();
+	}
+	#case ifcode JAVASCRIPT then
+	static unique(flag){
+		if (flag == undefined) flag = true;
+		if (flag)
+			return "" + (new Date).getTime() + Math.floor((Math.random() * 899999 + 100000));
+		return Symbol();
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Round down
+	 * @param double value
+	 * @return int
+	 */
+	declare static string dump(var value);
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function dump($value){
+		var_dump($value);
+	}
+	#case ifcode JAVASCRIPT then
+	static dump(value){
+		console.log(value);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Returns random value x, where a <= x <= b
+	 * @param int a
+	 * @param int b
+	 * @return int
+	 */
+	declare static int random(int a, int b);
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function random($a, $b){
+		if (PHP_VERSION_ID < 70000) return mt_rand($a, $b);
+		return random_int($a, $b);
+	}
+	#case ifcode JAVASCRIPT then
+	static random(a, b){
+		if (window != undefined && window.crypto != undefined && window.crypto.getRandomValues != undefined)
+		{
+			var s = new Uint32Array(1);
+			window.crypto.getRandomValues(s);
+			return Math.floor(s[0] / 4294967296 * (b - a + 1) + a);
+		}
+		return Math.floor(Math.random() * (b - a + 1) + a);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Returns current unix time in seconds
+	 * @return int
+	 */
+	declare static int time();
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function time(){
+		return time();
+	}
+	#case ifcode JAVASCRIPT then
+	static time(){
+		return Math.round((new Date()).getTime() / 1000);
+	}
+	#endswitch
+	
+	
+	
+	
+	/**
+	 * Returns new element
+	 * @param string name
+	 * @param Dict<mixed> props
+	 * @param Collection<mixed> children
+	 * @param UIControl<mixed> control
+	 */
+	static UIStruct e(string name, Dict<mixed> props, Collection<mixed> children, UIControl control = null)
+	{
+		return new UIStruct(
+			{
+				"name": name,
+				"kind": UIStruct::TYPE_ELEMENT,
+				"props": props,
+				"children": children,
+				"control": control,
+			}
+		);
+	}
+	
+	
+	
+	/**
+	 * Returns new component
+	 * @param string name
+	 * @param Dict<mixed> props
+	 * @param Collection<mixed> children	 
+	 */
+	static UIStruct c(string name, Dict<mixed> props, Collection<mixed> children, UIControl control = null)
+	{
+		return new UIStruct(
+			{
+				"name": name,
+				"kind": UIStruct::TYPE_COMPONENT,
+				"props": props,
+				"children": children,
+				"control": control,
+			}
+		);
+	}
+	
+	
+	
+
+	
+	
+	/* =================== Deprecated =================== */
+	
+	
+	/**
+	 * Call method
+	 * @return Object
+	 */
+	declare static var callMethod(Object obj, string method_name, Vector args = null);
+	
+	#switch
+	#case ifcode PHP then
+	static function callMethod($obj, $method_name, $args = null){
+		if ($args != null)
+			return call_user_func_array([$obj, $method_name], $args->_getArr());
+		return call_user_func([$obj, $method_name]);
+	}
+	#case ifcode JAVASCRIPT then
+	static callMethod(obj, method_name, args){
+		var f = obj[method_name];
+		return f.apply(obj, args);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Call method
+	 * @return Object
+	 */
+	declare static var callStaticMethod(string class_name, string method_name, Vector args = null);
+	
+	#switch
+	#case ifcode PHP then
+	static function callStaticMethod($class_name, $method_name, $args=null){
+		$class_name = static::find_class($class_name);
+		if (!class_exists($class_name)){
+			throw new \Exception($class_name . " not found ");
+		}
+		if (!method_exists($class_name, $method_name)){
+			throw new \Exception("Method '" . $method_name . "' not found in " . $class_name);
+		}
+		return call_user_func_array([$class_name, $method_name], ($args!=null)?$args->_getArr():[]);
+	}
+	#case ifcode JAVASCRIPT then
+	static callStaticMethod(class_name, method_name, args){
+		var obj = this.find_class(class_name);
+		var f = obj[method_name];
+		if (f == null || f == undefined){
+			throw new Error(class_name + "." + method_name + " not found");
+		}
+		return f.apply(obj, args);
+	}
+	#endswitch
 	
 }

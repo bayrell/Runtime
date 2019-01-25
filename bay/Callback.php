@@ -20,16 +20,19 @@
 
 namespace Runtime;
 
-class Callback {
+class Callback 
+{
 	protected $obj;
 	protected $name;
 	
-	function __construct($obj, $name){
+	function __construct($obj, $name)
+	{
 		$this->obj = $obj;
 		$this->name = $name;
 	}
 		
-	function __invoke(){
+	function __invoke()
+	{
 		return call_user_func_array([$this->obj, $this->name], func_get_args());
 	}
 	

@@ -28,14 +28,14 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 #endswitch
 
 
-declare class List<T>{
+declare class Collection<T>{
 	
 	
 	/**
 	 * Append value to the end of the list and return new list
 	 * @param T value
 	 */
-	declare public List<T> pushIm(T value);
+	declare public Collection<T> pushIm(T value);
 	
 	
 	
@@ -43,7 +43,7 @@ declare class List<T>{
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	declare public List<T> unshiftIm(T value);
+	declare public Collection<T> unshiftIm(T value);
 	
 	
 	
@@ -88,7 +88,7 @@ declare class List<T>{
 	 * @param T value
 	 * @param int pos - position
 	 */
-	declare public Vector<T> insertIm(int pos, T value);
+	declare public Collection<T> insertIm(int pos, T value);
 	
 	
 	
@@ -97,7 +97,7 @@ declare class List<T>{
 	 * @param int pos - position
 	 * @param int count - count remove items
 	 */
-	declare public Vector<T> removeIm(int pos, int count = 1);
+	declare public Collection<T> removeIm(int pos, int count = 1);
 	
 	
 	
@@ -106,7 +106,7 @@ declare class List<T>{
 	 * @param int pos_begin - start position
 	 * @param int pos_end - end position
 	 */
-	declare public Vector<T> removeRangeIm(int pos_begin, int pos_end);
+	declare public Collection<T> removeRangeIm(int pos_begin, int pos_end);
 	
 	
 	
@@ -131,7 +131,7 @@ declare class List<T>{
 	 * @param int pos - position
 	 * @param T value 
 	 */
-	declare public List<T> setIm(int pos, T value);
+	declare public Collection<T> setIm(int pos, T value);
 	
 	
 	
@@ -146,7 +146,7 @@ declare class List<T>{
 	 * Append value to the end of the vector
 	 * @param T value
 	 */
-	declare public List<T> appendIm(T value);
+	declare public Collection<T> appendIm(T value);
 	
 	
 	
@@ -154,23 +154,23 @@ declare class List<T>{
 	 * Insert first value to begin of the vector
 	 * @return T value
 	 */
-	declare public List<T> prependIm(T value);
+	declare public Collection<T> prependIm(T value);
 	
 	
 	
 	/**
 	 * Append vector to the end of the vector
-	 * @param Vector<T> arr
+	 * @param Collection<T> arr
 	 */
-	declare public List<T> appendListIm(Vector<T> arr);
+	declare public Collection<T> appendListIm(Collection<T> arr);
 	
 	
 	
 	/**
 	 * Prepend vector to the begin of the vector
-	 * @param Vector<T> arr
+	 * @param Collection<T> arr
 	 */
-	declare public List<T> prependListIm(Vector<T> arr);
+	declare public Collection<T> prependListIm(Collection<T> arr);
 	
 	
 	
@@ -192,39 +192,39 @@ declare class List<T>{
 	/**
 	 * Remove value
 	 */
-	declare public List<T> removeValueIm(T value);
+	declare public Collection<T> removeValueIm(T value);
 	
 	
 	
 	/**
 	 * Remove value
 	 */
-	declare public List<T> removeItemIm(T value);
+	declare public Collection<T> removeItemIm(T value);
 	
 	
 	
 	/**
 	 * Remove value
 	 */
-	declare public List<T> removeItemsIm(List<T> values);
+	declare public Collection<T> removeItemsIm(Collection<T> values);
 	
 	
 	
 	/**
 	 * Map
 	 * @param func f
-	 * @return Vector
+	 * @return Collection
 	 */
-	declare Vector map(func f);
+	declare Collection map(func f);
 	
 	
 	
 	/**
 	 * Filter items
 	 * @param func f
-	 * @return Vector
+	 * @return Collection
 	 */
-	declare List<T> filter(func f);
+	declare Collection<T> filter(func f);
 	
 	
 	
@@ -242,7 +242,7 @@ declare class List<T>{
 	 * Call function for each item
 	 * @param func f
 	 */
-	declare List<T> each(func f);
+	declare Collection<T> each(func f);
 	
 	
 	
@@ -252,41 +252,41 @@ declare class List<T>{
 	 * @param func childs Returns childs items
 	 * @param func kind. 1 - Node item first, -1 - Node item last
 	 */
-	declare List<T> recurse(func f, func childs, int kind = 1);
+	declare Collection<T> recurse(func f, func childs, int kind = 1);
 	
 	
 	
 	/**
-	 * Returns Vector
-	 * @param Vector<T> arr
-	 * @return Vector<T>
+	 * Returns Collection
+	 * @param Collection<T> arr
+	 * @return Collection<T>
 	 */
-	declare List<T> concatIm(List<T> arr);
+	declare Collection<T> concatIm(Collection<T> arr);
 	
 	
 	
 	/**
-	 * Returns new Vector
+	 * Returns new Collection
 	 * @param int offset
 	 * @param int lenght
-	 * @return List<T>
+	 * @return Collection<T>
 	 */
-	declare List<T> sliceIm(int offset, int lenght = null);
+	declare Collection<T> sliceIm(int offset, int lenght = null);
 	
 	
 	
 	/**
-	 * Copy Vector
-	 * @return Vector<T>
+	 * Copy Collection
+	 * @return Collection<T>
 	 */
-	declare List<T> copy();
+	declare Collection<T> copy();
 	
 	
 	
 	/**
 	 * Reverse array
 	 */
-	declare public List<T> reverseIm();
+	declare public Collection<T> reverseIm();
 	
 	
 	
@@ -294,7 +294,7 @@ declare class List<T>{
 	 * Sort vector
 	 * @param func f - Sort user function
 	 */
-	declare public List<T> sortIm(func f = null);
+	declare public Collection<T> sortIm(func f = null);
 	
 	
 	/**
@@ -302,13 +302,13 @@ declare class List<T>{
 	 * @params int index1 - item1 position
 	 * @params int index2 - item2 position. If index2 = -1, insert as last item
 	 */
-	declare public List<T> swapIm(int index1, int index2);
+	declare public Collection<T> swapIm(int index1, int index2);
 	
 	
 	/**
 	 * Remove dublicate values
 	 */
-	declare public List<T> removeDublicatesIm();
+	declare public Collection<T> removeDublicatesIm();
 }
 
 
@@ -317,7 +317,7 @@ declare class List<T>{
 #case ifcode JAVASCRIPT then
 if (typeof Runtime == "undefined") Runtime = {};
 
-Runtime.Vector = class extends Array{
+Runtime.Collection = class extends Array{
 	
 	
 	/**
@@ -339,15 +339,15 @@ Runtime.Vector = class extends Array{
 	 * Returns new Instance
 	 */
 	createNewInstance(){
-		if (isBrowser()) return new Runtime.Vector();
-		return new Vector();
+		if (isBrowser()) return new Runtime.Collection();
+		return new Collection();
 	}
 	
 	
 	
 	/**
 	 * Assign all data from other object
-	 * @param Vector obj
+	 * @param Collection obj
 	 */
 	assignObject(obj){
 		this.clear();
@@ -554,7 +554,7 @@ Runtime.Vector = class extends Array{
 	
 	/**
 	 * Append vector to the end of the vector
-	 * @param Vector<T> arr
+	 * @param Collection<T> arr
 	 */
 	appendVector(arr){
 		if (!arr) return this;
@@ -566,7 +566,7 @@ Runtime.Vector = class extends Array{
 	
 	/**
 	 * Prepend vector to the begin of the vector
-	 * @param Vector<T> arr
+	 * @param Collection<T> arr
 	 */
 	prependVector(arr){
 		for (var i=0; i<arr.length; i++) super.unshift(arr[i]);
@@ -634,7 +634,7 @@ Runtime.Vector = class extends Array{
 	/**
 	 * Map
 	 * @param func f
-	 * @return Vector
+	 * @return Collection
 	 */
 	map(f){
 		return super.map(f);
@@ -645,7 +645,7 @@ Runtime.Vector = class extends Array{
 	/**
 	 * Filter items
 	 * @param func f
-	 * @return Vector
+	 * @return Collection
 	 */
 	filter(f){
 		return super.filter(f);
@@ -691,9 +691,9 @@ Runtime.Vector = class extends Array{
 	
 	
 	/**
-	 * Returns Vector
-	 * @param Vector<T> arr
-	 * @return Vector<T>
+	 * Returns Collection
+	 * @param Collection<T> arr
+	 * @return Collection<T>
 	 */
 	concat(arr){
 		if (arr == null && arr == undefined){
@@ -705,10 +705,10 @@ Runtime.Vector = class extends Array{
 	
 	
 	/**
-	 * Returns Vector
+	 * Returns Collection
 	 * @param int offset begin
 	 * @param int length end
-	 * @return Vector<T>
+	 * @return Collection<T>
 	 */
 	slice(offset, length){
 		if (length == undefined){
@@ -723,8 +723,8 @@ Runtime.Vector = class extends Array{
 	
 	
 	/**
-	 * Copy Vector
-	 * @return Vector<T>
+	 * Copy Collection
+	 * @return Collection<T>
 	 */
 	copy(){
 		return super.slice();
@@ -806,19 +806,19 @@ Runtime.Vector = class extends Array{
 if (false){
 
 module.exports = {
-	"Vector": Runtime.Vector
+	"Collection": Runtime.Collection
 }
 
 }
 else{
 
-module.exports = Runtime.Vector;
+module.exports = Runtime.Collection;
 
 }
 
 #case ifcode PHP then
 
-class Vector implements \JsonSerializable{
+class Collection implements \JsonSerializable{
 	
 	protected $_arr = [];
 	
@@ -896,7 +896,7 @@ class Vector implements \JsonSerializable{
 	
 	/**
 	 * Assign all data from other object
-	 * @param Vector obj
+	 * @param Collection obj
 	 */
 	public function assign($obj){
 		$this->_arr = $obj->_arr;
@@ -1090,7 +1090,7 @@ class Vector implements \JsonSerializable{
 	
 	/**
 	 * Append vector to the end of the vector
-	 * @param Vector<T> arr
+	 * @param Collection<T> arr
 	 */
 	public function appendVector($arr){
 		if (!$arr) return $this;
@@ -1104,7 +1104,7 @@ class Vector implements \JsonSerializable{
 	
 	/**
 	 * Prepend vector to the begin of the vector
-	 * @param Vector<T> arr
+	 * @param Collection<T> arr
 	 */
 	public function prependVector($arr){
 		$arr->each(function($item){
@@ -1181,7 +1181,7 @@ class Vector implements \JsonSerializable{
 	/**
 	 * Map
 	 * @param func f
-	 * @return Vector
+	 * @return Collection
 	 */
 	function map($f){
 		$keys = array_keys($this->_arr);
@@ -1195,7 +1195,7 @@ class Vector implements \JsonSerializable{
 	/**
 	 * Filter items
 	 * @param func f
-	 * @return Vector
+	 * @return Collection
 	 */
 	function filter($f){
 		$arr2 = $this->createNewInstance();
@@ -1242,9 +1242,9 @@ class Vector implements \JsonSerializable{
 	
 	
 	/**
-	 * Returns new concated Vector
-	 * @param Vector v
-	 * @return Vector
+	 * Returns new concated Collection
+	 * @param Collection v
+	 * @return Collection
 	 */
 	function concat($v){
 		$arr2 = $this->createNewInstance();
@@ -1255,10 +1255,10 @@ class Vector implements \JsonSerializable{
 	
 	
 	/**
-	 * Returns Vector
+	 * Returns Collection
 	 * @param int offset begin
 	 * @param int length count
-	 * @return Vector<T>
+	 * @return Collection<T>
 	 */
 	function slice($offset = 0, $length = null){
 		$arr2 = $this->createNewInstance();
@@ -1269,8 +1269,8 @@ class Vector implements \JsonSerializable{
 	
 	
 	/**
-	 * Returns copy of the Vector
-	 * @return Vector<T>
+	 * Returns copy of the Collection
+	 * @return Collection<T>
 	 */
 	function copy(){
 		$arr2 = $this->createNewInstance();

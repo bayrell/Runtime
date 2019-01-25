@@ -18,15 +18,15 @@
 
 namespace Runtime;
 
-use Runtime.CoreObject;
 use Runtime.CoreStruct;
-use Runtime.rtl;
+use Runtime.Emitter;
+use Runtime.Reference;
 
 
-struct CoreEvent extends CoreStruct
+struct UIControl extends CoreStruct
 {
-	
-	public CoreObject sender = null;
-	
-	
+	public string key = "";
+	public Reference ref = null;
+	public Emitter signal_in = null;
+	public Emitter signal_out = null;	
 }

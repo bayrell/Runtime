@@ -19,7 +19,8 @@
 namespace Runtime;
 
 
-class RuntimeConstant{
+class RuntimeConstant
+{
 	
 	
 	/* Log level */

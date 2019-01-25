@@ -24,16 +24,17 @@ use Runtime.Interfaces.CloneableInterface;
 use Runtime.Interfaces.SerializeInterface;
 
 
-class DateTime extends CoreObject implements CloneableInterface, SerializeInterface{
+class DateTime extends CoreObject implements CloneableInterface, SerializeInterface
+{
 	
-	protected serializable cloneable int y = 0;
-	protected serializable cloneable int m = 0;
-	protected serializable cloneable int d = 0;
-	protected serializable cloneable int h = 0;
-	protected serializable cloneable int u = 0;
-	protected serializable cloneable int s = 0;
-	protected serializable cloneable int ms = 0;
-	protected serializable cloneable string tz = "UTC";
+	protected serializable int y = 0;
+	protected serializable int m = 0;
+	protected serializable int d = 0;
+	protected serializable int h = 0;
+	protected serializable int u = 0;
+	protected serializable int s = 0;
+	protected serializable int ms = 0;
+	protected serializable string tz = "UTC";
 	
 	
 	/**
@@ -43,7 +44,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param int d - Day
 	 * @return DateTime instance
 	 */
-	public DateTime setDate (int y, int m, int d){
+	public DateTime setDate (int y, int m, int d)
+	{
 		this.y = y;
 		this.m = m;
 		this.d = d;
@@ -59,7 +61,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param int s - Second
 	 * @return DateTime instance
 	 */
-	public DateTime setTime (int h, int i, int s){
+	public DateTime setTime (int h, int i, int s)
+	{
 		this.h = h;
 		this.i = i;
 		this.s = s;
@@ -73,7 +76,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param int y - Year
 	 * @return DateTime instance
 	 */
-	public int setYear (int y){
+	public int setYear (int y)
+	{
 		this.y = y;
 		return this;
 	}
@@ -85,7 +89,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param int m - Month
 	 * @return DateTime instance
 	 */
-	public int setMonth (int m){
+	public int setMonth (int m)
+	{
 		this.m = m;
 		return this;
 	}
@@ -97,7 +102,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param int d - Day
 	 * @return DateTime instance
 	 */
-	public int setDay (int d){
+	public int setDay (int d)
+	{
 		this.d = d;
 		return this;
 	}
@@ -109,7 +115,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param int h - Hour
 	 * @return DateTime instance
 	 */
-	public int setHour (int h){
+	public int setHour (int h)
+	{
 		this.h = h;
 		return this;
 	}
@@ -121,7 +128,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param int i - Minute
 	 * @return DateTime instance
 	 */
-	public int setMinute (int i){
+	public int setMinute (int i)
+	{
 		this.i = i;
 		return this;
 	}
@@ -133,7 +141,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param int s - Second
 	 * @return DateTime instance
 	 */
-	public int setSecond (int s){
+	public int setSecond (int s)
+	{
 		this.s = s;
 		return this;
 	}
@@ -145,7 +154,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param int ms - Microsecond
 	 * @return DateTime instance
 	 */
-	public int setMicrosecond (int ms){
+	public int setMicrosecond (int ms)
+	{
 		this.ms = ms;
 		return this;
 	}
@@ -157,7 +167,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param string tz
 	 * @return DateTime instance
 	 */
-	public DateTime setTimezone (string tz){
+	public DateTime setTimezone (string tz)
+	{
 		this.tz = tz;
 		return this;
 	}
@@ -168,7 +179,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Returns year
 	 * @return int
 	 */
-	public int getYear (){
+	public int getYear ()
+	{
 		return this.y;
 	}
 	
@@ -178,7 +190,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Returns month
 	 * @return int
 	 */
-	public int getMonth (){
+	public int getMonth ()
+	{
 		return this.m;
 	}
 	
@@ -188,7 +201,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Returns day
 	 * @return int
 	 */
-	public int getDay (){
+	public int getDay ()
+	{
 		return this.d;
 	}
 	
@@ -198,7 +212,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Returns hour
 	 * @return int
 	 */
-	public int getHour (){
+	public int getHour ()
+	{
 		return this.h;
 	}
 	
@@ -208,7 +223,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Returns minute
 	 * @return int
 	 */
-	public int getMinute (){
+	public int getMinute ()
+	{
 		return this.i;
 	}
 	
@@ -218,7 +234,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Returns second
 	 * @return int
 	 */
-	public int getSecond (){
+	public int getSecond ()
+	{
 		return this.s;
 	}
 	
@@ -228,7 +245,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Returns microsecond
 	 * @return int
 	 */
-	public int getMicrosecond (){
+	public int getMicrosecond ()
+	{
 		return this.ms;
 	}
 	
@@ -238,7 +256,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Returns time zone
 	 * @return string
 	 */
-	public string getTimezone (){
+	public string getTimezone ()
+	{
 		return this.tz;
 	}
 	
@@ -247,7 +266,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	#switch
 	
 	#case ifcode PHP then
-	public function assignDatetime($dt){
+	public function assignDatetime($dt)
+	{
 		$this->y = (int)$dt->format("Y");
 		$this->m = (int)$dt->format("m");
 		$this->d = (int)$dt->format("d");
@@ -255,7 +275,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 		$this->i = (int)$dt->format("i");
 		$this->s = (int)$dt->format("s");
 	}
-	public function getDatetime(){
+	public function getDatetime()
+	{
 		$dt = new \DateTime("now", new \DateTimeZone($this->tz));
 		$dt->setDate($this->y, $this->m, $this->d);
 		$dt->setTime($this->h, $this->i, $this->s);
@@ -263,7 +284,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	}
 	
 	#case ifcode JAVASCRIPT then
-	getTimezoneOffset(){
+	getTimezoneOffset()
+	{
 		if (this.tz == "GMT") return 0;
 		if (this.tz == "GMT+1") return -60;
 		if (this.tz == "GMT+2") return -120;
@@ -292,7 +314,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 		if (this.tz == "GMT-12") return 720;		
 		return 0;
 	}
-	getTimezoneOffsetString(){
+	getTimezoneOffsetString()
+	{
 		var offset = this.getTimezoneOffset();
 		var sign = 1;
 		if (offset <= 0){ sign = -1; offset = -offset; }
@@ -304,14 +327,16 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 		if (sign == 1) s = "-" + s; else s = "+" + s;
 		return s;
 	}
-	shiftTimezone(dt, offset){
+	shiftTimezone(dt, offset)
+	{
 		var h = Math.floor(offset / 60);
 		var m = offset % 60;
 		dt.setMinutes(dt.getMinutes() + m);
 		dt.setHours(dt.getHours() + h);
 		return dt;
 	}
-	assignDatetime(dt){
+	assignDatetime(dt)
+	{
 		var offset = dt.getTimezoneOffset() - this.getTimezoneOffset();
 		this.shiftTimezone(dt, offset);
 		this.y = Number(dt.getFullYear());
@@ -321,7 +346,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 		this.i = Number(dt.getMinutes());
 		this.s = Number(dt.getSeconds());
 	}
-	getDatetime(){
+	getDatetime()
+	{
 		var dt = new Date(this.y, this.m - 1, this.d, this.h, this.i, this.s);
 		var offset = this.getTimezoneOffset() - dt.getTimezoneOffset();
 		this.shiftTimezone(dt, offset);
@@ -337,7 +363,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param string tz
 	 * @return DateTime
 	 */
-	public static DateTime now (string tz = "UTC"){
+	public static DateTime now (string tz = "UTC")
+	{
 		#switch
 		
 		#case ifcode PHP then
@@ -365,7 +392,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Returns day of week
 	 * @return int
 	 */
-	public int getDayOfWeek (){
+	public int getDayOfWeek ()
+	{
 		#switch
 		
 		#case ifcode PHP then
@@ -387,7 +415,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Returns timestamp
 	 * @return int
 	 */
-	public int getTimestamp (){
+	public int getTimestamp ()
+	{
 		#switch
 		
 		#case ifcode PHP then
@@ -410,7 +439,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param int timestamp
 	 * @return DateTime instance
 	 */
-	public DateTime setTimestamp (int timestamp){
+	public DateTime setTimestamp (int timestamp)
+	{
 		#switch
 		
 		#case ifcode PHP then
@@ -435,7 +465,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * @param string tz
 	 * @return DateTime instance
 	 */
-	public DateTime changeTimezone (string tz){
+	public DateTime changeTimezone (string tz)
+	{
 		#switch
 		
 		#case ifcode PHP then
@@ -460,7 +491,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Return datetime in RFC822
 	 * @return string
 	 */
-	public string getRFC822(){
+	public string getRFC822()
+	{
 		#switch
 		
 		#case ifcode PHP then
@@ -518,7 +550,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Return datetime in ISO8601
 	 * @return string
 	 */
-	public string getISO8601(){
+	public string getISO8601()
+	{
 		#switch
 		
 		#case ifcode PHP then
@@ -545,7 +578,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Return datetime by GMT
 	 * @return string
 	 */
-	public string getGMT(){
+	public string getGMT()
+	{
 		#switch
 		
 		#case ifcode PHP then
@@ -571,7 +605,8 @@ class DateTime extends CoreObject implements CloneableInterface, SerializeInterf
 	 * Return datetime by UTC
 	 * @return string
 	 */
-	public string getUTC(){
+	public string getUTC()
+	{
 		#switch
 		
 		#case ifcode PHP then

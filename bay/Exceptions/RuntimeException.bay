@@ -37,7 +37,8 @@ class ClassException extends \Exception {}
 #endswitch
 
 
-class RuntimeException extends ClassException{
+class RuntimeException extends ClassException
+{
 	
 	
 	protected ContextInterface context = null;
@@ -122,6 +123,46 @@ class RuntimeException extends ClassException{
 	}
 	#endswitch
 	
+	
+	
+	/**
+	 * Apply function and return new container
+	 * @param fun f
+	 * @return RuntimeException
+	 */
+	public RuntimeException map(fun f)
+	{
+		return this;
+	}
 
-
+	
+	
+	/**
+	 * Return values of the container
+	 * @return mixed
+	 */
+	public mixed value()
+	{
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns true if value is empty
+	 */
+	public bool isEmpty()
+	{
+		return true;
+	}
+	
+	
+	
+	/**
+	 * Returns true if is error
+	 */
+	public bool isError()
+	{
+		return true;
+	}
 }

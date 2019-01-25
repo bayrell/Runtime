@@ -18,48 +18,71 @@
 
 namespace Runtime;
 
-use Runtime.CoreStruct;
-use Runtime.Emitter;
-use Runtime.Map;
-use Runtime.Vector;
-use Runtime.Events.StructChangeEvent;
 
-
-class VectorStruct extends Vector
-{
+class Container
+{	
 	
-	protected Emitter emitter = new Emitter();
+	protected mixed _value = null;
 	
 	
-	/**
-	 * Send StructChangeEvent
-	 * @param string variable_name
-	 * @param var value
+	/** 
+	 * Constructor
 	 */
-	public void changed(CoreObject sender)
+	public void constructor(mixed x)
 	{
-		if (sender != null)
-		{
-			this.emitter.dispatch(
-				new StructChangeEvent(
-					{
-						"sender": sender,
-						"obj": this,
-					}
-				)
-			);
-		}
+		this._value = x;
+	}
+	
+	
+	
+	/** 
+	 * Returns new instance of this
+	 */
+	public static Container of(mixed x)
+	{
+		return new Container(x);
 	}
 	
 	
 	
 	/**
-	 * Returns model emitter
-	 * @return Emitter
+	 * Apply function and return new container
+	 * @param fun f
+	 * @return Container
 	 */
-	public Emitter getEmitter()
+	public Container map(fun f)
 	{
-		return this.emitter;
+		return this.of( f(this._value) );
 	}
 	
+	
+	
+	/**
+	 * Return values of the container
+	 * @return mixed
+	 */
+	public mixed value()
+	{
+		return this._value;
+	}
+	
+	
+	
+	/**
+	 * Returns true if value is empty
+	 */
+	public bool isEmpty()
+	{
+		return this._value == null;
+	}
+	
+	
+	
+	/**
+	 * Returns true if is error
+	 */
+	public bool isError()
+	{
+		return false;
+	}
 }

@@ -22,7 +22,8 @@ use Runtime.CoreObject;
 use Runtime.Vector;
 
 
-class AsyncTask extends CoreObject{
+class AsyncTask extends CoreObject
+{
 	
 	string pos = null;
 	callback f = null;
