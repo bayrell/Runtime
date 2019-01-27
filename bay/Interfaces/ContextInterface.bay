@@ -18,10 +18,9 @@
 
 namespace Runtime.Interfaces;
 
-use Runtime.CoreObject;
 
-
-interface ContextInterface{
+interface ContextInterface
+{
 	
 	
 	
