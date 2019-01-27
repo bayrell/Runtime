@@ -71,7 +71,7 @@ class CoreStruct extends CoreObject implements SerializeInterface
 	 * @param fun f
 	 * @return CoreStruct
 	 */
-	public CoreStruct map(string field_name, fun f) =>
+	public CoreStruct map(string field_name, fun f)
 	{
 		return this.copy( (new Map()).set(field_name, f(this.takeValue(field_name))) );
 	}
