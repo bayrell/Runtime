@@ -380,15 +380,15 @@ class rtl{
 						return val;
 					}
 					else if (type_value == "float" or type_value == "double"){
-						int val = rtl::toFloat(value);
+						double val = rtl::toFloat(value);
 						return val;
 					}
 					else if (type_value == "bool"){
-						int val = rtl::toBool(value);
+						bool val = rtl::toBool(value);
 						return val;
 					}
 					else if (type_value == "string"){
-						int val = rtl::toString(value);
+						string val = rtl::toString(value);
 						return val;
 					}
 				}
@@ -723,7 +723,7 @@ class rtl{
 	#case ifcode JAVASCRIPT then
 	static toBool(val){
 		var res = false;
-		if (val == 'true') res = true;
+		if (val == true || val == 'true') return true;
 		var s_res = new String(res);
 		var s_val = new String(val);
 		if (s_res.localeCompare(s_val) == 0)
