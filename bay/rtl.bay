@@ -1042,16 +1042,6 @@ class rtl{
 	
 	
 	/**
-	 * Normalize UIStruct
-	 */
-	Vector<UIStruct> normalizeUI(mixed value)
-	{
-		return value;
-	}
-	
-	
-	
-	/**
 	 * Translate message
 	 * @params string message - message need to be translated
 	 * @params MapInterface params - Messages params. Default null.
