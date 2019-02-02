@@ -1061,6 +1061,17 @@ class rtl{
 	
 
 	
+	/**
+	 * Normalize UIStruct
+	 * @param mixed data
+	 * @return UIStruct
+	 */
+	public static UIStruct normalizeUI(mixed data)
+	{
+		self::callStaticMethod("Runtime.RuntimeUtils", "normalizeUI", [data]);
+	}
+	
+	
 	
 	/* =================== Deprecated =================== */
 	
