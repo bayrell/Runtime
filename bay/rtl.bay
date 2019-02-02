@@ -1041,6 +1041,15 @@ class rtl{
 	
 	
 	
+	/**
+	 * Normalize UIStruct
+	 */
+	Vector<UIStruct> normalizeUI(mixed value)
+	{
+		return value;
+	}
+	
+	
 	
 	/**
 	 * Translate message

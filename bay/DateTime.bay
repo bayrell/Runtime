@@ -123,9 +123,9 @@ struct DateTime extends CoreStruct
 		var s = Number(dt.getSeconds());
 		return obj.copy( new Map({"y":y, "m":m, "d":d, "h":h, "i":i, "s":s}) );
 	}
-	static function createDatetime(dt, tz)
+	static createDatetime(dt, tz)
 	{
-		return static::assignDatetime(dt, new Runtime.DateTime( new Map({"tz":tz}) ));
+		return this.assignDatetime(dt, new Runtime.DateTime( new Map({"tz":tz}) ));
 	}
 	static getDatetime(obj)
 	{
