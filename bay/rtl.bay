@@ -441,8 +441,12 @@ export class rtl{
 			}
 			
 			/* Is Vector or Map */
-			else if ( (type_value == "Runtime.Vector" or type_value == "Runtime.Map") and type_template != "")
-			{
+			else if (
+				(
+					type_value == "Runtime.Vector" or type_value == "Runtime.Map" or
+					type_value == "Runtime.Collection" or type_value == "Runtime.Dict"
+				) and type_template != ""
+			){
 				#switch
 				#case ifcode PHP then
 				return $value->_correctItemsByType($type_template);

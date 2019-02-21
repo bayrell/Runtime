@@ -1,0 +1,1363 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.bayrell.org/licenses/APACHE-LICENSE-2.0.html
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+ 
+namespace Runtime;
+
+use Runtime.rtl;
+use Runtime.Exceptions.IndexOutOfRange;
+
+
+#switch
+#case ifcode JAVASCRIPT then
+var isBrowser=function(){return typeof window !== "undefined" && this === window;}
+#endswitch
+
+
+declare class Collection<T>
+{
+	
+	
+	/**
+	 * Returns value from position
+	 * @param int pos - position
+	 */
+	declare public T get(int pos, T default_value);
+	
+	
+	
+	/**
+	 * Returns value from position. Throw exception, if position does not exists
+	 * @param int pos - position
+	 */
+	declare public T item(int pos);
+	
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	declare public int count();
+	
+	
+	
+	/**
+	 * Find value in array. Returns -1 if value not found.
+	 * @param T value
+	 * @return  int
+	 */
+	declare public int indexOf(T value);
+	
+	
+	
+	/**
+	 * Find value in array, and returns position. Returns -1 if value not found.
+	 * @param T value
+	 * @param int pos_begin - begin position
+	 * @param int pos_end - end position
+	 * @return  int
+	 */
+	declare public int indexOfRange(T value, int pos_begin, int pos_end);
+	
+	
+	
+	/**
+	 * Get first item
+	 */
+	declare public T first(T default_value, int pos = -1);
+	
+	
+	
+	/**
+	 * Get last item
+	 */
+	declare public T last(T default_value, int pos = -1);
+	
+	
+	
+	/**
+	 * Append value to the end of the Collection and return new Collection
+	 * @param T value
+	 */
+	declare public Collection<T> pushIm(T value);
+	
+	
+	
+	/**
+	 * Insert first value size_to array
+	 * @return T value
+	 */
+	declare public Collection<T> unshiftIm(T value);
+	
+	
+	
+	/**
+	 * Extract last value from array
+	 * @return T value
+	 */
+	declare public Collection<T> removeLastIm();
+	
+	
+	
+	/**
+	 * Extract first value from array
+	 * @return T value
+	 */
+	declare public Collection<T> removeFirstIm();
+	
+	
+	
+	/**
+	 * Insert value to position
+	 * @param T value
+	 * @param int pos - position
+	 */
+	declare public Collection<T> insertIm(int pos, T value);
+	
+	
+	
+	/**
+	 * Remove value from position
+	 * @param int pos - position
+	 * @param int count - count remove items
+	 */
+	declare public Collection<T> removeIm(int pos, int count = 1);
+	
+	
+	
+	/**
+	 * Remove range
+	 * @param int pos_begin - start position
+	 * @param int pos_end - end position
+	 */
+	declare public Collection<T> removeRangeIm(int pos_begin, int pos_end);
+	
+	
+	
+	/**
+	 * Set value size_to position
+	 * @param int pos - position
+	 * @param T value 
+	 */
+	declare public Collection<T> setIm(int pos, T value);
+	
+	
+	
+	/**
+	 * Append value to the end of the vector
+	 * @param T value
+	 */
+	declare public Collection<T> appendIm(T value);
+	
+	
+	
+	/**
+	 * Insert first value to begin of the vector
+	 * @return T value
+	 */
+	declare public Collection<T> prependIm(T value);
+	
+	
+	
+	/**
+	 * Append vector to the end of the vector
+	 * @param Collection<T> arr
+	 */
+	declare public Collection<T> appendCollectionIm(Collection<T> arr);
+	
+	
+	
+	/**
+	 * Prepend vector to the begin of the vector
+	 * @param Collection<T> arr
+	 */
+	declare public Collection<T> prependCollectionIm(Collection<T> arr);
+	
+	
+	
+	/**
+	 * Remove value
+	 */
+	declare public Collection<T> removeValueIm(T value);
+	
+	
+	
+	/**
+	 * Remove value
+	 */
+	declare public Collection<T> removeItemIm(T value);
+	
+	
+	
+	/**
+	 * Remove value
+	 */
+	declare public Collection<T> removeItemsIm(Collection<T> values);
+	
+	
+	
+	/**
+	 * Map
+	 * @param func f
+	 * @return Collection
+	 */
+	declare Collection<T> map(func f);
+	
+	
+	
+	/**
+	 * Filter items
+	 * @param func f
+	 * @return Collection
+	 */
+	declare Collection<T> filter(func f);
+	
+	
+	
+	/**
+	 * Reduce
+	 * @param func f
+	 * @param mixed init_value
+	 * @return init_value
+	 */
+	declare mixed reduce(func f, mixed init_value);
+	
+	
+	
+	/**
+	 * Call function for each item
+	 * @param func f
+	 */
+	declare Collection<T> each(func f);
+	
+	
+	
+	/**
+	 * Each item recursive
+	 * @param func f
+	 * @param func childs Returns childs items
+	 * @param func kind. 1 - Node item first, -1 - Node item last
+	 */
+	declare Collection<T> recurse(func f, func childs, int kind = 1);
+	
+	
+	
+	/**
+	 * Returns Collection
+	 * @param Collection<T> arr
+	 * @return Collection<T>
+	 */
+	declare Collection<T> concat(Collection<T> arr);
+	
+	
+	
+	/**
+	 * Returns new Collection
+	 * @param int offset
+	 * @param int lenght
+	 * @return Collection<T>
+	 */
+	declare Collection<T> slice(int offset, int lenght = null);
+	
+	
+	
+	/**
+	 * Reverse array
+	 */
+	declare public Collection<T> reverseIm();
+	
+	
+	
+	/**
+	 * Sort vector
+	 * @param func f - Sort user function
+	 */
+	declare public Collection<T> sortIm(func f = null);
+	
+	
+	
+	/**
+	 * Remove dublicate values
+	 */
+	declare public Collection<T> removeDublicatesIm();
+}
+
+
+
+#switch
+#case ifcode JAVASCRIPT then
+if (typeof Runtime == "undefined") Runtime = {};
+
+Runtime.Collection = class extends Array
+{
+	
+	copy()
+	{
+		return super.slice();
+	}
+	
+	
+	
+	/**
+	 * Correct items
+	 */
+	_correctItemsByType(type)
+	{
+		var arr = this.copy();
+		for (var i=0; i<arr.length; i++)
+		{
+			if (isBrowser()) arr[i] = Runtime.rtl.correct(arr[i], type, null);
+			else arr[i] = rtl.correct(arr[i], type, null);
+		}
+		return arr;
+	}
+	
+	
+	
+	/**
+	 * Returns new Instance
+	 */
+	createNewInstance()
+	{
+		if (isBrowser()) return new Runtime.Collection();
+		return new Collection();
+	}
+	
+	
+	
+	/**
+	 * Returns value from position
+	 * @param int pos - position
+	 */
+	get(pos, default_value)
+	{
+		if (pos < 0 || pos >= this.length)
+			return default_value;
+		return this[pos];
+	}
+	
+	
+	
+	/**
+	 * Returns value from position. Throw exception, if position does not exists
+	 * @param int pos - position
+	 */
+	item(pos)
+	{
+		if (pos < 0 || pos >= this.length){
+			if (isBrowser()) throw new Runtime.Exceptions.IndexOutOfRange();
+			throw new IndexOutOfRange();
+		}
+		return this[pos];
+	}
+	
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	count()
+	{
+		return this.length;
+	}
+	
+	
+	
+	/**
+	 * Find value in array
+	 * @param T value
+	 * @return  int
+	 */
+	indexOf(value)
+	{
+		for (var i=0; i<this.count(); i++){
+			if (this[i] == value)
+				return i;
+		}
+		return -1;
+	}
+	
+	
+	
+	/**
+	 * Find value in array in range pos_begin <= pos <= pos_end, and returns position. 
+	 * @param T value
+	 * @param int pos_begin - begin position
+	 * @param int pos_end - end position
+	 * @return int - position
+	 */
+	indexOfRange(value, pos_begin, pos_end)
+	{
+		var pos = super.indexOf(value, pos_begin);
+		if (pos == -1 || pos > pos_end)
+			return -1;
+		return pos;
+	}
+	
+	
+	
+	/**
+	 * Get last item
+	 */
+	first(default_value)
+	{
+		if (this.length == 0)
+			return default_value;	
+		return this[0];
+	}
+	
+	
+	
+	/**
+	 * Get last item
+	 */
+	last(default_value, pos)
+	{
+		if (pos == undefined) pos = -1;
+		if (this.length == 0)
+			return default_value;
+		if (this.length + pos + 1 == 0)
+			return default_value;	
+		return this[this.length + pos];
+	}
+	getLastItem(default_value, pos)
+	{
+		return this.last(default_value, pos); 
+	}
+	
+	
+	
+	/**
+	 * Append value to the end of array
+	 * @param T value
+	 */
+	pushIm(value)
+	{
+		var arr = this.copy();
+		arr.push(value);
+		return arr;
+	}
+	
+	
+	
+	/**
+	 * Insert first value size_to array
+	 * @return T value
+	 */
+	unshiftIm(value)
+	{
+		var arr = this.copy();
+		arr.unshift(value);
+		return arr;
+	}
+	
+	
+	
+	/**
+	 * Extract last value from array
+	 * @return T value
+	 */
+	removeLastIm()
+	{
+		return this.slice(0, -1);
+	}
+	
+	
+	
+	/**
+	 * Extract last value from array
+	 * @return T value
+	 */
+	removeFirstIm()
+	{
+		return this.slice(1);
+	}
+	
+	
+	
+	/**
+	 * Insert value size_to position
+	 * @param T value
+	 * @param int pos - position
+	 */
+	insertIm(pos, value)
+	{
+		var arr = this.copy();
+		arr.splice(pos, 0, value);
+		return arr;
+	}
+	
+	
+	
+	/**
+	 * Remove value from position
+	 * @param int pos - position
+	 */
+	removeIm(pos, count)
+	{
+		if (count == undefined) count = 1;
+		var arr = this.copy();
+		arr.splice(pos, count);
+		return arr;
+	}
+	
+	
+	
+	/**
+	 * Remove range
+	 * @param int pos_begin - start position
+	 * @param int pos_end - end position
+	 */
+	removeRangeIm(pos_begin, pos_end)
+	{
+		var arr = this.copy();
+		arr.splice(pos_begin, pos_end - pos_begin + 1);
+		return arr;
+	}
+	
+	
+	
+	/**
+	 * Set value size_to position
+	 * @param int pos - position
+	 * @param T value 
+	 */
+	setIm(pos, value)
+	{
+		if (pos < 0 || pos >= this.length){
+			if (isBrowser()) throw new Runtime.Exceptions.IndexOutOfRange();
+			throw new IndexOutOfRange();
+		}
+		var arr = this.copy();
+		arr[pos] = value;
+		return arr;
+	}
+	
+	
+	
+	/**
+	 * Append value to the end of the vector
+	 * @param T value
+	 */
+	appendIm(value)
+	{
+		return this.pushIm(value);
+	}
+	
+	
+	
+	/**
+	 * Insert first value to the begin of the vector
+	 * @return T value
+	 */
+	prependIm(value)
+	{
+		return this.unshift(value);
+	}
+	
+	
+	
+	/**
+	 * Append vector to the end of the vector
+	 * @param Collection<T> arr
+	 */
+	appendCollectionIm(arr)
+	{
+		if (!arr) return this;
+		var res = this.copy();
+		for (var i=0; i<arr.length; i++)
+		{
+			res.push(arr[i]);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Prepend vector to the begin of the vector
+	 * @param Collection<T> arr
+	 */
+	prependCollectionIm(arr)
+	{
+		var res = this.copy();
+		for (var i=0; i<arr.length; i++)
+		{
+			res.unshift(arr[i]);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Remove value
+	 */
+	removeValueIm(value)
+	{
+		var index = this.indexOf(value);
+		if (index != -1)
+		{
+			return this.removeIm(index);
+		}
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Remove value
+	 */
+	removeItemIm(value)
+	{
+		return this.removeValueIm(value);
+	}
+	
+	
+	
+	/**
+	 * Remove values
+	 */
+	removeItemsIm(values)
+	{
+		var res = this;
+		for (var i=0; i<values.count(); i++)
+		{
+			res = res.removeItem( values.item(i) );
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Map
+	 * @param func f
+	 * @return Collection
+	 */
+	map(f)
+	{
+		return super.map(f);
+	}
+	
+	
+	
+	/**
+	 * Filter items
+	 * @param func f
+	 * @return Collection
+	 */
+	filter(f)
+	{
+		return super.filter(f);
+	}
+	
+	
+	
+	/**
+	 * Reduce
+	 * @param func f
+	 * @param mixed init_value
+	 * @return init_value
+	 */
+	reduce(f, init_value)
+	{
+		return super.reduce(f, init_value);
+	}
+	
+	
+	
+	/**
+	 * Call function for each item
+	 * @param func f
+	 */
+	each(f)
+	{
+		super.forEach(f);
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Each item recursive
+	 * @param func f
+	 * @param func childs Returns childs items
+	 * @param func kind. 1 - Node item first, -1 - Node item last
+	 */
+	recurse(f, childs, kind)
+	{
+		if (kind == undefined) kind=1;
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Returns Collection
+	 * @param Collection<T> arr
+	 * @return Collection<T>
+	 */
+	concat(arr)
+	{
+		if (arr == null && arr == undefined)
+		{
+			return this.slice();
+		}
+		return super.concat(arr);
+	}
+	
+	
+	
+	/**
+	 * Returns Collection
+	 * @param int offset
+	 * @param int length
+	 * @return Collection<T>
+	 */
+	slice(offset, length)
+	{
+		if (offset == undefined) offset = 0;
+		if (length == undefined)
+		{
+			if (offset == 0) return this;
+			return super.slice(offset);
+		}
+		if (offset == 0 && length == this.length) return this;
+		if (length >= 0)
+		{
+			length = this.count() - offset + length - 1;
+		}
+		return super.slice(offset, length);
+	}
+	
+	
+	
+	
+	/**
+	 * Reverse array
+	 */
+	reverseIm()
+	{
+		var arr = this.copy();
+		arr.reverse();
+		return arr;
+	}
+	
+	
+	
+	/**
+	 * Returns sorted vector
+	 * @param func f - Sort user function
+	 */
+	sortIm(f)
+	{
+		var arr = this.copy();
+		if (f == undefined) arr.sort();
+		arr.sort(f);
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Remove dublicate values
+	 */
+	removeDublicatesIm()
+	{
+		var res = this.createNewInstance();
+		for (var i=0; i<this.length; i++)
+		{
+			if (res.indexOf(this[i]) == -1)
+			{
+				res.push( this[i] );
+			}
+		}
+		return res;
+	}
+}
+
+#case ifcode NODEJS then
+
+if (false){
+
+module.exports = {
+	"Collection": Runtime.Collection
+}
+
+}
+else{
+
+module.exports = Runtime.Collection;
+
+}
+
+#case ifcode PHP then
+
+class Collection implements \JsonSerializable
+{
+	
+	protected $_arr = [];
+	
+	
+	
+	/**
+	 * Copy collection
+	 */
+	public function copy()
+	{
+		$arr2 = $this->createNewInstance();
+		if ($this->_arr == null) $arr2->_arr = [];
+		else $arr2->_arr = array_slice($this->_arr, 0);
+		return $arr2;
+	}
+	
+	
+	
+	/**
+	 * Constructor
+	 */
+	public function __construct()
+	{
+		$this->_arr = [];
+		$arr = func_get_args();
+		foreach ($arr as $data)
+		{
+			if (is_array($data))
+			{
+				foreach ($data as $item)
+				{
+					if (!is_array($item))
+					{
+						$this->_arr[] = $item;
+					}
+				}
+			}
+			else
+			{
+				$this->_arr[] = $data;
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Correct items
+	 */
+	public function _correctItemsByType($type)
+	{
+		return $this->map(
+			function($item) use ($type)
+			{
+				return rtl::correct($item, $type, null);
+			}
+		);
+	}
+	
+	
+	
+	/**
+	 * Destructor
+	 */
+	public function __destruct()
+	{
+		unset($this->_arr);
+	}
+	
+	
+	
+	/**
+	 * Get array
+	 */
+	public function _getArr()
+	{
+		return $this->_arr;
+	}
+	
+	
+	
+	/**
+	 * Returns new Instance
+	 */
+	public function createNewInstance()
+	{
+		$class_name = get_class($this);
+		return new $class_name();
+	}
+	
+	
+	
+	/**
+	 * Returns value from position
+	 * @param int pos - position
+	 */
+	public function get($pos, $default_value)
+	{
+		return isset($this->_arr[$pos]) ? $this->_arr[$pos] : $default_value;
+	}
+	
+	
+	
+	/**
+	 * Returns value from position. Throw exception, if position does not exists
+	 * @param int pos - position
+	 */
+	public function item($pos)
+	{
+		if (!array_key_exists($pos, $this->_arr))
+			throw new IndexOutOfRange();
+		return $this->_arr[$pos];
+	}
+	
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	public function count()
+	{
+		return count($this->_arr);
+	}
+	
+	
+	
+	/**
+	 * Find value in array. Returns -1 if value not found.
+	 * @param T value
+	 * @return  int
+	 */
+	public function indexOf($value)
+	{
+		$pos = array_search($value, $this->_arr, true);
+		if ($pos === false)
+			return -1;
+		return $pos;
+	}
+	
+	
+	
+	/**
+	 * Find value in array, and returns position. Returns -1 if value not found.
+	 * @param T value
+	 * @param int pos_begin - begin position
+	 * @param int pos_end - end position
+	 * @return  int
+	 */
+	public function indexOfRange($value, $pos_begin, $pos_end)
+	{
+		$pos = $this->indexOf($value);
+		if ($pos == -1 or $pos > $pos_end or $pos < $pos_begin)
+			return -1;
+		return $pos;
+	}
+	
+	
+	
+	/**
+	 * Get last item
+	 */
+	public function first($default_value = null)
+	{
+		$c = count($this->_arr);
+		if ($c == 0)
+			return $default_value;	
+		return $this->_arr[0];
+	}
+	
+	
+	
+	/**
+	 * Get last item
+	 */
+	public function last($default_value = null, $pos=-1)
+	{
+		$c = count($this->_arr);
+		if ($c == 0) return $default_value;
+		if ($c + $pos + 1 == 0) return $default_value;
+		return isset( $this->_arr[$c+$pos] ) ? $this->_arr[$c+$pos] : $default_value;
+	}
+	public function getLastItem($default_value = null, $pos=-1)
+	{
+		return this.last($default_value, $pos); 
+	}
+	
+	
+	
+	/**
+	 * Append value to the end of array
+	 * @param T value
+	 */
+	public function pushIm($value)
+	{
+		$res = $this->copy();
+		$res->_arr[] = $value;
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Insert first value size_to array
+	 * @return T value
+	 */
+	public function unshiftIm($value)
+	{
+		$res = $this->copy();
+		array_unshift($res->_arr, $value);
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Extract last value from array
+	 * @return T value
+	 */
+	public function removeLastIm()
+	{
+		$res = $this->copy();
+		array_pop($res->_arr);
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Extract first value from array
+	 * @return T value
+	 */
+	public function removeFirstIm()
+	{
+		$res = $this->copy();
+		array_shift($res->_arr);
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Insert value size_to position
+	 * @param T value
+	 * @param int pos - position
+	 */
+	public function insertIm($pos, $value)
+	{
+		$res = $this->copy();
+		array_splice($res->_arr, $pos, 0, [$value]);
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Remove value from position
+	 * @param int pos - position
+	 * @param int count - count remove items
+	 */
+	public function removeIm($pos, $count = 1)
+	{
+		$res = $this->copy();
+		array_splice($res->_arr, $pos, $count);
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Remove range
+	 * @param int pos_begin - start position
+	 * @param int pos_end - end position
+	 */
+	public function removeRangeIm($pos_begin, $pos_end)
+	{
+		$res = $this->copy();
+		$res->removeIm($pos_begin, $pos_end - $pos_begin + 1);
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Set value size_to position
+	 * @param int pos - position
+	 * @param T value 
+	 */
+	public function setIm($pos, $value)
+	{
+		if (!array_key_exists($pos, $this->_arr))
+			throw new IndexOutOfRange();
+		$res = $this->copy();	
+		$res->_arr[$pos] = $value;
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Append value to the end of array
+	 * @param T value
+	 */
+	public function appendIm($value)
+	{
+		return $this->pushIm($value);
+	}
+	
+	
+	
+	/**
+	 * Insert first value size_to array
+	 * @return T value
+	 */
+	public function prependIm($value)
+	{
+		return $this->unshiftIm($value);
+	}
+	
+	
+	
+	/**
+	 * Append vector to the end of the vector
+	 * @param Collection<T> arr
+	 */
+	public function appendCollectionIm($arr)
+	{
+		if (!$arr) return $this;
+		$res = $this->copy();
+		foreach ($arr->_arr as $item)
+		{
+			$res->_arr[] = $item;
+		}
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Prepend vector to the begin of the vector
+	 * @param Collection<T> arr
+	 */
+	public function prependCollectionIm($arr)
+	{
+		if (!$arr) return $this;
+		$res = $this->copy();
+		foreach ($arr->_arr as $item)
+		{
+			array_unshift($res->_arr, $item);
+		}
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Remove value
+	 * @param mixed value
+	 */
+	public function removeValueIm($value)
+	{
+		$index = $this->indexOf($value);
+		if ($index != -1) return $this->removeIm($index, 1);
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Remove value
+	 * @param mixed value
+	 */
+	public function removeItem($value)
+	{
+		return $this->removeValueIm($value);
+	}
+	
+	
+	
+	/**
+	 * Remove values
+	 * @param mixed values
+	 */
+	public function removeItems($values)
+	{
+		$res = $this;
+		for ($i=0; $i<$values->count(); $i++)
+		{
+			$res = $res->removeItem( $values->item(i) );
+		}
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Map
+	 * @param func f
+	 * @return Collection
+	 */
+	function map($f)
+	{
+		$keys = array_keys($this->_arr);
+		$arr2 = $this->createNewInstance();
+		$arr2->_arr = array_map($f, $this->_arr, $keys);
+		return $arr2;
+	}
+	
+	
+	
+	/**
+	 * Filter items
+	 * @param func f
+	 * @return Collection
+	 */
+	function filter($f)
+	{
+		$arr2 = $this->createNewInstance();
+		$arr2->_arr = array_values(array_filter($this->_arr, $f));
+		return $arr2;
+	}
+	
+	
+	
+	/**
+	 * Reduce
+	 * @param func f
+	 * @param mixed init_value
+	 * @return init_value
+	 */
+	function reduce($f, $init_value)
+	{
+		return array_reduce($this->_arr, $f, $init_value);
+	}
+	
+	
+	
+	/**
+	 * Call function for each item
+	 * @param func f
+	 */
+	function each($f)
+	{
+		array_walk($this->_arr, $f);
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Each item recursive
+	 * @param func f
+	 * @param func childs Returns childs items
+	 * @param func kind. 1 - Node item first, -1 - Node item last
+	 */
+	function recurse($f, $childs, $kind=1)
+	{
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Returns new concated Collection
+	 * @param Collection v
+	 * @return Collection
+	 */
+	function concat($v)
+	{
+		$arr2 = $this->createNewInstance();
+		$arr2->_arr = array_merge($this->_arr, $v->_arr);
+		return $arr2;
+	}
+	
+	
+	
+	/**
+	 * Returns Collection
+	 * @param int offset begin
+	 * @param int length count
+	 * @return Collection<T>
+	 */
+	function slice($offset = 0, $length = null)
+	{
+		$arr2 = $this->createNewInstance();
+		$arr2->_arr = array_slice($this->_arr, $offset, $length);
+		return $arr2;
+	}
+	
+	
+	
+	/**
+	 * JsonSerializable
+	 */
+	public function jsonSerialize(){
+		return $this->_arr;
+	}
+	
+	
+	
+	/**
+	 * Reverse array
+	 */
+	public function reverse(){
+		array_reverse($this->_arr);
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Sort vector
+	 * @param func f - Sort user function
+	 */
+	public function sortIm($f = null)
+	{
+		$res = $this->copy();
+		if ($f == null)
+		{
+			asort($res->_arr);
+		}
+		else
+		{
+			usort($res->_arr, $f);
+		}
+		return $res;
+	}
+	
+	
+	
+	/**
+	 * Remove dublicate values
+	 */
+	public function removeDublicatesIm()
+	{
+		$arr = [];
+		for ($i=0; $i<$this->count(); $i++)
+		{			
+			$value = $this->item($i);
+			$pos = array_search($value, $arr, true);
+			if ($pos === false)
+			{
+				$arr[] = $value;
+			}
+		}
+		$res = $this->createNewInstance();
+		$res->_arr = $arr;
+		return $res;
+	}
+}
+
+#endswitch

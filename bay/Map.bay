@@ -28,27 +28,8 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 #endswitch
 
 
-declare class Map<T>{
-
-
-	/**
-	 * Returns value from position
-	 * @param string key
-	 * @param T default_value
-	 * @return T
-	 */
-	declare public T get(string key, T default_value, string type_value = "mixed", string type_template = "");
-	
-	
-	
-	/**
-	 * Returns value from position. Throw exception, if position does not exists
-	 * @param string key - position
-	 * @return T
-	 */
-	declare public T item(string key, string type_value, string type_template = "");
-	
-	
+declare class Map<T> extends Dict<T>
+{
 	
 	/**
 	 * Set value size_to position
@@ -70,149 +51,31 @@ declare class Map<T>{
 	
 	
 	/**
-	 * Return true if key exists
-	 * @param string key
-	 * @return bool var
-	 */
-	declare public bool contains(string key);
-	
-	
-	
-	/**
-	 * Return true if key exists
-	 * @param string key
-	 * @return bool var
-	 */
-	declare public bool has(string key);
-	
-	
-	
-	/**
 	 * Clear all values from vector
 	 * @return self
 	 */
 	declare public Map<T> clear();
-
 	
-	
-	/**
-	 * Returns count items in vector
-	 */
-	declare public int count();
-	
-	
-	
-	/**
-	 * Returns vector of the keys
-	 * @return Vector<string>
-	 */
-	declare public Vector<string> keys();
-	
-	
-	
-	/**
-	 * Returns vector of the values
-	 * @return Vector<T>
-	 */
-	declare public Vector<T> values();
-	
-	
-	
-	/**
-	 * Call function for each item
-	 * @param func f
-	 */
-	declare void each(func f);
-	
-	
-	
-	/**
-	 * Call function map
-	 * @param func f
-	 * @return Map
-	 */
-	declare Map map(func f);
-	
-	
-	
-	/**
-	 * Reduce
-	 * @param func f
-	 * @param mixed init_value
-	 * @return init_value
-	 */
-	declare mixed reduce(func f, mixed init_value);
-	
-	
-	
-	/**
-	 * Add values from other map
-	 * @param Map<T> map
-	 * @return self
-	 */
-	declare public Map<T> addMap(Map<T> map);
-	
-	
-	
-	/**
-	 * Returns copy of the current Map
-	 * @return new instance
-	 */
-	declare public Map<T> copy();
 }
 
 
 
 #switch
 #case ifcode JAVASCRIPT then
-if (typeof Runtime == "undefined") Runtime = {};
 
-Runtime.Map = class extends Map{
-	
-	
-	/**
-	 * Correct items
-	 */
-	_correctItemsByType(type)
-	{
-		
-		var obj={};
-		var it = super.keys();
-		var next = it.next();
-		while (!next.done){
-			var key = next.value;
-			var val = super.get(key);
-			if (isBrowser()) val = Runtime.rtl.correct(val, type, null);
-			else val = rtl.correct(val, type, null);
-			obj[key] = val;
-			next = it.next();
-		}
-		
-		var _Map = null; if (isBrowser()) _Map = Runtime.Map; else _Map = Map;
-		return new _Map(obj);
-	}
-	
-	
-	
-	/**
-	 * Convert to string
-	 * @param var value
-	 * @return value
-	 */
-	toString(value){
-		if (isBrowser()) return Runtime.rtl.toString(value);
-		return rtl.toString(value);
-	}
-	
-	
+var _Dict = Dict;
+if (typeof Runtime == "undefined") Runtime = {};
+if (isBrowser()) _Dict = Runtime.Dict;
+
+Runtime.Map = class extends _Dict
+{
 	
 	/**
 	 * Returns new Instance
-	 * @param ContextInterface context
-	 * @param Map<string, mixed> values
-	 * @return CoreObject
+	 * @return Object
 	 */
-	createNewInstance(){
+	createNewInstance()
+	{
 		if (isBrowser()) return new Runtime.Map();
 		return new Runtime.Map();
 	}
@@ -222,69 +85,17 @@ Runtime.Map = class extends Map{
 	/**
 	 * Assign objects
 	 */
-	assignObject(obj){
-		if (obj instanceof Runtime.Map){
-			obj.each((key, value) => {
-				if (isBrowser()) this.set(key, Runtime.rtl._clone(value));
-				else this.set(key, rtl._clone(value));
-			});
-		}
-	}
-	
-	
-	
-	/**
-	 * Map constructor
-	 */
-	constructor(map){
-		super();
-		var _Map = null; if (isBrowser()) _Map = Runtime.Map; else _Map = Map;
-		if (map != undefined && typeof map == 'object'){		
-			if (map instanceof Map){
-				var keys = map.keys();
-				keys.each((key)=>{
-					super.set(key, map.item(key));
-				});		
-			}
-			else{
-				for (var i in map){
-					super.set(i, map[i]);
+	assignObject(obj)
+	{
+		if (obj instanceof Runtime.Map)
+		{
+			obj.each(
+				(key, value) => {
+					if (isBrowser()) this.set(key, Runtime.rtl._clone(value));
+					else this.set(key, rtl._clone(value));
 				}
-			}
+			);
 		}
-	}
-	
-	
-	/**
-	 * Returns value from position
-	 * @param T key
-	 * @param T default_value
-	 * @return T
-	 */
-	get(key, default_value, type_value = "mixed", type_template = ""){
-		key = this.toString(key);
-		var val = super.get(key);
-		if (val == undefined) return default_value;
-		if (isBrowser()) return Runtime.rtl.correct(val, type_value, default_value, type_template);
-		return rtl.correct(val, type_value, default_value, type_template);
-	}
-	
-	
-	
-	/**
-	 * Returns value from position. Throw exception, if position does not exists
-	 * @param T key - position
-	 * @return T
-	 */
-	item(key){
-		key = this.toString(key);
-		if (!super.has(key)){
-			if (isBrowser()) throw new Runtime.Exceptions.KeyNotFound(key);
-			throw new KeyNotFound(key);
-		}
-		var val = super.get(key);
-		if (val === null || val == undefined) return null;
-		return val;
 	}
 	
 	
@@ -294,7 +105,8 @@ Runtime.Map = class extends Map{
 	 * @param T pos - position
 	 * @param T value 
 	 */
-	set(key, value){
+	set(key, value)
+	{
 		key = this.toString(key);
 		super.set(key, value);
 		return this;
@@ -306,7 +118,8 @@ Runtime.Map = class extends Map{
 	 * Remove value from position
 	 * @param T key
 	 */
-	remove(key){
+	remove(key)
+	{
 		key = this.toString(key);
 		if (super.has(key)){
 			super.delete(key);
@@ -317,165 +130,14 @@ Runtime.Map = class extends Map{
 	
 	
 	/**
-	 * Return true if key exists
-	 * @param T key
-	 * @return bool var
-	 */
-	contains(key){
-		key = this.toString(key);
-		return super.has(key);
-	}
-	
-	
-	
-	/**
-	 * Return true if key exists
-	 * @param T key
-	 * @return bool var
-	 */
-	has(key){
-		key = this.toString(key);
-		return super.has(key);
-	}
-	
-	
-	
-	/**
 	 * Clear all values from vector
 	 */
-	clear(){
+	clear()
+	{
 		super.clear();
 		return this;
 	}
-
 	
-	
-	/**
-	 * Returns count items in vector
-	 */
-	count(){
-		return this.size;
-	}
-	
-	
-	
-	/**
-	 * Returns vector of the keys
-	 * @return Vector<T>
-	 */
-	keys(){
-		var it = super.keys();
-		var res = new Runtime.Vector();
-		var next = it.next();
-		while (!next.done){
-			res.push( next.value );
-			next = it.next();
-		}
-		return res;
-	}
-	
-	
-	
-	/**
-	 * Returns vector of the values
-	 * @return Vector<T>
-	 */
-	values(){
-		var it = super.values();
-		var res = new Runtime.Vector();
-		var next = it.next();
-		while (!next.done){
-			res.push( next.value );
-			next = it.next();
-		}
-		return res;
-	}
-	
-	
-	
-	/**
-	 * Call function for each item
-	 * @param func f
-	 */
-	each(f){
-		var keys = this.keys();
-		keys.each((key)=>{
-			var value = this.item(key);
-			f(key, value);
-		});
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Call function map
-	 * @param func f
-	 * @return Map
-	 */
-	map(f){
-		var _Map = null; if (isBrowser()) _Map = Runtime.Map; else _Map = Map;
-		var res = new _Map();
-		this.each((key, value)=>{
-			res.set(key, f(key, value));
-		});
-		return res;
-	}
-	
-	
-	
-	/**
-	 * Reduce
-	 * @param func f
-	 * @param mixed init_value
-	 * @return init_value
-	 */
-	reduce(f, init_value){
-		var res = init_value;
-		this.each((key, value) => {
-			res = f(res, key, value);
-		});
-		return res;
-	}
-	
-	
-	
-	/**
-	 * Add values from other map
-	 * @param Map<T, T> map
-	 * @return self
-	 */
-	addMap(map){
-		if (map != null)
-			map.each((key)=>{
-				this.set(key, map.item(key));
-			});
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Convert Map to Object
-	 */
-	toObject(){
-		var obj = {};
-		this.each((key)=>{obj[key]=this.get(key, null);});
-		return obj;
-	}
-	
-	
-	
-	/**
-	 * Returns copy of the current Map
-	 */
-	copy(){
-		var instance = this.createNewInstance();
-		this.each((key, value) => {
-			instance.set(key, value);
-		});
-		return instance;
-	}
 }
 
 #case ifcode NODEJS then
@@ -496,87 +158,11 @@ module.exports = Runtime.Map;
 
 #case ifcode PHP then
 
-class Map implements \JsonSerializable{
+class Map extends Dict
+{
 	
 	
 	protected $_map = null;
-	
-	
-	
-	/**
-	 * Correct items
-	 */
-	public function _correctItemsByType($type){
-		return $this->map(function($key, $value) use ($type){
-			return rtl::correct($value, $type, null);
-		});
-	}
-	
-	
-	
-	/**
-	 * Constructor
-	 */
-	public function __construct($map = null){
-		$this->_map = [];
-		if ($map instanceof Map){
-			foreach ($map->_map as $key => $value){
-				$key = rtl::toString($key);
-				$this->_map[$key] = $value;
-			}		
-		}
-		else if (is_array($map)){
-			foreach ($map as $key => $value){
-				$key = rtl::toString($key);
-				$this->_map[$key] = $value;
-			}		
-		}
-		else if (is_object($map)){
-			$values = get_object_vars($map);
-			foreach ($values as $key => $value){
-				$key = rtl::toString($key);
-				$this->_map[$key] = $value;
-			}
-		}
-	}
-	
-	
-	
-	/**
-	 * Destructor
-	 */
-	public function __destruct(){
-		unset($this->_map);
-	}
-	
-	
-	/**
-	 * Returns value from position
-	 * @param T key
-	 * @param T default_value
-	 * @return T
-	 */
-	public function get($key, $default_value, $type_value = "mixed", $type_template = ""){
-		$key = rtl::toString($key);
-		$val = isset($this->_map[$key]) ? $this->_map[$key] : $default_value;
-		$val = rtl::convert($val, $type_value, $default_value, $type_template);
-		return $val;
-	}
-	
-	
-	
-	/**
-	 * Returns value from position. Throw exception, if position does not exists
-	 * @param T key - position
-	 * @return T
-	 */
-	public function item($key, $type_value = "mixed", $type_template = ""){
-		$key = rtl::toString($key);
-		if (!array_key_exists($key, $this->_map)){
-			throw new KeyNotFound($key);
-		}
-		return $this->_map[$key];
-	}
 	
 	
 	
@@ -586,7 +172,8 @@ class Map implements \JsonSerializable{
 	 * @param T value 
 	 * @return self
 	 */
-	public function set($key, $value){
+	public function set($key, $value)
+	{
 		$key = rtl::toString($key);
 		$this->_map[$key] = $value;
 		return $this;
@@ -599,35 +186,12 @@ class Map implements \JsonSerializable{
 	 * @param T key
 	 * @return self
 	 */
-	public function remove($key){
+	public function remove($key)
+	{
 		$key = rtl::toString($key);
 		if (isset($this->_map[$key]))
 			unset($this->_map[$key]);
 		return $this;
-	}
-	
-	
-	
-	/**
-	 * Return true if key exists
-	 * @param T key
-	 * @return bool var
-	 */
-	public function contains($key){
-		$key = rtl::toString($key);
-		return isset($this->_map[$key]);
-	}
-	
-	
-	
-	/**
-	 * Return true if key exists
-	 * @param T key
-	 * @return bool var
-	 */
-	public function has($key){
-		$key = rtl::toString($key);
-		return isset($this->_map[$key]);
 	}
 	
 	
@@ -640,143 +204,7 @@ class Map implements \JsonSerializable{
 		$this->_map = [];
 		return $this;
 	}
-
 	
-	
-	/**
-	 * Returns count items in vector
-	 */
-	public function count(){
-		return count($this->_map);
-	}
-	
-	
-	
-	/**
-	 * Returns vector of the keys
-	 * @return Vector<T>
-	 */
-	public function keys(){
-		$keys = array_keys($this->_map);
-		$res = new Vector();
-		$res->_assignArr($keys);		
-		return $res;
-	}
-	
-	
-	
-	/**
-	 * Returns vector of the values
-	 * @return Vector<T>
-	 */
-	public function values(){
-		$values = array_values($this->_map);
-		$res = new Vector();
-		$res->_assignArr($values);		
-		return $res;
-	}
-	
-	
-	
-	/**
-	 * Call function for each item
-	 * @param func f
-	 */
-	function each($f){
-		$keys = array_keys($this->_map);
-		array_walk($keys, function($key) use ($f){
-			$value = $this->item($key);
-			$f($key, $value);
-		});
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Call function map
-	 * @param func f
-	 * @return Map
-	 */
-	function map($f){
-		$res = new Map();
-		$this->each(function($key) use ($res, $f){
-			$value = $this->item($key);
-			$res->set($key, $f($key, $value));
-		});
-		return $res;
-	}
-	
-	
-	
-	/**
-	 * Reduce
-	 * @param func f
-	 * @param mixed init_value
-	 * @return init_value
-	 */
-	function reduce($f, $init_value){
-		$res = $init_value;
-		$this->each(function ($key, $value) use (&$res, $f){
-			$res = $f($res, $key, $value);
-		});
-		return $res;
-	}
-	
-	
-	
-	/**
-	 * Add values from other map
-	 * @param Map<T, T> map
-	 * @return self
-	 */
-	function addMap($map){
-		if ($map != null)
-			$map->each(function ($key) use ($map){
-				$this->set($key, $map->item($key));
-			});
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Returns copy of the current Map
-	 */
-	function copy(){
-		$instance = new \Runtime\Map();
-		$this->each(function ($key, $value) use ($instance){
-			$instance->set($key, $value);
-		});
-		return $instance;
-	}
-	
-	
-	
-	/**
-	 * Get and set methods
-	 */
-	function __set($name, $value){
-		return $this->set($name, $value);
-	}
-	function __get($name){
-		return $this->get($name, null);
-	}
-	function __isset($name){
-		return $this->has($name);
-	}
-	function __unset($name){
-		return $this->remove($name);
-	}
-	
-	
-	
-	/**
-	 * JsonSerializable
-	 */
-	public function jsonSerialize(){
-		return (object) $this->_map;
-	}
 }
 
 #endswitch

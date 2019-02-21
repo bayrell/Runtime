@@ -19,6 +19,7 @@
 namespace Runtime;
 
 use Runtime.rtl;
+use Runtime.Collection;
 use Runtime.Exceptions.IndexOutOfRange;
 
 
@@ -28,7 +29,8 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 #endswitch
 
 
-declare class Vector<T>{
+declare class Vector<T> extends Collection
+{
 	
 	
 	/**
@@ -64,26 +66,6 @@ declare class Vector<T>{
 	
 	
 	/**
-	 * Find value in array. Returns -1 if value not found.
-	 * @param T value
-	 * @return  int
-	 */
-	declare public int indexOf(T value);
-	
-	
-	
-	/**
-	 * Find value in array, and returns position. Returns -1 if value not found.
-	 * @param T value
-	 * @param int pos_begin - begin position
-	 * @param int pos_end - end position
-	 * @return  int
-	 */
-	declare public int indexOfRange(T value, int pos_begin, int pos_end);
-	
-	
-	
-	/**
 	 * Insert value to position
 	 * @param T value
 	 * @param int pos - position
@@ -111,22 +93,6 @@ declare class Vector<T>{
 	
 	
 	/**
-	 * Returns value from position
-	 * @param int pos - position
-	 */
-	declare public T get(int pos, T default_value);
-	
-	
-	
-	/**
-	 * Returns value from position. Throw exception, if position does not exists
-	 * @param int pos - position
-	 */
-	declare public T item(int pos);
-	
-	
-	
-	/**
 	 * Set value size_to position
 	 * @param int pos - position
 	 * @param T value 
@@ -139,13 +105,6 @@ declare class Vector<T>{
 	 * Clear all values from vector
 	 */
 	declare public Vector<T> clear();
-	
-	
-	
-	/**
-	 * Returns count items in vector
-	 */
-	declare public int count();
 	
 	
 	
@@ -182,21 +141,6 @@ declare class Vector<T>{
 	
 	
 	/**
-	 * Returns count items in vector
-	 */
-	declare public void length();
-	
-	
-	
-	/**
-	 * Get last item
-	 */
-	declare public T getLastItem(T default_value);
-	declare public T last(T default_value, int pos = -1);
-	
-	
-	
-	/**
 	 * Remove value
 	 */
 	declare public Vector<T> removeValue(T value);
@@ -216,152 +160,43 @@ declare class Vector<T>{
 	declare public Vector<T> removeItems(Vector<T> values);
 	
 	
-	
-	/**
-	 * Map
-	 * @param func f
-	 * @return Vector
-	 */
-	declare Vector map(func f);
-	
-	
-	
-	/**
-	 * Filter items
-	 * @param func f
-	 * @return Vector
-	 */
-	declare Vector<T> filter(func f);
-	
-	
-	
-	/**
-	 * Reduce
-	 * @param func f
-	 * @param mixed init_value
-	 * @return init_value
-	 */
-	declare mixed reduce(func f, mixed init_value);
-	
-	
-	
-	/**
-	 * Call function for each item
-	 * @param func f
-	 */
-	declare Vector<T> each(func f);
-	
-	
-	
-	/**
-	 * Each item recursive
-	 * @param func f
-	 * @param func childs Returns childs items
-	 * @param func kind. 1 - Node item first, -1 - Node item last
-	 */
-	declare Vector<T> recurse(func f, func childs, int kind = 1);
-	
-	
-	
-	/**
-	 * Returns Vector
-	 * @param Vector<T> arr
-	 * @return Vector<T>
-	 */
-	declare Vector<T> concat(Vector<T> arr);
-	
-	
-	
-	/**
-	 * Returns new Vector
-	 * @param int offset
-	 * @param int lenght
-	 * @return Vector<T>
-	 */
-	declare Vector<T> slice(int offset, int lenght = null);
-	
-	
-	
-	/**
-	 * Copy Vector
-	 * @return Vector<T>
-	 */
-	declare Vector<T> copy();
-	
-	
-	
-	/**
-	 * Reverse array
-	 */
-	declare public Vector<T> reverse();
-	
-	
-	
-	/**
-	 * Sort vector
-	 * @param func f - Sort user function
-	 */
-	declare public Vector<T> sort(func f = null);
-	
-	
-	/**
-	 * Swap item1 to item2
-	 * @params int index1 - item1 position
-	 * @params int index2 - item2 position. If index2 = -1, insert as last item
-	 */
-	declare public Vector<T> swap(int index1, int index2);
-	
-	
-	/**
-	 * Remove dublicate values
-	 */
-	declare public Vector<T> removeDublicates();
 }
 
 
 
 #switch
 #case ifcode JAVASCRIPT then
-if (typeof Runtime == "undefined") Runtime = {};
 
-Runtime.Vector = class extends Array{
-	
-	
-	/**
-	 * Correct items
-	 */
-	_correctItemsByType(type){
-		var arr = this.slice();
-		for (var i=0; i<arr.length; i++)
-		{
-			if (isBrowser()) arr[i] = Runtime.rtl.correct(arr[i], type, null);
-			else arr[i] = rtl.correct(arr[i], type, null);
-		}
-		return arr;
-	}
-	
-	
+var _Collection = Collection;
+if (typeof Runtime == "undefined") Runtime = {};
+if (isBrowser()) _Collection = Runtime.Collection;
+
+Runtime.Vector = class extends _Collection
+{
 	
 	/**
 	 * Returns new Instance
+	 * @return Object
 	 */
 	createNewInstance(){
 		if (isBrowser()) return new Runtime.Vector();
-		return new Vector();
+		return new Runtime.Vector();
 	}
-	
 	
 	
 	/**
 	 * Assign all data from other object
 	 * @param Vector obj
 	 */
-	assignObject(obj){
+	assignObject(obj)
+	{
 		this.clear();
-		obj.each((item)=>{
-			if (isBrowser()) this.push( Runtime.rtl._clone(item) );
-			else this.push( rtl._clone(item) );
-		});
+		obj.each(
+			(item)=>{
+				if (isBrowser()) this.push( Runtime.rtl._clone(item) );
+				else this.push( rtl._clone(item) );
+			}
+		);
 	}
 	
 	
@@ -370,8 +205,8 @@ Runtime.Vector = class extends Array{
 	 * Append value to the end of array
 	 * @param T value
 	 */
-	push(value){
-		/*Array.prototype.push.call(this, value);*/
+	push(value)
+	{
 		super.push(value);
 		return this;
 	}
@@ -382,7 +217,8 @@ Runtime.Vector = class extends Array{
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	unshift(value){
+	unshift(value)
+	{
 		super.unshift(value);
 		return this;
 	}
@@ -393,7 +229,8 @@ Runtime.Vector = class extends Array{
 	 * Extract last value from array
 	 * @return T value
 	 */
-	pop(){
+	pop()
+	{
 		return super.pop();
 	}
 	
@@ -403,39 +240,9 @@ Runtime.Vector = class extends Array{
 	 * Extract first value from array
 	 * @return T value
 	 */
-	shift(){
+	shift()
+	{
 		return super.shift();
-	}
-	
-	
-	
-	/**
-	 * Find value in array
-	 * @param T value
-	 * @return  int
-	 */
-	indexOf(value){
-		for (var i=0; i<this.count(); i++){
-			if (this[i] == value)
-				return i;
-		}
-		return -1;
-	}
-	
-	
-	
-	/**
-	 * Find value in array in range pos_begin <= pos <= pos_end, and returns position. 
-	 * @param T value
-	 * @param int pos_begin - begin position
-	 * @param int pos_end - end position
-	 * @return int - position
-	 */
-	indexOfRange(value, pos_begin, pos_end){
-		var pos = super.indexOf(value, pos_begin);
-		if (pos == -1 || pos > pos_end)
-			return -1;
-		return pos;
 	}
 	
 	
@@ -445,7 +252,8 @@ Runtime.Vector = class extends Array{
 	 * @param T value
 	 * @param int pos - position
 	 */
-	insert(pos, value){
+	insert(pos, value)
+	{
 		super.splice(pos, 0, value);
 		return this;
 	}
@@ -456,7 +264,8 @@ Runtime.Vector = class extends Array{
 	 * Remove value from position
 	 * @param int pos - position
 	 */
-	remove(pos, count){
+	remove(pos, count)
+	{
 		if (count == undefined) count = 1;
 		super.splice(pos, count);
 		return this;
@@ -469,35 +278,10 @@ Runtime.Vector = class extends Array{
 	 * @param int pos_begin - start position
 	 * @param int pos_end - end position
 	 */
-	removeRange(pos_begin, pos_end){
+	removeRange(pos_begin, pos_end)
+	{
 		super.splice(pos_begin, pos_end - pos_begin + 1);
 		return this;
-	}
-	
-	
-	
-	/**
-	 * Returns value from position
-	 * @param int pos - position
-	 */
-	get(pos, default_value){
-		if (pos < 0 || pos >= this.length)
-			return default_value;
-		return this[pos];
-	}
-	
-	
-	
-	/**
-	 * Returns value from position. Throw exception, if position does not exists
-	 * @param int pos - position
-	 */
-	item(pos){
-		if (pos < 0 || pos >= this.length){
-			if (isBrowser()) throw new Runtime.Exceptions.IndexOutOfRange();
-			throw new IndexOutOfRange();
-		}
-		return this[pos];
 	}
 	
 	
@@ -507,8 +291,10 @@ Runtime.Vector = class extends Array{
 	 * @param int pos - position
 	 * @param T value 
 	 */
-	set(pos, value){
-		if (pos < 0 || pos >= this.length){
+	set(pos, value)
+	{
+		if (pos < 0 || pos >= this.length)
+		{
 			if (isBrowser()) throw new Runtime.Exceptions.IndexOutOfRange();
 			throw new IndexOutOfRange();
 		}
@@ -529,19 +315,11 @@ Runtime.Vector = class extends Array{
 	
 	
 	/**
-	 * Returns count items in vector
-	 */
-	count(){
-		return this.length;
-	}
-	
-	
-	
-	/**
 	 * Append value to the end of the vector
 	 * @param T value
 	 */
-	append(value){
+	append(value)
+	{
 		this.push(value);
 		return this;
 	}
@@ -552,7 +330,8 @@ Runtime.Vector = class extends Array{
 	 * Insert first value to the begin of the vector
 	 * @return T value
 	 */
-	prepend(value){
+	prepend(value)
+	{
 		this.unshift(value);
 		return this;
 	}
@@ -563,7 +342,8 @@ Runtime.Vector = class extends Array{
 	 * Append vector to the end of the vector
 	 * @param Vector<T> arr
 	 */
-	appendVector(arr){
+	appendVector(arr)
+	{
 		if (!arr) return this;
 		for (var i=0; i<arr.length; i++) super.push(arr[i]);
 		return this;
@@ -575,7 +355,8 @@ Runtime.Vector = class extends Array{
 	 * Prepend vector to the begin of the vector
 	 * @param Vector<T> arr
 	 */
-	prependVector(arr){
+	prependVector(arr)
+	{
 		for (var i=0; i<arr.length; i++) super.unshift(arr[i]);
 		return this;
 	}
@@ -583,27 +364,10 @@ Runtime.Vector = class extends Array{
 	
 	
 	/**
-	 * Get last item
-	 */
-	getLastItem(default_value, pos){
-		if (pos == undefined) pos = -1;
-		if (this.length == 0)
-			return default_value;
-		if (this.length + pos + 1 == 0)
-			return default_value;	
-		return this[this.length + pos];
-	}
-	last(default_value, pos){
-		if (pos == undefined) pos = -1;
-		return this.getLastItem(default_value, pos); 
-	}
-	
-	
-	
-	/**
 	 * Remove value
 	 */
-	removeValue(value){
+	removeValue(value)
+	{
 		var index = this.indexOf(value);
 		if (index != -1)
 			this.remove(index, 1);
@@ -615,11 +379,9 @@ Runtime.Vector = class extends Array{
 	/**
 	 * Remove value
 	 */
-	removeItem(value){
-		var index = this.indexOf(value);
-		if (index != -1)
-			this.remove(index, 1);
-		return this;
+	removeItem(value)
+	{
+		return this.removeValue(value);
 	}
 	
 	
@@ -636,176 +398,6 @@ Runtime.Vector = class extends Array{
 		return this;
 	}
 	
-	
-	
-	/**
-	 * Map
-	 * @param func f
-	 * @return Vector
-	 */
-	map(f){
-		return super.map(f);
-	}
-	
-	
-	
-	/**
-	 * Filter items
-	 * @param func f
-	 * @return Vector
-	 */
-	filter(f){
-		return super.filter(f);
-	}
-	
-	
-	
-	/**
-	 * Reduce
-	 * @param func f
-	 * @param mixed init_value
-	 * @return init_value
-	 */
-	reduce(f, init_value){
-		return super.reduce(f, init_value);
-	}
-	
-	
-	
-	/**
-	 * Call function for each item
-	 * @param func f
-	 */
-	each(f){
-		super.forEach(f);
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Each item recursive
-	 * @param func f
-	 * @param func childs Returns childs items
-	 * @param func kind. 1 - Node item first, -1 - Node item last
-	 */
-	recurse(f, childs, kind)
-	{
-		if (kind == undefined) kind=1;
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Returns Vector
-	 * @param Vector<T> arr
-	 * @return Vector<T>
-	 */
-	concat(arr){
-		if (arr == null && arr == undefined){
-			return super.slice();
-		}
-		return super.concat(arr);
-	}
-	
-	
-	
-	/**
-	 * Returns Vector
-	 * @param int offset begin
-	 * @param int length end
-	 * @return Vector<T>
-	 */
-	slice(offset, length){
-		if (length == undefined){
-			return super.slice(offset);
-		}
-		if (length >= 0){
-			length = this.count() - offset + length - 1;
-		}
-		return super.slice(offset, length);
-	}
-	
-	
-	
-	/**
-	 * Copy Vector
-	 * @return Vector<T>
-	 */
-	copy(){
-		return super.slice();
-	}
-	
-	
-	
-	/**
-	 * Reverse array
-	 */
-	reverse(){
-		super.reverse();
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Returns sorted vector
-	 * @param func f - Sort user function
-	 */
-	sort(f){
-		if (f == undefined) super.sort();
-		super.sort(f);
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Swap item1 to item2
-	 * @params int index1 - item1 position
-	 * @params int index2 - item2 position. If index2 = -1, insert as last item
-	 */
-	swap(index1, index2){
-		if (index2 < 0){
-			index2 += this.length;
-		}
-		var item1 = this.item(index1);
-		if (index2 == -1){
-			this.remove(index1, 1);
-			this.push(item1);
-		}
-		else if (index1 > index2){
-			var item2 = this.item(index2);
-			this.insert(index1, item2);
-			this.remove(index1 + 1, 1);	
-			this.insert(index2, item1);
-			this.remove(index2 + 1, 1);
-		}
-		else if (index1 < index2){
-			var item2 = this.item(index2);
-			this.insert(index2, item1);
-			this.remove(index2 + 1, 1);
-			this.insert(index1, item2);
-			this.remove(index1 + 1, 1);			
-		}
-		return this;
-	}
-	
-	
-	/**
-	 * Remove dublicate values
-	 */
-	removeDublicates(){
-		var arr = this.copy();
-		this.clear();		
-		for (var i=0; i<arr.length; i++){
-			if (this.indexOf(arr[i]) == -1){
-				this.push(arr[i]);
-			}
-		}
-		return this;
-	}
 }
 
 #case ifcode NODEJS then
@@ -825,76 +417,14 @@ module.exports = Runtime.Vector;
 
 #case ifcode PHP then
 
-class Vector implements \JsonSerializable{
-	
-	protected $_arr = [];
-	
-	
-	/**
-	 * Constructor
-	 */
-	public function __construct(){
-		$this->_arr = [];
-		$arr = func_get_args();
-		foreach ($arr as $data){
-			if (is_array($data)){
-				foreach ($data as $item){
-					if (!is_array($item)){
-						$this->_arr[] = $item;
-					}
-				}
-			}
-			else{
-				$this->_arr[] = $data;
-			}
-		}
-	}
-	
-	
-	
-	/**
-	 * Correct items
-	 */
-	public function _correctItemsByType($type){
-		return $this->map(function($item) use ($type){
-			return rtl::correct($item, $type, null);
-		});
-	}
-	
-	
-	
-	/**
-	 * Destructor
-	 */
-	public function __destruct(){
-		unset($this->_arr);
-	}
-	
-	
-	
-	/**
-	 * Assign arr
-	 */
-	public function _assignArr(&$arr){
-		$this->_arr = $arr;
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Get array
-	 */
-	public function _getArr(){
-		return $this->_arr;
-	}
-	
-	
+class Vector extends \Runtime\Collection
+{
 	
 	/**
 	 * Returns new Instance
 	 */
-	public function createNewInstance(){
+	public function createNewInstance()
+	{
 		$class_name = get_class($this);
 		return new $class_name();
 	}
@@ -902,19 +432,22 @@ class Vector implements \JsonSerializable{
 	
 	
 	/**
-	 * Assign all data from other object
-	 * @param Vector obj
+	 * Assign arr
 	 */
-	public function assign($obj){
-		$this->_arr = $obj->_arr;
+	public function _assignArr(&$arr)
+	{
+		$this->_arr = $arr;
+		return $this;
 	}
+	
 	
 	
 	/**
 	 * Append value to the end of array
 	 * @param T value
 	 */
-	public function push($value){
+	public function push($value)
+	{
 		$this->_arr[] = $value;
 		return $this;
 	}
@@ -925,7 +458,8 @@ class Vector implements \JsonSerializable{
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	public function unshift($value){
+	public function unshift($value)
+	{
 		array_unshift($this->_arr, $value);
 		return $this;
 	}
@@ -936,7 +470,8 @@ class Vector implements \JsonSerializable{
 	 * Extract last value from array
 	 * @return T value
 	 */
-	public function pop(){
+	public function pop()
+	{
 		return array_pop($this->_arr);
 	}
 	
@@ -946,38 +481,9 @@ class Vector implements \JsonSerializable{
 	 * Extract first value from array
 	 * @return T value
 	 */
-	public function shift(){
+	public function shift()
+	{
 		return array_shift($this->_arr);
-	}
-	
-	
-	
-	/**
-	 * Find value in array. Returns -1 if value not found.
-	 * @param T value
-	 * @return  int
-	 */
-	public function indexOf($value){
-		$pos = array_search($value, $this->_arr, true);
-		if ($pos === false)
-			return -1;
-		return $pos;
-	}
-	
-	
-	
-	/**
-	 * Find value in array, and returns position. Returns -1 if value not found.
-	 * @param T value
-	 * @param int pos_begin - begin position
-	 * @param int pos_end - end position
-	 * @return  int
-	 */
-	public function indexOfRange($value, $pos_begin, $pos_end){
-		$pos = $this->indexOf($value);
-		if ($pos == -1 or $pos > $pos_end or $pos < $pos_begin)
-			return -1;
-		return $pos;
 	}
 	
 	
@@ -987,7 +493,8 @@ class Vector implements \JsonSerializable{
 	 * @param T value
 	 * @param int pos - position
 	 */
-	public function insert($pos, $value){
+	public function insert($pos, $value)
+	{
 		array_splice($this->_arr, $pos, 0, [$value]);
 		return $this;
 	}
@@ -999,7 +506,8 @@ class Vector implements \JsonSerializable{
 	 * @param int pos - position
 	 * @param int count - count remove items
 	 */
-	public function remove($pos, $count = 1){
+	public function remove($pos, $count = 1)
+	{
 		array_splice($this->_arr, $pos, $count);
 		return $this;
 	}
@@ -1011,31 +519,10 @@ class Vector implements \JsonSerializable{
 	 * @param int pos_begin - start position
 	 * @param int pos_end - end position
 	 */
-	public function removeRange($pos_begin, $pos_end){
+	public function removeRange($pos_begin, $pos_end)
+	{
 		$this->remove($pos_begin, $pos_end - $pos_begin + 1);
 		return $this;
-	}
-	
-	
-	
-	/**
-	 * Returns value from position
-	 * @param int pos - position
-	 */
-	public function get($pos, $default_value){
-		return isset($this->_arr[$pos]) ? $this->_arr[$pos] : $default_value;
-	}
-	
-	
-	
-	/**
-	 * Returns value from position. Throw exception, if position does not exists
-	 * @param int pos - position
-	 */
-	public function item($pos){
-		if (!array_key_exists($pos, $this->_arr))
-			throw new IndexOutOfRange();
-		return $this->_arr[$pos];
 	}
 	
 	
@@ -1045,7 +532,8 @@ class Vector implements \JsonSerializable{
 	 * @param int pos - position
 	 * @param T value 
 	 */
-	public function set($pos, $value){
+	public function set($pos, $value)
+	{
 		if (!array_key_exists($pos, $this->_arr))
 			throw new IndexOutOfRange();
 		$this->_arr[$pos] = $value;
@@ -1057,18 +545,10 @@ class Vector implements \JsonSerializable{
 	/**
 	 * Clear all values from vector
 	 */
-	public function clear(){
+	public function clear()
+	{
 		$this->_arr = [];
 		return $this;
-	}
-	
-	
-	
-	/**
-	 * Returns count items in vector
-	 */
-	public function count(){
-		return count($this->_arr);
 	}
 	
 	
@@ -1077,7 +557,8 @@ class Vector implements \JsonSerializable{
 	 * Append value to the end of array
 	 * @param T value
 	 */
-	public function append($value){
+	public function append($value)
+	{
 		$this->push($value);
 		return $this;
 	}
@@ -1088,7 +569,8 @@ class Vector implements \JsonSerializable{
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	public function prepend($value){
+	public function prepend($value)
+	{
 		$this->unshift($value);
 		return $this;
 	}
@@ -1099,11 +581,14 @@ class Vector implements \JsonSerializable{
 	 * Append vector to the end of the vector
 	 * @param Vector<T> arr
 	 */
-	public function appendVector($arr){
+	public function appendVector($arr)
+	{
 		if (!$arr) return $this;
-		$arr->each(function($item){
-			$this->append($item);
-		});
+		$arr->each(
+			function($item){
+				$this->append($item);
+			}
+		);
 		return $this;
 	}
 	
@@ -1113,34 +598,16 @@ class Vector implements \JsonSerializable{
 	 * Prepend vector to the begin of the vector
 	 * @param Vector<T> arr
 	 */
-	public function prependVector($arr){
-		$arr->each(function($item){
-			$this->prepend($item);
-		});
+	public function prependVector($arr)
+	{
+		if (!$arr) return $this;
+		$arr->each(
+			function($item){
+				$this->prepend($item);
+			}
+		);
 		return $this;
 	}
-	
-	
-	
-	/**
-	 * Returns count items in vector
-	 */
-	public function length(){
-		return count($this->_arr);
-	}
-	
-	
-	
-	/**
-	 * Get last item
-	 */
-	public function getLastItem($default_value = null, $pos=-1){
-		$c = count($this->_arr);
-		if ($c == 0) return $default_value;
-		if ($c + $pos + 1 == 0) return $default_value;
-		return isset($this->_arr[$c+$pos]) ? $this->_arr[$c+$pos] : $default_value;
-	}
-	public function last($default_value = null, $pos=-1){ return this.getLastItem($default_value, $pos); }
 	
 	
 	
@@ -1148,7 +615,8 @@ class Vector implements \JsonSerializable{
 	 * Remove value
 	 * @param mixed value
 	 */
-	public function removeValue($value){
+	public function removeValue($value)
+	{
 		$index = $this->indexOf($value);
 		if ($index != -1)
 			$this->remove($index, 1);
@@ -1161,11 +629,9 @@ class Vector implements \JsonSerializable{
 	 * Remove value
 	 * @param mixed value
 	 */
-	public function removeItem($value){
-		$index = $this->indexOf($value);
-		if ($index != -1)
-			$this->remove($index, 1);
-		return $this;
+	public function removeItem($value)
+	{
+		return $this->removeValue($value);
 	}
 	
 	
@@ -1180,195 +646,6 @@ class Vector implements \JsonSerializable{
 		{
 			$this->removeItem( $values->item(i) );
 		}
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Map
-	 * @param func f
-	 * @return Vector
-	 */
-	function map($f){
-		$keys = array_keys($this->_arr);
-		$arr2 = $this->createNewInstance();
-		$arr2->_arr = array_map($f, $this->_arr, $keys);
-		return $arr2;
-	}
-	
-	
-	
-	/**
-	 * Filter items
-	 * @param func f
-	 * @return Vector
-	 */
-	function filter($f){
-		$arr2 = $this->createNewInstance();
-		$arr2->_arr = array_values(array_filter($this->_arr, $f));
-		return $arr2;
-	}
-	
-	
-	
-	/**
-	 * Reduce
-	 * @param func f
-	 * @param mixed init_value
-	 * @return init_value
-	 */
-	function reduce($f, $init_value){
-		return array_reduce($this->_arr, $f, $init_value);
-	}
-	
-	
-	
-	/**
-	 * Call function for each item
-	 * @param func f
-	 */
-	function each($f){
-		array_walk($this->_arr, $f);
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Each item recursive
-	 * @param func f
-	 * @param func childs Returns childs items
-	 * @param func kind. 1 - Node item first, -1 - Node item last
-	 */
-	function recurse($f, $childs, $kind=1)
-	{
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Returns new concated Vector
-	 * @param Vector v
-	 * @return Vector
-	 */
-	function concat($v){
-		$arr2 = $this->createNewInstance();
-		$arr2->_arr = array_merge($this->_arr, $v->_arr);
-		return $arr2;
-	}
-	
-	
-	
-	/**
-	 * Returns Vector
-	 * @param int offset begin
-	 * @param int length count
-	 * @return Vector<T>
-	 */
-	function slice($offset = 0, $length = null){
-		$arr2 = $this->createNewInstance();
-		$arr2->_arr = array_slice($this->_arr, $offset, $length);
-		return $arr2;
-	}
-	
-	
-	
-	/**
-	 * Returns copy of the Vector
-	 * @return Vector<T>
-	 */
-	function copy(){
-		$arr2 = $this->createNewInstance();
-		if ($this->_arr == null) $arr2->_arr = [];
-		else $arr2->_arr = array_slice($this->_arr, 0);
-		return $arr2;
-	}
-	
-	
-	
-	/**
-	 * JsonSerializable
-	 */
-	public function jsonSerialize(){
-		return $this->_arr;
-	}
-	
-	
-	
-	/**
-	 * Reverse array
-	 */
-	public function reverse(){
-		array_reverse($this->_arr);
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Sort vector
-	 * @param func f - Sort user function
-	 */
-	public function sort($f = null){
-		if ($f == null){
-			asort($this->_arr);
-		}
-		else{
-			usort($this->_arr, $f);
-		}
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Swap item1 to item2
-	 * @params int index1 - item1 position
-	 * @params int index2 - item2 position. If index2 = -1, insert as last item
-	 */
-	public function swap($index1, $index2){
-		if ($index2 < 0){
-			$index2 += $this->count();
-		}
-		$item1 = $this->item($index1);
-		if ($index2 == -1){
-			$this->remove($index1, 1);
-			$this->push($item1);
-		}
-		else if ($index1 > $index2){
-			$item2 = $this->item($index2);
-			$this->insert($index1, $item2);
-			$this->remove($index1 + 1, 1);			
-			$this->insert($index2, $item1);
-			$this->remove($index2 + 1, 1);
-		}
-		else if (index1 < index2){
-			$item2 = $this->item($index2);
-			$this->insert($index2, $item1);
-			$this->remove($index2 + 1, 1);
-			$this->insert($index1, $item2);
-			$this->remove($index1 + 1, 1);			
-		}
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Remove dublicate values
-	 */
-	public function removeDublicates(){
-		$arr = [];
-		for ($i=0; $i<$this->count();$i++){			
-			$value = $this->item($i);
-			$pos = array_search($value, $arr, true);
-			if ($pos === false){
-				$arr[] = $value;
-			}
-		}
-		$this->_arr = $arr;
 		return $this;
 	}
 }
