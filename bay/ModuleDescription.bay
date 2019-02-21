@@ -26,14 +26,16 @@ use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
-class ModuleDescription implements ModuleDescriptionInterface{
+class ModuleDescription implements ModuleDescriptionInterface
+{
 
 	
 	/**
 	 * Returns module name
 	 * @return string
 	 */
-	public static string getName(){
+	public static string getName()
+	{
 		return "Runtime";
 	}
 	
@@ -43,8 +45,9 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * Returns module name
 	 * @return string
 	 */
-	public static string getModuleVersion(){
-		return "0.6.2";
+	public static string getModuleVersion()
+	{
+		return "0.7.0";
 	}
 	
 	
@@ -53,7 +56,8 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * Returns required modules
 	 * @return Map<string, string>
 	 */	
-	public static Map<string, string> getRequiredModules(ContextInterface context){
+	public static Map<string, string> getRequiredModules(ContextInterface context)
+	{
 		return null;
 	}
 	
@@ -63,7 +67,8 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * Called then module registed in context
 	 * @param ContextInterface context
 	 */
-	public static void onRegister(ContextInterface context){
+	public static void onRegister(ContextInterface context)
+	{
 		context.registerDriver("driver.runtime.config", new Map<string, string>());
 	}
 	
@@ -74,7 +79,8 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * @param ContextInterface context
 	 * @param Map<mixed> config
 	 */
-	public static void onReadConfig(ContextInterface context, Map<mixed> config){
+	public static void onReadConfig(ContextInterface context, Map<mixed> config)
+	{
 	}
 	
 	
@@ -83,7 +89,8 @@ class ModuleDescription implements ModuleDescriptionInterface{
 	 * Init context
 	 * @param ContextInterface context
 	 */
-	public static void initContext(ContextInterface context){
+	public static void initContext(ContextInterface context)
+	{
 	}
 	
 }

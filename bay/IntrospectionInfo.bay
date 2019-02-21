@@ -19,20 +19,25 @@
 namespace Runtime;
 
 use Runtime.CoreStruct;
+use Runtime.Maybe;
 use Runtime.rtl;
-use Runtime.Vector;
+use Runtime.Collection;
 
 
-class IntrospectionInfo extends CoreStruct{
+struct IntrospectionInfo extends CoreStruct
+{
 	
 	const string ITEM_CLASS = "class";
 	const string ITEM_FIELD = "field";
 	const string ITEM_METHOD = "method";
 	
-	public serializable string class_name = "";
-	public serializable string kind = "";
-	public serializable string name = "";
-	public serializable Vector<CoreStruct> annotations = null;
+	public string class_name = "";
+	public string kind = "";
+	public string name = "";
+	public Collection<CoreStruct> annotations = null;
+	
+	
+	/* lambda isInstanceOf(string class_name) => bool (CoreStruct item) => rtl::is_instanceof(item, class_name); */
 	
 	
 	
@@ -43,6 +48,30 @@ class IntrospectionInfo extends CoreStruct{
 	 */
 	bool hasAnnotation(string class_name)
 	{
+		
+		return Maybe.of(this.annotations)
+			.map( 
+				rtl::findFirst(
+					bool (CoreStruct item) use (class_name)
+					{
+						return rtl::is_instanceof(item, class_name);
+					}
+				) 
+			)
+			.value() != null
+		;
+		
+		
+		/* return 
+			( 
+				pipe(this.annotations) >> 
+				rtl::findFirst(self::isInstanceOf(class_name))
+			).value() != null
+		; 
+		*/
+		/* return Maybe.of(this.annotations).map( rtl::findFirst( self::isInstanceOf(class_name) ) ).value() != null; */
+		
+		/*
 		if (this.annotations == null)
 		{
 			return false;
@@ -58,6 +87,7 @@ class IntrospectionInfo extends CoreStruct{
 		}
 		
 		return false;
+		*/
 	}
 	
 	
@@ -67,8 +97,25 @@ class IntrospectionInfo extends CoreStruct{
 	 * @string class_name
 	 * @return bool
 	 */
-	Vector<CoreStruct> filterAnnotations(string class_name)
+	Collection<CoreStruct> filterAnnotations(string class_name)
 	{
+		
+		return Maybe.of(this.annotations)
+			.map( 
+				rtl::filter(
+					bool (CoreStruct item) use (class_name)
+					{
+						return rtl::is_instanceof(item, class_name);
+					}
+				) 
+			)
+			.value()
+		;
+		
+		
+		/* return Maybe.of(this.annotations).map( rtl::filter( self::isInstanceOf(class_name) ) ).value() != null; */
+		
+		/*
 		if (this.annotations == null)
 		{
 			return null;
@@ -80,6 +127,7 @@ class IntrospectionInfo extends CoreStruct{
 				return rtl::is_instanceof(item, class_name);
 			}
 		);
+		*/
 	}
 	
 }

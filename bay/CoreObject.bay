@@ -21,7 +21,6 @@ namespace Runtime;
 use Runtime.rtl;
 use Runtime.Map;
 use Runtime.Vector;
-use Runtime.RuntimeUtils;
 
 
 class CoreObject
@@ -33,7 +32,8 @@ class CoreObject
 	/** 
 	 * Constructor
 	 */
-	public void constructor(){
+	public void constructor()
+	{
 		#switch
 		#case ifcode PHP then
 		$this->_init();
@@ -119,19 +119,7 @@ class CoreObject
 	 * @param string variable_name
 	 * @param var value
 	 */
-	public void assignValue(string variable_name, var value, CoreObject sender = null)
-	{
-		this.assignValueAfter(variable_name, value, sender);
-	}
-	
-	
-	
-	/**
-	 * Calls after assign new value
-	 * @param string variable_name
-	 * @param var value
-	 */
-	void assignValueAfter(string variable_name, var value, CoreObject sender = null)
+	public void assignValue(string variable_name, var value)
 	{
 	}
 	
@@ -286,7 +274,11 @@ class CoreObject
 	 */
 	public void getVariablesNames(Vector<string> names, int flag=0)
 	{
-		RuntimeUtils::getVariablesNames( this.getClassName(), names, flag );
+		rtl::callStaticMethod
+		(
+			"Runtime.RuntimeUtils", "getVariablesNames",
+			[this.getClassName(), names, flag]
+		);
 	}
 	
 	
@@ -299,7 +291,12 @@ class CoreObject
 	 */
 	public void getFieldInfo(string variable_name)
 	{
-		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
+		Vector<string> classes = rtl::callStaticMethod
+		(
+			"Runtime.RuntimeUtils", "getParents",
+			[ this.getClassName() ]
+		);
+		
 		for (int i=0; i<classes.count(); i++)
 		{
 			string class_name = classes.item(i);
@@ -325,7 +322,12 @@ class CoreObject
 	 */
 	public void getMethodsNames(Vector<string> names)
 	{
-		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
+		Vector<string> classes = rtl::callStaticMethod
+		(
+			"Runtime.RuntimeUtils", "getParents",
+			[ this.getClassName() ]
+		);
+		
 		for (int i=0; i<classes.count(); i++)
 		{
 			string class_name = classes.item(i);
@@ -342,7 +344,12 @@ class CoreObject
 	 */
 	public IntrospectionInfo getMethodInfo(string method_name)
 	{
-		Vector<string> classes = RuntimeUtils::getParents( this.getClassName() );
+		Vector<string> classes = rtl::callStaticMethod
+		(
+			"Runtime.RuntimeUtils", "getParents",
+			[ this.getClassName() ]
+		);
+		
 		for (int i=0; i<classes.count(); i++)
 		{
 			string class_name = classes.item(i);

@@ -21,7 +21,8 @@ namespace Runtime;
 use Runtime.Vector;
 
 
-export class re{
+export class re
+{
 	
 	
 	/**
@@ -30,7 +31,8 @@ export class re{
 	 * @param string s string
 	 * @return bool
 	 */
-	static bool match(string r, string s){
+	static bool match(string r, string s)
+	{
 		#switch
 		
 		#case ifcode PHP then
@@ -56,7 +58,8 @@ export class re{
 	 * @param string s string
 	 * @return Vector result
 	 */
-	static Map<string, string> matchAll(string r, string s){
+	static Map<string, string> matchAll(string r, string s)
+	{
 		#switch
 		
 		#case ifcode PHP then
@@ -86,7 +89,8 @@ export class re{
 	 * @param string s - replaceable string
 	 * @return string
 	 */
-	static string replace(var r, string replace, string s){
+	static string replace(var r, string replace, string s)
+	{
 		#switch
 		
 		#case ifcode PHP then

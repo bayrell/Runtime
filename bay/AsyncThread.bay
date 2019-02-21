@@ -24,7 +24,8 @@ use Runtime.CoreObject;
 use Runtime.Vector;
 
 
-class AsyncThread extends CoreObject{
+class AsyncThread extends CoreObject
+{
 	
 	
 	protected callback f = null;
@@ -38,7 +39,8 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Constructor
 	 */
-	void constructor(){
+	void constructor()
+	{
 		super();
 		this.reset();
 	}
@@ -48,7 +50,8 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Reset AsyncThread
 	 */
-	void reset(){
+	void reset()
+	{
 		this.pos = "0";
 		this.res = null;
 		this.err = null;
@@ -62,7 +65,8 @@ class AsyncThread extends CoreObject{
 	 * Returns current position
 	 * @return string
 	 */
-	string current(){
+	string current()
+	{
 		return this.pos;
 	}
 	
@@ -72,7 +76,8 @@ class AsyncThread extends CoreObject{
 	 * Returns result of the prev function
 	 * @return mixed
 	 */
-	mixed result(){
+	mixed result()
+	{
 		return this.res;
 	}
 	
@@ -82,7 +87,8 @@ class AsyncThread extends CoreObject{
 	 * Returns error of the prev function
 	 * @return mixed
 	 */
-	mixed getError(){
+	mixed getError()
+	{
 		return this.err;
 	}
 
@@ -91,7 +97,8 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Clear error
 	 */
-	void clearError(){
+	void clearError()
+	{
 		this.err = null;
 	}
 	
@@ -101,7 +108,8 @@ class AsyncThread extends CoreObject{
 	 * Resolve thread with result
 	 * @param mixed res
 	 */
-	string resolve(mixed res){
+	string resolve(mixed res)
+	{
 		this.res = res;
 		this.next();
 		this.forward();
@@ -114,7 +122,8 @@ class AsyncThread extends CoreObject{
 	 * Set position
 	 * @param string pos
 	 */
-	string jump(string pos){
+	string jump(string pos)
+	{
 		this.pos = pos;
 		return "jump";
 	}
@@ -125,7 +134,8 @@ class AsyncThread extends CoreObject{
 	 * Resolve Exception
 	 * @param mixed res
 	 */
-	string error(mixed err){
+	string error(mixed err)
+	{
 		if (this.catch_stack.count() == 0){
 			this.err = err;
 			this.next(true);
@@ -144,7 +154,8 @@ class AsyncThread extends CoreObject{
 	 * Push catch
 	 * @param string pos
 	 */
-	void catchPush(string pos){
+	void catchPush(string pos)
+	{
 		this.catch_stack.push(pos);
 	}
 	
@@ -153,7 +164,8 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Pop catch
 	 */
-	void catchPop(){
+	void catchPop()
+	{
 		this.catch_stack.pop();
 	}
 	
@@ -162,9 +174,11 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Call next
 	 */
-	string next(bool is_error = false){
+	string next(bool is_error = false)
+	{
 		
-		if (this.run_stack.count() == 0){
+		if (this.run_stack.count() == 0)
+		{
 			this.pos = "-1";
 			return;
 		}
@@ -176,8 +190,10 @@ class AsyncThread extends CoreObject{
 		this.pos = task.pos;
 		this.catch_stack = task.catch_stack;
 		
-		if (is_error){
-			if (this.catch_stack.count() == 0){
+		if (is_error)
+		{
+			if (this.catch_stack.count() == 0)
+			{
 				this.pos = "-1";
 			}
 			else{
@@ -193,7 +209,8 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Forward call
 	 */
-	string forward(){
+	string forward()
+	{
 		
 		bool is_browser = rtl::isBrowser();
 		
@@ -252,7 +269,8 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Run async await
 	 */
-	void run(callback f){
+	void run(callback f)
+	{
 		this.pos = "0";
 		this.f = f;
 		this.forward();
@@ -263,7 +281,8 @@ class AsyncThread extends CoreObject{
 	/**
 	 * Call if thread is ended
 	 */
-	string end(){
+	string end()
+	{
 		this.pos = "-1";
 		return "end";
 	}

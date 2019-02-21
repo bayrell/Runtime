@@ -21,8 +21,6 @@ namespace Runtime;
 use Runtime.CoreObject;
 use Runtime.CoreStruct;
 use Runtime.rtl;
-use Runtime.Interfaces.CloneableInterface;
-use Runtime.Interfaces.SerializeInterface;
 
 
 struct CoreEvent extends CoreStruct

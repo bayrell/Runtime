@@ -19,9 +19,8 @@
 namespace Runtime;
 
 use Runtime.CoreObject;
-use Runtime.Map;
+use Runtime.Dict;
 use Runtime.rtl;
-use Runtime.Vector;
 use Runtime.Interfaces.SerializeInterface;
 
 
@@ -70,6 +69,21 @@ class CoreStruct extends CoreObject implements SerializeInterface
 		
 		/* Return object */
 		return rtl::newInstance( this.getClassName(), [obj] );
-	}	
+	}
+	
+	
+	
+	/**
+	 * Create new struct with new value
+	 * @param string field_name
+	 * @param fun f
+	 * @return CoreStruct
+	 */
+	public CoreStruct map(string field_name, fun f)
+	{
+		return this.copy( (new Map()).set(field_name, f(this.takeValue(field_name))) );
+	}
+	
+	
 	
 }

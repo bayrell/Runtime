@@ -772,8 +772,9 @@ export class RuntimeUtils{
 	public static string translate(
 		string message, MapInterface params = null, string locale = "", 
 		Object context = null
-	){
-		if (context == null) context = self::globalContext();
+	)
+	{
+		if (context == null) context = self::getContext();
 		if (context != null) {
 			Vector<var> args = (new Vector<var>())
 				.push(message)
@@ -789,4 +790,68 @@ export class RuntimeUtils{
 		return message;
 	}
 	
+	
+	
+	/**
+	 * Normalize UIStruct
+	 */
+	static Vector<UIStruct> normalizeUIVector(mixed data)
+	{
+		if (data instanceof Vector)
+		{
+			Vector<UIStruct> res = new Vector();
+			for (int i=0; i<data.count(); i++)
+			{
+				mixed item = res.item(i);
+				if (item instanceof Vector)
+				{
+					Vector<UIStruct> new_item = static::normalizeUIVector(item);
+					res.appendVector(new_item);
+				}
+				else if (item instanceof UIStruct)
+				{
+					res.push(item);
+				}
+				else if (rlt::isString(item))
+				{
+					res.push(
+						new UIStruct(
+							{
+								"kind": UIStruct::TYPE_STRING,
+								"content": rtl::toString(data),
+							}
+						)
+					);
+				}
+			}
+			
+			return res;
+		}
+		
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Normalize UIStruct
+	 */
+	UIStruct normalizeUI(mixed data)
+	{
+		if (data instanceof UIStruct)
+		{
+			data = data.copy({ "children": this.normalizeUIVector(data.children) });
+			return data;
+		}
+		else if (this.isString(data))
+		{
+			return new UIStruct(
+				{
+					"kind": UIStruct::TYPE_STRING,
+					"content": rtl::toString(data),
+				}
+			);
+		}
+		return null;
+	}
 }

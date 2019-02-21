@@ -24,12 +24,13 @@ use Runtime.Exceptions.RuntimeException;
 use Runtime.Interfaces.ContextInterface;
 
 
-class IndexOutOfRange extends RuntimeException{
+class AssignStructValueError extends RuntimeException
+{
 	
-	void constructor(ContextInterface context = null, Object prev = null){
-		
+	void constructor(string name, ContextInterface context = null, Object prev = null)
+	{
 		parent(
-			rtl::translate("Index out of range", null, "", context), 
+			rtl::translate("Can not assign field '" ~ name ~ "' in immutable data struct", null, "", context), 
 			RuntimeConstant::ERROR_INDEX_OUT_OF_RANGE, 
 			context,
 			prev

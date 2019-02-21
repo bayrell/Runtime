@@ -28,7 +28,8 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 #endswitch
 
 
-export class rs{
+export class rs
+{
 
 
 	/**

@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library 
+ *  Bayrell Runtime Library
  *
  *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -16,24 +16,33 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Exceptions;
+namespace Runtime;
 
-use Runtime.rtl;
-use Runtime.RuntimeConstant;
-use Runtime.Exceptions.RuntimeException;
-use Runtime.Interfaces.ContextInterface;
+use Runtime.Container;
 
 
-class IndexOutOfRange extends RuntimeException{
+class Maybe extends Container
+{	
 	
-	void constructor(ContextInterface context = null, Object prev = null){
-		
-		parent(
-			rtl::translate("Index out of range", null, "", context), 
-			RuntimeConstant::ERROR_INDEX_OUT_OF_RANGE, 
-			context,
-			prev
-		);
+	/** 
+	 * Returns new instance of this
+	 */
+	public static Maybe of(mixed x)
+	{
+		return new Maybe(x);
 	}
-
+	
+	
+	
+	/**
+	 * Apply function and return new container
+	 * @param fun f
+	 * @return Container
+	 */
+	public Container map(fun f)
+	{
+		return this._value == null ? this : this.of( f(this._value) );
+	}
+	
+	
 }
