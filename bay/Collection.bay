@@ -294,6 +294,20 @@ declare class Collection<T>
 	 * Remove dublicate values
 	 */
 	declare public Collection<T> removeDublicatesIm();
+	
+	
+	
+	/**
+	 * Convert to collection
+	 */
+	declare Collection<T> toCollection();
+	
+	
+	
+	/**
+	 * Convert to vector
+	 */
+	declare Vector<T> toVector();
 }
 
 
@@ -313,10 +327,34 @@ Runtime.Collection = class extends Array
 	
 	
 	/**
+	 * Convert to dict
+	 */
+	toCollection()
+	{
+		if (isBrowser()) return new Runtime.Collection(this);
+		return new Collection(this);
+	}
+	
+	
+	
+	/**
+	 * Convert to dict
+	 */
+	toVector()
+	{
+		if (isBrowser()) return new Runtime.Vector(this);
+		return new Vector(this);
+	}
+	
+	
+	
+	/**
 	 * Correct items
 	 */
 	_correctItemsByType(type)
 	{
+		if (type == "mixed" or type == "primitive" or type == "var") return this;
+		
 		var arr = this.copy();
 		for (var i=0; i<arr.length; i++)
 		{
@@ -814,6 +852,25 @@ class Collection implements \JsonSerializable
 	protected $_arr = [];
 	
 	
+	/**
+	 * Convert to Collection
+	 */
+	public function toCollection()
+	{
+		return new \Runtime\Collection($this);
+	}
+	
+	
+	
+	/**
+	 * Convert to Vector
+	 */
+	public function toVector()
+	{
+		return new \Runtime\Vector($this);
+	}
+	
+	
 	
 	/**
 	 * Copy collection
@@ -847,6 +904,16 @@ class Collection implements \JsonSerializable
 					}
 				}
 			}
+			else if ($data instanceof \Runtime\Collection)
+			{
+				foreach ($data->_arr as $item)
+				{
+					if (!is_array($item))
+					{
+						$this->_arr[] = $item;
+					}
+				}
+			}
 			else
 			{
 				$this->_arr[] = $data;
@@ -861,6 +928,8 @@ class Collection implements \JsonSerializable
 	 */
 	public function _correctItemsByType($type)
 	{
+		if ($type == "mixed" or $type == "primitive" or $type == "var") return $this;
+		
 		return $this->map(
 			function($item) use ($type)
 			{

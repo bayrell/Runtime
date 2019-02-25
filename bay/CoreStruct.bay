@@ -21,6 +21,7 @@ namespace Runtime;
 use Runtime.CoreObject;
 use Runtime.Dict;
 use Runtime.rtl;
+use Runtime.Vector;
 use Runtime.Interfaces.SerializeInterface;
 
 
@@ -56,19 +57,11 @@ class CoreStruct extends CoreObject implements SerializeInterface
 	 */
 	public CoreStruct copy(Map obj = null)
 	{
-		Map obj = this.takeMap();
-		
-		/* copy values without clone */
-		Vector<string> names = new Vector();
-		this.getVariablesNames(names, 2);
-		for (int i=0; i<names.count(); i++)
-		{
-			string name = names.item(i);
-			obj.set(name, this.takeValue(name));
-		}
+		Dict res = this.takeMap().toDict();
+		res = res.concat(obj);
 		
 		/* Return object */
-		return rtl::newInstance( this.getClassName(), [obj] );
+		return rtl::newInstance( this.getClassName(), [res] );
 	}
 	
 	

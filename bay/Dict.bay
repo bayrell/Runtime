@@ -143,6 +143,20 @@ declare class Dict<T>
 	 * @return self
 	 */
 	declare public Dict<T> concat(Dict<T> map);
+	
+	
+	
+	/**
+	 * Convert to dict
+	 */
+	declare Dict<T> toDict();
+	
+	
+	
+	/**
+	 * Convert to dict
+	 */
+	declare Dict<T> toMap();
 }
 
 
@@ -158,10 +172,33 @@ Runtime.Dict = class extends Dict
 	 * Returns new Instance
 	 * @return Object
 	 */
-	createNewInstance()
+	createNewInstance(obj)
 	{
-		if (isBrowser()) return new Runtime.Dict();
-		return new Runtime.Dict();
+		if (obj == undefined) obj = null;
+		if (isBrowser()) return new Runtime.Dict(obj);
+		return new Runtime.Dict(obj);
+	}
+	
+	
+	
+	/**
+	 * Convert to dict
+	 */
+	toDict()
+	{
+		if (isBrowser()) return new Runtime.Dict(this);
+		return new Dict(this);
+	}
+	
+	
+	
+	/**
+	 * Convert to dict
+	 */
+	toMap()
+	{
+		if (isBrowser()) return new Runtime.Map(this);
+		return new Map(this);
 	}
 	
 	
@@ -171,13 +208,7 @@ Runtime.Dict = class extends Dict
 	 */
 	copy()
 	{
-		var instance = this.createNewInstance();
-		this.each(
-			(key, value) => {
-				instance.set(key, value);
-			}
-		);
-		return instance;
+		return this.createNewInstance(this);
 	}
 	
 	
@@ -187,7 +218,9 @@ Runtime.Dict = class extends Dict
 	 */
 	_correctItemsByType(type)
 	{
-		var obj=this.createNewInstance();
+		if (type == "mixed" or type == "primitive" or type == "var") return this;
+		
+		var obj = this.createNewInstance();
 		var it = super.keys();
 		var next = it.next();
 		while (!next.done){
@@ -195,7 +228,7 @@ Runtime.Dict = class extends Dict
 			var val = super.get(key);
 			if (isBrowser()) val = Runtime.rtl.correct(val, type, null);
 			else val = rtl.correct(val, type, null);
-			obj[key] = val;
+			obj.set(key, val);
 			next = it.next();
 		}
 		
@@ -414,13 +447,13 @@ Runtime.Dict = class extends Dict
 	 */
 	map(f)
 	{
-		var res = this.createNewInstance();
+		var obj={};
 		this.each(
 			(key, value)=>{
-				res.set(key, f(key, value));
+				obj[key] = f(key, value);
 			}
 		);
-		return res;
+		return this.createNewInstance(obj);
 	}
 	
 	
@@ -453,7 +486,7 @@ Runtime.Dict = class extends Dict
 	{
 		if (map != null)
 		{
-			var res = this.createNewInstance();
+			var res = this.copy();
 			map.each(
 				(key)=>{
 					res.set(key, map.item(key));
@@ -505,10 +538,10 @@ class Dict implements \JsonSerializable
 	/**
 	 * Returns new Instance
 	 */
-	public function createNewInstance()
+	public function createNewInstance($obj=null)
 	{
 		$class_name = get_class($this);
-		return new $class_name();
+		return new $class_name($obj);
 	}
 	
 	
@@ -518,16 +551,28 @@ class Dict implements \JsonSerializable
 	 */
 	function copy()
 	{
-		$instance = $this->createNewInstance();
-		$this->each(
-			function ($key, $value) use ($instance)
-			{
-				$instance->set($key, $value);
-			}
-		);
-		return $instance;
+		return $this->createNewInstance($this->_map);
 	}
 	
+	
+	
+	/**
+	 * Convert to dict
+	 */
+	public function toDict()
+	{
+		return new \Runtime\Dict($this);
+	}
+	
+	
+	
+	/**
+	 * Convert to map
+	 */
+	public function toMap()
+	{
+		return new \Runtime\Map($this);
+	}
 	
 	
 	
@@ -536,6 +581,8 @@ class Dict implements \JsonSerializable
 	 */
 	public function _correctItemsByType($type)
 	{
+		if ($type == "mixed" or $type == "primitive" or $type == "var") return $this;
+		
 		return $this->map(
 			function($key, $value) use ($type)
 			{
@@ -657,7 +704,7 @@ class Dict implements \JsonSerializable
 	 */
 	public function setIm($key, $value)
 	{
-		$res = $this->createNewInstance();
+		$res = $this->copy();
 		$key = rtl::toString($key);
 		$res->_map[$key] = $value;
 		return $res;
@@ -675,7 +722,7 @@ class Dict implements \JsonSerializable
 		$key = rtl::toString($key);
 		if (isset($this->_map[$key]))
 		{
-			$res = $this->createNewInstance();
+			$res = $this->copy();
 			unset($res->_map[$key]);
 			return $res;
 		}
@@ -746,15 +793,14 @@ class Dict implements \JsonSerializable
 	 */
 	function map($f)
 	{
-		$res = new Dict();
+		$res = [];
 		$this->each(
 			function($key) use ($res, $f)
 			{
-				$value = $this->item($key);
-				$res->set($key, $f($key, $value));
+				$res[$key] = $this->item($key);
 			}
 		);
-		return $res;
+		return $this->createNewInstance($res);
 	}
 	
 	
@@ -788,10 +834,11 @@ class Dict implements \JsonSerializable
 	{
 		if ($map != null)
 		{
-			$res = $this->createNewInstance();
+			$res = $this->copy();
 			$map->each(
-				function ($key) use ($map, $res){
-					$res->set($key, $map->item($key));
+				function ($key) use ($map, $res)
+				{
+					$res->_map[$key] = $map->item($key);
 				}
 			);
 			return $res;

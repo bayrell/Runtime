@@ -18,10 +18,13 @@
 
 namespace Runtime;
 
+use Runtime.Collection;
 use Runtime.Context;
+use Runtime.Dict;
 use Runtime.Map;
 use Runtime.rs;
 use Runtime.rtl;
+use Runtime.UIStruct;
 use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.FactoryInterface;
@@ -191,7 +194,7 @@ export class RuntimeUtils{
 				try{ rtl::callStaticMethod(class_name, "getVirtualFieldsList", [names, flag]); } catch (var e) {}
 			}
 		);
-		names.removeDublicates();
+		names = names.removeDublicatesIm();
 		
 		var variables_names = RuntimeUtils::_variables_names;
 		if (not RuntimeUtils::_variables_names.has(class_name))
@@ -261,7 +264,7 @@ export class RuntimeUtils{
 						
 						if (info != null)
 						{
-							info.class_name = item_class_name;
+							info <= class_name <= item_class_name;
 							res.push(info);
 						}
 					}
@@ -283,7 +286,7 @@ export class RuntimeUtils{
 						
 						if (info != null)
 						{
-							info.class_name = item_class_name;
+							info <= class_name <= item_class_name;
 							res.push(info);
 						}
 					}
@@ -298,7 +301,7 @@ export class RuntimeUtils{
 				catch (var e) { info = null; }
 				if (info != null)
 				{
-					info.class_name = item_class_name;
+					info <= class_name <= item_class_name;
 					res.push(info);
 				}
 				
@@ -795,14 +798,14 @@ export class RuntimeUtils{
 	/**
 	 * Normalize UIStruct
 	 */
-	static Vector<UIStruct> normalizeUIVector(mixed data)
+	static Collection<UIStruct> normalizeUIVector(mixed data)
 	{
-		if (data instanceof Vector)
+		if (data instanceof Collection)
 		{
 			Vector<UIStruct> res = new Vector();
 			for (int i=0; i<data.count(); i++)
 			{
-				mixed item = res.item(i);
+				mixed item = data.item(i);
 				if (item instanceof Vector)
 				{
 					Vector<UIStruct> new_item = static::normalizeUIVector(item);
@@ -815,17 +818,16 @@ export class RuntimeUtils{
 				else if (rlt::isString(item))
 				{
 					res.push(
-						new UIStruct(
-							{
-								"kind": UIStruct::TYPE_STRING,
-								"content": rtl::toString(data),
-							}
-						)
+						new UIStruct
+						{
+							"kind": UIStruct::TYPE_STRING,
+							"content": rtl::toString(item),
+						}
 					);
 				}
 			}
 			
-			return res;
+			return res.toCollection();
 		}
 		
 		return null;
@@ -836,21 +838,28 @@ export class RuntimeUtils{
 	/**
 	 * Normalize UIStruct
 	 */
-	UIStruct normalizeUI(mixed data)
+	static UIStruct normalizeUI(mixed data)
 	{
 		if (data instanceof UIStruct)
 		{
-			data = data.copy({ "children": this.normalizeUIVector(data.children) });
-			return data;
+			Map obj = {
+				"children": static::normalizeUIVector(data.children),
+			};
+			
+			if (data.props != null and data.props instanceof Map)
+			{
+				obj.set("props", data.props.toDict());
+			}
+			
+			return data.copy(obj);
 		}
 		else if (this.isString(data))
 		{
-			return new UIStruct(
-				{
-					"kind": UIStruct::TYPE_STRING,
-					"content": rtl::toString(data),
-				}
-			);
+			return new UIStruct
+			{
+				"kind": UIStruct::TYPE_STRING,
+				"content": rtl::toString(data),
+			};
 		}
 		return null;
 	}

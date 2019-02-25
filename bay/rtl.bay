@@ -360,7 +360,7 @@ class rtl{
 	 */
 	static var convert(var value, string type_value, var def_value = null, string type_template = "")
 	{
-		if (type_value == "mixed" or type_value == "var")
+		if (type_value == "mixed" or type_value == "primitive" or type_value == "var")
 			return value;
 		
 		if (type_value == "")
@@ -1060,7 +1060,12 @@ class rtl{
 		Object context = null
 	)
 	{
-		self::callStaticMethod("Runtime.RuntimeUtils", "translate", [message, params, locale, context]);
+		#switch
+		#case ifcode PHP then
+		return self::callStaticMethod("Runtime.RuntimeUtils", "translate", [$message, $params, $locale, $context]);
+		#case ifcode JAVASCRIPT then
+		return this.callStaticMethod("Runtime.RuntimeUtils", "translate", [message, params, locale, context]);
+		#endswitch
 	}
 	
 
@@ -1072,7 +1077,12 @@ class rtl{
 	 */
 	public static UIStruct normalizeUI(mixed data)
 	{
-		self::callStaticMethod("Runtime.RuntimeUtils", "normalizeUI", [data]);
+		#switch
+		#case ifcode PHP then
+		return self::callStaticMethod("Runtime.RuntimeUtils", "normalizeUI", [$data]);
+		#case ifcode JAVASCRIPT then
+		return this.callStaticMethod("Runtime.RuntimeUtils", "normalizeUI", [data]);
+		#endswitch
 	}
 	
 	
@@ -1118,6 +1128,8 @@ class rtl{
 		if (!method_exists($class_name, $method_name)){
 			throw new \Exception("Method '" . $method_name . "' not found in " . $class_name);
 		}
+		if (gettype($args) == 'array')
+			return call_user_func_array([$class_name, $method_name], $args);
 		return call_user_func_array([$class_name, $method_name], ($args!=null)?$args->_getArr():[]);
 	}
 	#case ifcode JAVASCRIPT then

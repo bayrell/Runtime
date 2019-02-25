@@ -30,7 +30,7 @@ class AssignStructValueError extends RuntimeException
 	void constructor(string name, ContextInterface context = null, Object prev = null)
 	{
 		parent(
-			rtl::translate("Can not assign field '" ~ name ~ "' in immutable data struct", null, "", context), 
+			rtl::translate("Can not set key '" ~ name ~ "' in immutable struct", null, "", context), 
 			RuntimeConstant::ERROR_INDEX_OUT_OF_RANGE, 
 			context,
 			prev

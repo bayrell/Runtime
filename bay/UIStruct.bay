@@ -19,8 +19,10 @@
 namespace Runtime;
 
 use Runtime.CoreStruct;
+use Runtime.Dict;
 use Runtime.Map;
 use Runtime.rtl;
+use Runtime.Collection;
 use Runtime.Vector;
 
 
@@ -40,8 +42,8 @@ struct UIStruct extends CoreStruct
 	public string control = "";
 	public string signal_in = "";
 	public string signal_out = "";
-	public Map<primitive> props = null;
-	public Vector<UIStruct> children = null;
+	public Dict<primitive> props = null;
+	public Collection<UIStruct> children = null;
 	
 	
 	

@@ -55,7 +55,6 @@ declare class Map<T> extends Dict<T>
 	 * @return self
 	 */
 	declare public Map<T> clear();
-	
 }
 
 
@@ -164,7 +163,7 @@ class Map extends Dict
 	
 	protected $_map = null;
 	
-	
+		
 	
 	/**
 	 * Set value size_to position

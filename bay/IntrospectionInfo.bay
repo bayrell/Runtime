@@ -46,10 +46,31 @@ struct IntrospectionInfo extends CoreStruct
 	 * @string class_name
 	 * @return bool
 	 */
-	bool hasAnnotation(string class_name)
+	pure Collection<CoreStruct> filterAnnotations(string class_name, IntrospectionInfo info)
+	{
+		if (info.annotations == null)
+			return null;
+		
+		return info.annotations.filter(
+			bool (CoreStruct item) use (class_name)
+			{
+				return rtl::is_instanceof(item, class_name);
+			}
+		);
+	}
+	
+	
+	
+	/**
+	 * Returns true if has annotations by class_name
+	 * @string class_name
+	 * @return bool
+	 */
+	bool hasAnnotationOld(string class_name)
 	{
 		
-		return Maybe.of(this.annotations)
+		/*
+		return Maybe::of(this.annotations)
 			.map( 
 				rtl::findFirst(
 					bool (CoreStruct item) use (class_name)
@@ -61,7 +82,7 @@ struct IntrospectionInfo extends CoreStruct
 			.value() != null
 		;
 		
-		
+		*/
 		/* return 
 			( 
 				pipe(this.annotations) >> 
@@ -97,9 +118,9 @@ struct IntrospectionInfo extends CoreStruct
 	 * @string class_name
 	 * @return bool
 	 */
-	Collection<CoreStruct> filterAnnotations(string class_name)
+	Collection<CoreStruct> filterAnnotationsOld(string class_name)
 	{
-		
+		/*
 		return Maybe.of(this.annotations)
 			.map( 
 				rtl::filter(
@@ -111,7 +132,7 @@ struct IntrospectionInfo extends CoreStruct
 			)
 			.value()
 		;
-		
+		*/
 		
 		/* return Maybe.of(this.annotations).map( rtl::filter( self::isInstanceOf(class_name) ) ).value() != null; */
 		

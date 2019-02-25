@@ -159,7 +159,6 @@ declare class Vector<T> extends Collection
 	 */
 	declare public Vector<T> removeItems(Vector<T> values);
 	
-	
 }
 
 
