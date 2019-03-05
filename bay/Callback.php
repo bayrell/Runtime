@@ -27,6 +27,10 @@ class Callback
 	
 	function __construct($obj, $name)
 	{
+		if (gettype($obj) == "string")
+		{
+			$obj = \Runtime\rtl::find_class($obj);
+		}
 		$this->obj = $obj;
 		$this->name = $name;
 	}
