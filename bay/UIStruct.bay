@@ -42,6 +42,7 @@ struct UIStruct extends CoreStruct
 	public string control = "";
 	public string signal_in = "";
 	public string signal_out = "";
+	public CoreStruct model = null;
 	public Dict<primitive> props = null;
 	public Collection<UIStruct> children = null;
 	
@@ -73,26 +74,11 @@ struct UIStruct extends CoreStruct
 	
 	
 	/**
-	 * Returns true if component and name == class_name
-	 * @param string class_name
-	 * @return bool
+	 * Returns model
+	 * @return CoreStruct
 	 */
-	public bool isClass(string class_name)
+	public CoreStruct getModel()
 	{
-		if (this.is_component and this.name == class_name)
-			return true;
-		return false;
-	}
-	
-	
-	
-	/**
-	 * Returns props value
-	 * @return mixed
-	 */
-	public mixed getProps(string key, mixed default_value, string type_value = "mixed", string type_template = "")
-	{
-		if (this.props == null) return default_value;
-		return this.props.get(key, default_value, type_value, type_template);
+		return this.model;
 	}
 }

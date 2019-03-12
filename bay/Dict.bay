@@ -536,6 +536,15 @@ class Dict implements \JsonSerializable
 	
 	
 	/**
+	 * Returns map
+	 */
+	public function _getArr()
+	{
+		return $this->_map;
+	}
+	
+	
+	/**
 	 * Returns new Instance
 	 */
 	public function createNewInstance($obj=null)
@@ -773,14 +782,10 @@ class Dict implements \JsonSerializable
 	 */
 	function each($f)
 	{
-		$keys = array_keys($this->_map);
-		array_walk(
-			$keys, 
-			function($key) use ($f){
-				$value = $this->item($key);
-				$f($key, $value);
-			}
-		);
+		foreach ($this->_map as $key => $value)
+		{
+			$f( $key, $value );
+		}
 		return $this;
 	}
 	
@@ -794,12 +799,10 @@ class Dict implements \JsonSerializable
 	function map($f)
 	{
 		$res = [];
-		$this->each(
-			function($key) use ($res, $f)
-			{
-				$res[$key] = $this->item($key);
-			}
-		);
+		foreach ($this->_map as $key => $value)
+		{
+			$res[$key] = $f( $key, $value );
+		}
 		return $this->createNewInstance($res);
 	}
 	
@@ -814,12 +817,10 @@ class Dict implements \JsonSerializable
 	function reduce($f, $init_value)
 	{
 		$res = $init_value;
-		$this->each(
-			function ($key, $value) use (&$res, $f)
-			{
-				$res = $f($res, $key, $value);
-			}
-		);
+		foreach ($this->_map as $key => $value)
+		{
+			$res = $f($res, $key, $value );
+		}
 		return $res;
 	}
 	

@@ -315,6 +315,18 @@ class rtl{
 	 */
 	declare static fun method(mixed obj, string method_name);
 	
+	#switch
+	#case ifcode PHP then
+	static function method($obj, $method_name){
+		return new \Runtime\Callback($obj, $method_name);
+	}
+	#case ifcode JAVASCRIPT then
+	static method(obj, method_name){
+		return obj.method_name;
+	}
+	#endswitch
+	
+	
 	
 	
 	/**

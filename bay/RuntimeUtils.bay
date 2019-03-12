@@ -815,7 +815,7 @@ export class RuntimeUtils{
 				{
 					res.push(item);
 				}
-				else if (rlt::isString(item))
+				else if (rtl::isString(item))
 				{
 					res.push(
 						new UIStruct
