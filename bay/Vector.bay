@@ -164,11 +164,21 @@ declare class Vector<T> extends Collection
 
 
 #switch
-#case ifcode JAVASCRIPT then
 
-var _Collection = Collection;
+#case ifcode JAVASCRIPT then
+var _Collection = null;
 if (typeof Runtime == "undefined") Runtime = {};
-if (isBrowser()) _Collection = Runtime.Collection;
+
+
+#case ifcode NODEJS then
+_Collection = require('./Collection.js');
+
+
+#case ifcode ES6 then
+_Collection = Runtime.Collection;
+
+
+#case ifcode JAVASCRIPT then
 
 Runtime.Vector = class extends _Collection
 {

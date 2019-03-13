@@ -60,11 +60,21 @@ declare class Map<T> extends Dict<T>
 
 
 #switch
-#case ifcode JAVASCRIPT then
 
-var _Dict = Dict;
+#case ifcode JAVASCRIPT then
+var _Dict = null;
 if (typeof Runtime == "undefined") Runtime = {};
-if (isBrowser()) _Dict = Runtime.Dict;
+
+
+#case ifcode NODEJS then
+_Dict = require('./Dict.js');
+
+
+#case ifcode ES6 then
+_Dict = Runtime.Dict;
+
+
+#case ifcode JAVASCRIPT then
 
 Runtime.Map = class extends _Dict
 {

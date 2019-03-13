@@ -349,6 +349,8 @@ export class rs
 	#switch
 	#case ifcode PHP then
 	static function htmlEscape($s){
+		if ($s instanceof \Runtime\Collection) return $s;
+		if ($s instanceof \Runtime\UIStruct) return $s;
 		return htmlspecialchars($s, ENT_QUOTES | ENT_HTML401);
 	}
 	#case ifcode JAVASCRIPT then

@@ -806,7 +806,7 @@ export class RuntimeUtils{
 			for (int i=0; i<data.count(); i++)
 			{
 				mixed item = data.item(i);
-				if (item instanceof Vector)
+				if (item instanceof Collection)
 				{
 					Vector<UIStruct> new_item = static::normalizeUIVector(item);
 					res.appendVector(new_item);
@@ -820,7 +820,7 @@ export class RuntimeUtils{
 					res.push(
 						new UIStruct
 						{
-							"kind": UIStruct::TYPE_STRING,
+							"kind": UIStruct::TYPE_RAW,
 							"content": rtl::toString(item),
 						}
 					);
@@ -853,11 +853,11 @@ export class RuntimeUtils{
 			
 			return data.copy(obj);
 		}
-		else if (this.isString(data))
+		else if (rtl::isString(data))
 		{
 			return new UIStruct
 			{
-				"kind": UIStruct::TYPE_STRING,
+				"kind": UIStruct::TYPE_RAW,
 				"content": rtl::toString(data),
 			};
 		}

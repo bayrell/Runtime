@@ -165,7 +165,7 @@ declare class Dict<T>
 #case ifcode JAVASCRIPT then
 if (typeof Runtime == "undefined") Runtime = {};
 
-Runtime.Dict = class extends Dict
+Runtime.Dict = class extends Map
 {
 	
 	/**
@@ -218,7 +218,7 @@ Runtime.Dict = class extends Dict
 	 */
 	_correctItemsByType(type)
 	{
-		if (type == "mixed" or type == "primitive" or type == "var") return this;
+		if (type == "mixed" || type == "primitive" || type == "var") return this;
 		
 		var obj = this.createNewInstance();
 		var it = super.keys();

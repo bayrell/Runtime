@@ -353,7 +353,7 @@ Runtime.Collection = class extends Array
 	 */
 	_correctItemsByType(type)
 	{
-		if (type == "mixed" or type == "primitive" or type == "var") return this;
+		if (type == "mixed" || type == "primitive" || type == "var") return this;
 		
 		var arr = this.copy();
 		for (var i=0; i<arr.length; i++)
@@ -616,6 +616,7 @@ Runtime.Collection = class extends Array
 	appendCollectionIm(arr)
 	{
 		if (!arr) return this;
+		if (arr.length == 0) return this;
 		var res = this.copy();
 		for (var i=0; i<arr.length; i++)
 		{
@@ -1206,6 +1207,7 @@ class Collection implements \JsonSerializable
 	public function appendCollectionIm($arr)
 	{
 		if (!$arr) return $this;
+		if (count($arr->_arr) == 0) return $this;
 		$res = $this->copy();
 		foreach ($arr->_arr as $item)
 		{

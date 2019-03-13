@@ -1099,6 +1099,22 @@ class rtl{
 	
 	
 	
+	/**
+	 * Normalize UIStruct
+	 * @param mixed data
+	 * @return UIStruct
+	 */
+	public static UIStruct normalizeUIVector(mixed data)
+	{
+		#switch
+		#case ifcode PHP then
+		return self::callStaticMethod("Runtime.RuntimeUtils", "normalizeUIVector", [$data]);
+		#case ifcode JAVASCRIPT then
+		return this.callStaticMethod("Runtime.RuntimeUtils", "normalizeUIVector", [data]);
+		#endswitch
+	}
+	
+	
 	/* =================== Deprecated =================== */
 	
 	
