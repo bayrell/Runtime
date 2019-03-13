@@ -416,9 +416,17 @@ class rtl{
 			){
 				#switch
 				#case ifcode PHP then
-				return $value->_correctItemsByType($type_template);
+				if ($value instanceof \Runtime\Collection or $value instanceof \Runtime\Dict)
+				{
+					return $value->_correctItemsByType($type_template);
+				}
+				return null;
 				#case ifcode JAVASCRIPT then
-				return value._correctItemsByType(type_template);
+				if (this.is_instanceof(value, "Runtime.Collection") || this.is_instanceof(value, "Runtime.Dict"))
+				{
+					return value._correctItemsByType(type_template);
+				}
+				return null;
 				#endswitch
 			}
 			

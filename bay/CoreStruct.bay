@@ -34,18 +34,20 @@ class CoreStruct extends CoreObject implements SerializeInterface
 	public void constructor(Map obj = null)
 	{
 		parent();
-		obj = static::convert(obj);
-		this.assignMap(obj);
+		if (obj != null)
+		{
+			this.assignMap(obj);
+			this.initData();
+		}
 	}
 	
 	
 	
 	/**
-	 * Convert object
+	 * Init struct data
 	 */
-	pure Map convert(Map obj)
+	protected void initData()
 	{
-		return obj;
 	}
 	
 	
@@ -57,11 +59,15 @@ class CoreStruct extends CoreObject implements SerializeInterface
 	 */
 	public CoreStruct copy(Map obj = null)
 	{
-		Dict res = this.takeMap().toDict();
-		res = res.concat(obj);
+		if (obj == null) return this;
+		
+		CoreStruct res = rtl::newInstance( this.getClassName(), [] );
+		res.assignObject(this);
+		res.setMap(obj);
+		res.initData();
 		
 		/* Return object */
-		return rtl::newInstance( this.getClassName(), [res] );
+		return res;
 	}
 	
 	

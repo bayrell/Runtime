@@ -99,21 +99,10 @@ class CoreObject
 	 */
 	void assignObject(CoreObject obj)
 	{
-		this.assignObjectAfter(obj);
 	}
 	
 	
-	
-	/**
-	 * Assign and clone data from other object
-	 * @param CoreObject obj
-	 */
-	void assignObjectAfter(CoreObject obj)
-	{
-	}
-	
-	
-	
+		
 	/**
 	 * Set new value instance by variable name
 	 * @param string variable_name
