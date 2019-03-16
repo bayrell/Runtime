@@ -56,7 +56,7 @@ struct IntrospectionInfo extends CoreStruct
 			{
 				return rtl::is_instanceof(item, class_name);
 			}
-		);
+		).toCollection();
 	}
 	
 	

@@ -331,8 +331,10 @@ Runtime.Collection = class extends Array
 	 */
 	toCollection()
 	{
-		if (isBrowser()) return new Runtime.Collection(this);
-		return new Collection(this);
+		var obj = super.slice();
+		if (isBrowser()) Object.setPrototypeOf(obj, Runtime.Collection.prototype);
+		else Object.setPrototypeOf(obj, Collection.prototype);
+		return obj;
 	}
 	
 	
@@ -342,8 +344,10 @@ Runtime.Collection = class extends Array
 	 */
 	toVector()
 	{
-		if (isBrowser()) return new Runtime.Vector(this);
-		return new Vector(this);
+		var obj = super.slice();
+		if (isBrowser()) Object.setPrototypeOf(obj, Runtime.Vector.prototype);
+		else Object.setPrototypeOf(obj, Vector.prototype);
+		return obj;
 	}
 	
 	

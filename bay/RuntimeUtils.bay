@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.Collection;
 use Runtime.Context;
+use Runtime.CoreStruct;
 use Runtime.Dict;
 use Runtime.Map;
 use Runtime.rs;
@@ -216,7 +217,7 @@ export class RuntimeUtils{
 	 * @param string class_name
 	 * @return Vector<IntrospectionInfo>
 	 */
-	static Vector<IntrospectionInfo> getIntrospection(string class_name)
+	pure Collection<IntrospectionInfo> getIntrospection(string class_name)
 	{
 		Vector<IntrospectionInfo> res = new Vector();
 		Vector<string> class_names = self::getParents(class_name);
@@ -242,7 +243,7 @@ export class RuntimeUtils{
 						
 						if (info != null)
 						{
-							info.class_name = item_class_name;
+							info <= class_name <= item_class_name;
 							res.push(info);
 						}
 					}
@@ -294,6 +295,7 @@ export class RuntimeUtils{
 				
 				
 				/* Get class introspection */
+				IntrospectionInfo info = null;
 				try
 				{ 
 					info = rtl::callStaticMethod(item_class_name, "getClassInfo", []);
@@ -308,7 +310,7 @@ export class RuntimeUtils{
 			}
 		);
 		
-		return res;
+		return res.toCollection();
 	}
 	
 	
@@ -340,7 +342,7 @@ export class RuntimeUtils{
 		if (obj === null) return null;
 		if (rtl::isScalarValue(obj)) return obj;
 		
-		if (obj instanceof Vector)
+		if (obj instanceof Collection)
 		{
 			Vector<mixed> res = new Vector();
 			for (int i=0; i<obj.count(); i++)
@@ -349,10 +351,10 @@ export class RuntimeUtils{
 				value = self::ObjectToPrimitive( value, force_class_name );
 				res.push(value);
 			}
-			return res;
+			return res.toCollection();
 		}
 		
-		if (obj instanceof Map)
+		if (obj instanceof Dict)
 		{
 			Map<mixed> res = new Map();
 			Vector<string> keys = obj.keys();
@@ -367,10 +369,10 @@ export class RuntimeUtils{
 			
 			delete keys;
 			if (force_class_name){
-				res.set("__class_name__", classof Map);
+				res.set("__class_name__", classof Dict);
 			}
 			
-			return res;
+			return res.toDict();
 		}
 		
 		
@@ -409,7 +411,7 @@ export class RuntimeUtils{
 		if (obj === null) return null;
 		if (rtl::isScalarValue(obj)) return obj;
 		
-		if (obj instanceof Vector)
+		if (obj instanceof Collection)
 		{
 			Vector<mixed> res = new Vector();
 			for (int i=0; i<obj.count(); i++)
@@ -418,10 +420,10 @@ export class RuntimeUtils{
 				value = self::PrimitiveToObject(value);
 				res.push(value);
 			}
-			return res;
+			return res.toCollection();
 		}
 		
-		if (obj instanceof Map)
+		if (obj instanceof Dict)
 		{
 			Map<mixed> res = new Map();
 			Vector<string> keys = obj.keys();
@@ -437,9 +439,9 @@ export class RuntimeUtils{
 			delete keys;
 			
 			if ( !res.has("__class_name__") ) return res;
-			if ( res.item("__class_name__") == "Runtime.Map" ){
+			if ( res.item("__class_name__") == "Runtime.Map" or res.item("__class_name__") == "Runtime.Dict" ){
 				res.remove("__class_name__");
-				return res;
+				return res.toDict();
 			}
 			
 			string class_name = res.item("__class_name__");
@@ -464,6 +466,10 @@ export class RuntimeUtils{
 					var value = res.get(variable_name, null);
 					instance.assignValue(variable_name, value);
 				}
+			}
+			if (instance instanceof CoreStruct)
+			{
+				instance.initData();
 			}
 			
 			delete res;

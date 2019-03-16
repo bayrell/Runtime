@@ -62,31 +62,30 @@ declare class Map<T> extends Dict<T>
 #switch
 
 #case ifcode JAVASCRIPT then
-var _Dict = null;
 if (typeof Runtime == "undefined") Runtime = {};
 
 
 #case ifcode NODEJS then
-_Dict = require('./Dict.js');
+var _Dict = require('./Dict.js');
+Runtime.Map = class extends _Dict
 
 
 #case ifcode ES6 then
-_Dict = Runtime.Dict;
+Runtime.Map = class extends Runtime.Dict
 
 
 #case ifcode JAVASCRIPT then
-
-Runtime.Map = class extends _Dict
 {
-	
+
 	/**
 	 * Returns new Instance
 	 * @return Object
 	 */
-	createNewInstance()
+	createNewInstance(obj)
 	{
-		if (isBrowser()) return new Runtime.Map();
-		return new Runtime.Map();
+		if (obj == undefined) obj = null;
+		if (isBrowser()) return new Runtime.Map(obj);
+		return new Runtime.Map(obj);
 	}
 	
 	

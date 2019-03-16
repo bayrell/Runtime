@@ -30,6 +30,17 @@ class Reference<T> extends CoreObject
 	
 	
 	/**
+	 * Constructor
+	 */
+	public void constructor(T ref = null)
+	{
+		parent();
+		this.ref = ref;
+	}
+	
+	
+	
+	/**
 	 * Assign and clone data from other object
 	 * @param CoreObject obj
 	 */

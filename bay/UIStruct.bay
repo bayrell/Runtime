@@ -21,6 +21,7 @@ namespace Runtime;
 use Runtime.CoreStruct;
 use Runtime.Dict;
 use Runtime.Map;
+use Runtime.rs;
 use Runtime.rtl;
 use Runtime.Collection;
 use Runtime.Vector;
@@ -34,30 +35,36 @@ struct UIStruct extends CoreStruct
 	const string TYPE_RAW = "raw";
 	
 	
+	public string class_name = "";
 	public string key = "";
 	public string name = "";
 	public string kind = "element";
 	public string content = "";
-	public string ref = "";
-	public string control = "";
-	public string signal_in = "";
-	public string signal_out = "";
+	public string controller = "";
 	public CoreStruct model = null;
 	public Dict<primitive> props = null;
 	public Collection<UIStruct> children = null;
 	
 	
-	
-	/* TODO: Rewrite to lambda functions */
-	
-	
+
 	/**
 	 * Returns true if component
 	 * @return bool
 	 */
-	public bool isComponent()
+	pure bool isComponent(UIStruct ui)
 	{
-		return this.kind == self::TYPE_COMPONENT;
+		return ui.kind == self::TYPE_COMPONENT;
+	}
+	
+	
+	
+	/**
+	 * Returns true if element
+	 * @return bool
+	 */
+	pure bool isElement(UIStruct ui)
+	{
+		return ui.kind == self::TYPE_ELEMENT;
 	}
 	
 	
@@ -66,9 +73,9 @@ struct UIStruct extends CoreStruct
 	 * Returns true if string
 	 * @return bool
 	 */
-	public bool isString()
+	pure bool isString(UIStruct ui)
 	{
-		return this.kind == self::TYPE_STRING or this.kind == self::TYPE_RAW;
+		return ui.kind == self::TYPE_STRING or ui.kind == self::TYPE_RAW;
 	}
 	
 	
@@ -77,8 +84,87 @@ struct UIStruct extends CoreStruct
 	 * Returns model
 	 * @return CoreStruct
 	 */
-	public CoreStruct getModel()
+	pure CoreStruct getModel(UIStruct ui)
 	{
-		return this.model;
+		return ui.model;
+	}
+	
+	
+	
+	/**
+	 * Returns key path
+	 * @return string
+	 */
+	pure string getKey(UIStruct ui, string index)
+	{
+		return (ui.key !== "") ? ui.key : index;
+	}
+	
+	
+	
+	/**
+	 * Returns key path
+	 * @return string
+	 */
+	pure string getKeyPath(UIStruct ui, string key_path, string index)
+	{
+		return (key_path !== "") ? (key_path ~ "." ~ static::getKey(ui, index)) : static::getKey(ui, index);
+	}
+	
+	
+	
+	/**
+	 * Returns attrs
+	 */
+	pure Dict<string> getAttrs(UIStruct ui)
+	{
+		if (ui.props != null)
+		{
+			return ui.props.filter(
+				bool (string key, string value)
+				{
+					return rs::strpos(key, "@") != 0 or key == "@class";
+				}
+			);
+		}
+		return new Dict<string>();
+	}
+	
+	
+	
+	/**
+	 * Returns props
+	 */
+	pure Dict<string> getProps(UIStruct ui)
+	{
+		if (ui.props != null)
+		{
+			return ui.props.filter(
+				bool (string key, string value)
+				{
+					return rs::strpos(key, "@") == 0 and rs::strpos(key, "@on") != 0 and key != "@class";
+				}
+			);
+		}
+		return new Dict<string>();
+	}
+	
+	
+	
+	/**
+	 * Returns events
+	 */
+	pure Dict<string> getEvents(UIStruct ui)
+	{
+		if (ui.props != null)
+		{
+			return ui.props.filter(
+				bool (string key, string value)
+				{
+					return rs::strpos(key, "@on") == 0;
+				}
+			);
+		}
+		return new Dict<string>();
 	}
 }

@@ -128,6 +128,15 @@ declare class Dict<T>
 	
 	
 	/**
+	 * Filter items
+	 * @param func f
+	 * @return Collection
+	 */
+	declare Dict<T> filter(func f);
+	
+	
+	
+	/**
 	 * Reduce
 	 * @param func f
 	 * @param mixed init_value
@@ -255,10 +264,10 @@ Runtime.Dict = class extends Map
 	constructor(map)
 	{
 		super();
-		var _Map = null; if (isBrowser()) _Map = Runtime.Dict; else _Map = Dict;
+		var _Dict = null; if (isBrowser()) _Dict = Runtime.Dict; else _Dict = Dict;
 		if (map != undefined && typeof map == 'object')
 		{		
-			if (map instanceof Dict)
+			if (map instanceof _Dict)
 			{
 				var keys = map.keys();
 				keys.each(
@@ -451,6 +460,27 @@ Runtime.Dict = class extends Map
 		this.each(
 			(key, value)=>{
 				obj[key] = f(key, value);
+			}
+		);
+		return this.createNewInstance(obj);
+	}
+	
+	
+	
+	/**
+	 * Filter items
+	 * @param func f
+	 * @return Dict
+	 */
+	filter(f)
+	{
+		var obj={};
+		this.each(
+			(key, value)=>{
+				if (f(key, value))
+				{
+					obj[key] = value;
+				}
 			}
 		);
 		return this.createNewInstance(obj);
@@ -804,6 +834,27 @@ class Dict implements \JsonSerializable
 			$res[$key] = $f( $key, $value );
 		}
 		return $this->createNewInstance($res);
+	}
+	
+	
+	
+	/**
+	 * Filter items
+	 * @param func f
+	 * @return Dict
+	 */
+	function filter($f)
+	{
+		$arr2 = $this->createNewInstance();
+		$arr2->_arr = [];
+		foreach ($this->_arr as $key => $value)
+		{
+			if ($f($key, $value))
+			{
+				$arr2->_arr[$key] = $value;
+			}
+		}
+		return $arr2;
 	}
 	
 	

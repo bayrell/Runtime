@@ -59,6 +59,9 @@ class rtl{
 		if (class_name instanceof Function)
 			return class_name;
 		
+		if (class_name instanceof Runtime.CoreObject) class_name = class_name.getClassName();
+		else if (class_name instanceof Object) class_name = class_name.constructor.name;
+		
 		if (Runtime.rtl._classes==undefined) Runtime.rtl._classes = {};
 		if (Runtime.rtl._classes[class_name]!=undefined) return Runtime.rtl._classes[class_name];
 		
@@ -322,7 +325,11 @@ class rtl{
 	}
 	#case ifcode JAVASCRIPT then
 	static method(obj, method_name){
-		return obj.method_name;
+		if (!(obj instanceof Object))
+		{
+			obj = this.find_class(obj);
+		}
+		return obj[method_name].bind(obj);
 	}
 	#endswitch
 	
@@ -330,17 +337,45 @@ class rtl{
 	
 	
 	/**
-	 * Call async method
-	 * @return Object
+	 * Returns callback
+	 * @return fun
 	 */
-	declare static void callAwait(callback f);
+	declare static fun methodAwait(mixed obj, string method_name);
 	
 	#switch
 	#case ifcode PHP then
-	static function callAwait($f){
+	static function methodAwait($obj, $method_name){
+		return new \Runtime\Callback($obj, $method_name);
+	}
+	#case ifcode JAVASCRIPT then
+	static methodAwait(obj, method_name){
+		if (!(obj instanceof Object))
+		{
+			obj = this.find_class(obj);
+		}
+		return function ()
+		{
+			var thread = new Runtime.AsyncThread();
+			thread.run( obj[method_name].apply(obj, arguments) );
+		}
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Call async method
+	 * @return Object
+	 */
+	declare static void runAwait(callback f);
+	
+	#switch
+	#case ifcode PHP then
+	static function runAwait($f){
+		$f();
 	}
 	#case ifcode ES6 then
-	static callAwait(f){
+	static runAwait(f){
 		var thread = new Runtime.AsyncThread();
 		thread.run(f);
 	}
@@ -357,7 +392,7 @@ class rtl{
 	 * @return var
 	 */
 	static var correct(var value, string type_value, var def_value = null, string type_template = ""){
-		return self::convert(value, type_value, def_value, type_template);
+		return static::convert(value, type_value, def_value, type_template);
 	}
 	
 	
@@ -1088,7 +1123,24 @@ class rtl{
 		#endswitch
 	}
 	
-
+	
+	
+	/**
+	 * Json encode data
+	 * @param mixed data
+	 * @return string
+	 */
+	public static string json_encode(mixed data)
+	{
+		#switch
+		#case ifcode PHP then
+		return self::callStaticMethod("Runtime.RuntimeUtils", "json_encode", [$data]);
+		#case ifcode JAVASCRIPT then
+		return this.callStaticMethod("Runtime.RuntimeUtils", "json_encode", [data]);
+		#endswitch
+	}
+	
+	
 	
 	/**
 	 * Normalize UIStruct
