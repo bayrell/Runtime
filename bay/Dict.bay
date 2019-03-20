@@ -181,7 +181,7 @@ Runtime.Dict = class extends Map
 	 * Returns new Instance
 	 * @return Object
 	 */
-	createNewInstance(obj)
+	static createNewInstance(obj)
 	{
 		if (obj == undefined) obj = null;
 		if (isBrowser()) return new Runtime.Dict(obj);
@@ -217,7 +217,7 @@ Runtime.Dict = class extends Map
 	 */
 	copy()
 	{
-		return this.createNewInstance(this);
+		return this.constructor.createNewInstance(this);
 	}
 	
 	
@@ -229,7 +229,7 @@ Runtime.Dict = class extends Map
 	{
 		if (type == "mixed" || type == "primitive" || type == "var") return this;
 		
-		var obj = this.createNewInstance();
+		var obj = this.constructor.createNewInstance();
 		var it = super.keys();
 		var next = it.next();
 		while (!next.done){
@@ -462,7 +462,7 @@ Runtime.Dict = class extends Map
 				obj[key] = f(key, value);
 			}
 		);
-		return this.createNewInstance(obj);
+		return this.constructor.createNewInstance(obj);
 	}
 	
 	
@@ -483,7 +483,7 @@ Runtime.Dict = class extends Map
 				}
 			}
 		);
-		return this.createNewInstance(obj);
+		return this.constructor.createNewInstance(obj);
 	}
 	
 	
@@ -577,9 +577,9 @@ class Dict implements \JsonSerializable
 	/**
 	 * Returns new Instance
 	 */
-	public function createNewInstance($obj=null)
+	public static function createNewInstance($obj=null)
 	{
-		$class_name = get_class($this);
+		$class_name = static::class;
 		return new $class_name($obj);
 	}
 	
@@ -590,7 +590,7 @@ class Dict implements \JsonSerializable
 	 */
 	function copy()
 	{
-		return $this->createNewInstance($this->_map);
+		return static::createNewInstance($this->_map);
 	}
 	
 	
@@ -787,7 +787,7 @@ class Dict implements \JsonSerializable
 	public function keys()
 	{
 		$keys = array_keys($this->_map);
-		$res = new \Runtime\Collection($keys);
+		$res = static::createNewInstance($keys);
 		return $res;
 	}
 	
@@ -800,7 +800,7 @@ class Dict implements \JsonSerializable
 	public function values()
 	{
 		$values = array_values($this->_map);
-		$res = new \Runtime\Collection($values);
+		$res = static::createNewInstance($values);
 		return $res;
 	}
 	
@@ -833,7 +833,7 @@ class Dict implements \JsonSerializable
 		{
 			$res[$key] = $f( $key, $value );
 		}
-		return $this->createNewInstance($res);
+		return static::createNewInstance($res);
 	}
 	
 	
@@ -845,13 +845,13 @@ class Dict implements \JsonSerializable
 	 */
 	function filter($f)
 	{
-		$arr2 = $this->createNewInstance();
-		$arr2->_arr = [];
-		foreach ($this->_arr as $key => $value)
+		$arr2 = static::createNewInstance();
+		$arr2->_map = [];
+		foreach ($this->_map as $key => $value)
 		{
 			if ($f($key, $value))
 			{
-				$arr2->_arr[$key] = $value;
+				$arr2->_map[$key] = $value;
 			}
 		}
 		return $arr2;

@@ -640,7 +640,7 @@ export class RuntimeUtils{
 			var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;			
 			var obj = JSON.parse(s, function (key, value){
 				if (Array.isArray(value)){
-					return new _Vector(value);
+					return _Vector.createNewInstance(value);
 				}
 				if (typeof value == 'object'){
 					return new _Map(value);
@@ -834,6 +834,16 @@ export class RuntimeUtils{
 			}
 			
 			return res.toCollection();
+		}
+		
+		else if (data instanceof UIStruct)
+		{
+			return new Collection( static::normalizeUI(data) );
+		}
+		
+		else if (rtl::isString(data))
+		{
+			return new Collection( static::normalizeUI(data) );
 		}
 		
 		return null;

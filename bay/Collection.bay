@@ -372,11 +372,14 @@ Runtime.Collection = class extends Array
 	
 	/**
 	 * Returns new Instance
+	 * @return Object
 	 */
-	createNewInstance()
-	{
-		if (isBrowser()) return new Runtime.Collection();
-		return new Collection();
+	static createNewInstance(arr){
+		var res = null;
+		if (isBrowser()) res = new Runtime.Collection();
+		else res = new Runtime.Collection();
+		if (arr != undefined && arr != null) res = res.concat(arr);
+		return res;
 	}
 	
 	
@@ -822,7 +825,7 @@ Runtime.Collection = class extends Array
 	 */
 	removeDublicatesIm()
 	{
-		var res = this.createNewInstance();
+		var res = this.constructor.createNewInstance();
 		for (var i=0; i<this.length; i++)
 		{
 			if (res.indexOf(this[i]) == -1)
@@ -882,7 +885,7 @@ class Collection implements \JsonSerializable
 	 */
 	public function copy()
 	{
-		$arr2 = $this->createNewInstance();
+		$arr2 = static::createNewInstance();
 		if ($this->_arr == null) $arr2->_arr = [];
 		else $arr2->_arr = array_slice($this->_arr, 0);
 		return $arr2;
@@ -968,10 +971,12 @@ class Collection implements \JsonSerializable
 	/**
 	 * Returns new Instance
 	 */
-	public function createNewInstance()
+	public static function createNewInstance($arr = null)
 	{
-		$class_name = get_class($this);
-		return new $class_name();
+		$class_name = static::class;
+		$res = new $class_name();
+		if ($arr != null) $res->_arr = $arr;
+		return $res;
 	}
 	
 	
@@ -1287,7 +1292,7 @@ class Collection implements \JsonSerializable
 	function map($f)
 	{
 		$keys = array_keys($this->_arr);
-		$arr2 = $this->createNewInstance();
+		$arr2 = static::createNewInstance();
 		$arr2->_arr = array_map($f, $this->_arr, $keys);
 		return $arr2;
 	}
@@ -1301,7 +1306,7 @@ class Collection implements \JsonSerializable
 	 */
 	function filter($f)
 	{
-		$arr2 = $this->createNewInstance();
+		$arr2 = static::createNewInstance();
 		$arr2->_arr = array_values(array_filter($this->_arr, $f));
 		return $arr2;
 	}
@@ -1353,7 +1358,7 @@ class Collection implements \JsonSerializable
 	 */
 	function concat($v)
 	{
-		$arr2 = $this->createNewInstance();
+		$arr2 = static::createNewInstance();
 		$arr2->_arr = array_merge($this->_arr, $v->_arr);
 		return $arr2;
 	}
@@ -1368,7 +1373,7 @@ class Collection implements \JsonSerializable
 	 */
 	function slice($offset = 0, $length = null)
 	{
-		$arr2 = $this->createNewInstance();
+		$arr2 = static::createNewInstance();
 		$arr2->_arr = array_slice($this->_arr, $offset, $length);
 		return $arr2;
 	}
@@ -1429,7 +1434,7 @@ class Collection implements \JsonSerializable
 				$arr[] = $value;
 			}
 		}
-		$res = $this->createNewInstance();
+		$res = static::createNewInstance();
 		$res->_arr = $arr;
 		return $res;
 	}

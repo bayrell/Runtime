@@ -86,7 +86,17 @@ struct UIStruct extends CoreStruct
 	 */
 	pure CoreStruct getModel(UIStruct ui)
 	{
-		return ui.model;
+		if (ui.model != null) 
+			return ui.model;
+			
+		if (ui.kind == self::TYPE_COMPONENT)
+		{
+			string model_name = (method (ui.name, "modelName"))();
+			CoreStruct model = rtl::newInstance(model_name, [ui.props]);
+			return model;
+		}
+		
+		return null;
 	}
 	
 	

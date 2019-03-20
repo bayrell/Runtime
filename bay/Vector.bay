@@ -184,10 +184,14 @@ Runtime.Vector = class extends Runtime.Collection
 	 * Returns new Instance
 	 * @return Object
 	 */
-	createNewInstance(){
-		if (isBrowser()) return new Runtime.Vector();
-		return new Runtime.Vector();
+	static createNewInstance(arr){
+		var res = null;
+		if (isBrowser()) res = new Runtime.Vector();
+		else res = new Runtime.Vector();
+		if (arr != undefined && arr != null) res = res.concat(arr);
+		return res;
 	}
+	
 	
 	
 	/**
@@ -425,16 +429,6 @@ module.exports = Runtime.Vector;
 
 class Vector extends \Runtime\Collection
 {
-	
-	/**
-	 * Returns new Instance
-	 */
-	public function createNewInstance()
-	{
-		$class_name = get_class($this);
-		return new $class_name();
-	}
-	
 	
 	
 	/**
