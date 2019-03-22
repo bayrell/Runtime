@@ -294,6 +294,17 @@ class rtl{
 	 * Call method
 	 * @return Object
 	 */
+	static var f(callback f)
+	{
+		return f;
+	}
+	
+	
+	
+	/**
+	 * Call method
+	 * @return Object
+	 */
 	declare static var call(callback f, Vector args = null);
 	
 	#switch
@@ -407,7 +418,7 @@ class rtl{
 	 */
 	static var convert(var value, string type_value, var def_value = null, string type_template = "")
 	{
-		if (type_value == "mixed" or type_value == "primitive" or type_value == "var")
+		if (type_value == "mixed" or type_value == "primitive" or type_value == "var" or type_value == "fun")
 			return value;
 		
 		if (type_value == "")

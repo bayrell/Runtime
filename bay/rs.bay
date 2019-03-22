@@ -355,6 +355,8 @@ export class rs
 	}
 	#case ifcode JAVASCRIPT then
 	static htmlEscape(s){
+		if (s instanceof Runtime.Collection) return s;
+		if (s instanceof Runtime.UIStruct) return s;
 		var obj = {
 			"<":"&lt;",
 			">": "&gt;", 

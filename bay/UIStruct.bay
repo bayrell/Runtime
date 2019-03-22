@@ -38,6 +38,7 @@ struct UIStruct extends CoreStruct
 	public string class_name = "";
 	public string key = "";
 	public string name = "";
+	public string space = "";
 	public string kind = "element";
 	public string content = "";
 	public string controller = "";
