@@ -284,6 +284,7 @@ Runtime.Dict = class extends Map
 				}
 			}
 		}
+		this.__uq__ = Symbol();
 	}
 	
 	

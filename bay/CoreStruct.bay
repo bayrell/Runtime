@@ -39,6 +39,10 @@ class CoreStruct extends CoreObject implements SerializeInterface
 			this.assignMap(obj);
 			this.initData();
 		}
+		#switch
+		#case ifcode JAVASCRIPT then
+		if (this.__uq__ == undefined || this.__uq__ == null) this.__uq__ = Symbol();
+		#endswitch
 	}
 	
 	

@@ -968,6 +968,171 @@ class rtl{
 	
 	
 	
+	/* ================ Memorize functions ================ */
+	
+	static mixed _memorize_cache = null;
+	
+	
+	#switch
+	#case ifcode PHP then
+	static $_memorize_not_found = null;
+	static $_memorize_hkey = [];
+	static function _memorizeValidHKey($hkey, $key)
+	{
+		if ( !isset(static::$_memorize_hkey[$hkey]) ) return false;
+		if ( static::$_memorize_hkey[$hkey] == $key ) return true;
+		return false;
+	}
+	#case ifcode JAVASCRIPT then
+	#endswitch
+	
+	
+	
+	/**
+	 * Clear memorize cache
+	 */
+	static void _memorizeClear()
+	{
+		static::_memorize_cache = null;
+		
+		#switch
+		#case ifcode PHP then
+		static::$_memorize_hkey = [];
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Returns cached value
+	 */
+	declare static string _memorizeValue(string name, mixed args);
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function &_memorizeValue($name, $args)
+	{
+		if (static::$_memorize_cache == null) return static::$_memorize_not_found;
+		if (!isset(static::$_memorize_cache[$name])) return static::$_memorize_not_found;
+		
+		$arr = &static::$_memorize_cache[$name];
+		$sz = count($args);
+		for ($i=0; $i<$sz; $i++)
+		{
+			$key = &$args[$i];
+			$hkey = null; 
+			if (gettype($key) == 'object') $hkey = spl_object_hash($key); else $hkey = $key;
+			if ($i == $sz - 1)
+			{
+				if (array_key_exists($hkey, $arr))
+				{
+					return $arr[$hkey];
+				}
+				return static::$_memorize_not_found;
+			}
+			else
+			{
+				if (!isset($arr[$hkey])) return static::$_memorize_not_found;
+				$arr = &$arr[$hkey];
+			}
+		}
+	}
+	#case ifcode JAVASCRIPT then
+	static _memorizeValue(name, args, f)
+	{
+		if (this._memorize_cache == null) return this._memorize_not_found;
+		if (this._memorize_cache[name] == undefined) return this._memorize_not_found;
+		var arr = this._memorize_cache[name];
+		var sz = args.length;
+		for (var i=0; i<sz; i++)
+		{
+			var key = args[i];
+			var hkey = null;
+			if (typeof key == 'object')
+			{
+				if (key.__uq__ != undefined) hkey = key.__uq__;
+				else return this._memorize_not_found;
+			}
+			else hkey = key;
+			if (i == sz - 1)
+			{
+				if (arr[hkey] == undefined) return this._memorize_not_found;
+				return arr[hkey];
+			}
+			else
+			{
+				if (arr[hkey] == undefined) arr[hkey] = {};
+				arr = arr[hkey];
+			}
+		}
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Returns cached value
+	 */
+	declare static string _memorizeSave(string name, mixed args, mixed value);
+	
+	
+	#switch
+	#case ifcode PHP then
+	static function _memorizeSave($name, $args, $value)
+	{
+		if (static::$_memorize_cache == null) static::$_memorize_cache = [];
+		if (!isset(static::$_memorize_cache[$name])) static::$_memorize_cache[$name] = [];
+		
+		$arr = &static::$_memorize_cache[$name];
+		$sz = count($args);
+		for ($i=0; $i<$sz; $i++)
+		{
+			$key = &$args[$i];
+			$hkey = null; 
+			if (gettype($key) == 'object') $hkey = spl_object_hash($key); else $hkey = $key;
+			if ($i == $sz - 1)
+			{
+				$arr[$hkey] = $value;
+			}
+			else
+			{
+				if (!isset($arr[$hkey])) $arr[$hkey] = [];
+				else if (!static::_memorizeValidHKey($hkey, $key)) $arr[$hkey] = [];
+				$arr = &$arr[$hkey];
+			}
+		}
+	}
+	#case ifcode JAVASCRIPT then
+	static _memorizeSave(name, args, value)
+	{
+		if (this._memorize_cache == null) this._memorize_cache = {};
+		if (this._memorize_cache[name] == undefined) this._memorize_cache[name] = {};
+		var arr = this._memorize_cache[name];
+		var sz = args.length;
+		for (var i=0; i<sz; i++)
+		{
+			var key = args[i];
+			var hkey = null;
+			if (typeof key == 'object')
+			{
+				if (key.__uq__ != undefined) hkey = key.__uq__;
+				else hkey = null;
+			}
+			else hkey = key;
+			if (i == sz - 1)
+			{
+				arr[hkey] = value;
+			}
+			else
+			{
+				if (arr[hkey] == undefined) arr[hkey] = {};
+				arr = arr[hkey];
+			}
+		}
+	}
+	#endswitch
+	
 	
 	/* ================ Unsafe functions ================ */
 	
@@ -1065,49 +1230,6 @@ class rtl{
 	}
 	#endswitch
 	
-	
-	
-	
-	/**
-	 * Returns new element
-	 * @param string name
-	 * @param Dict<mixed> props
-	 * @param Collection<mixed> children
-	 * @param UIControl<mixed> control
-	 */
-	static UIStruct e(string name, Dict<mixed> props, Collection<mixed> children, UIControl control = null)
-	{
-		return new UIStruct(
-			{
-				"name": name,
-				"kind": UIStruct::TYPE_ELEMENT,
-				"props": props,
-				"children": children,
-				"control": control,
-			}
-		);
-	}
-	
-	
-	
-	/**
-	 * Returns new component
-	 * @param string name
-	 * @param Dict<mixed> props
-	 * @param Collection<mixed> children	 
-	 */
-	static UIStruct c(string name, Dict<mixed> props, Collection<mixed> children, UIControl control = null)
-	{
-		return new UIStruct(
-			{
-				"name": name,
-				"kind": UIStruct::TYPE_COMPONENT,
-				"props": props,
-				"children": children,
-				"control": control,
-			}
-		);
-	}
 	
 	
 	
@@ -1243,3 +1365,13 @@ class rtl{
 	#endswitch
 	
 }
+
+
+#switch
+#case ifcode PHP then
+rtl::$_memorize_not_found = (object) ['s' => 'memorize_key_not_found'];
+#case ifcode NODEJS then
+rtl._memorize_not_found = {'s':'memorize_key_not_found'};
+#case ifcode ES6 then
+Runtime.rtl._memorize_not_found = {'s':'memorize_key_not_found','id':Symbol()};
+#endswitch

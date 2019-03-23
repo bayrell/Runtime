@@ -385,6 +385,17 @@ Runtime.Collection = class extends Array
 	
 	
 	/**
+	 * Collection constructor
+	 */
+	constructor()
+	{
+		super();
+		for (var i=0; i<arguments.length; i++) super.push( arguments[i] );
+		this.__uq__ = Symbol();
+	}
+	
+	
+	/**
 	 * Returns value from position
 	 * @param int pos - position
 	 */
