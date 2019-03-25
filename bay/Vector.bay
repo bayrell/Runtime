@@ -185,9 +185,7 @@ Runtime.Vector = class extends Runtime.Collection
 	 * @return Object
 	 */
 	static createNewInstance(arr){
-		var res = null;
-		if (isBrowser()) res = new Runtime.Vector();
-		else res = new Runtime.Vector();
+		var res = new Runtime.Vector();
 		if (arr != undefined && arr != null) res = res.concat(arr);
 		return res;
 	}

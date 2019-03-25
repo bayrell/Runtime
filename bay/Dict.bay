@@ -184,7 +184,6 @@ Runtime.Dict = class extends Map
 	static createNewInstance(obj)
 	{
 		if (obj == undefined) obj = null;
-		if (isBrowser()) return new Runtime.Dict(obj);
 		return new Runtime.Dict(obj);
 	}
 	
@@ -195,8 +194,7 @@ Runtime.Dict = class extends Map
 	 */
 	toDict()
 	{
-		if (isBrowser()) return new Runtime.Dict(this);
-		return new Dict(this);
+		return new Runtime.Dict(this);
 	}
 	
 	
@@ -206,8 +204,8 @@ Runtime.Dict = class extends Map
 	 */
 	toMap()
 	{
-		if (isBrowser()) return new Runtime.Map(this);
-		return new Map(this);
+		var _Map = Runtime.Dict.getMap();
+		return new _Map(this);
 	}
 	
 	
@@ -264,10 +262,9 @@ Runtime.Dict = class extends Map
 	constructor(map)
 	{
 		super();
-		var _Dict = null; if (isBrowser()) _Dict = Runtime.Dict; else _Dict = Dict;
 		if (map != undefined && typeof map == 'object')
 		{		
-			if (map instanceof _Dict)
+			if (map instanceof Runtime.Dict)
 			{
 				var keys = map.keys();
 				keys.each(
@@ -540,6 +537,14 @@ Runtime.Dict = class extends Map
 	}
 	
 }
+
+
+#case ifcode NODEJS then
+Runtime.Dict.getMap = function(){ return require('./Map.js'); }
+
+#case ifcode ES6 then
+Runtime.Dict.getMap = function(){ return Runtime.Map; }
+
 
 #case ifcode NODEJS then
 

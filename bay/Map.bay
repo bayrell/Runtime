@@ -84,7 +84,6 @@ Runtime.Map = class extends Runtime.Dict
 	static createNewInstance(obj)
 	{
 		if (obj == undefined) obj = null;
-		if (isBrowser()) return new Runtime.Map(obj);
 		return new Runtime.Map(obj);
 	}
 	

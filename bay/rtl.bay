@@ -302,28 +302,6 @@ class rtl{
 	
 	
 	/**
-	 * Call method
-	 * @return Object
-	 */
-	declare static var call(callback f, Vector args = null);
-	
-	#switch
-	#case ifcode PHP then
-	static function call($f, $args = null){
-		if ($args == null) return call_user_func($f);
-		if ($args instanceof \Runtime\Vector) $args = $args->_getArr();
-		return call_user_func_array($f, $args);
-	}
-	#case ifcode JAVASCRIPT then
-	static call(f, args){
-		if (args == undefined) return f.apply(null);
-		return f.apply(null, args);
-	}
-	#endswitch
-	
-	
-	
-	/**
 	 * Returns callback
 	 * @return fun
 	 */
@@ -343,7 +321,6 @@ class rtl{
 		return obj[method_name].bind(obj);
 	}
 	#endswitch
-	
 	
 	
 	
@@ -371,40 +348,6 @@ class rtl{
 		}
 	}
 	#endswitch
-	
-	
-	
-	/**
-	 * Call async method
-	 * @return Object
-	 */
-	declare static void runAwait(callback f);
-	
-	#switch
-	#case ifcode PHP then
-	static function runAwait($f){
-		$f();
-	}
-	#case ifcode ES6 then
-	static runAwait(f){
-		var thread = new Runtime.AsyncThread();
-		thread.run(f);
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Returns value if value instanceof type_value, else returns def_value
-	 * @param var value
-	 * @param string type_value
-	 * @param var def_value
-	 * @param var type_template
-	 * @return var
-	 */
-	static var correct(var value, string type_value, var def_value = null, string type_template = ""){
-		return static::convert(value, type_value, def_value, type_template);
-	}
 	
 	
 	
@@ -970,6 +913,7 @@ class rtl{
 	
 	/* ================ Memorize functions ================ */
 	
+	
 	static mixed _memorize_cache = null;
 	
 	
@@ -1134,8 +1078,8 @@ class rtl{
 	#endswitch
 	
 	
-	/* ================ Unsafe functions ================ */
 	
+	/* ================ Dirty functions ================ */
 	
 	
 	/**
@@ -1310,6 +1254,27 @@ class rtl{
 	
 	/* =================== Deprecated =================== */
 	
+	/**
+	 * Call method
+	 * @return Object
+	 */
+	declare static var call(callback f, Vector args = null);
+	
+	#switch
+	#case ifcode PHP then
+	static function call($f, $args = null){
+		if ($args == null) return call_user_func($f);
+		if ($args instanceof \Runtime\Vector) $args = $args->_getArr();
+		return call_user_func_array($f, $args);
+	}
+	#case ifcode JAVASCRIPT then
+	static call(f, args){
+		if (args == undefined) return f.apply(null);
+		return f.apply(null, args);
+	}
+	#endswitch
+	
+	
 	
 	/**
 	 * Call method
@@ -1363,6 +1328,20 @@ class rtl{
 		return f.apply(obj, args);
 	}
 	#endswitch
+	
+	
+	
+	/**
+	 * Returns value if value instanceof type_value, else returns def_value
+	 * @param var value
+	 * @param string type_value
+	 * @param var def_value
+	 * @param var type_template
+	 * @return var
+	 */
+	static var correct(var value, string type_value, var def_value = null, string type_template = ""){
+		return static::convert(value, type_value, def_value, type_template);
+	}
 	
 }
 
