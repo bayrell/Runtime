@@ -93,6 +93,7 @@ struct UIStruct extends CoreStruct
 		if (ui.kind == self::TYPE_COMPONENT)
 		{
 			string model_name = (method (ui.name, "modelName"))();
+			if (model_name == "") return null;
 			CoreStruct model = rtl::newInstance(model_name, [ui.props]);
 			return model;
 		}

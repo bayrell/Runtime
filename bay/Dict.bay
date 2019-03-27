@@ -536,6 +536,11 @@ Runtime.Dict = class extends Map
 		return obj;
 	}
 	
+	
+	getClassName(){return "Runtime.Dict";}
+	static getCurrentClassName(){return "Runtime.Dict";}
+	static getParentClassName(){return "Map";}
+	
 }
 
 
@@ -930,6 +935,11 @@ class Dict implements \JsonSerializable
 	public function jsonSerialize(){
 		return (object) $this->_map;
 	}
+	
+	
+	public function getClassName(){return "Runtime.Dict";}
+	public static function getCurrentClassName(){return "Runtime.Dict";}
+	public static function getParentClassName(){return "";}
 }
 
 #endswitch

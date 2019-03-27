@@ -843,6 +843,13 @@ Runtime.Collection = class extends Array
 		}
 		return res;
 	}
+	
+	
+	
+	getClassName(){return "Runtime.Collection";}
+	static getCurrentClassName(){return "Runtime.Collection";}
+	static getParentClassName(){return "Array";}
+	
 }
 
 #case ifcode NODEJS then
@@ -1453,6 +1460,12 @@ class Collection implements \JsonSerializable
 		$res->_arr = $arr;
 		return $res;
 	}
+	
+	
+	public function getClassName(){return "Runtime.Collection";}
+	public static function getCurrentClassName(){return "Runtime.Collection";}
+	public static function getParentClassName(){return "";}
+	
 }
 
 #endswitch

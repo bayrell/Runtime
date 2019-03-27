@@ -639,13 +639,13 @@ export class RuntimeUtils{
 			var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
 			var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;			
 			var obj = JSON.parse(s, function (key, value){
+				if (value == null) return value;
 				if (Array.isArray(value)){
 					return _Vector.createNewInstance(value);
 				}
 				if (typeof value == 'object'){
 					return new _Map(value);
 				}
-				
 				return value;
 			});
 			return _Utils.PrimitiveToObject(obj);
@@ -813,7 +813,6 @@ export class RuntimeUtils{
 		int arr_mod = 65536;
 		int sz = rs::strlen(s);
 		int hash = 0;
-		
 		for (int i=0; i<sz; i++)
 		{
 			int ch = rs::ord(s[i]);

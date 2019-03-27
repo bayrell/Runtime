@@ -145,6 +145,11 @@ Runtime.Map = class extends Runtime.Dict
 		return this;
 	}
 	
+	
+	getClassName(){return "Runtime.Map";}
+	static getCurrentClassName(){return "Runtime.Map";}
+	static getParentClassName(){return "Runtime.Dict";}
+	
 }
 
 #case ifcode NODEJS then
@@ -212,6 +217,10 @@ class Map extends Dict
 		return $this;
 	}
 	
+	
+	function getClassName(){return "Runtime.Map";}
+	public static function getCurrentClassName(){return "Runtime.Map";}
+	public static function getParentClassName(){return "Runtime.Dict";}
 }
 
 #endswitch

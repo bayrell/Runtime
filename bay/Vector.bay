@@ -406,6 +406,11 @@ Runtime.Vector = class extends Runtime.Collection
 		return this;
 	}
 	
+	
+	getClassName(){return "Runtime.Vector";}
+	static getCurrentClassName(){return "Runtime.Vector";}
+	static getParentClassName(){return "Runtime.Collection";}
+	
 }
 
 #case ifcode NODEJS then
@@ -646,6 +651,12 @@ class Vector extends \Runtime\Collection
 		}
 		return $this;
 	}
+	
+	
+	public function getClassName(){return "Runtime.Vector";}
+	public static function getCurrentClassName(){return "Runtime.Vector";}
+	public static function getParentClassName(){return "Runtime.Collection";}
+	
 }
 
 #endswitch
