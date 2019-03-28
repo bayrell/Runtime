@@ -367,7 +367,7 @@ class rtl{
 		if (type_value == "")
 			return def_value;
 		
-		if (value != null)
+		if (value !== null)
 		{
 		
 			/* Is scalar value */
