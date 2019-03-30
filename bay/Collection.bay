@@ -705,7 +705,12 @@ Runtime.Collection = class extends Array
 	 */
 	map(f)
 	{
-		return super.map(f);
+		var arr = this.copy();
+		for (var i=0; i<arr.length; i++)
+		{
+			arr[i] = f(arr[i], i);
+		}
+		return arr;
 	}
 	
 	
