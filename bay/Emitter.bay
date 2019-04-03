@@ -182,7 +182,8 @@ class Emitter extends CoreObject
 			for (int j=0; j<items.count(); j++)
 			{
 				callback f = items.item(j);
-				rtl::call(f, [e]);
+				f(e);
+				/*rtl::call(f, [e]);*/
 			}
 		}
 		

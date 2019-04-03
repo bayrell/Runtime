@@ -135,7 +135,7 @@ struct UIStruct extends CoreStruct
 			return ui.props.filter(
 				bool (string key, string value)
 				{
-					return rs::strpos(key, "@") != 0 or key == "@class";
+					return rs::strpos(key, "@") != 0 or key == "@class" or key == "@style";
 				}
 			);
 		}
