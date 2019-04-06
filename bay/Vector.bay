@@ -184,10 +184,8 @@ Runtime.Vector = class extends Runtime.Collection
 	 * Returns new Instance
 	 * @return Object
 	 */
-	static createNewInstance(arr){
-		var res = new Runtime.Vector();
-		if (arr != undefined && arr != null) res = res.concat(arr);
-		return res;
+	static Instance(){
+		return new Runtime.Vector();
 	}
 	
 	

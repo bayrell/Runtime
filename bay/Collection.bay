@@ -373,10 +373,55 @@ Runtime.Collection = class extends Array
 	 * Returns new Instance
 	 * @return Object
 	 */
-	static createNewInstance(arr){
-		var res = new Runtime.Collection();
-		if (arr != undefined && arr != null) res = res.concat(arr);
+	static Instance()
+	{
+		return new Runtime.Collection();
+	}
+	
+	
+	
+	/**
+	 * Returns new Instance
+	 * @return Object
+	 */
+	static create(arr)
+	{
+		var res = this.Instance();
+		if (arr != undefined && arr != null)
+		{
+			if (arr instanceof Array) res = res.concat(arr);
+			else
+			{
+				if (
+					arr instanceof Int8Array ||
+					arr instanceof Uint8Array ||
+					arr instanceof Int16Array ||
+					arr instanceof Uint16Array ||
+					arr instanceof Int32Array ||
+					arr instanceof Uint32Array ||
+					arr instanceof Float32Array ||
+					arr instanceof Float64Array
+				)
+				{
+					for (var i=0; i<arr.length; i++)
+					{
+						res.push(arr[i]);
+					}
+				}
+			}
+		}
 		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns new Instance
+	 * @return Object
+	 */
+	static createNewInstance(arr)
+	{
+		return this.create(arr);
 	}
 	
 	
@@ -838,7 +883,7 @@ Runtime.Collection = class extends Array
 	 */
 	removeDublicatesIm()
 	{
-		var res = this.constructor.createNewInstance();
+		var res = this.constructor.create();
 		for (var i=0; i<this.length; i++)
 		{
 			if (res.indexOf(this[i]) == -1)
@@ -912,7 +957,7 @@ class Collection implements \JsonSerializable
 	 */
 	public function copy()
 	{
-		$arr2 = static::createNewInstance();
+		$arr2 = static::create();
 		if ($this->_arr == null) $arr2->_arr = [];
 		else $arr2->_arr = array_slice($this->_arr, 0);
 		return $arr2;
@@ -991,6 +1036,19 @@ class Collection implements \JsonSerializable
 	public function _getArr()
 	{
 		return $this->_arr;
+	}
+	
+	
+	
+	/**
+	 * Returns new Instance
+	 */
+	public static function create($arr = null)
+	{
+		$class_name = static::class;
+		$res = new $class_name();
+		if ($arr != null) $res->_arr = $arr;
+		return $res;
 	}
 	
 	
@@ -1319,7 +1377,7 @@ class Collection implements \JsonSerializable
 	function map($f)
 	{
 		$keys = array_keys($this->_arr);
-		$arr2 = static::createNewInstance();
+		$arr2 = static::create();
 		$arr2->_arr = array_map($f, $this->_arr, $keys);
 		return $arr2;
 	}
@@ -1333,7 +1391,7 @@ class Collection implements \JsonSerializable
 	 */
 	function filter($f)
 	{
-		$arr2 = static::createNewInstance();
+		$arr2 = static::create();
 		$arr2->_arr = array_values(array_filter($this->_arr, $f));
 		return $arr2;
 	}
@@ -1385,7 +1443,7 @@ class Collection implements \JsonSerializable
 	 */
 	function concat($v)
 	{
-		$arr2 = static::createNewInstance();
+		$arr2 = static::create();
 		$arr2->_arr = array_merge($this->_arr, $v->_arr);
 		return $arr2;
 	}
@@ -1400,7 +1458,7 @@ class Collection implements \JsonSerializable
 	 */
 	function slice($offset = 0, $length = null)
 	{
-		$arr2 = static::createNewInstance();
+		$arr2 = static::create();
 		$arr2->_arr = array_slice($this->_arr, $offset, $length);
 		return $arr2;
 	}
@@ -1461,7 +1519,7 @@ class Collection implements \JsonSerializable
 				$arr[] = $value;
 			}
 		}
-		$res = static::createNewInstance();
+		$res = static::create();
 		$res->_arr = $arr;
 		return $res;
 	}

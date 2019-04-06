@@ -344,6 +344,14 @@ export class RuntimeUtils{
 		
 		if (obj instanceof Collection)
 		{
+			return obj.map(
+				mixed (mixed value) use (force_class_name)
+				{
+					return static::ObjectToPrimitive( value, force_class_name );
+				}
+			);
+			
+			/*
 			Vector<mixed> res = new Vector();
 			for (int i=0; i<obj.count(); i++)
 			{
@@ -352,13 +360,23 @@ export class RuntimeUtils{
 				res.push(value);
 			}
 			return res.toCollection();
+			*/
 		}
 		
 		if (obj instanceof Dict)
 		{
+			
+			obj = obj.map(
+				mixed (string key, mixed value) use (force_class_name)
+				{
+					return static::ObjectToPrimitive( value, force_class_name );
+				}
+			);
+			
+			/*
 			Map<mixed> res = new Map();
 			Vector<string> keys = obj.keys();
-		
+			
 			for (int i=0; i<keys.count(); i++)
 			{
 				string key = keys.item(i);
@@ -368,11 +386,12 @@ export class RuntimeUtils{
 			}
 			
 			delete keys;
+			*/
 			if (force_class_name){
-				res.set("__class_name__", classof Dict);
+				obj = obj.setIm("__class_name__", classof Dict);
 			}
 			
-			return res.toDict();
+			return obj.toDict();
 		}
 		
 		
@@ -757,7 +776,17 @@ export class RuntimeUtils{
 	 * @string charset - charset of the bytes vector. Default utf8
 	 * @return string
 	 */
-	public string bytesToString(Vector<byte> arr, string charset="utf8"){}
+	public static string bytesToString(Vector<byte> arr, string charset="utf8")
+	{
+		#switch
+		#case ifcode PHP then
+		#case ifcode ES6 then
+		var decoder = new TextDecoder(charset);
+		var bytes = new Uint8Array(arr);
+		return decoder.decode(bytes);
+		#case ifcode NODEJS then
+		#endswitch
+	}
 	
 	
 	
@@ -767,7 +796,17 @@ export class RuntimeUtils{
 	 * @param Vector<byte> arr - output vector
 	 * @param charset - Result bytes charset. Default utf8
 	 */
-	public void stringToBytes(string s, Vector<byte> arr, string charset="utf8"){}
+	public static void stringToBytes(string s, Vector<byte> arr, string charset="utf8")
+	{
+		#switch
+		#case ifcode PHP then
+		#case ifcode ES6 then
+		var encoder = new TextEncoder(charset);
+		var bytes = encoder.encode(s);
+		return Runtime.Collection.create(bytes);
+		#case ifcode NODEJS then
+		#endswitch
+	}
 	
 	
 	
