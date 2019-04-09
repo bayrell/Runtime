@@ -726,6 +726,8 @@ class rtl{
 	#switch
 	#case ifcode PHP then
 	static function toBool($val){
+		if ($val === false || $val === "false") return false;
+		if ($val === true || $val === "true") return true;
 		$res = (bool)$val;
 		$s_res = (string)$res;
 		$s_val = (string)$val;
@@ -736,6 +738,7 @@ class rtl{
 	#case ifcode JAVASCRIPT then
 	static toBool(val){
 		var res = false;
+		if (val == false || val == 'false') return false;
 		if (val == true || val == 'true') return true;
 		var s_res = new String(res);
 		var s_val = new String(val);

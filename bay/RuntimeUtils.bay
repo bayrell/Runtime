@@ -621,15 +621,15 @@ export class RuntimeUtils{
 		if (flags == undefined) flags = 0;
 		if (convert == undefined) convert = true;
 		var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
-		var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
-		var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
+		var _Collection=null;if (isBrowser()) _Collection=Runtime.Collection; else _Collection=Collection;
+		var _Dict=null;if (isBrowser()) _Dict=Runtime.Dict; else _Dict=Dict;
 		var _rtl=null;if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
 		if (convert) value = _Utils.ObjectToPrimitive(value);
 		return JSON.stringify(value, function (key, value){
 			if (_rtl.isScalarValue(value)) return value;
-			if (value instanceof _Vector) return value;
-			if (value instanceof _Map) return value.toObject();
-			return undefined;
+			if (value instanceof _Collection) return value;
+			if (value instanceof _Dict) return value.toObject();
+			return null;
 		});
 	}
 	#endswitch

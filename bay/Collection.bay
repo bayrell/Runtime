@@ -308,6 +308,16 @@ declare class Collection<T>
 	 * Convert to vector
 	 */
 	declare Vector<T> toVector();
+	
+	
+	
+	/**
+	 * Find item 
+	 * @param mixed item - Find function
+	 * @param func f - Find function
+	 * @return int - position
+	 */
+	declare int find(callback f, mixed item);
 }
 
 
@@ -894,6 +904,25 @@ Runtime.Collection = class extends Array
 		return res;
 	}
 	
+	
+	
+	/**
+	 * Find item 
+	 * @param func f - Find function
+	 * @param mixed item - Search item
+	 * @return Collection
+	 */
+	find(f, item)
+	{
+		for (var i=0; i<this.length; i++)
+		{
+			if (f(this[i], item))
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
 	
 	
 	getClassName(){return "Runtime.Collection";}
@@ -1522,6 +1551,27 @@ class Collection implements \JsonSerializable
 		$res = static::create();
 		$res->_arr = $arr;
 		return $res;
+	}
+	
+	
+	
+	/**
+	 * Find item 
+	 * @param func f - Find function
+	 * @param mixed item - Search item
+	 * @return Collection
+	 */
+	public function find($f, $item)
+	{
+		for ($i=0; $i<$this->count(); $i++)
+		{
+			$elem = $this->item($i);
+			if ($f($elem, $item))
+			{
+				return $i;
+			}
+		}
+		return -1;
 	}
 	
 	
