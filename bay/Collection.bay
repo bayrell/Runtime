@@ -958,7 +958,7 @@ module.exports = Runtime.Collection;
 class Collection implements \JsonSerializable
 {
 	
-	protected $_arr = [];
+	public $_arr = [];
 	
 	
 	/**
@@ -966,7 +966,7 @@ class Collection implements \JsonSerializable
 	 */
 	public function toCollection()
 	{
-		return new \Runtime\Collection($this);
+		return \Runtime\Collection::create($this);
 	}
 	
 	
@@ -976,7 +976,7 @@ class Collection implements \JsonSerializable
 	 */
 	public function toVector()
 	{
-		return new \Runtime\Vector($this);
+		return \Runtime\Vector::create($this);
 	}
 	
 	
@@ -1003,30 +1003,7 @@ class Collection implements \JsonSerializable
 		$arr = func_get_args();
 		foreach ($arr as $data)
 		{
-			if (is_array($data))
-			{
-				foreach ($data as $item)
-				{
-					if (!is_array($item))
-					{
-						$this->_arr[] = $item;
-					}
-				}
-			}
-			else if ($data instanceof \Runtime\Collection)
-			{
-				foreach ($data->_arr as $item)
-				{
-					if (!is_array($item))
-					{
-						$this->_arr[] = $item;
-					}
-				}
-			}
-			else
-			{
-				$this->_arr[] = $data;
-			}
+			$this->_arr[] = $data;
 		}
 	}
 	
@@ -1076,7 +1053,14 @@ class Collection implements \JsonSerializable
 	{
 		$class_name = static::class;
 		$res = new $class_name();
-		if ($arr != null) $res->_arr = $arr;
+		if ($arr != null)
+		{
+			if ($arr instanceof \Runtime\Collection)
+			{
+				$arr = $arr->_arr;
+			}
+			$res->_arr = $arr;
+		}
 		return $res;
 	}
 	

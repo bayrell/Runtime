@@ -129,7 +129,8 @@ export class RuntimeUtils{
 		
 		while (class_name != "")
 		{
-			class_name = rtl::callStaticMethod(class_name, "getParentClassName");
+			var f = rtl::method(class_name, "getParentClassName");
+			class_name = f();
 			if (class_name != "")
 			{
 				res.push(class_name);
@@ -191,8 +192,8 @@ export class RuntimeUtils{
 		classes.each(
 			void (string class_name) use (names, flag)
 			{
-				try{ rtl::callStaticMethod(class_name, "getFieldsList", [names, flag]); } catch (var e) {}
-				try{ rtl::callStaticMethod(class_name, "getVirtualFieldsList", [names, flag]); } catch (var e) {}
+				try{ rtl::method(class_name, "getFieldsList")(names, flag); } catch (var e) {}
+				try{ rtl::method(class_name, "getVirtualFieldsList")(names, flag); } catch (var e) {}
 			}
 		);
 		names = names.removeDublicatesIm();
@@ -230,14 +231,14 @@ export class RuntimeUtils{
 				
 				
 				/* Get fields introspection */
-				try{ rtl::callStaticMethod(item_class_name, "getFieldsList", [names]); } catch (var e) {}
+				try{ rtl::method(item_class_name, "getFieldsList")(names); } catch (var e) {}
 				names.each(
 					void (string field_name) use (res, item_class_name)
 					{
 						IntrospectionInfo info = null;
 						try
 						{ 
-							info = rtl::callStaticMethod(item_class_name, "getFieldInfoByName", [field_name]);
+							info = rtl::method(item_class_name, "getFieldInfoByName")(field_name);
 						}
 						catch (var e) { info = null; }
 						
@@ -252,14 +253,14 @@ export class RuntimeUtils{
 				
 				/* Get virtual fields introspection */
 				names.clear();
-				try{ rtl::callStaticMethod(item_class_name, "getVirtualFieldsList", [names]); } catch (var e) {}
+				try{ rtl::method(item_class_name, "getVirtualFieldsList")(names); } catch (var e) {}
 				names.each(
 					void (string field_name) use (res, item_class_name)
 					{
 						IntrospectionInfo info = null;
 						try
 						{ 
-							info = rtl::callStaticMethod(item_class_name, "getVirtualFieldInfo", [field_name]);
+							info = rtl::method(item_class_name, "getVirtualFieldInfo")(field_name);
 						}
 						catch (var e) { info = null; }
 						
@@ -274,14 +275,14 @@ export class RuntimeUtils{
 				
 				/* Get methods introspection */
 				names.clear();
-				try{ rtl::callStaticMethod(item_class_name, "getMethodsList", [names]); } catch (var e) {}
+				try{ rtl::method(item_class_name, "getMethodsList")(names); } catch (var e) {}
 				names.each(
 					void (string method_name) use (res, item_class_name)
 					{
 						IntrospectionInfo info = null;
 						try
 						{ 
-							info = rtl::callStaticMethod(item_class_name, "getMethodInfoByName", [method_name]);
+							info = rtl::method(item_class_name, "getMethodInfoByName")(method_name);
 						}
 						catch (var e) { info = null; }
 						
@@ -298,7 +299,7 @@ export class RuntimeUtils{
 				IntrospectionInfo info = null;
 				try
 				{ 
-					info = rtl::callStaticMethod(item_class_name, "getClassInfo", []);
+					info = rtl::method(item_class_name, "getClassInfo")();
 				}
 				catch (var e) { info = null; }
 				if (info != null)
