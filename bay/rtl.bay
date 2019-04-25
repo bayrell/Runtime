@@ -372,11 +372,11 @@ class rtl{
 		
 			/* Is scalar value */
 			if (
-				type_value == "int" or type_value == "float" or 
+				type_value == "int" or type_value == "float" or type_value == "byte" or
 				type_value == "double" or type_value == "bool" or type_value == "string"
 			){
 				try{
-					if (type_value == "int"){
+					if (type_value == "int" or type_value == "byte"){
 						int val = rtl::toInt(value);
 						return val;
 					}
