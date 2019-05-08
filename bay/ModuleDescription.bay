@@ -54,9 +54,9 @@ class ModuleDescription implements ModuleDescriptionInterface
 	
 	/**
 	 * Returns required modules
-	 * @return Map<string, string>
+	 * @return Map<string>
 	 */	
-	public static Map<string, string> getRequiredModules(ContextInterface context)
+	public static Map<string> getRequiredModules(ContextInterface context)
 	{
 		return null;
 	}
@@ -69,7 +69,7 @@ class ModuleDescription implements ModuleDescriptionInterface
 	 */
 	public static void onRegister(ContextInterface context)
 	{
-		context.registerDriver("driver.runtime.config", new Map<string, string>());
+		context.registerDriver("runtime.config", new Map<mixed>());
 	}
 	
 	

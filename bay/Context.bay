@@ -86,6 +86,10 @@ class Context extends CoreObject implements ContextInterface
 		
 		Vector<var> args = [this];
 		string module_description_class_name = module_name ~ ".ModuleDescription";
+		if (not rtl::class_exists(module_description_class_name))
+		{
+			return this;
+		}
 		
 		/* Add module */
 		this._modules.push(module_name);
@@ -219,8 +223,8 @@ class Context extends CoreObject implements ContextInterface
 	{
 		bool is_provider = rs::strpos(name, "provider.") === 0;
 		bool is_driver = rs::strpos(name, "driver.") === 0;
-		if (is_provider) return this.createProvider(name, params);
-		if (is_driver) return this.getDriver(name);
+		if (is_provider) return this.createProvider( rs::substr(name, 9), params);
+		if (is_driver) return this.getDriver( rs::substr(name, 7) );
 		return null;
 	}
 	
@@ -331,6 +335,14 @@ class Context extends CoreObject implements ContextInterface
 			}
 		);
 		
+		/* Add values */
+		this._values.each( 
+			void (string key, mixed value) use (obj)
+			{
+				obj._values.set(key, value);
+			}
+		);
+		
 		return obj;
 	}
 	
@@ -364,4 +376,38 @@ class Context extends CoreObject implements ContextInterface
 	{
 		this._values.set(name, value);
 	}
+	
+	
+	
+	/**
+	 * Returns context value
+	 * @param string name
+	 * @return mixed
+	 */
+	mixed getConfig(string name, mixed default_value = null, string type_value = "mixed", string type_template = "")
+	{
+		Map<mixed> conf = this.getDriver("runtime.config");
+		if (conf)
+		{
+			return conf.get(name, default_value, type_value, type_template);
+		}
+		return default_value;
+	}
+	
+	
+	
+	/**
+	 * Set context value
+	 * @param string name
+	 * @param mixed value
+	 */
+	void setConfig(string name, mixed value)
+	{
+		Map<mixed> conf = this.getDriver("runtime.config");
+		if (conf)
+		{
+			conf.set(name, value);
+		}
+	}
+	
 }
