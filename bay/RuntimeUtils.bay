@@ -690,7 +690,7 @@ export class RuntimeUtils{
 	}
 	#case ifcode ES6 then
 	static base64_encode(s){
-		return window.btoa($s);
+		return window.btoa(s);
 	}
 	#case ifcode NODEJS then
 	static base64_encode(s){
@@ -713,7 +713,7 @@ export class RuntimeUtils{
 	}
 	#case ifcode ES6 then
 	static base64_decode(s){
-		return window.atob($s);
+		return window.atob(s);
 	}
 	#case ifcode NODEJS then
 	static base64_decode(s){

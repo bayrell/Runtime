@@ -410,4 +410,52 @@ class Context extends CoreObject implements ContextInterface
 		}
 	}
 	
+	
+	
+	/**
+	 * Call api
+	 * @param string class_name
+	 * @param string method_name
+	 * @param ApiRequest request
+	 * @return mixed The result of the api
+	 */ 
+	declare async ApiResult callApi(
+		string class_name, string interface_name, string method_name, 
+		Map<mixed> data
+	);
+	
+	
+	#switch
+	#case ifcode JAVASCRIPT then
+	
+	callApi(class_name, interface_name, method_name, data)
+	{
+		var bus = this.getDriver("core.ui.bus");
+		method_name = (interface_name != "") ? interface_name + "." + method_name : method_name;
+		return (ctx) => {
+			bus.sendApi(
+				class_name,
+				method_name,
+				data,
+				(function (ctx){
+					return function (data){
+						var res = new Core.Http.ApiResult( data );
+						return ctx.resolve(res);
+					}
+				})(ctx)
+			);
+			return null;
+		}
+	}
+	
+	#case ifcode PHP then
+	
+	public function callApi($class_name, $interface_name, $method_name, $data)
+	{
+		$driver = $this->getDriver('Backend.App');
+		return $driver->callApi($class_name, $interface_name, $method_name, $data, $this);
+	}
+	
+	#endswitch
+	
 }
