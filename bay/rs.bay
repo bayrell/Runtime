@@ -19,6 +19,7 @@
 namespace Runtime;
 
 use Runtime.rtl;
+use Runtime.PathInfo;
 use Runtime.Vector;
 
 
@@ -370,5 +371,149 @@ export class rs
 	}
 	#endswitch
 	
+	
+	
+	/**
+	 * Разбивает путь файла на составляющие
+	 * @param {string} filepath путь к файлу
+	 * @return {json} Объект вида:
+	 *         dirname    - папка, в которой находиться файл
+	 *         basename   - полное имя файла
+	 *         extension  - расширение файла
+	 *         filename   - имя файла без расширения
+	 */
+	public static PathInfo pathinfo(string filepath)
+	{
+		Vector<string> arr1 = rs::explode(".", filepath);
+		Vector<string> arr2 = rs::explode("/", filepath);
+		
+		PathInfo ret = new PathInfo();
+		
+		ret.filepath = filepath;
+		ret.extension = arr1.pop();
+		ret.basename = arr2.pop();
+		ret.dirname = rs::implode("/", arr2);
+		
+		int ext_length = rs::strlen(ret.extension);
+		if (ext_length > 0) ext_length++;
+		ret.filename = rs::substr(ret.basename, 0, -1*ext_length);
+		
+		delete arr1;
+		delete arr2;
+		
+		return ret;
+	}
+	
+	
+	
+	/**
+	 * Возвращает имя файла без расширения
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} полное имя файла
+	 */
+	public static string filename(string filepath)
+	{
+		PathInfo ret = self::pathinfo(filepath);
+		string res = ret.basename;
+		string ext = ret.extension;
+		if (ext != "")
+		{
+			int sz = 0 - rs::strlen(ext) - 1;
+			res = rs::substr(res, 0, sz);
+		}
+		delete ret;
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Возвращает полное имя файла
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} полное имя файла
+	 */
+	public static string basename(string filepath)
+	{
+		PathInfo ret = self::pathinfo(filepath);
+		string res = ret.basename;
+		delete ret;
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Возвращает расширение файла
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} расширение файла
+	 */
+	public static string extname(string filepath)
+	{
+		PathInfo ret = self::pathinfo(filepath);
+		string res = ret.extension;
+		delete ret;
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Возвращает путь к папке, содержащий файл
+	 * @param {string} filepath - путь к файлу
+	 * @return {string} путь к папке, содержащий файл
+	 */
+	public static string dirname(string filepath)
+	{
+		PathInfo ret = self::pathinfo(filepath);
+		string res = ret.dirname;
+		delete ret;
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns relative path of the filepath
+	 * @param string filepath
+	 * @param string basepath
+	 * @param string ch - Directory separator
+	 * @return string relative path
+	 */
+	public static string relativePath(string filepath, string basepath, string ch = "/")
+	{
+		Vector<string> source = rs::explode(ch, filepath);
+		Vector<string> base = rs::explode(ch, basepath);
+		
+		source = source.filter(bool (string s){ return s != ""; });
+		base = base.filter(bool (string s){ return s != ""; });
+		
+		int i=0;
+		while (source.count() > 0 and base.count() > 0 and source.item(0) == base.item(0))
+		{
+			source.shift();
+			base.shift();
+		}
+		
+		base.each(
+			void (string s) use (source)
+			{
+				source.unshift("..");
+			}
+		);
+		
+		return rs::implode(ch, source);
+	}
+	
+	
+	
+	/**
+	 * Return normalize path
+	 * @param string filepath - File path
+	 * @return string
+	 */
+	public static string normalize(string filepath)
+	{
+		return filepath;
+	}
 	
 }
