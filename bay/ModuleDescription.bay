@@ -34,10 +34,7 @@ class ModuleDescription implements ModuleDescriptionInterface
 	 * Returns module name
 	 * @return string
 	 */
-	public static string getName()
-	{
-		return "Runtime";
-	}
+	pure string getName() => "Runtime";
 	
 	
 	
@@ -45,10 +42,7 @@ class ModuleDescription implements ModuleDescriptionInterface
 	 * Returns module name
 	 * @return string
 	 */
-	public static string getModuleVersion()
-	{
-		return "0.7.2";
-	}
+	pure string getModuleVersion() => "0.7.2";
 	
 	
 	
@@ -56,10 +50,14 @@ class ModuleDescription implements ModuleDescriptionInterface
 	 * Returns required modules
 	 * @return Map<string>
 	 */	
-	public static Map<string> getRequiredModules(ContextInterface context)
-	{
-		return null;
-	}
+	pure Map<string> requiredModules() => null;
+	
+	
+	
+	/**
+	 * Returns enities
+	 */
+	pure Collection<Dict> entities() => null;
 	
 	
 	

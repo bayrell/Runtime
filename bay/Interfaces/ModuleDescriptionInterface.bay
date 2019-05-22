@@ -30,7 +30,7 @@ interface ModuleDescriptionInterface{
 	 * Returns module name
 	 * @return string
 	 */
-	public static string getName();
+	pure string getName();
 	
 	
 	
@@ -38,18 +38,25 @@ interface ModuleDescriptionInterface{
 	 * Returns module name
 	 * @return string
 	 */	
-	public static string getModuleVersion();
+	pure string getModuleVersion();
 	
 	
 	
 	/**
 	 * Returns required modules
-	 * @return Map<string, string>
+	 * @return Map<string>
 	 */	
-	public static Map<string, string> getRequiredModules(ContextInterface context);
+	pure Map<string> requiredModules();
 	
 	
-		
+	
+	/**
+	 * Returns enities
+	 */
+	pure Collection<Dict> entities();
+	
+	
+	
 	/**
 	 * Called then module registed in context
 	 * @param ContextInterface context
