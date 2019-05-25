@@ -30,7 +30,7 @@ interface ModuleDescriptionInterface{
 	 * Returns module name
 	 * @return string
 	 */
-	pure string getName();
+	lambda string getName();
 	
 	
 	
@@ -38,7 +38,7 @@ interface ModuleDescriptionInterface{
 	 * Returns module name
 	 * @return string
 	 */	
-	pure string getModuleVersion();
+	lambda string getModuleVersion();
 	
 	
 	
@@ -46,14 +46,14 @@ interface ModuleDescriptionInterface{
 	 * Returns required modules
 	 * @return Map<string>
 	 */	
-	pure Map<string> requiredModules();
+	lambda Map<string> requiredModules();
 	
 	
 	
 	/**
 	 * Returns enities
 	 */
-	pure Collection<Dict> entities();
+	lambda Collection<Dict> entities();
 	
 	
 	
