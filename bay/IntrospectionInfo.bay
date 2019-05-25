@@ -46,7 +46,7 @@ struct IntrospectionInfo extends CoreStruct
 	 * @string class_name
 	 * @return bool
 	 */
-	pure Collection<CoreStruct> filterAnnotations(string class_name, IntrospectionInfo info)
+	lambda Collection<CoreStruct> filterAnnotations(string class_name, IntrospectionInfo info)
 	{
 		if (info.annotations == null)
 			return null;

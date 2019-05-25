@@ -52,7 +52,7 @@ struct UIStruct extends CoreStruct
 	 * Returns true if component
 	 * @return bool
 	 */
-	pure bool isComponent(UIStruct ui)
+	lambda bool isComponent(UIStruct ui)
 	{
 		return ui.kind == self::TYPE_COMPONENT;
 	}
@@ -63,7 +63,7 @@ struct UIStruct extends CoreStruct
 	 * Returns true if element
 	 * @return bool
 	 */
-	pure bool isElement(UIStruct ui)
+	lambda bool isElement(UIStruct ui)
 	{
 		return ui.kind == self::TYPE_ELEMENT;
 	}
@@ -74,7 +74,7 @@ struct UIStruct extends CoreStruct
 	 * Returns true if string
 	 * @return bool
 	 */
-	pure bool isString(UIStruct ui)
+	lambda bool isString(UIStruct ui)
 	{
 		return ui.kind == self::TYPE_STRING or ui.kind == self::TYPE_RAW;
 	}
@@ -85,7 +85,7 @@ struct UIStruct extends CoreStruct
 	 * Returns model
 	 * @return CoreStruct
 	 */
-	pure CoreStruct getModel(UIStruct ui)
+	lambda CoreStruct getModel(UIStruct ui)
 	{
 		if (ui.model != null) 
 			return ui.model;
@@ -107,7 +107,7 @@ struct UIStruct extends CoreStruct
 	 * Returns key path
 	 * @return string
 	 */
-	pure string getKey(UIStruct ui, string index)
+	lambda string getKey(UIStruct ui, string index)
 	{
 		return (ui.key !== "") ? ui.key : index;
 	}
@@ -118,7 +118,7 @@ struct UIStruct extends CoreStruct
 	 * Returns key path
 	 * @return string
 	 */
-	pure string getKeyPath(UIStruct ui, string key_path, string index)
+	lambda string getKeyPath(UIStruct ui, string key_path, string index)
 	{
 		return (key_path !== "") ? (key_path ~ "." ~ static::getKey(ui, index)) : static::getKey(ui, index);
 	}
@@ -128,7 +128,7 @@ struct UIStruct extends CoreStruct
 	/**
 	 * Returns attrs
 	 */
-	pure Dict<string> getAttrs(UIStruct ui)
+	lambda Dict<string> getAttrs(UIStruct ui)
 	{
 		if (ui.props != null)
 		{
@@ -147,7 +147,7 @@ struct UIStruct extends CoreStruct
 	/**
 	 * Returns props
 	 */
-	pure Dict<string> getProps(UIStruct ui)
+	lambda Dict<string> getProps(UIStruct ui)
 	{
 		if (ui.props != null)
 		{
@@ -166,7 +166,7 @@ struct UIStruct extends CoreStruct
 	/**
 	 * Returns events
 	 */
-	pure Dict<string> getEvents(UIStruct ui)
+	lambda Dict<string> getEvents(UIStruct ui)
 	{
 		if (ui.props != null)
 		{

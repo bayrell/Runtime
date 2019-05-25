@@ -144,7 +144,7 @@ struct DateTime extends CoreStruct
 	 * @param string tz
 	 * @return DateTime
 	 */
-	pure DateTime now (string tz = "UTC")
+	lambda DateTime now (string tz = "UTC")
 	{
 		#switch
 		
@@ -168,7 +168,7 @@ struct DateTime extends CoreStruct
 	 * @param DateTime obj
 	 * @return int
 	 */
-	pure int getDayOfWeek (DateTime obj)
+	lambda int getDayOfWeek (DateTime obj)
 	{
 		#switch
 		
@@ -192,7 +192,7 @@ struct DateTime extends CoreStruct
 	 * @param DateTime obj
 	 * @return int
 	 */
-	pure int getTimestamp (DateTime obj)
+	lambda int getTimestamp (DateTime obj)
 	{
 		#switch
 		
@@ -217,7 +217,7 @@ struct DateTime extends CoreStruct
 	 * @param DateTime obj
 	 * @return DateTime instance
 	 */
-	pure DateTime setTimestamp (int timestamp, DateTime obj)
+	lambda DateTime setTimestamp (int timestamp, DateTime obj)
 	{
 		#switch
 		
@@ -242,7 +242,7 @@ struct DateTime extends CoreStruct
 	 * @param DateTime obj
 	 * @return DateTime instance
 	 */
-	pure DateTime changeTimezone (string tz, DateTime obj)
+	lambda DateTime changeTimezone (string tz, DateTime obj)
 	{
 		#switch
 		
@@ -267,7 +267,7 @@ struct DateTime extends CoreStruct
 	 * @param DateTime obj
 	 * @return string
 	 */
-	pure DateTime getRFC822(DateTime obj)
+	lambda DateTime getRFC822(DateTime obj)
 	{
 		#switch
 		
@@ -327,7 +327,7 @@ struct DateTime extends CoreStruct
 	 * @param DateTime obj
 	 * @return string
 	 */
-	pure DateTime getISO8601(DateTime obj)
+	lambda DateTime getISO8601(DateTime obj)
 	{
 		#switch
 		
@@ -356,7 +356,7 @@ struct DateTime extends CoreStruct
 	 * @param DateTime obj
 	 * @return string
 	 */
-	pure DateTime getGMT(DateTime obj)
+	lambda DateTime getGMT(DateTime obj)
 	{
 		#switch
 		
@@ -384,7 +384,7 @@ struct DateTime extends CoreStruct
 	 * @param DateTime obj
 	 * @return string
 	 */
-	pure DateTime getUTC(DateTime obj)
+	lambda DateTime getUTC(DateTime obj)
 	{
 		#switch
 		

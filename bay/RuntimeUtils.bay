@@ -218,7 +218,7 @@ export class RuntimeUtils{
 	 * @param string class_name
 	 * @return Vector<IntrospectionInfo>
 	 */
-	pure Collection<IntrospectionInfo> getIntrospection(string class_name)
+	lambda Collection<IntrospectionInfo> getIntrospection(string class_name)
 	{
 		Vector<IntrospectionInfo> res = new Vector();
 		Vector<string> class_names = self::getParents(class_name);
