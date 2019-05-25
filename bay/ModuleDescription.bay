@@ -34,10 +34,7 @@ class ModuleDescription implements ModuleDescriptionInterface
 	 * Returns module name
 	 * @return string
 	 */
-	public static string getName()
-	{
-		return "Runtime";
-	}
+	pure string getName() => "Runtime";
 	
 	
 	
@@ -45,21 +42,22 @@ class ModuleDescription implements ModuleDescriptionInterface
 	 * Returns module name
 	 * @return string
 	 */
-	public static string getModuleVersion()
-	{
-		return "0.7.2";
-	}
+	pure string getModuleVersion() => "0.7.2";
 	
 	
 	
 	/**
 	 * Returns required modules
-	 * @return Map<string, string>
+	 * @return Map<string>
 	 */	
-	public static Map<string, string> getRequiredModules(ContextInterface context)
-	{
-		return null;
-	}
+	pure Map<string> requiredModules() => null;
+	
+	
+	
+	/**
+	 * Returns enities
+	 */
+	pure Collection<Dict> entities() => null;
 	
 	
 	
@@ -69,7 +67,7 @@ class ModuleDescription implements ModuleDescriptionInterface
 	 */
 	public static void onRegister(ContextInterface context)
 	{
-		context.registerDriver("driver.runtime.config", new Map<string, string>());
+		context.registerDriver("runtime.config", new Map<mixed>());
 	}
 	
 	
