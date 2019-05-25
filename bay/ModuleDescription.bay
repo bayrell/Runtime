@@ -62,6 +62,51 @@ class ModuleDescription implements ModuleDescriptionInterface
 	
 	
 	/**
+	 * Returns module files load order
+	 * @return Collection<string>
+	 */
+	lambda Collection<string> getModuleFiles() => 
+	[
+		"Runtime.rs",
+		"Runtime.re",
+		"Runtime.rtl",
+		"Runtime.Collection",
+		"Runtime.Container",
+		"Runtime.CoreObject",
+		"Runtime.Dict",
+		"Runtime.Emitter",
+		"Runtime.RuntimeConstant",
+		"Runtime.RuntimeUtils",
+		"Runtime.Exceptions.RuntimeException",
+		"Runtime.Interfaces.CloneableInterface",
+		"Runtime.Interfaces.ContextInterface",
+		"Runtime.Interfaces.FactoryInterface",
+		"Runtime.Interfaces.ModuleDescriptionInterface",
+		"Runtime.Interfaces.SerializeInterface",
+		"Runtime.Interfaces.StringInterface",
+		"Runtime.Interfaces.SubscribeInterface",
+		"Runtime.AsyncTask",
+		"Runtime.AsyncThread",
+		"Runtime.Context",
+		"Runtime.ContextObject",
+		"Runtime.CoreStruct",
+		"Runtime.CoreEvent",
+		"Runtime.Map",
+		"Runtime.Maybe",
+		"Runtime.ModuleDescription",
+		"Runtime.Reference",
+		"Runtime.Vector",
+		"Runtime.Exceptions.IndexOutOfRange",
+		"Runtime.Exceptions.KeyNotFound",
+		"Runtime.Exceptions.UnknownError",
+		"Runtime.DateTime",
+		"Runtime.IntrospectionInfo",
+		"Runtime.UIStruct",
+	];
+	
+	
+	
+	/**
 	 * Returns enities
 	 */
 	lambda Collection<Dict> entities() => null;

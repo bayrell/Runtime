@@ -207,6 +207,25 @@ export class rs
 	
 	
 	/**
+	 * Заменяет одну строку на другую
+	 */
+	declare export static int replace(string search, string item, string s);
+
+	#switch
+	#case ifcode PHP then
+	static function replace($search, $item, $s)
+	{
+		return str_replace($search, $item, $s);
+	}
+	#case ifcode JAVASCRIPT then
+	static replace(search, item, s){
+		return s.replace(search, item);
+	}
+	#endswitch
+	
+	
+	
+	/**
 	 * Возвращает повторяющуюся строку
 	 * @param {string} s - повторяемая строка
 	 * @param {integer} n - количество раз, которые нужно повторить строку s

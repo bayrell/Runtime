@@ -51,6 +51,14 @@ interface ModuleDescriptionInterface{
 	
 	
 	/**
+	 * Returns module files load order
+	 * @return Collection<string>
+	 */
+	lambda Collection<string> getModuleFiles();
+	
+	
+	
+	/**
 	 * Returns enities
 	 */
 	lambda Collection<Dict> entities();
