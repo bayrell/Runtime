@@ -810,7 +810,7 @@ class Dict implements \JsonSerializable
 	public function keys()
 	{
 		$keys = array_keys($this->_map);
-		$res = static::createNewInstance($keys);
+		$res = \Runtime\Collection::create($keys);
 		return $res;
 	}
 	
@@ -823,7 +823,7 @@ class Dict implements \JsonSerializable
 	public function values()
 	{
 		$values = array_values($this->_map);
-		$res = static::createNewInstance($values);
+		$res = \Runtime\Collection::create($values);
 		return $res;
 	}
 	

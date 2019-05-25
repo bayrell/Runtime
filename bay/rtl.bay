@@ -152,7 +152,6 @@ class rtl{
 	#case ifcode PHP then
 	static function is_implements($obj, $interface_name){
 		$class_name = get_class($obj);
-		$interface_name = self::find_class($interface_name);
 		return self::class_implements($class_name, $interface_name);
 	}
 	#case ifcode JAVASCRIPT then
