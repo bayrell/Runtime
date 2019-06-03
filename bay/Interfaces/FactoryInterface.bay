@@ -22,7 +22,8 @@ use Runtime.CoreObject;
 use Runtime.Interfaces.ContextInterface;
 
 
-interface FactoryInterface{
+interface FactoryInterface
+{
 	
 	
 	/**

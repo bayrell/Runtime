@@ -31,11 +31,10 @@ use Runtime.Interfaces.ModuleDescriptionInterface;
 class Context extends CoreObject implements ContextInterface
 {
 	
-	
 	protected Vector<string> _modules = null;
 	protected Map<mixed> _values = null;
 	protected Map<mixed> _drivers = null;
-	protected Map<FactoryInterface> _providers_names = null;
+	protected Map<mixed> _providers = null;
 	
 	
 	/**
@@ -45,8 +44,8 @@ class Context extends CoreObject implements ContextInterface
 	{
 		parent();
 		this._modules = new Vector<string>();
-		this._providers_names = new Map<FactoryInterface>();
 		this._drivers = new Map<mixed>();
+		this._providers = new Map<mixed>();
 		this._values = new Map<mixed>();
 	}
 	
@@ -57,9 +56,10 @@ class Context extends CoreObject implements ContextInterface
 	 */
 	public void destructor()
 	{
-		delete this._providers_classes_names;
+		delete this._providers;
 		delete this._modules;
 		delete this._values;
+		delete this._helpers;
 		parent();
 	}
 	
@@ -125,22 +125,6 @@ class Context extends CoreObject implements ContextInterface
 	
 	
 	/**
-	 * Register module
-	 * @param string provider_name
-	 * @param FactoryInterface factory
-	 */
-	ContextInterface registerProviderFactory(string provider_name, FactoryInterface factory)
-	{
-		if (not this._providers_names.has(provider_name))
-		{
-			this._providers_names.set(provider_name, factory);
-		}
-		return this;
-	}
-	
-	
-	
-	/**
 	 * Register driver
 	 * @param string driver_name
 	 * @param FactoryInterface factory
@@ -150,6 +134,22 @@ class Context extends CoreObject implements ContextInterface
 		if (not this._drivers.has(driver_name))
 		{
 			this._drivers.set(driver_name, obj);
+		}
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Register provider
+	 * @param string provider_name
+	 * @param CoreStruct
+	 */
+	ContextInterface registerProvider(string provider_name, CoreStruct s)
+	{
+		if (not this._providers.has(provider_name))
+		{
+			this._providers.set(provider_name, s);
 		}
 		return this;
 	}
@@ -208,44 +208,6 @@ class Context extends CoreObject implements ContextInterface
 		
 		return this;
 	}
-	
-	
-	
-	/**
-	 * Returns provider or driver
-	 *
-	 * @params string name
-	 * @return CoreObject
-	 */
-	public CoreObject get(string name, Map<mixed> params = null)
-	{
-		bool is_provider = rs::strpos(name, "provider.") === 0;
-		bool is_driver = rs::strpos(name, "driver.") === 0;
-		if (is_provider) return this.createProvider( rs::substr(name, 9), params);
-		if (is_driver) return this.getDriver( rs::substr(name, 7) );
-		return null;
-	}
-	
-	
-	
-	/**
-	 * Returns provider
-	 *
-	 * @params string provider_name
-	 * @return CoreObject
-	 */
-	public CoreObject createProvider(string provider_name, Map<mixed> params = null)
-	{
-		if (not this._providers_names.has(provider_name))
-			return null;
-			
-		FactoryInterface factory_obj = this._providers_names.item(provider_name);
-		if (factory_obj == null)
-			return null;
-		
-		CoreObject obj = factory_obj.newInstance(this, params);
-		return obj;
-	}
 
 	
 	
@@ -259,6 +221,22 @@ class Context extends CoreObject implements ContextInterface
 	{
 		if (this._drivers.has(driver_name))
 			return this._drivers.item(driver_name);
+			
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns helper
+	 *
+	 * @params string provider_name
+	 * @return CoreStruct
+	 */
+	public CoreStruct getProvider(string provider_name)
+	{
+		if (this._providers.has(provider_name))
+			return this._providers.item(provider_name);
 			
 		return null;
 	}

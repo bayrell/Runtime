@@ -36,7 +36,7 @@ interface ContextInterface
 	 * @param string provider_name
 	 * @param FactoryInterface factory
 	 */
-	ContextInterface registerProviderFactory(string provider_name, FactoryInterface factory);
+	ContextInterface registerProvider(string provider_name, CoreStruct obj);
 	
 	
 	
@@ -52,9 +52,9 @@ interface ContextInterface
 	/**
 	 * Returns provider
 	 * @params string provider_name
-	 * @return CoreObject
+	 * @return CoreStruct
 	 */
-	public CoreObject createProvider(string provider_name);
+	public CoreStruct getProvider(string provider_name);
 	
 	
 	
