@@ -1,9 +1,0 @@
-{
-  "name": "bayrell",
-  "dependencies": {
-    "shelljs": "^0.7.0",
-    "upath": "^0.2.0"
-  },
-  "devDependencies": {
-  }
-}

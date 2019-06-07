@@ -93,8 +93,9 @@ export class RuntimeUtils{
 		ContextInterface context = new Context();
 		if (modules != null){
 			modules.each(
-				void (string module) use (context){
-				context.registerModule(module);
+				void (string module) use (context)
+				{
+					context.registerModule(module);
 				}
 			);
 		}

@@ -23,14 +23,15 @@ use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
 
 
-interface ModuleDescriptionInterface{
+interface ModuleDescriptionInterface
+{
 	
 	
 	/**
 	 * Returns module name
 	 * @return string
 	 */
-	lambda string getName();
+	lambda string getModuleName();
 	
 	
 	

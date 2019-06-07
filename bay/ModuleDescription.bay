@@ -34,7 +34,7 @@ class ModuleDescription implements ModuleDescriptionInterface
 	 * Returns module name
 	 * @return string
 	 */
-	lambda string getName() => "Runtime";
+	lambda string getModuleName() => "Runtime";
 	
 	
 	
