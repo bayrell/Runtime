@@ -360,7 +360,9 @@ class rtl{
 	 */
 	static var convert(var value, string type_value, var def_value = null, string type_template = "")
 	{
-		if (type_value == "mixed" or type_value == "primitive" or type_value == "var" or type_value == "fun")
+		if (type_value == "mixed" or type_value == "primitive" or type_value == "var" or 
+			type_value == "fun" or type_value == "callback"
+		)
 			return value;
 		
 		if (type_value == "")

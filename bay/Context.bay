@@ -26,15 +26,19 @@ use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.FactoryInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
+use Runtime.LambdaChain;
+use Runtime.Provider;
 
 
 class Context extends CoreObject implements ContextInterface
 {
-	
-	protected Vector<string> _modules = null;
-	protected Map<mixed> _values = null;
+	protected string base_path = null;
+	protected Dict<mixed> config = null;
+	protected Vector<Provider> _modules = null;
+	protected Vector<CoreStruct> _entities = null;
 	protected Map<mixed> _drivers = null;
-	protected Map<mixed> _providers = null;
+	protected Map<string> _providers = null;
+	protected Map<mixed> _providers_obj = null;
 	
 	
 	/**
@@ -43,10 +47,10 @@ class Context extends CoreObject implements ContextInterface
 	void constructor()
 	{
 		parent();
+		this._entities = new Vector<CoreStruct>();
 		this._modules = new Vector<string>();
-		this._drivers = new Map<mixed>();
-		this._providers = new Map<mixed>();
-		this._values = new Map<mixed>();
+		this._providers = new Map<string>();
+		this._providers_obj = new Map<mixed>();
 	}
 	
 	
@@ -57,9 +61,9 @@ class Context extends CoreObject implements ContextInterface
 	public void destructor()
 	{
 		delete this._providers;
+		delete this._providers_obj;
+		delete this._entities;
 		delete this._modules;
-		delete this._values;
-		delete this._helpers;
 		parent();
 	}
 	
@@ -72,6 +76,60 @@ class Context extends CoreObject implements ContextInterface
 	Vector<string> getModules()
 	{
 		return this._modules.slice();
+	}
+	
+	
+	
+	/**
+	 * Returns helper
+	 *
+	 * @params string provider_name
+	 * @return CoreStruct
+	 */
+	public CoreStruct createProvider(string provider_name)
+	{
+		if (this._providers.has(provider_name))
+		{
+			Provider info = this._providers.item(provider_name);
+			CoreStruct obj = rtl::newInstance(info.value);
+			if (info.init)
+			{
+				
+				fun f = info.init;
+				obj = f(this, obj);
+			}
+			else
+			{
+				fun f = rtl::method(info.value, "init");
+				obj = f(this, obj);
+			}
+			obj = this.chain(info.value, obj);
+			return obj;
+		}
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns helper
+	 *
+	 * @params string provider_name
+	 * @return CoreStruct
+	 */
+	public CoreStruct getProvider(string provider_name)
+	{
+		if (this._providers_obj.has(provider_name))
+		{
+			return this._providers_obj.item(provider_name);
+		}		
+		if (this._providers.has(provider_name))
+		{
+			mixed provider = this.createProvider(provider_name);
+			this._providers_obj.set(provider_name, provider);
+			return provider;
+		}
+		return null;
 	}
 	
 	
@@ -112,6 +170,17 @@ class Context extends CoreObject implements ContextInterface
 			delete modules;
 		}
 		
+		/* Call entities */
+		Collection<CoreStruct> entities = rtl::callStaticMethod(
+			module_description_class_name, 
+			"entities",
+			[this]
+		);
+		if (entities != null)
+		{
+			this._entities = this._entities.appendVector(entities);
+		}
+		
 		/* Call onRegister */
 		rtl::callStaticMethod(
 			module_description_class_name, 
@@ -125,33 +194,29 @@ class Context extends CoreObject implements ContextInterface
 	
 	
 	/**
-	 * Register driver
-	 * @param string driver_name
-	 * @param FactoryInterface factory
+	 * Apply Lambda Chain
 	 */
-	ContextInterface registerDriver(string driver_name, CoreObject obj)
+	CoreStruct chain(string filter_name, CoreStruct obj = null)
 	{
-		if (not this._drivers.has(driver_name))
+		Collection<CoreStruct> entities = this._entities.filter
+		(
+			bool (CoreStruct item) => item instanceof LambdaChain
+		);
+		entities = entities.filter
+		( 
+			bool (LambdaChain item) use (filter_name) => item.name == filter_name
+		);
+		entities = entities.sortIm
+		(
+			int (LambdaChain a, LambdaChain b) => a.pos > b.pos
+		);
+		for (int i=0; i<entities.count(); i++)
 		{
-			this._drivers.set(driver_name, obj);
+			LambdaChain item = entities.item(i);
+			callback f = item.value;
+			obj = f(this, obj);
 		}
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Register provider
-	 * @param string provider_name
-	 * @param CoreStruct
-	 */
-	ContextInterface registerProvider(string provider_name, CoreStruct s)
-	{
-		if (not this._providers.has(provider_name))
-		{
-			this._providers.set(provider_name, s);
-		}
-		return this;
+		return obj;
 	}
 	
 	
@@ -159,8 +224,11 @@ class Context extends CoreObject implements ContextInterface
 	/**
 	 * Read config
 	 */
-	ContextInterface readConfig(Map<mixed> config)
+	ContextInterface readConfig(Dict<mixed> config)
 	{
+		this.config = config;
+		return this;
+		
 		Vector<var> args = new Vector();
 		args.push(this);	
 		args.push(config);	
@@ -184,11 +252,30 @@ class Context extends CoreObject implements ContextInterface
 	
 	
 	
+	Dict<mixed> getConfig()
+	{
+		return this.config;
+	}
+	
+	
+	
 	/**
 	 * Init context
 	 */
 	ContextInterface init()
 	{
+		/* Register providers */
+		Collection<CoreStruct> providers = this._entities.filter
+		(
+			bool (CoreStruct item) => item instanceof Provider
+		);
+		for (int i=0; i<providers.count(); i++)
+		{
+			Provider item = providers.item(i);
+			this._providers.set(item.name, item);
+		}
+		
+		/* Call onInitContext */
 		Vector<var> args = new Vector();
 		args.push(this);	
 	
@@ -199,7 +286,7 @@ class Context extends CoreObject implements ContextInterface
 			string module_description_class_name = module_name ~ ".ModuleDescription";
 			rtl::callStaticMethod(
 				module_description_class_name, 
-				"initContext",
+				"onInitContext",
 				args
 			);
 		}
@@ -207,38 +294,6 @@ class Context extends CoreObject implements ContextInterface
 		delete args;
 		
 		return this;
-	}
-
-	
-	
-	/**
-	 * Returns driver
-	 *
-	 * @params string driver_name
-	 * @return CoreObject
-	 */
-	public CoreObject getDriver(string driver_name)
-	{
-		if (this._drivers.has(driver_name))
-			return this._drivers.item(driver_name);
-			
-		return null;
-	}
-	
-	
-	
-	/**
-	 * Returns helper
-	 *
-	 * @params string provider_name
-	 * @return CoreStruct
-	 */
-	public CoreStruct getProvider(string provider_name)
-	{
-		if (this._providers.has(provider_name))
-			return this._providers.item(provider_name);
-			
-		return null;
 	}
 	
 	
@@ -332,58 +387,23 @@ class Context extends CoreObject implements ContextInterface
 	
 	
 	/**
-	 * Returns context value
-	 * @param string name
-	 * @return mixed
+	 * Returns base path
+	 * @return string
 	 */
-	mixed getValue(string name, mixed default_value = null, string type_value = "mixed", string type_template = "")
+	string setBasePath(string base_path)
 	{
-		return this._values.get(name, default_value, type_value, type_template);
+		this.base_path = base_path;
 	}
 	
 	
 	
 	/**
-	 * Set context value
-	 * @param string name
-	 * @param mixed value
+	 * Returns base path
+	 * @return string
 	 */
-	void setValue(string name, mixed value)
+	string getBasePath()
 	{
-		this._values.set(name, value);
-	}
-	
-	
-	
-	/**
-	 * Returns context value
-	 * @param string name
-	 * @return mixed
-	 */
-	mixed getConfig(string name, mixed default_value = null, string type_value = "mixed", string type_template = "")
-	{
-		Map<mixed> conf = this.getDriver("runtime.config");
-		if (conf)
-		{
-			return conf.get(name, default_value, type_value, type_template);
-		}
-		return default_value;
-	}
-	
-	
-	
-	/**
-	 * Set context value
-	 * @param string name
-	 * @param mixed value
-	 */
-	void setConfig(string name, mixed value)
-	{
-		Map<mixed> conf = this.getDriver("runtime.config");
-		if (conf)
-		{
-			conf.set(name, value);
-		}
+		return this.base_path;
 	}
 	
 	
@@ -428,8 +448,13 @@ class Context extends CoreObject implements ContextInterface
 	
 	public function callApi($class_name, $interface_name, $method_name, $data)
 	{
-		$driver = $this->getDriver('Backend.App');
-		return $driver->callApi($class_name, $interface_name, $method_name, $data, $this);
+		$app = $this->getProvider("Core.Backend.BackendAppProvider");
+		$app_class_name = $app->getClassName();
+		$app_class_name = rtl::find_class($app_class_name);
+		return call_user_func_array(
+			[ $app_class_name, "callApi" ],
+			[ $this, $app, $class_name, $interface_name, $method_name, $data ]
+		);
 	}
 	
 	#endswitch

@@ -101,6 +101,7 @@ class ModuleDescription implements ModuleDescriptionInterface
 		"Runtime.Exceptions.UnknownError",
 		"Runtime.DateTime",
 		"Runtime.IntrospectionInfo",
+		"Runtime.LambdaFilter",
 		"Runtime.UIStruct",
 	];
 	
@@ -114,12 +115,18 @@ class ModuleDescription implements ModuleDescriptionInterface
 	
 	
 	/**
+	 * Register lambda filters
+	 */
+	lambda Collection<LambdaFilter> lambdaFilters() => null;
+	
+	
+	
+	/**
 	 * Called then module registed in context
 	 * @param ContextInterface context
 	 */
 	public static void onRegister(ContextInterface context)
 	{
-		context.registerDriver("runtime.config", new Map<mixed>());
 	}
 	
 	
@@ -139,7 +146,7 @@ class ModuleDescription implements ModuleDescriptionInterface
 	 * Init context
 	 * @param ContextInterface context
 	 */
-	public static void initContext(ContextInterface context)
+	public static void onInitContext(ContextInterface context)
 	{
 	}
 	

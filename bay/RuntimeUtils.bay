@@ -316,6 +316,25 @@ export class RuntimeUtils{
 	
 	
 	
+	/**
+	 * Returns item
+	 */
+	static mixed getItem
+	(
+		mixed obj, Collection<scalar> path, mixed default_value, 
+		string type_value = "mixed", string type_template = ""
+	)
+	{
+		if (path.count() == 0) return rtl::convert(obj, type_value, default_value, type_template);
+		scalar item = path.first(); 
+		path = path.removeFirstIm();
+		
+		obj = obj.get(item, default_value);
+		return static::getItem(obj, path, default_value, type_value, type_template);
+	}
+	
+	
+	
 	
 	/* ============================= Serialization Functions ============================= */
 	

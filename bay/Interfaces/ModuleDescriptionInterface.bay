@@ -62,7 +62,7 @@ interface ModuleDescriptionInterface
 	/**
 	 * Returns enities
 	 */
-	lambda Collection<Dict> entities();
+	lambda Collection<CoreStruct> entities();
 	
 	
 	
@@ -87,6 +87,6 @@ interface ModuleDescriptionInterface
 	 * Init context
 	 * @param ContextInterface context
 	 */
-	public static void initContext(ContextInterface context);
+	public static async void onInitContext(ContextInterface context);
 	
 }

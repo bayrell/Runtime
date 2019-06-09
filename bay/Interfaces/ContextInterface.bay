@@ -32,38 +32,11 @@ interface ContextInterface
 	
 	
 	/**
-	 * Register provider
-	 * @param string provider_name
-	 * @param FactoryInterface factory
-	 */
-	ContextInterface registerProvider(string provider_name, CoreStruct obj);
-	
-	
-	
-	/**
-	 * Register driver
-	 * @param string driver_name
-	 * @param CoreObject obj
-	 */
-	ContextInterface registerDriver(string driver_name, CoreObject obj);
-	
-	
-	
-	/**
 	 * Returns provider
 	 * @params string provider_name
 	 * @return CoreStruct
 	 */
 	public CoreStruct getProvider(string provider_name);
-	
-	
-	
-	/**
-	 * Returns driver
-	 * @params string driver_name
-	 * @return CoreObject
-	 */
-	public CoreObject getDriver(string driver_name);
 	
 	
 	
@@ -107,22 +80,6 @@ interface ContextInterface
 	 */
 	void release();
 	
-	
-	
-	/**
-	 * Returns context value
-	 * @param string name
-	 * @return mixed
-	 */
-	mixed getValue(string name, mixed default_value = null, string type_value = "mixed", string type_template = "");
-	
-	
-	
-	/**
-	 * Set context value
-	 * @param string name
-	 */
-	void setValue(string name, mixed value);
 	
 }
 

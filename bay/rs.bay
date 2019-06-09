@@ -42,8 +42,10 @@ export class rs
 	 
 	#switch
 	#case ifcode PHP then
-	static function strlen(&$s){
-		return mb_strlen($s);
+	static function strlen(&$s)
+	{
+		if (gettype($s) != "string") return 0;
+		return @mb_strlen($s);
 	}
 	#case ifcode JAVASCRIPT then
 	static strlen(s){
@@ -95,7 +97,7 @@ export class rs
 	 * @return string
 	 */
 	static string charAt(string s, int pos){
-		int sz = self::strlen(s);
+		int sz = static::strlen(s);
 		if (pos >= 0 and pos < sz)
 			return s[pos];
 		return "";
