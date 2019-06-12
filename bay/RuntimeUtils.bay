@@ -326,11 +326,16 @@ export class RuntimeUtils{
 	)
 	{
 		if (path.count() == 0) return rtl::convert(obj, type_value, default_value, type_template);
-		scalar item = path.first(); 
-		path = path.removeFirstIm();
-		
-		obj = obj.get(item, default_value);
-		return static::getItem(obj, path, default_value, type_value, type_template);
+		if (obj == null) return default_value;
+		if (obj instanceof Dict or obj instanceof Collection)
+		{
+			scalar item = path.first(); 
+			path = path.removeFirstIm();
+			
+			obj = obj.get(item, default_value);
+			return static::getItem(obj, path, default_value, type_value, type_template);
+		}
+		return default_value;
 	}
 	
 	

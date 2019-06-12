@@ -271,7 +271,7 @@ declare class Collection<T>
 	 * @param int lenght
 	 * @return Collection<T>
 	 */
-	declare Collection<T> slice(int offset, int lenght = null);
+	declare Collection<T> slice(int offset, int length = null);
 	
 	
 	

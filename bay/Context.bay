@@ -73,9 +73,19 @@ class Context extends CoreObject implements ContextInterface
 	 * Returns registed modules
 	 * @return Vector<string>
 	 */
-	Vector<string> getModules()
+	Collection<string> getModules()
 	{
-		return this._modules.slice();
+		return this._modules.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Returns providers names
+	 */
+	Collection<string> getProviders()
+	{
+		return this._providers.keys().toCollection();
 	}
 	
 	
