@@ -88,6 +88,7 @@ class RuntimeConstant
 	static const int ERROR_VALIDATION = -12;
 	static const int ERROR_PARSE_SERIALIZATION_ERROR = -14;
 	static const int ERROR_ASSIGN_DATA_STRUCT_VALUE = -15;
+	static const int ERROR_FILE_NOT_FOUND = -16;
 	static const int ERROR_FATAL = -99;
 	
 }

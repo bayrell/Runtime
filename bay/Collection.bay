@@ -785,7 +785,16 @@ Runtime.Collection = class extends Array
 	 */
 	filter(f)
 	{
-		return super.filter(f);
+		var res = this.constructor.create();
+		for (var i=0; i<this.length; i++)
+		{
+			var item = this[i];
+			if (f(item))
+			{
+				res.push(item);
+			}
+		}
+		return res;
 	}
 	
 	

@@ -21,13 +21,14 @@ namespace Runtime;
 use Runtime.rs;
 use Runtime.rtl;
 use Runtime.CoreObject;
+use Runtime.LambdaChain;
+use Runtime.Provider;
+use Runtime.RuntimeUtils;
 use Runtime.Map;
 use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.FactoryInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
-use Runtime.LambdaChain;
-use Runtime.Provider;
 
 
 class Context extends CoreObject implements ContextInterface
@@ -237,6 +238,14 @@ class Context extends CoreObject implements ContextInterface
 	ContextInterface readConfig(Dict<mixed> config)
 	{
 		this.config = config;
+		
+		/* Set base path */
+		mixed base_path = RuntimeUtils::getItem(config, ["Runtime", "base_path"], null, "string");
+		if (base_path != null)
+		{
+			this.base_path = base_path;
+		}
+		
 		return this;
 		
 		Vector<var> args = new Vector();
@@ -254,7 +263,7 @@ class Context extends CoreObject implements ContextInterface
 				args
 			);
 		}
-		
+				
 		delete args;
 		
 		return this;
@@ -400,17 +409,6 @@ class Context extends CoreObject implements ContextInterface
 	 * Returns base path
 	 * @return string
 	 */
-	string setBasePath(string base_path)
-	{
-		this.base_path = base_path;
-	}
-	
-	
-	
-	/**
-	 * Returns base path
-	 * @return string
-	 */
 	string getBasePath()
 	{
 		return this.base_path;
@@ -436,7 +434,7 @@ class Context extends CoreObject implements ContextInterface
 	
 	callApi(class_name, interface_name, method_name, data)
 	{
-		var bus = this.getDriver("core.ui.bus");
+		var bus = this.getProvider("core.ui.bus");
 		method_name = (interface_name != "") ? interface_name + "." + method_name : method_name;
 		return (ctx) => {
 			bus.sendApi(

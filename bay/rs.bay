@@ -261,11 +261,54 @@ export class rs
 	 * @param integer limit - ограничение 
 	 * @return Vector<string>
 	 */
+	declare export static Vector<string> split(Collection<string> delimiters, string s, int limit = -1);
+	
+	#switch
+	#case ifcode PHP then
+	static function split($delimiters, $s, $limit = -1)
+	{
+		$res = new Vector();
+		$pattern = "[".implode("", $delimiters->_getArr())."]";
+		$pattern = str_replace("/", "\/", $pattern);
+		$arr = preg_split("/".$pattern."/", $s, $limit);
+		$res->_assignArr($arr);
+		return $res;
+	}
+	#case ifcode JAVASCRIPT then
+	static split(delimiters, s, limit)
+	{
+		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
+		var _Vector; if (isBrowser()) _Vector = Runtime.Vector; else _Vector = Vector;
+		var arr = null;
+		var delimiter = new RegExp("[" + delimiters.join("") + "]", "g");
+		if (!_rtl.exists(limit))
+		{
+			arr = s.split(delimiter);
+		}
+		else
+		{
+			arr = s.split(delimiter, limit);
+		}
+		return (new _Vector()).concat(arr);
+	}
+	#endswitch
+	
+	
+	
+	
+	/**
+	 * Разбивает строку на подстроки
+	 * @param string ch - разделитель
+	 * @param string s - строка, которую нужно разбить
+	 * @param integer limit - ограничение 
+	 * @return Vector<string>
+	 */
 	declare export static Vector<string> explode(string ch, string s, int limit = -1);
 	
 	#switch
 	#case ifcode PHP then
-	static function explode($delimiter, $s, $limit = -1){
+	static function explode($delimiter, $s, $limit = -1)
+	{
 		$res = new Vector();
 		$arr = [];
 		if ($limit < 0) $arr = explode($delimiter, $s);

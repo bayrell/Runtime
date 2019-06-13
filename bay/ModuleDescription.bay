@@ -102,6 +102,7 @@ class ModuleDescription implements ModuleDescriptionInterface
 		"Runtime.DateTime",
 		"Runtime.IntrospectionInfo",
 		"Runtime.LambdaFilter",
+		"Runtime.Provider",
 		"Runtime.UIStruct",
 	];
 	
