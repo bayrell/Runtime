@@ -39,11 +39,13 @@ struct UIStruct extends CoreStruct
 	public string key = "";
 	public string name = "";
 	public string space = "";
+	public string bind = "";
 	public string kind = "element";
 	public string content = "";
 	public string controller = "";
 	public CoreStruct model = null;
 	public Dict<primitive> props = null;
+	public Collection<CoreStruct> events = null;
 	public Collection<UIStruct> children = null;
 	
 	
