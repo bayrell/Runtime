@@ -23,7 +23,6 @@ use Runtime.rtl;
 use Runtime.CoreObject;
 use Runtime.LambdaChain;
 use Runtime.Provider;
-use Runtime.RuntimeUtils;
 use Runtime.Map;
 use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
@@ -240,10 +239,14 @@ class Context extends CoreObject implements ContextInterface
 		this.config = config;
 		
 		/* Set base path */
-		mixed base_path = RuntimeUtils::getItem(config, ["Runtime", "base_path"], null, "string");
-		if (base_path != null)
+		mixed runtime = config.get("Runtime", null);
+		if (runtime != null and runtime instanceof Dict)
 		{
-			this.base_path = base_path;
+			mixed base_path = runtime.get("base_path", null, "string");
+			if (base_path != null)
+			{
+				this.base_path = base_path;
+			}
 		}
 		
 		return this;
