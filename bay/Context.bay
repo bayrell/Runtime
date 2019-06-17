@@ -23,6 +23,7 @@ use Runtime.rtl;
 use Runtime.CoreObject;
 use Runtime.LambdaChain;
 use Runtime.Provider;
+use Runtime.Dict;
 use Runtime.Map;
 use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
