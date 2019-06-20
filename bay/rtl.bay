@@ -317,7 +317,26 @@ class rtl{
 		{
 			obj = this.find_class(obj);
 		}
-		return obj[method_name].bind(obj);
+		
+		var res = null;
+		try
+		{
+			res = obj[method_name].bind(obj);
+		}
+		catch (e)
+		{
+			res = null;
+		}
+		
+		if (res == null)
+		{
+			var class_name = "";
+			if (obj.getClassName != undefined) class_name = obj.getClassName();
+			else if (obj.getCurrentClassName != undefined) class_name = obj.getCurrentClassName();
+			throw new Error("Method " + method_name + " not found in " + class_name);
+		}
+		
+		return res;
 	}
 	#endswitch
 	

@@ -979,4 +979,30 @@ export class RuntimeUtils{
 	}
 	
 	
+	
+	
+	/* Lambda Functions */
+	
+	
+	/**
+	 * Equal two struct by key
+	 */
+	lambda fun equalItemKey(string key)
+		=> bool (CoreStruct item1, mixed value) 
+			=> item1.takeValue(key) == value
+	;
+	
+	
+	/**
+	 * Returns max id from items
+	 */
+	lambda int getMaxIdFromItems(Collectior<CoreStruct> items, int start = 0) =>
+		items.reduce
+		(
+			int (int value, CoreStruct item) => item.id > value ? item.id : value,
+			start
+		)
+	;
+	
+	
 }

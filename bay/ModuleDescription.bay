@@ -93,6 +93,7 @@ class ModuleDescription implements ModuleDescriptionInterface
 		"Runtime.CoreEvent",
 		"Runtime.Map",
 		"Runtime.Maybe",
+		"Runtime.PathInfo",
 		"Runtime.ModuleDescription",
 		"Runtime.Reference",
 		"Runtime.Vector",

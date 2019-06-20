@@ -44,6 +44,7 @@ struct UIStruct extends CoreStruct
 	public string content = "";
 	public string controller = "";
 	public string reference = "";
+	public primitive tag = null;
 	public CoreStruct model = null;
 	public Dict<primitive> props = null;
 	public Collection<CoreStruct> annotations = null;
