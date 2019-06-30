@@ -318,17 +318,7 @@ class rtl{
 			obj = this.find_class(obj);
 		}
 		
-		var res = null;
-		try
-		{
-			res = obj[method_name].bind(obj);
-		}
-		catch (e)
-		{
-			res = null;
-		}
-		
-		if (res == null)
+		if (obj[method_name] == null || obj[method_name] == "undefined")
 		{
 			var class_name = "";
 			if (obj.getClassName != undefined) class_name = obj.getClassName();
@@ -336,7 +326,9 @@ class rtl{
 			throw new Error("Method " + method_name + " not found in " + class_name);
 		}
 		
-		return res;
+		return function(obj, method_name){ return function () {
+			return obj[method_name].apply(obj, arguments);
+		}}(obj, method_name);
 	}
 	#endswitch
 	
@@ -346,24 +338,47 @@ class rtl{
 	 * Returns callback
 	 * @return fun
 	 */
-	declare static fun methodAwait(mixed obj, string method_name);
+	declare static mixed apply(fun f, Collection args);
 	
 	#switch
 	#case ifcode PHP then
-	static function methodAwait($obj, $method_name){
-		return new \Runtime\Callback($obj, $method_name);
+	static function apply($f, $args){
+		if ($f instanceof \Runtime\Callback)
+		{
+			return $f->invokeArgs($args->_getArr());
+		}
+		return call_user_func_array($f, $args->_getArr());
 	}
 	#case ifcode JAVASCRIPT then
-	static methodAwait(obj, method_name){
-		if (!(obj instanceof Object))
+	static apply(f, args)
+	{
+		return f.apply(null, args);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Call await method
+	 * @return fun
+	 */
+	declare static mixed applyAwait(fun f, Collection args);
+	
+	#switch
+	#case ifcode PHP then
+	static function applyAwait($f, $args)
+	{
+		if ($f instanceof \Runtime\Callback)
 		{
-			obj = this.find_class(obj);
+			return $f->invokeArgs($agrs->_getArr());
 		}
-		return function ()
-		{
-			var thread = new Runtime.AsyncThread();
-			thread.run( obj[method_name].apply(obj, arguments) );
-		}
+		return call_user_func_array($f, $args->_getArr());
+	}
+	#case ifcode JAVASCRIPT then
+	static applyAwait(f, args)
+	{
+		var thread = new Runtime.AsyncThread();
+		thread.run( f.apply(null, args) );
 	}
 	#endswitch
 	
@@ -1281,17 +1296,17 @@ class rtl{
 	 * Call method
 	 * @return Object
 	 */
-	declare static var call(callback f, Vector args = null);
+	declare static var callOld(callback f, Vector args = null);
 	
 	#switch
 	#case ifcode PHP then
-	static function call($f, $args = null){
+	static function callOld($f, $args = null){
 		if ($args == null) return call_user_func($f);
 		if ($args instanceof \Runtime\Vector) $args = $args->_getArr();
 		return call_user_func_array($f, $args);
 	}
 	#case ifcode JAVASCRIPT then
-	static call(f, args){
+	static callOld(f, args){
 		if (args == undefined) return f.apply(null);
 		return f.apply(null, args);
 	}
@@ -1303,19 +1318,73 @@ class rtl{
 	 * Call method
 	 * @return Object
 	 */
-	declare static var callMethod(Object obj, string method_name, Vector args = null);
+	declare static var callMethodOld(Object obj, string method_name, Vector args = null);
 	
 	#switch
 	#case ifcode PHP then
-	static function callMethod($obj, $method_name, $args = null){
+	static function callMethodOld($obj, $method_name, $args = null){
 		if ($args != null)
 			return call_user_func_array([$obj, $method_name], $args->_getArr());
 		return call_user_func([$obj, $method_name]);
 	}
 	#case ifcode JAVASCRIPT then
-	static callMethod(obj, method_name, args){
+	static callMethodOld(obj, method_name, args){
 		var f = obj[method_name];
 		return f.apply(obj, args);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Returns callback
+	 * @return fun
+	 */
+	declare static mixed callAwaitOld(fun apply, Collection args);
+	
+	#switch
+	#case ifcode PHP then
+	static function callAwaitOld($obj, $method_name){
+		return new \Runtime\Callback($obj, $method_name);
+	}
+	#case ifcode JAVASCRIPT then
+	static callAwaitOld(obj, method_name){
+		if (!(obj instanceof Object))
+		{
+			obj = this.find_class(obj);
+		}
+		return function ()
+		{
+			var thread = new Runtime.AsyncThread();
+			thread.run( obj[method_name].apply(obj, arguments) );
+		}
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Returns callback
+	 * @return fun
+	 */
+	declare static fun methodAwaitOld(mixed obj, string method_name);
+	
+	#switch
+	#case ifcode PHP then
+	static function methodAwaitOld($obj, $method_name){
+		return new \Runtime\Callback($obj, $method_name);
+	}
+	#case ifcode JAVASCRIPT then
+	static methodAwaitOld(obj, method_name){
+		if (!(obj instanceof Object))
+		{
+			obj = this.find_class(obj);
+		}
+		return function ()
+		{
+			var thread = new Runtime.AsyncThread();
+			thread.run( obj[method_name].apply(obj, arguments) );
+		}
 	}
 	#endswitch
 	
@@ -1325,7 +1394,7 @@ class rtl{
 	 * Call method
 	 * @return Object
 	 */
-	declare static var callStaticMethod(string class_name, string method_name, Vector args = null);
+	declare static var callStaticMethodOld(string class_name, string method_name, Vector args = null);
 	
 	#switch
 	#case ifcode PHP then

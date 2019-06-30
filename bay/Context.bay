@@ -26,6 +26,8 @@ use Runtime.Provider;
 use Runtime.Dict;
 use Runtime.Map;
 use Runtime.Vector;
+use Runtime.RuntimeConstant;
+use Runtime.Exceptions.RuntimeException;
 use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.FactoryInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
@@ -114,7 +116,7 @@ class Context extends CoreObject implements ContextInterface
 				fun f = rtl::method(info.value, "init");
 				obj = f(this, obj);
 			}
-			obj = this.chain(info.value, obj);
+			obj = this.chain(info.value, [this, obj]);
 			return obj;
 		}
 		return null;
@@ -156,18 +158,16 @@ class Context extends CoreObject implements ContextInterface
 		string module_description_class_name = module_name ~ ".ModuleDescription";
 		if (not rtl::class_exists(module_description_class_name))
 		{
-			return this;
+			throw new RuntimeException("Module " ~ module_name ~ " not found", RuntimeConstant::ERROR_FILE_NOT_FOUND);
 		}
 		
 		/* Add module */
 		this._modules.push(module_name);
 		
 		/* Register required Modules*/
-		Map<string> modules = rtl::callStaticMethod(
-			module_description_class_name, 
-			"requiredModules",
-			[]
-		);
+		fun f = rtl::method(module_description_class_name, "requiredModules");
+		Dict<string> modules = f();
+		
 		if (modules != null)
 		{
 			Vector<string> keys = modules.keys();
@@ -182,22 +182,16 @@ class Context extends CoreObject implements ContextInterface
 		}
 		
 		/* Call entities */
-		Collection<CoreStruct> entities = rtl::callStaticMethod(
-			module_description_class_name, 
-			"entities",
-			[this]
-		);
+		fun f = rtl::method(module_description_class_name, "entities");
+		Collection<CoreStruct> entities = f([ this ]);
 		if (entities != null)
 		{
 			this._entities = this._entities.appendVector(entities);
 		}
 		
 		/* Call onRegister */
-		rtl::callStaticMethod(
-			module_description_class_name, 
-			"onRegister",
-			[this]
-		);
+		fun f = rtl::method(module_description_class_name, "onRegister");
+		Collection<CoreStruct> entities = f([ this ]);
 		
 		return this;
 	}
@@ -207,27 +201,92 @@ class Context extends CoreObject implements ContextInterface
 	/**
 	 * Apply Lambda Chain
 	 */
-	CoreStruct chain(string filter_name, CoreStruct obj = null)
+	CoreStruct chain(string chain_name, Dict args)
 	{
 		Collection<CoreStruct> entities = this._entities.filter
 		(
-			bool (CoreStruct item) => item instanceof LambdaChain
-		);
-		entities = entities.filter
-		( 
-			bool (LambdaChain item) use (filter_name) => item.name == filter_name
+			bool (CoreStruct item) use (chain_name) => 
+				item instanceof LambdaChain and 
+				item.name == chain_name and 
+				item.is_async == false
 		);
 		entities = entities.sortIm
 		(
 			int (LambdaChain a, LambdaChain b) => a.pos > b.pos
 		);
+		
 		for (int i=0; i<entities.count(); i++)
 		{
 			LambdaChain item = entities.item(i);
-			callback f = item.value;
-			obj = f(this, obj);
+			string item_chain_name = item.chain;
+			if (item_chain_name != "")
+			{
+				mixed res = this.chain(item_chain_name, args);
+				args = args.setIm( args.count() - 1, res);
+			}
+			else
+			{
+				Collection arr = rs::split("::", item.value);
+				string class_name = arr.get(0, "");
+				string method_name = arr.get(1, "");
+				fun f = rtl::method(class_name, method_name);
+				mixed res = rtl::apply(f, args);
+				args = args.setIm( args.count() - 1, res);
+			}
 		}
-		return obj;
+		mixed res = args.last();
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Apply Lambda Chain Await
+	 */
+	async CoreStruct chainAwait(string chain_name, Dict args)
+	{
+		Collection<CoreStruct> entities = this._entities.filter
+		(
+			bool (CoreStruct item) use (chain_name) => 
+				item instanceof LambdaChain and 
+				item.name == chain_name
+		);
+		entities = entities.sortIm
+		(
+			int (LambdaChain a, LambdaChain b) => a.pos > b.pos
+		);
+		
+		mixed obj = args.last();
+		for (int i=0; i<entities.count(); i++)
+		{
+			LambdaChain item = entities.item(i);
+			string item_chain_name = item.chain;
+			if (item_chain_name != "")
+			{
+				mixed res = await this.chainAwait(item_chain_name, args);
+				args = args.setIm( args.count() - 1, res);
+			}
+			else
+			{
+				Collection arr = rs::split("::", item.value);
+				string class_name = arr.get(0, "");
+				string method_name = arr.get(1, "");
+				fun f = rtl::method(class_name, method_name);
+				
+				if (item.is_async)
+				{
+					mixed res = await rtl::apply(f, args);
+					args = args.setIm( args.count() - 1, res);
+				}
+				else
+				{
+					mixed res = rtl::apply(f, args);
+					args = args.setIm( args.count() - 1, res);
+				}
+			}
+		}
+		mixed res = args.last();
+		return res;
 	}
 	
 	
@@ -299,9 +358,7 @@ class Context extends CoreObject implements ContextInterface
 		}
 		
 		/* Call onInitContext */
-		Vector<var> args = new Vector();
-		args.push(this);	
-	
+		Collection<mixed> args = [ this ];
 		int sz = this._modules.count();
 		for (int i=0; i<sz; i++)
 		{

@@ -42,7 +42,7 @@ export class rs
 	 
 	#switch
 	#case ifcode PHP then
-	static function strlen(&$s)
+	static function strlen($s)
 	{
 		if (gettype($s) != "string") return 0;
 		return @mb_strlen($s);
@@ -52,6 +52,39 @@ export class rs
 		if (isBrowser())
 			return Runtime.rtl.toString(s).length;
 		return rtl.toString(s).length;
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Ищет позицию первого вхождения подстроки search в строке s.
+	 * @param {string} s - строка, в которой производится поиск 
+	 * @param {string} search - строка, которую ищем 
+	 * @param {string} offset - если этот параметр указан, 
+	 *                 то поиск будет начат с указанного количества символов с начала строки.  
+	 * @return {variable} Если строка найдена, то возвращает позицию вхождения, начиная с 0.
+	 *                    Если строка не найдена, то вернет -1
+	 */
+	declare export static int search(string s, string search, string offset = 0);
+
+	#switch
+	#case ifcode PHP then
+	static function search($s, $search, $offset = 0){
+		if ($search == ""){
+			return -1;
+		}
+		$res = mb_strpos($s, $search, $offset);
+		if ($res === false)
+			return -1;
+		return $res;
+	}
+	#case ifcode JAVASCRIPT then
+	static search(s, search, offset){
+		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
+		if (!_rtl.exists(offset)) offset = 0;
+		var res = _rtl.toString(s).indexOf(search);
+		return res;
 	}
 	#endswitch
 	
@@ -176,39 +209,6 @@ export class rs
 	
 	
 	/**
-	 * Ищет позицию первого вхождения подстроки search в строке s.
-	 * @param {string} s - строка, в которой производится поиск 
-	 * @param {string} search - строка, которую ищем 
-	 * @param {string} offset - если этот параметр указан, 
-	 *                 то поиск будет начат с указанного количества символов с начала строки.  
-	 * @return {variable} Если строка найдена, то возвращает позицию вхождения, начиная с 0.
-	 *                    Если строка не найдена, то вернет -1
-	 */
-	declare export static int strpos(string s, string search, string offset = 0);
-
-	#switch
-	#case ifcode PHP then
-	static function strpos($s, $search, $offset = 0){
-		if ($search == ""){
-			return -1;
-		}
-		$res = mb_strpos($s, $search, $offset);
-		if ($res === false)
-			return -1;
-		return $res;
-	}
-	#case ifcode JAVASCRIPT then
-	static strpos(s, search, offset){
-		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
-		if (!_rtl.exists(offset)) offset = 0;
-		var res = _rtl.toString(s).indexOf(search);
-		return res;
-	}
-	#endswitch
-	
-	
-	
-	/**
 	 * Заменяет одну строку на другую
 	 */
 	declare export static int replace(string search, string item, string s);
@@ -256,29 +256,64 @@ export class rs
 	
 	/**
 	 * Разбивает строку на подстроки
-	 * @param string ch - разделитель
+	 * @param string reg - regular expression
 	 * @param string s - строка, которую нужно разбить
 	 * @param integer limit - ограничение 
-	 * @return Vector<string>
+	 * @return Collection<string>
 	 */
-	declare export static Vector<string> split(Collection<string> delimiters, string s, int limit = -1);
+	declare lambda string split(string reg, string s, int limit = -1);
 	
 	#switch
 	#case ifcode PHP then
-	static function split($delimiters, $s, $limit = -1)
+	static function split($delimiter, $s, $limit = -1)
 	{
-		$res = new Vector();
+		$arr = preg_split("/".$delimiter."/", $s, $limit);
+		return Collection::create($arr);
+	}
+	#case ifcode JAVASCRIPT then
+	static split(delimiter, s, limit)
+	{
+		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
+		var _Collection; if (isBrowser()) _Collection = Runtime.Collection; else _Collection = Collection;
+		var arr = null;
+		var delimiter = new RegExp(delimiter, "g");
+		if (!_rtl.exists(limit))
+		{
+			arr = s.split(delimiter);
+		}
+		else
+		{
+			arr = s.split(delimiter, limit);
+		}
+		return _Collection.create(arr);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Разбивает строку на подстроки
+	 * @param string ch - разделитель
+	 * @param string s - строка, которую нужно разбить
+	 * @param integer limit - ограничение 
+	 * @return Collection<string>
+	 */
+	declare lambda Collection<string> splitArr(Collection<string> delimiters, string s, int limit = -1);
+	
+	#switch
+	#case ifcode PHP then
+	static function splitArr($delimiters, $s, $limit = -1)
+	{
 		$pattern = "[".implode("", $delimiters->_getArr())."]";
 		$pattern = str_replace("/", "\/", $pattern);
 		$arr = preg_split("/".$pattern."/", $s, $limit);
-		$res->_assignArr($arr);
-		return $res;
+		return Collection::create($arr);
 	}
 	#case ifcode JAVASCRIPT then
-	static split(delimiters, s, limit)
+	static splitArr(delimiters, s, limit)
 	{
 		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
-		var _Vector; if (isBrowser()) _Vector = Runtime.Vector; else _Vector = Vector;
+		var _Collection; if (isBrowser()) _Collection = Runtime.Collection; else _Collection = Collection;
 		var arr = null;
 		var delimiter = new RegExp("[" + delimiters.join("") + "]", "g");
 		if (!_rtl.exists(limit))
@@ -289,42 +324,7 @@ export class rs
 		{
 			arr = s.split(delimiter, limit);
 		}
-		return (new _Vector()).concat(arr);
-	}
-	#endswitch
-	
-	
-	
-	
-	/**
-	 * Разбивает строку на подстроки
-	 * @param string ch - разделитель
-	 * @param string s - строка, которую нужно разбить
-	 * @param integer limit - ограничение 
-	 * @return Vector<string>
-	 */
-	declare export static Vector<string> explode(string ch, string s, int limit = -1);
-	
-	#switch
-	#case ifcode PHP then
-	static function explode($delimiter, $s, $limit = -1)
-	{
-		$res = new Vector();
-		$arr = [];
-		if ($limit < 0) $arr = explode($delimiter, $s);
-		else $arr = explode($delimiter, $s, $limit);
-		$res->_assignArr($arr);
-		return $res;
-	}
-	#case ifcode JAVASCRIPT then
-	static explode(delimiter, s, limit){
-		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
-		var _Vector; if (isBrowser()) _Vector = Runtime.Vector; else _Vector = Vector;
-		var arr = null;
-		if (!_rtl.exists(limit))
-			arr = s.split(delimiter);
-		arr = s.split(delimiter, limit);
-		return (new _Vector()).concat(arr);
+		return _Collection.create(arr);
 	}
 	#endswitch
 	
@@ -337,15 +337,15 @@ export class rs
 	 * @param integer limit - ограничение 
 	 * @return Vector<string>
 	 */
-	declare export static string implode(string ch, Vector<string> arr);
+	declare static string join(string ch, Vector<string> arr);
 	 
 	#switch
 	#case ifcode PHP then
-	static function implode($s, $arr){
+	static function join($s, $arr){
 		return implode($s, $arr->_getArr());
 	}
 	#case ifcode JAVASCRIPT then
-	static implode(ch, arr){
+	static join(ch, arr){
 		return arr.join(ch);
 	}
 	#endswitch
@@ -448,8 +448,8 @@ export class rs
 	 */
 	public static PathInfo pathinfo(string filepath)
 	{
-		Vector<string> arr1 = rs::explode(".", filepath);
-		Vector<string> arr2 = rs::explode("/", filepath);
+		Vector<string> arr1 = rs::explode(".", filepath).toVector();
+		Vector<string> arr2 = rs::explode("/", filepath).toVector();
 		
 		PathInfo ret = new PathInfo();
 		
@@ -579,5 +579,97 @@ export class rs
 	{
 		return filepath;
 	}
+	
+	
+	
+	/* =================== Deprecated =================== */
+	
+	
+	
+	
+	
+	/**
+	 * Разбивает строку на подстроки
+	 * @param string ch - разделитель
+	 * @param string s - строка, которую нужно разбить
+	 * @param integer limit - ограничение 
+	 * @return Vector<string>
+	 */
+	declare export static Vector<string> explode(string ch, string s, int limit = -1);
+	
+	#switch
+	#case ifcode PHP then
+	static function explode($delimiter, $s, $limit = -1)
+	{
+		$arr = [];
+		if ($limit < 0) $arr = explode($delimiter, $s);
+		else $arr = explode($delimiter, $s, $limit);
+		return Collection::create($arr);
+	}
+	#case ifcode JAVASCRIPT then
+	static explode(delimiter, s, limit){
+		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
+		var _Collection; if (isBrowser()) _Collection = Runtime.Collection; else _Vector = Collection;
+		var arr = null;
+		if (!_rtl.exists(limit))
+			arr = s.split(delimiter);
+		arr = s.split(delimiter, limit);
+		return _Collection.create(arr);
+	}
+	#endswitch
+	
+	
+	
+	/**
+	 * Разбивает строку на подстроки
+	 * @param string ch - разделитель
+	 * @param string s - строка, которую нужно разбить
+	 * @param integer limit - ограничение 
+	 * @return Vector<string>
+	 */
+	declare export static string implode(string ch, Vector<string> arr);
+	 
+	#switch
+	#case ifcode PHP then
+	static function implode($s, $arr){
+		return implode($s, $arr->_getArr());
+	}
+	#case ifcode JAVASCRIPT then
+	static implode(ch, arr){
+		return arr.join(ch);
+	}
+	#endswitch
+	
+	
+	/**
+	 * Ищет позицию первого вхождения подстроки search в строке s.
+	 * @param {string} s - строка, в которой производится поиск 
+	 * @param {string} search - строка, которую ищем 
+	 * @param {string} offset - если этот параметр указан, 
+	 *                 то поиск будет начат с указанного количества символов с начала строки.  
+	 * @return {variable} Если строка найдена, то возвращает позицию вхождения, начиная с 0.
+	 *                    Если строка не найдена, то вернет -1
+	 */
+	declare export static int strpos(string s, string search, string offset = 0);
+
+	#switch
+	#case ifcode PHP then
+	static function strpos($s, $search, $offset = 0){
+		if ($search == ""){
+			return -1;
+		}
+		$res = mb_strpos($s, $search, $offset);
+		if ($res === false)
+			return -1;
+		return $res;
+	}
+	#case ifcode JAVASCRIPT then
+	static strpos(s, search, offset){
+		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
+		if (!_rtl.exists(offset)) offset = 0;
+		var res = _rtl.toString(s).indexOf(search);
+		return res;
+	}
+	#endswitch
 	
 }

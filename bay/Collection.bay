@@ -312,12 +312,23 @@ declare class Collection<T>
 	
 	
 	/**
-	 * Find item 
-	 * @param mixed item - Find function
+	 * Find item pos
 	 * @param func f - Find function
+	 * @param mixed key - Find function
 	 * @return int - position
 	 */
-	declare int find(callback f, mixed item);
+	declare int find(callback f, mixed key);
+	
+	
+	
+	/**
+	 * Find item
+	 * @param mixed item - Find function
+	 * @param func f - Find function
+	 * @param T def_value - Find function
+	 * @return item
+	 */
+	declare T findItem(callback f, mixed key, T def_value = null);
 }
 
 
@@ -924,21 +935,36 @@ Runtime.Collection = class extends Array
 	
 	
 	/**
-	 * Find item 
+	 * Find item pos
 	 * @param func f - Find function
-	 * @param mixed item - Search item
+	 * @param mixed key - Search key
 	 * @return Collection
 	 */
-	find(f, item)
+	find(f, key)
 	{
 		for (var i=0; i<this.length; i++)
 		{
-			if (f(this[i], item))
+			if (f(this[i], key))
 			{
 				return i;
 			}
 		}
 		return -1;
+	}
+	
+	
+	
+	/**
+	 * Find item 
+	 * @param func f - Find function
+	 * @param mixed key - Search key
+	 * @return Collection
+	 */
+	findItem(f, key, def_value)
+	{
+		if (def_value == undefined) def_value = null;
+		var pos = this.find(f, key);
+		return this.get(pos, def_value);
 	}
 	
 	
@@ -1575,6 +1601,20 @@ class Collection implements \JsonSerializable
 			}
 		}
 		return -1;
+	}
+	
+	
+	
+	/**
+	 * Find item 
+	 * @param func f - Find function
+	 * @param mixed key - Search key
+	 * @return Collection
+	 */
+	public function findItem($f, $key, $def_value = null)
+	{
+		$pos = $this->find($f, $key);
+		return $this->get($pos, $def_value);
 	}
 	
 	

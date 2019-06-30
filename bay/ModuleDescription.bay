@@ -22,11 +22,12 @@ use Runtime.Emitter;
 use Runtime.Map;
 use Runtime.rtl;
 use Runtime.Vector;
+use Runtime.Interfaces.AssetsInterface;
 use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
-class ModuleDescription implements ModuleDescriptionInterface
+class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 {
 
 	
@@ -117,9 +118,9 @@ class ModuleDescription implements ModuleDescriptionInterface
 	
 	
 	/**
-	 * Register lambda filters
+	 * Returns enities
 	 */
-	lambda Collection<LambdaFilter> lambdaFilters() => null;
+	lambda Collection<Dict> resources() => null;
 	
 	
 	
