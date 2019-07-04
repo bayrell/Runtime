@@ -231,7 +231,7 @@ class AsyncThread extends CoreObject
 				/* Call task function */
 				var res = null;
 				try{
-					res = _rtl.call(this.f, [this]);
+					res = _rtl.apply(this.f, [this]);
 				}
 				catch (e){
 					res = null;

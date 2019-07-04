@@ -315,7 +315,12 @@ class rtl{
 	static method(obj, method_name){
 		if (!(obj instanceof Object))
 		{
-			obj = this.find_class(obj);
+			var find_obj = this.find_class(obj);
+			if (find_obj == null)
+			{
+				throw new Error("Object " + obj + " not found");
+			}
+			obj = find_obj;
 		}
 		
 		if (obj[method_name] == null || obj[method_name] == "undefined")

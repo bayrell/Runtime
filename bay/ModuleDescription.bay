@@ -98,6 +98,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 		"Runtime.ModuleDescription",
 		"Runtime.Reference",
 		"Runtime.Vector",
+		"Runtime.Exceptions.ApiException",
 		"Runtime.Exceptions.IndexOutOfRange",
 		"Runtime.Exceptions.KeyNotFound",
 		"Runtime.Exceptions.UnknownError",

@@ -175,6 +175,7 @@ class Context extends CoreObject implements ContextInterface
 			for (int i=0; i<sz; i++)
 			{
 				string module_name = keys.item(i);
+				module_name = rs::replace("/", ".", module_name);
 				this.registerModule(module_name);
 			}
 			delete keys;
@@ -339,6 +340,14 @@ class Context extends CoreObject implements ContextInterface
 		return this.config;
 	}
 	
+	
+	Dict<mixed> getConfigItem
+	(
+		Collection<scalar> path, mixed default_value, string type_value = "mixed", string type_template = ""
+	)
+	{
+		return RuntimeUtils::getItem(this.config, path, default_value, type_value, type_template);
+	}
 	
 	
 	/**
@@ -515,17 +524,96 @@ class Context extends CoreObject implements ContextInterface
 	
 	#case ifcode PHP then
 	
-	public function callApi($class_name, $interface_name, $method_name, $data)
+	public function callApi($class_name, $interface_name, $method_name, $params)
 	{
-		$app = $this->getProvider("Core.Backend.BackendAppProvider");
-		$app_class_name = $app->getClassName();
-		$app_class_name = rtl::find_class($app_class_name);
-		return call_user_func_array(
-			[ $app_class_name, "callApi" ],
-			[ $this, $app, $class_name, $interface_name, $method_name, $data ]
-		);
+		$res = null;
+		
+		try
+		{
+			$app = $this->getProvider("Core.Backend.BackendAppProvider");
+			$app_class_name = $app->getClassName();
+			$app_class_name = rtl::find_class($app_class_name);
+			$api_result = call_user_func_array(
+				[ $app_class_name, "callApi" ],
+				[ $this, $app, $class_name, $interface_name, $method_name, $params ]
+			);
+			$res = \Core\Http\ApiResult::setError
+			(
+				new \Core\Http\ApiResult( new \Runtime\Dict(["result"=> $api_result]) ),
+				\Runtime\RuntimeConstant::ERROR_OK,
+				"Ok"
+			);
+		}
+		catch (\Runtime\Exceptions\ApiException $e)
+		{
+			$res = \Core\Http\ApiResult::setError
+			(
+				new \Core\Http\ApiResult(),
+				$e->getErrorCode(),
+				$e->getErrorMessage()
+			);
+		}
+		catch (\Exception $e)
+		{
+			throw $e;
+		}
+		
+		return $res;
 	}
 	
 	#endswitch
 	
+	
+	
+	
+	/**
+	 * Call api
+	 * @param string class_name
+	 * @param string method_name
+	 * @param ApiRequest request
+	 * @return mixed The result of the api
+	 */ 
+	declare async ApiResult callApi(
+		string bus_gate, string class_name, string interface_name, string method_name, 
+		Map<mixed> data
+	);
+	
+	
+	#switch
+	#case ifcode JAVASCRIPT then
+	
+	callBus(bus_gate, class_name, interface_name, method_name, data)
+	{
+		if (bus_gate == "")
+		{
+			return this.callApi(class_name, interface_name, method_name, data);
+		}
+		
+		var bus = this.getProvider("core.ui.bus");
+		method_name = (interface_name != "") ? interface_name + "." + method_name : method_name;
+		return (ctx) => {
+			bus.sendApi(
+				class_name,
+				method_name,
+				data,
+				(function (ctx){
+					return function (data){
+						var res = new Core.Http.ApiResult( data );
+						return ctx.resolve(res);
+					}
+				})(ctx)
+			);
+			return null;
+		}
+	}
+	
+	#case ifcode PHP then
+	
+	public function callBus($bus_gate, $class_name, $interface_name, $method_name, $data)
+	{
+		if ($bus_gate == "") return this.callApi($class_name, $interface_name, $method_name, $data);
+		return null;
+	}
+	
+	#endswitch
 }
