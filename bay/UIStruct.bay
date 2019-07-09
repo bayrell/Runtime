@@ -91,6 +91,8 @@ struct UIStruct extends CoreStruct
 	 */
 	lambda CoreStruct getModel(UIStruct ui)
 	{
+		return ui.model;
+		
 		if (ui.model != null) 
 			return ui.model;
 			

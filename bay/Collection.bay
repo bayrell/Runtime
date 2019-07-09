@@ -882,7 +882,7 @@ Runtime.Collection = class extends Array
 		if (offset == 0 && length == this.length) return this;
 		if (length >= 0)
 		{
-			length = this.count() - offset + length - 1;
+			length = offset + length;
 		}
 		return super.slice(offset, length);
 	}

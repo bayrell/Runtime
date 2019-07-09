@@ -221,7 +221,7 @@ export class rs
 	}
 	#case ifcode JAVASCRIPT then
 	static replace(search, item, s){
-		return s.replace(search, item);
+		return s.replace(new RegExp(search, "g"), item);
 	}
 	#endswitch
 	

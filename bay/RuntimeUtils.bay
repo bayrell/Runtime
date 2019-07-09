@@ -801,7 +801,7 @@ export class RuntimeUtils{
 	 * @string charset - charset of the bytes vector. Default utf8
 	 * @return string
 	 */
-	public static string bytesToString(Vector<byte> arr, string charset="utf8")
+	public static string bytesToString(Collection<byte> arr, string charset="utf8")
 	{
 		#switch
 		#case ifcode PHP then
@@ -818,10 +818,23 @@ export class RuntimeUtils{
 	/**
 	 * Convert string to bytes
 	 * @param string s - incoming string
+	 * @param charset - Result bytes charset. Default utf8
+	 * @return Collection<byte> output collection
+	 */
+	lambda Collection<byte> toString(Collection<byte> arr, string charset="utf8")
+	{
+		return static::bytesToString(arr, charset);
+	}
+	
+	
+	
+	/**
+	 * Convert string to bytes
+	 * @param string s - incoming string
 	 * @param Vector<byte> arr - output vector
 	 * @param charset - Result bytes charset. Default utf8
 	 */
-	public static void stringToBytes(string s, Vector<byte> arr, string charset="utf8")
+	lambda Collection<byte> stringToBytes(string s, Vector<byte> arr, string charset="utf8")
 	{
 		#switch
 		#case ifcode PHP then
@@ -831,6 +844,19 @@ export class RuntimeUtils{
 		return Runtime.Collection.create(bytes);
 		#case ifcode NODEJS then
 		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Convert string to bytes
+	 * @param string s - incoming string
+	 * @param charset - Result bytes charset. Default utf8
+	 * @return Collection<byte> output collection
+	 */
+	lambda Collection<byte> toBytes(string s, string charset="utf8")
+	{
+		return static::stringToBytes(s, charset);
 	}
 	
 	
