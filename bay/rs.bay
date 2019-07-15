@@ -582,6 +582,17 @@ export class rs
 	
 	
 	
+	/**
+	 * New line to br
+	 */
+	public static string nl2br(string s)
+	{
+		return static::replace("\n", "<br/>", s);
+	}
+	
+	
+	
+	
 	/* =================== Deprecated =================== */
 	
 	

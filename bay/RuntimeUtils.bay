@@ -695,6 +695,7 @@ export class RuntimeUtils{
 			return _Utils.PrimitiveToObject(obj);
 		}
 		catch(e){
+			throw e;
 			return null;
 		}
 	}

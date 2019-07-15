@@ -37,7 +37,7 @@ class CoreStruct extends CoreObject implements SerializeInterface
 		if (obj != null)
 		{
 			this.assignMap(obj);
-			this.initData();
+			this.initData(null, obj);
 		}
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -50,7 +50,7 @@ class CoreStruct extends CoreObject implements SerializeInterface
 	/**
 	 * Init struct data
 	 */
-	protected void initData()
+	protected void initData(CoreStruct old_model, Dict changed = null)
 	{
 	}
 	
@@ -61,14 +61,14 @@ class CoreStruct extends CoreObject implements SerializeInterface
 	 * @param Map obj = null
 	 * @return CoreStruct
 	 */
-	public CoreStruct copy(Map obj = null)
+	public CoreStruct copy(Dict obj = null)
 	{
 		if (obj == null) return this;
 		
 		CoreStruct res = rtl::newInstance( this.getClassName(), [] );
 		res.assignObject(this);
 		res.setMap(obj);
-		res.initData();
+		res.initData(this, obj);
 		
 		/* Return object */
 		return res;
