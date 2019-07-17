@@ -233,8 +233,8 @@ Runtime.Dict = class extends Map
 		while (!next.done){
 			var key = next.value;
 			var val = super.get(key);
-			if (isBrowser()) val = Runtime.rtl.correct(val, type, null);
-			else val = rtl.correct(val, type, null);
+			if (isBrowser()) val = Runtime.rtl.convert(val, type, null);
+			else val = rtl.convert(val, type, null);
 			obj.set(key, val);
 			next = it.next();
 		}
@@ -323,8 +323,8 @@ Runtime.Dict = class extends Map
 		key = this.toString(key);
 		var val = super.get(key);
 		if (val == undefined) return default_value;
-		if (isBrowser()) return Runtime.rtl.correct(val, type_value, default_value, type_template);
-		return rtl.correct(val, type_value, default_value, type_template);
+		if (isBrowser()) return Runtime.rtl.convert(val, type_value, default_value, type_template);
+		return rtl.convert(val, type_value, default_value, type_template);
 	}
 	
 	
@@ -648,7 +648,7 @@ class Dict implements \JsonSerializable
 		return $this->map(
 			function($key, $value) use ($type)
 			{
-				return rtl::correct($value, $type, null);
+				return rtl::convert($value, $type, null);
 			}
 		);
 	}

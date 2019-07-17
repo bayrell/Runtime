@@ -137,12 +137,12 @@ class Context extends CoreObject implements ContextInterface
 			string class_name = info.value;
 			if (class_name == "") class_name = info.name;
 			provider = this.createProvider(class_name, params);
-			if (provider_name != class_name) obj = this.chain(provider_name, [this, provider]);
+			if (provider_name != class_name) provider = this.chain(provider_name, [this, provider]);
 		}
 		else
 		{
 			provider = this.createProvider(provider_name, params);
-			obj = this.chain(provider_name, [this, provider]);
+			provider = this.chain(provider_name, [this, provider]);
 		}
 		return provider;
 	}
@@ -495,12 +495,34 @@ class Context extends CoreObject implements ContextInterface
 	 * @param ApiRequest request
 	 * @return mixed The result of the api
 	 */ 
-	async ApiResult bus(
+	async ApiResult busCall(
 		string class_name, string interface_name, string method_name, 
 		Map<mixed> data
 	)
 	{
 		BusInterface provider = this.getProvider("Runtime.Interfaces.BusInterface");
+		ApiResult res = await provider.call(this, class_name, interface_name, method_name, data);
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Remote bus call
+	 * @param string remote_name
+	 * @param string method_name
+	 * @param ApiRequest request
+	 * @return mixed The result of the api
+	 */ 
+	async ApiResult remoteBusCall
+	(
+		string remote_gate,
+		string class_name, string interface_name, string method_name, 
+		Map<mixed> data
+	)
+	{
+		RemoteBusInterface provider = this.getProvider("Runtime.Interfaces.RemoteBusInterface");
+		provider = provider.setRemoteGate(remote_gate);
 		ApiResult res = await provider.call(this, class_name, interface_name, method_name, data);
 		return res;
 	}

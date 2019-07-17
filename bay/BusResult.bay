@@ -21,6 +21,7 @@ namespace Runtime;
 use Runtime.CoreStruct;
 use Runtime.Collection;
 use Runtime.Map;
+use Runtime.rtl;
 use Runtime.RuntimeConstant;
 
 
@@ -28,12 +29,12 @@ struct BusResult<primitive> extends CoreStruct
 {
 	
 	public bool success = false;
-	public int code = -1;
+	public int code = 0;
 	public string error = "";
 	public string class_name = "";
 	public string method_name = "";
 	public string text = "";
-	public primitive res = null;
+	public primitive data = null;
 	public primitive params = null;
 	
 	
@@ -70,7 +71,7 @@ struct BusResult<primitive> extends CoreStruct
 	 */
 	BusResult setResult(primitive res)
 	{
-		return this.copy({ "code": RuntimeConstant::ERROR_OK, "error": "Ok", "success": true, "res": res });
+		return this.copy({ "code": RuntimeConstant::ERROR_OK, "error": "Ok", "success": true, "data": res });
 	}
 	
 }

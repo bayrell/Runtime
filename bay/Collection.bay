@@ -382,8 +382,8 @@ Runtime.Collection = class extends Array
 		var arr = this.copy();
 		for (var i=0; i<arr.length; i++)
 		{
-			if (isBrowser()) arr[i] = Runtime.rtl.correct(arr[i], type, null);
-			else arr[i] = rtl.correct(arr[i], type, null);
+			if (isBrowser()) arr[i] = Runtime.rtl.convert(arr[i], type, null);
+			else arr[i] = rtl.convert(arr[i], type, null);
 		}
 		return arr;
 	}
@@ -471,8 +471,8 @@ Runtime.Collection = class extends Array
 		var val = this[pos];
 		if (type_value == "mixed")
 		{
-			if (isBrowser()) return Runtime.rtl.correct(val, type_value, default_value, type_template);
-			return rtl.correct(val, type_value, default_value, type_template);
+			if (isBrowser()) return Runtime.rtl.convert(val, type_value, default_value, type_template);
+			return rtl.convert(val, type_value, default_value, type_template);
 		}
 		return val;
 	}
@@ -1062,7 +1062,7 @@ class Collection implements \JsonSerializable
 		return $this->map(
 			function($item) use ($type)
 			{
-				return rtl::correct($item, $type, null);
+				return rtl::convert($item, $type, null);
 			}
 		);
 	}

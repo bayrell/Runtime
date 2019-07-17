@@ -93,6 +93,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 		"Runtime.CoreStruct",
 		"Runtime.CoreProvider",
 		"Runtime.CoreEvent",
+		"Runtime.BusResult",
 		"Runtime.Map",
 		"Runtime.Maybe",
 		"Runtime.PathInfo",

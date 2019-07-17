@@ -19,7 +19,7 @@
 namespace Runtime.Interfaces;
 
 
-interface BusInterface
+interface RemoteBusInterface
 {
 	
 	/**
@@ -37,6 +37,6 @@ interface BusInterface
 	/**
 	 * Set remote gate
 	 */
-	BusInterface setRemoteGate(string remote_gate);
+	RemoteBusInterface setRemoteGate(string remote_gate);
 	
 }

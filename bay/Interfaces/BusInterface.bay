@@ -28,7 +28,7 @@ interface BusInterface
 	async BusResult call
 	(
 		ContextInterface context,
-		string name, string space, string method_name, 
+		string api_name, string space, string method_name, 
 		Collection<mixed> data
 	);
 	

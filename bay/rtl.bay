@@ -436,22 +436,43 @@ class rtl{
 				catch (var e){}
 			}
 			
-			/* Is Vector or Map */
+			/* Is Collection */
 			else if (
 				(
-					type_value == "Runtime.Vector" or type_value == "Runtime.Map" or
-					type_value == "Runtime.Collection" or type_value == "Runtime.Dict"
+					type_value == "Runtime.Vector" or type_value == "Runtime.Collection"
 				) and type_template != ""
 			){
 				#switch
 				#case ifcode PHP then
-				if ($value instanceof \Runtime\Collection or $value instanceof \Runtime\Dict)
+				if ($value instanceof \Runtime\Collection)
 				{
 					return $value->_correctItemsByType($type_template);
 				}
 				return null;
 				#case ifcode JAVASCRIPT then
-				if (this.is_instanceof(value, "Runtime.Collection") || this.is_instanceof(value, "Runtime.Dict"))
+				if (this.is_instanceof(value, "Runtime.Collection"))
+				{
+					return value._correctItemsByType(type_template);
+				}
+				return null;
+				#endswitch
+			}
+			
+			/* Is Dict */
+			else if (
+				(
+					type_value == "Runtime.Map" or type_value == "Runtime.Dict"
+				) and type_template != ""
+			){
+				#switch
+				#case ifcode PHP then
+				if ($value instanceof \Runtime\Dict)
+				{
+					return $value->_correctItemsByType($type_template);
+				}
+				return null;
+				#case ifcode JAVASCRIPT then
+				if (this.is_instanceof(value, "Runtime.Dict"))
 				{
 					return value._correctItemsByType(type_template);
 				}
@@ -1436,7 +1457,7 @@ class rtl{
 	 * @param var type_template
 	 * @return var
 	 */
-	static var correct(var value, string type_value, var def_value = null, string type_template = ""){
+	static var correct(var value, var def_value = null, string type_value, string type_template = ""){
 		return static::convert(value, type_value, def_value, type_template);
 	}
 	
