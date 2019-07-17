@@ -1,7 +1,7 @@
 /*!
- *  Bayrell Runtime Library
+ *  Bayrell Core Library
  *
- *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,20 +15,28 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-namespace Runtime;
-
-use Runtime.CoreStruct;
-use Runtime.Dict;
-use Runtime.Map;
-use Runtime.rs;
-use Runtime.rtl;
-use Runtime.Collection;
-use Runtime.Vector;
+ 
+namespace Runtime.Interfaces;
 
 
-struct Provider extends CoreStruct
+interface BusInterface
 {
-	string name = "";
-	string value = "";
+	
+	/**
+	 * Remote procedure call
+	 */
+	async BusResult call
+	(
+		ContextInterface context,
+		string name, string space, string method_name, 
+		Collection<mixed> data
+	);
+	
+	
+	
+	/**
+	 * Set remote gate
+	 */
+	BusInterface setRemoteGate(string remote_gate);
+	
 }

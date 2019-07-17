@@ -19,16 +19,22 @@
 namespace Runtime;
 
 use Runtime.CoreStruct;
-use Runtime.Dict;
-use Runtime.Map;
-use Runtime.rs;
 use Runtime.rtl;
-use Runtime.Collection;
+use Runtime.RuntimeUtils;
 use Runtime.Vector;
 
 
-struct Provider extends CoreStruct
+struct CoreProvider extends CoreStruct
 {
-	string name = "";
-	string value = "";
+	
+	
+	/**
+	 * Init data
+	 */
+	static Dict<primitive> getDefaultProviderData(ContextInterface context)
+	{
+		return null;
+	}
+	
+	
 }

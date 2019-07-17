@@ -91,6 +91,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 		"Runtime.Context",
 		"Runtime.ContextObject",
 		"Runtime.CoreStruct",
+		"Runtime.CoreProvider",
 		"Runtime.CoreEvent",
 		"Runtime.Map",
 		"Runtime.Maybe",

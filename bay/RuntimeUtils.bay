@@ -1011,13 +1011,45 @@ export class RuntimeUtils{
 	/* Lambda Functions */
 	
 	
+	
+	/**
+	 * Equal two struct by key
+	 */
+	lambda fun equal(mixed value)
+		=> bool (mixed item) use (value)
+			=> item == value
+	;
+	
+	
+	
+	/**
+	 * Equal two struct by key
+	 */
+	lambda fun equalNot(mixed value)
+		=> bool (mixed item) use (value)
+			=> item != value
+	;
+	
+	
+	
+	/**
+	 * Returns attr of item
+	 */
+	lambda fun attr(string key, mixed def_value)
+		=> bool (CoreStruct item1) use (key, def_value)
+			=> item1.takeValue(key, def_value)
+	;
+	
+	
+	
 	/**
 	 * Equal two struct by key
 	 */
 	lambda fun equalItemKey(string key)
-		=> bool (CoreStruct item1, mixed value) 
+		=> bool (CoreStruct item1, mixed value) use (key)
 			=> item1.takeValue(key) == value
 	;
+	
 	
 	
 	/**

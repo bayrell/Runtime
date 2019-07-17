@@ -46,12 +46,12 @@ struct IntrospectionInfo extends CoreStruct
 	 * @string class_name
 	 * @return bool
 	 */
-	lambda Collection<CoreStruct> filterAnnotations(string class_name, IntrospectionInfo info)
+	Collection<CoreStruct> filterAnnotations(string class_name)
 	{
-		if (info.annotations == null)
+		if (this.annotations == null)
 			return null;
 		
-		return info.annotations.filter(
+		return this.annotations.filter(
 			bool (CoreStruct item) use (class_name)
 			{
 				return rtl::is_instanceof(item, class_name);

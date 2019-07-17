@@ -21,6 +21,7 @@ namespace Runtime;
 use Runtime.rs;
 use Runtime.rtl;
 use Runtime.CoreObject;
+use Runtime.CoreProvider;
 use Runtime.LambdaChain;
 use Runtime.Provider;
 use Runtime.Dict;
@@ -94,55 +95,56 @@ class Context extends CoreObject implements ContextInterface
 	
 	
 	/**
-	 * Returns helper
+	 * Create provider
 	 *
 	 * @params string provider_name
-	 * @return CoreStruct
+	 * @return CoreProvider
 	 */
-	public CoreStruct createProvider(string provider_name)
+	public CoreProvider createProvider(string class_name, Dict params = null)
 	{
-		if (this._providers.has(provider_name))
+		if (params == null)
 		{
-			Provider info = this._providers.item(provider_name);
-			CoreStruct obj = rtl::newInstance(info.value);
-			if (info.init)
+			if (this._providers_obj.has(class_name))
 			{
-				
-				fun f = info.init;
-				obj = f(this, obj);
+				params = this._providers_obj.item(class_name);
 			}
 			else
 			{
-				fun f = rtl::method(info.value, "init");
-				obj = f(this, obj);
+				params = (method (class_name, "getDefaultProviderData"))(this);
+				this._providers_obj.set(class_name, params);
 			}
-			obj = this.chain(info.value, [this, obj]);
-			return obj;
 		}
-		return null;
+		
+		CoreProvider provider = rtl::newInstance(class_name, [ params ]);
+		provider = this.chain(class_name, [this, provider]);
+		return provider;
 	}
 	
 	
 	
 	/**
-	 * Returns helper
+	 * Returns provider
 	 *
 	 * @params string provider_name
-	 * @return CoreStruct
+	 * @return CoreProvider
 	 */
-	public CoreStruct getProvider(string provider_name)
+	public CoreProvider getProvider(string provider_name, Dict params = null)
 	{
-		if (this._providers_obj.has(provider_name))
-		{
-			return this._providers_obj.item(provider_name);
-		}		
+		CoreProvider provider = null;
 		if (this._providers.has(provider_name))
 		{
-			mixed provider = this.createProvider(provider_name);
-			this._providers_obj.set(provider_name, provider);
-			return provider;
+			Provider info = this._providers.item(provider_name);
+			string class_name = info.value;
+			if (class_name == "") class_name = info.name;
+			provider = this.createProvider(class_name, params);
+			if (provider_name != class_name) obj = this.chain(provider_name, [this, provider]);
 		}
-		return null;
+		else
+		{
+			provider = this.createProvider(provider_name, params);
+			obj = this.chain(provider_name, [this, provider]);
+		}
+		return provider;
 	}
 	
 	
@@ -487,133 +489,20 @@ class Context extends CoreObject implements ContextInterface
 	
 	
 	/**
-	 * Call api
+	 * Local bus call
 	 * @param string class_name
 	 * @param string method_name
 	 * @param ApiRequest request
 	 * @return mixed The result of the api
 	 */ 
-	declare async ApiResult callApi(
+	async ApiResult bus(
 		string class_name, string interface_name, string method_name, 
 		Map<mixed> data
-	);
-	
-	
-	#switch
-	#case ifcode JAVASCRIPT then
-	
-	callApi(class_name, interface_name, method_name, data)
+	)
 	{
-		var bus = this.getProvider("core.ui.bus");
-		method_name = (interface_name != "") ? interface_name + "." + method_name : method_name;
-		return (ctx) => {
-			bus.sendApi(
-				class_name,
-				method_name,
-				data,
-				(function (ctx){
-					return function (data){
-						var res = new Core.Http.ApiResult( data );
-						return ctx.resolve(res);
-					}
-				})(ctx)
-			);
-			return null;
-		}
+		BusInterface provider = this.getProvider("Runtime.Interfaces.BusInterface");
+		ApiResult res = await provider.call(this, class_name, interface_name, method_name, data);
+		return res;
 	}
 	
-	#case ifcode PHP then
-	
-	public function callApi($class_name, $interface_name, $method_name, $params)
-	{
-		$res = null;
-		
-		try
-		{
-			$app = $this->getProvider("Core.Backend.BackendAppProvider");
-			$app_class_name = $app->getClassName();
-			$app_class_name = rtl::find_class($app_class_name);
-			$api_result = call_user_func_array(
-				[ $app_class_name, "callApi" ],
-				[ $this, $app, $class_name, $interface_name, $method_name, $params ]
-			);
-			$res = \Core\Http\ApiResult::setError
-			(
-				new \Core\Http\ApiResult( new \Runtime\Dict(["result"=> $api_result]) ),
-				\Runtime\RuntimeConstant::ERROR_OK,
-				"Ok"
-			);
-		}
-		catch (\Runtime\Exceptions\ApiException $e)
-		{
-			$res = \Core\Http\ApiResult::setError
-			(
-				new \Core\Http\ApiResult(),
-				$e->getErrorCode(),
-				$e->getErrorMessage()
-			);
-		}
-		catch (\Exception $e)
-		{
-			throw $e;
-		}
-		
-		return $res;
-	}
-	
-	#endswitch
-	
-	
-	
-	
-	/**
-	 * Call api
-	 * @param string class_name
-	 * @param string method_name
-	 * @param ApiRequest request
-	 * @return mixed The result of the api
-	 */ 
-	declare async ApiResult callApi(
-		string bus_gate, string class_name, string interface_name, string method_name, 
-		Map<mixed> data
-	);
-	
-	
-	#switch
-	#case ifcode JAVASCRIPT then
-	
-	callBus(bus_gate, class_name, interface_name, method_name, data)
-	{
-		if (bus_gate == "")
-		{
-			return this.callApi(class_name, interface_name, method_name, data);
-		}
-		
-		var bus = this.getProvider("core.ui.bus");
-		method_name = (interface_name != "") ? interface_name + "." + method_name : method_name;
-		return (ctx) => {
-			bus.sendApi(
-				class_name,
-				method_name,
-				data,
-				(function (ctx){
-					return function (data){
-						var res = new Core.Http.ApiResult( data );
-						return ctx.resolve(res);
-					}
-				})(ctx)
-			);
-			return null;
-		}
-	}
-	
-	#case ifcode PHP then
-	
-	public function callBus($bus_gate, $class_name, $interface_name, $method_name, $data)
-	{
-		if ($bus_gate == "") return this.callApi($class_name, $interface_name, $method_name, $data);
-		return null;
-	}
-	
-	#endswitch
 }
