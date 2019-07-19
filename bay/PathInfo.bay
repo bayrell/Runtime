@@ -34,7 +34,8 @@ class PathInfo implements StringInterface
 	/**
 	 * Returns string
 	 */
-	public string toString(){
+	public string toString()
+	{
 		return this.filepath;
 	}
 	

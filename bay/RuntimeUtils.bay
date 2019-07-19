@@ -88,17 +88,10 @@ export class RuntimeUtils{
 	/**
 	 * Register global Context
 	 */
-	public static ContextInterface createContext(Collectiom<string> modules = null)
+	public static ContextInterface createContext(Collectiom<string> modules = null, bool recursive = true)
 	{
 		ContextInterface context = new Context();
-		if (modules != null){
-			modules.each(
-				void (string module) use (context)
-				{
-					context.registerModule(module);
-				}
-			);
-		}
+		context.registerModules(modules, recursive);
 		return context;
 	}
 	
@@ -107,9 +100,9 @@ export class RuntimeUtils{
 	/**
 	 * Register global Context
 	 */
-	public static ContextInterface registerGlobalContext(Collectiom<string> modules = null)
+	public static ContextInterface registerContext(Collectiom<string> modules = null, bool recursive = true)
 	{
-		ContextInterface context = self::createContext(modules);
+		ContextInterface context = self::createContext(modules, recursive);
 		self::setContext(context);
 		return context;
 	}
@@ -143,35 +136,12 @@ export class RuntimeUtils{
 	
 	
 	/**
-	 * Returns true if class exists
-	 * @return Vector<string>
-	 */
-	declare public static Vector<string> getInterfaces(string class_name);
-	
-	#switch
-	#case ifcode PHP then
-	static function getInterfaces($class_name){
-		$arr = array_values(class_implements(rtl::find_class($class_name)));
-		$v = (new Vector())->_assignArr($arr);
-		$v = $v->map(function ($s){
-			return str_replace("\\", ".", $s);
-		});
-		return $v;
-	}
-	#case ifcode JAVASCRIPT then
-	static getInterfaces(class_name){
-		return new Vector();
-	}
-	#endswitch
-	
-	
-	
-	/**
 	 * Returns names of variables to serialization
 	 * @param Vector<string>
 	 */
-	public static void getVariablesNames(string class_name, Vector<string> names, int flag=0)
+	lambda Collection<string> getVariablesNames(string class_name, int flag=0)
 	{
+		Vector<string> names = new Vector();
 		
 		var variables_names = RuntimeUtils::_variables_names;
 		if (variables_names == null) RuntimeUtils::_variables_names = new Map();
@@ -182,7 +152,7 @@ export class RuntimeUtils{
 			if ( v.has(flag) )
 			{
 				names.appendVector( v.item(flag) );
-				return;
+				return names.toCollection();
 			}
 		}
 		
@@ -208,7 +178,7 @@ export class RuntimeUtils{
 		v.set(flag, names.copy());
 		RuntimeUtils::_variables_names.set(class_name, v);
 		
-		/*RuntimeUtils::_variables_names.set(class_name, names.copy());*/
+		return names.toCollection();
 	}
 	
 	
@@ -420,11 +390,10 @@ export class RuntimeUtils{
 		}
 		
 		
-		if (obj implements SerializeInterface){
-			
-			Vector<string> names = new Vector();
+		if (obj implements SerializeInterface)
+		{
 			Map<string, mixed> values = new Map();
-			obj.getVariablesNames(names, 1);
+			Collection<string> names = static::getVariablesNames(obj.getClassName(), 1);
 			
 			for (int i=0; i<names.count(); i++)
 			{
@@ -437,7 +406,7 @@ export class RuntimeUtils{
 			values.set("__class_name__", obj.getClassName());
 			delete names;
 			
-			return values;
+			return values.toDict();
 		}
 		
 		return null;
@@ -450,7 +419,8 @@ export class RuntimeUtils{
 	 * @param SerializeContainer container
 	 * @return mixed
 	 */
-	public static mixed PrimitiveToObject(mixed obj){
+	public static mixed PrimitiveToObject(mixed obj)
+	{
 		
 		if (obj === null) return null;
 		if (rtl::isScalarValue(obj)) return obj;
@@ -483,16 +453,19 @@ export class RuntimeUtils{
 			delete keys;
 			
 			if ( !res.has("__class_name__") ) return res;
-			if ( res.item("__class_name__") == "Runtime.Map" or res.item("__class_name__") == "Runtime.Dict" ){
+			if ( res.item("__class_name__") == "Runtime.Map" or res.item("__class_name__") == "Runtime.Dict" )
+			{
 				res.remove("__class_name__");
 				return res.toDict();
 			}
 			
 			string class_name = res.item("__class_name__");
-			if (not rtl::class_exists(class_name)){
+			if (not rtl::class_exists(class_name))
+			{
 				return null;
 			}
-			if (not rtl::class_implements(class_name, "Runtime.Interfaces.SerializeInterface")){
+			if (not rtl::class_implements(class_name, "Runtime.Interfaces.SerializeInterface"))
+			{
 				return null;
 			}
 			
@@ -500,8 +473,7 @@ export class RuntimeUtils{
 			SerializeInterface instance = rtl::newInstance(class_name, null);
 			
 			/* Assign values */
-			Vector<string> names = new Vector();
-			instance.getVariablesNames(names, 1);
+			Collection<string> names = static::getVariablesNames(instance.getClassName(), 1);
 			for (int i=0; i<names.count(); i++)
 			{
 				string variable_name = names.item(i);
@@ -1010,6 +982,10 @@ export class RuntimeUtils{
 	
 	/* Lambda Functions */
 	
+	
+	lambda fun isInstance(string class_name) =>
+		bool (mixed item) => rtl::is_instance(item, class_name)
+	;
 	
 	
 	/**

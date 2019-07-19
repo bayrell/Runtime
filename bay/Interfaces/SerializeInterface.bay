@@ -36,10 +36,10 @@ interface SerializeInterface{
 	
 	
 	/**
-	 * Returns name of variables to serialization
-	 * @return Vector<string>
+	 * Returns public fields list
+	 * @param Vector<string> names
 	 */
-	public void getVariablesNames(Vector<string> names);
+	public static void getFieldsList(Vector<string> names, int flag=0);
 	
 	
 	

@@ -105,9 +105,10 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 		"Runtime.Exceptions.KeyNotFound",
 		"Runtime.Exceptions.UnknownError",
 		"Runtime.DateTime",
-		"Runtime.IntrospectionInfo",
-		"Runtime.LambdaChain",
-		"Runtime.Provider",
+		"Runtime.Annotations.IntrospectionInfo",
+		"Runtime.Annotations.LambdaChain",
+		"Runtime.Annotations.Provider",
+		"Runtime.Annotations.Manager",
 		"Runtime.UIStruct",
 	];
 	

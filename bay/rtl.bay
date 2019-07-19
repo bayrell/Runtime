@@ -231,6 +231,31 @@ class rtl{
 	
 	
 	/**
+	 * Returns interface of class
+	 * @param string class_name
+	 * @return Collection<string>
+	 */
+	declare public static Collection<string> getInterfaces(string class_name);
+	
+	#switch
+	#case ifcode PHP then
+	static function getInterfaces($class_name){
+		$arr = array_values(class_implements(rtl::find_class($class_name)));
+		$v = (new Vector())->_assignArr($arr);
+		$v = $v->map(function ($s){
+			return str_replace("\\", ".", $s);
+		});
+		return $v->toCollection();
+	}
+	#case ifcode JAVASCRIPT then
+	static getInterfaces(class_name){
+		return new Collection();
+	}
+	#endswitch
+	
+	
+	
+	/**
 	 * Returns true if class exists
 	 * @return bool
 	 */
@@ -312,7 +337,9 @@ class rtl{
 		return new \Runtime\Callback($obj, $method_name);
 	}
 	#case ifcode JAVASCRIPT then
-	static method(obj, method_name){
+	static method(obj, method_name)
+	{
+		var save = obj;
 		if (!(obj instanceof Object))
 		{
 			var find_obj = this.find_class(obj);
@@ -328,6 +355,7 @@ class rtl{
 			var class_name = "";
 			if (obj.getClassName != undefined) class_name = obj.getClassName();
 			else if (obj.getCurrentClassName != undefined) class_name = obj.getCurrentClassName();
+			else class_name = save;
 			throw new Error("Method " + method_name + " not found in " + class_name);
 		}
 		

@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Runtime;
+namespace Runtime.Annotations;
 
 use Runtime.CoreStruct;
 use Runtime.Dict;
@@ -27,7 +27,7 @@ use Runtime.Collection;
 use Runtime.Vector;
 
 
-struct Provider extends CoreStruct
+struct Manager extends CoreStruct
 {
 	string name = "";
 	string value = "";

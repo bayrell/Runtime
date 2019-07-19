@@ -43,10 +43,8 @@ struct BusResult<primitive> extends CoreStruct
 	 * Returns true if success
 	 * @return bool
 	 */
-	bool isSuccess() =>
-		return 
-			this.success and this.code >= RuntimeConstant::ERROR_OK;
-		
+	bool isSuccess() => this.success and this.code >= RuntimeConstant::ERROR_OK;
+	
 	
 	
 	/**
@@ -55,12 +53,13 @@ struct BusResult<primitive> extends CoreStruct
 	 * @param string error
 	 * @return BusResult
 	 */
-	BusResult setError(int code, string error = "")
-	{
-		bool success = false;
-		if (code >= RuntimeConstant::ERROR_OK) success = true;
-		return this.copy({ "code": code, "error": error, "success": success });
-	}
+	BusResult setError(int code, string error = "") =>
+		this.copy({
+			"code": code,
+			"error": error,
+			"success": (code >= RuntimeConstant::ERROR_OK) ? true : false
+		})
+	;
 	
 	
 	
@@ -69,9 +68,8 @@ struct BusResult<primitive> extends CoreStruct
 	 * @param primitive res
 	 * @return BusResult
 	 */
-	BusResult setResult(primitive res)
-	{
-		return this.copy({ "code": RuntimeConstant::ERROR_OK, "error": "Ok", "success": true, "data": res });
-	}
+	BusResult setResult(primitive res) =>
+		this.copy({ "code": RuntimeConstant::ERROR_OK, "error": "Ok", "success": true, "data": res })
+	;
 	
 }

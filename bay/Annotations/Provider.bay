@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Runtime;
+namespace Runtime.Annotations;
 
 use Runtime.CoreStruct;
 use Runtime.Dict;
@@ -27,15 +27,8 @@ use Runtime.Collection;
 use Runtime.Vector;
 
 
-struct LambdaChain extends CoreStruct
+struct Provider extends CoreStruct
 {
-	const int POS_LOW = -100;
-	const int POS_NORMAL = 0;
-	const int POS_HIGHT = 100;
-	
 	string name = "";
 	string value = "";
-	string chain = "";
-	double pos = 0;
-	bool is_await = false;
 }

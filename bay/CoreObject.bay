@@ -26,8 +26,6 @@ use Runtime.Vector;
 class CoreObject
 {
 	
-	protected bool _is_destroyed = false;	
-	
 	
 	/** 
 	 * Constructor
@@ -48,7 +46,8 @@ class CoreObject
 	#case ifcode PHP then
 	protected function _init(){}
 	#case ifcode JAVASCRIPT then
-	_init(){
+	_init()
+	{
 		this.__implements__ = new Array();
 	}
 	#endswitch
@@ -57,10 +56,12 @@ class CoreObject
 	
 	#switch
 	#case ifcode JAVASCRIPT then
-	_del(){
+	_del()
+	{
 	}
 	#case ifcode PHP then
-	function __destruct() {
+	function __destruct()
+	{
 		/*this._is_destroyed = true;*/
 	}
 	#endswitch
@@ -94,6 +95,29 @@ class CoreObject
 	
 	
 	/**
+	 * Set new value
+	 * @param string variable_name
+	 * @param var value
+	 */
+	public void assignValue(string variable_name, var value)
+	{
+		this.assignVirtualValue(variable_name, value);
+	}
+	
+	
+	
+	/**
+	 * Assign virtual value
+	 * @param string variable_name
+	 * @param var value
+	 */
+	void assignVirtualValue(string variable_name, var value)
+	{
+	}
+	
+	
+	
+	/**
 	 * Assign and clone data from other object
 	 * @param CoreObject obj
 	 */
@@ -102,36 +126,21 @@ class CoreObject
 	}
 	
 	
-		
-	/**
-	 * Set new value instance by variable name
-	 * @param string variable_name
-	 * @param var value
-	 */
-	public void assignValue(string variable_name, var value)
-	{
-	}
-	
-	
 	
 	/**
 	 * Set new values instance by Map
 	 * @param Map<mixed> map
 	 * @return CoreObject
 	 */
-	public CoreObject assignMap(Map<mixed> values = null)
+	public CoreObject assignDict(Dict<mixed> values = null)
 	{
-		if (values == null)
-			return;
-		Vector<string> names = new Vector();
-		this.getVariablesNames(names, 2);
-		names.each(
-			void (string name) use (values)
-			{
-				this.assignValue(name, values.get(name, null));
-			}
-		);
-		delete names;
+		if (values == null) return;
+		Collection<string> names = (method ("Runtime.RuntimeUtils", "getVariablesNames")) (this.getClassName(), 2);
+		for (int i=0; i<names.count(); i++)
+		{
+			string name = names.item(i);
+			this.assignValue(name, values.get(name, null));
+		}
 		return this;
 	}
 	
@@ -139,21 +148,13 @@ class CoreObject
 	
 	/**
 	 * Set new values instance by Map
-	 * @param Map<mixed> map
+	 * @param Dict<mixed> map
 	 * @return CoreObject
 	 */
-	public CoreObject setMap(Map<mixed> values = null)
+	public CoreObject setDict(Dict<mixed> values = null)
 	{
-		if (values == null)
-			return;
-		
-		values.each(
-			void (string key, mixed value)
-			{
-				this.assignValue(key, value);
-			}
-		);
-		
+		if (values == null) return;
+		values.each( method (this, "assignValue") );
 		return this;
 	}
 	
@@ -163,57 +164,21 @@ class CoreObject
 	 * Dump serializable object to Map
 	 * @return Map<mixed>
 	 */
-	public Map<mixed> takeMap(int flag=2)
+	public Map<mixed> takeDict(int flag=2)
 	{
 		Map<mixed> values = new Map();
-		Vector<string> names = new Vector();
-		this.getVariablesNames(names, flag);
-		names.each(
-			void (string name) use (values)
-			{
-				values.set(name, this.takeValue(name, null));
-			}
-		);
-		return values;
+		Collection<string> names = (method ("Runtime.RuntimeUtils", "getVariablesNames")) (this.getClassName(), flag);
+		for (int i=0; i<names.count(); i++)
+		{
+			string name = names.item(i);
+			values.set(name, this.takeValue(name, null));
+		}
+		return values.toDict();
 	}
 	
 	
 	
-	/**
-	 * Call static method of the current class
-	 * @param string method_name
-	 * @param Vector args
-	 * @return mixed
-	 */
-	public mixed callStaticMethod(string method_name, Vector args = null)
-	{
-		return rtl::callStaticMethod(this.getClassName(), method_name, args);
-	}
-	
-	
-	
-	/**
-	 * Returns field info by field_name
-	 * @param string field_name
-	 * @return IntrospectionInfo
-	 */
-	public static IntrospectionInfo getFieldInfoByName(string field_name)
-	{
-	}
-	
-	
-	
-	/**
-	 * Returns virtual field info by field_name
-	 * @param string field_name
-	 * @return IntrospectionInfo
-	 */
-	public static IntrospectionInfo getVirtualFieldInfo(string field_name)
-	{
-		return null;
-	}
-	
-	
+	/* --------------------------- Introspection --------------------------- */
 	
 	/**
 	 * Returns public fields list
@@ -236,11 +201,23 @@ class CoreObject
 	
 	
 	/**
-	 * Returns info of the public method by name
-	 * @param string method_name
+	 * Returns field info by field_name
+	 * @param string field_name
 	 * @return IntrospectionInfo
 	 */
-	public static IntrospectionInfo getMethodInfoByName(string method_name)
+	public static IntrospectionInfo getFieldInfoByName(string field_name)
+	{
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns virtual field info by field_name
+	 * @param string field_name
+	 * @return IntrospectionInfo
+	 */
+	public static IntrospectionInfo getVirtualFieldInfoByName(string field_name)
 	{
 		return null;
 	}
@@ -258,94 +235,12 @@ class CoreObject
 	
 	
 	/**
-	 * Returns names of variables to serialization
-	 * @param Vector<string>
-	 */
-	public void getVariablesNames(Vector<string> names, int flag=0)
-	{
-		rtl::callStaticMethod
-		(
-			"Runtime.RuntimeUtils", "getVariablesNames",
-			[this.getClassName(), names, flag]
-		);
-	}
-	
-	
-	
-	
-	/**
-	 * Returns info of the public variable by name
-	 * @param string variable_name
-	 * @return IntrospectionInfo
-	 */
-	public void getFieldInfo(string variable_name)
-	{
-		Vector<string> classes = rtl::callStaticMethod
-		(
-			"Runtime.RuntimeUtils", "getParents",
-			[ this.getClassName() ]
-		);
-		
-		for (int i=0; i<classes.count(); i++)
-		{
-			string class_name = classes.item(i);
-			IntrospectionInfo info = rtl::callStaticMethod(class_name, "getFieldInfoByName", [variable_name]);
-			if (info != null  and item.kind == IntrospectionInfo::ITEM_FIELD)
-				return info;
-			try
-			{ 
-				IntrospectionInfo info = rtl::callStaticMethod(class_name, "getVirtualFieldInfo", [variable_name]); 
-				if (info != null  and item.kind == IntrospectionInfo::ITEM_FIELD)
-					return info;
-			} 
-			catch (var e) {}
-		}
-		return null;
-	}
-	
-	
-	
-	/**
-	 * Returns names of methods
-	 * @param Vector<string>
-	 */
-	public void getMethodsNames(Vector<string> names)
-	{
-		Vector<string> classes = rtl::callStaticMethod
-		(
-			"Runtime.RuntimeUtils", "getParents",
-			[ this.getClassName() ]
-		);
-		
-		for (int i=0; i<classes.count(); i++)
-		{
-			string class_name = classes.item(i);
-			rtl::callStaticMethod(class_name, "getMethodsList", [names]);
-		}
-	}
-	
-	
-	
-	/**
 	 * Returns info of the public method by name
 	 * @param string method_name
 	 * @return IntrospectionInfo
 	 */
-	public IntrospectionInfo getMethodInfo(string method_name)
+	public static IntrospectionInfo getMethodInfoByName(string method_name)
 	{
-		Vector<string> classes = rtl::callStaticMethod
-		(
-			"Runtime.RuntimeUtils", "getParents",
-			[ this.getClassName() ]
-		);
-		
-		for (int i=0; i<classes.count(); i++)
-		{
-			string class_name = classes.item(i);
-			IntrospectionInfo info = rtl::callStaticMethod(class_name, "getMethodInfoByName", [method_name]);
-			if (info != null and item.kind == IntrospectionInfo::ITEM_METHOD)
-				return info;
-		}
 		return null;
 	}
 	

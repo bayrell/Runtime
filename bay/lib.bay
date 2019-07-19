@@ -1,0 +1,96 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.Collection;
+use Runtime.Context;
+use Runtime.CoreStruct;
+use Runtime.Dict;
+use Runtime.Map;
+use Runtime.rs;
+use Runtime.rtl;
+use Runtime.UIStruct;
+use Runtime.Vector;
+use Runtime.Interfaces.ContextInterface;
+use Runtime.Interfaces.FactoryInterface;
+use Runtime.Interfaces.SerializeInterface;
+
+
+/* Lambda Functions */
+export class lib
+{
+	
+	lambda fun isInstance(string class_name) =>
+		bool (mixed item) => rtl::is_instance(item, class_name)
+	;
+	
+	
+	/**
+	 * Equal two struct by key
+	 */
+	lambda fun equal(mixed value)
+		=> bool (mixed item) use (value)
+			=> item == value
+	;
+	
+	
+	
+	/**
+	 * Equal two struct by key
+	 */
+	lambda fun equalNot(mixed value)
+		=> bool (mixed item) use (value)
+			=> item != value
+	;
+	
+	
+	
+	/**
+	 * Returns attr of item
+	 */
+	lambda fun attr(string key, mixed def_value)
+		=> bool (CoreStruct item1) use (key, def_value)
+			=> item1.takeValue(key, def_value)
+	;
+	
+	
+	
+	/**
+	 * Equal two struct by key
+	 */
+	lambda fun equalAttr(string key)
+		=> bool (CoreStruct item1, mixed value) use (key)
+			=> item1.takeValue(key) == value
+	;
+	
+	
+	
+	/**
+	 * Returns max id from items
+	 */
+	lambda int getMaxIdFromItems(Collectior<CoreStruct> items, int start = 0) =>
+		items.reduce
+		(
+			int (int value, CoreStruct item) => item.id > value ? item.id : value,
+			start
+		)
+	;
+	
+	
+}

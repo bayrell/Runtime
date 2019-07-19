@@ -16,16 +16,26 @@
  *  limitations under the License.
  */
 
-namespace Runtime;
+namespace Runtime.Annotations;
 
-use Runtime.CoreObject;
 use Runtime.CoreStruct;
+use Runtime.Dict;
+use Runtime.Map;
+use Runtime.rs;
 use Runtime.rtl;
+use Runtime.Collection;
+use Runtime.Vector;
 
 
-struct CoreEvent extends CoreStruct
+struct LambdaChain extends CoreStruct
 {
+	const int POS_LOW = -100;
+	const int POS_NORMAL = 0;
+	const int POS_HIGHT = 100;
 	
-	public CoreObject sender = null;
-	
+	string name = "";
+	string value = "";
+	string chain = "";
+	double pos = 0;
+	bool is_await = false;
 }

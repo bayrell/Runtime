@@ -22,12 +22,13 @@ use Runtime.rs;
 use Runtime.rtl;
 use Runtime.CoreObject;
 use Runtime.CoreProvider;
-use Runtime.LambdaChain;
-use Runtime.Provider;
 use Runtime.Dict;
 use Runtime.Map;
 use Runtime.Vector;
 use Runtime.RuntimeConstant;
+use Runtime.Annotations.Manager;
+use Runtime.Annotations.LambdaChain;
+use Runtime.Annotations.Provider;
 use Runtime.Exceptions.RuntimeException;
 use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.FactoryInterface;
@@ -38,10 +39,12 @@ class Context extends CoreObject implements ContextInterface
 {
 	protected string base_path = null;
 	protected Dict<mixed> config = null;
-	protected Vector<Provider> _modules = null;
+	protected Vector<string> _modules = null;
+	protected Vector<string> _modules_cache = null;
 	protected Vector<CoreStruct> _entities = null;
-	protected Map<mixed> _drivers = null;
-	protected Map<string> _providers = null;
+	protected Map<Manager> _managers = null;
+	protected Map<Provider> _providers = null;
+	protected Map<mixed> _managers_obj = null;
 	protected Map<mixed> _providers_obj = null;
 	
 	
@@ -53,7 +56,10 @@ class Context extends CoreObject implements ContextInterface
 		parent();
 		this._entities = new Vector<CoreStruct>();
 		this._modules = new Vector<string>();
-		this._providers = new Map<string>();
+		this._modules_cache = new Vector<string>();
+		this._managers = new Map<Manager>();
+		this._providers = new Map<Provider>();
+		this._managers_obj = new Map<mixed>();
 		this._providers_obj = new Map<mixed>();
 	}
 	
@@ -64,11 +70,24 @@ class Context extends CoreObject implements ContextInterface
 	 */
 	public void destructor()
 	{
+		delete this._managers;
 		delete this._providers;
 		delete this._providers_obj;
 		delete this._entities;
 		delete this._modules;
+		delete this._modules_cache;
 		parent();
+	}
+	
+	
+	
+	/**
+	 * Returns base path
+	 * @return string
+	 */
+	string getBasePath()
+	{
+		return this.base_path;
 	}
 	
 	
@@ -85,11 +104,39 @@ class Context extends CoreObject implements ContextInterface
 	
 	
 	/**
-	 * Returns providers names
+	 * Create manager
+	 *
+	 * @params string manager_name
+	 * @return CoreManager
 	 */
-	Collection<string> getProviders()
+	public CoreManager getManager(string manager_name)
 	{
-		return this._providers.keys().toCollection();
+		if (this._managers_obj.has(manager_name))
+		{
+			return this._managers_obj.item(manager_name);
+		}
+		
+		CoreManager manager = null;
+		if (this._managers.has(manager_name))
+		{
+			Manager info = this._managers.item(manager_name);
+			string class_name = info.value;
+			if (class_name == "") class_name = info.name;
+			
+			manager = rtl::newInstance(class_name);
+			manager = this.chain(class_name, [this, manager]);
+			
+			if (manager_name != class_name) manager = this.chain(manager_name, [this, manager]);
+		}
+		else
+		{
+			manager = rtl::newInstance(manager_name, [ this ]);
+			manager = this.chain(manager_name, [this, manager]);
+		}
+		
+		manager.flushModel();
+		this._managers_obj.set(manager_name, manager);
+		return manager;
 	}
 	
 	
@@ -100,7 +147,7 @@ class Context extends CoreObject implements ContextInterface
 	 * @params string provider_name
 	 * @return CoreProvider
 	 */
-	public CoreProvider createProvider(string class_name, Dict params = null)
+	protected CoreProvider createProvider(string class_name, Dict params = null)
 	{
 		if (params == null)
 		{
@@ -117,6 +164,7 @@ class Context extends CoreObject implements ContextInterface
 		
 		CoreProvider provider = rtl::newInstance(class_name, [ params ]);
 		provider = this.chain(class_name, [this, provider]);
+		
 		return provider;
 	}
 	
@@ -142,7 +190,6 @@ class Context extends CoreObject implements ContextInterface
 		else
 		{
 			provider = this.createProvider(provider_name, params);
-			provider = this.chain(provider_name, [this, provider]);
 		}
 		return provider;
 	}
@@ -152,10 +199,10 @@ class Context extends CoreObject implements ContextInterface
 	/**
 	 * Register module
 	 */
-	ContextInterface registerModule(string module_name)
+	ContextInterface registerModule(string module_name, bool recursive = true)
 	{
-		if (this._modules.indexOf(module_name) != -1)
-			return;
+		if (this._modules.indexOf(module_name) != -1) return;
+		if (this._modules_cache.indexOf(module_name) != -1) return;
 		
 		string module_description_class_name = module_name ~ ".ModuleDescription";
 		if (not rtl::class_exists(module_description_class_name))
@@ -164,25 +211,31 @@ class Context extends CoreObject implements ContextInterface
 		}
 		
 		/* Add module */
-		this._modules.push(module_name);
+		this._modules_cache.push(module_name);
 		
 		/* Register required Modules*/
-		fun f = rtl::method(module_description_class_name, "requiredModules");
-		Dict<string> modules = f();
-		
-		if (modules != null)
+		if (recursive)
 		{
-			Vector<string> keys = modules.keys();
-			int sz = keys.count();
-			for (int i=0; i<sz; i++)
+			fun f = rtl::method(module_description_class_name, "requiredModules");
+			Dict<string> modules = f();
+			
+			if (modules != null)
 			{
-				string module_name = keys.item(i);
-				module_name = rs::replace("/", ".", module_name);
-				this.registerModule(module_name);
+				Vector<string> keys = modules.keys();
+				int sz = keys.count();
+				for (int i=0; i<sz; i++)
+				{
+					string m_name = keys.item(i);
+					m_name = rs::replace("/", ".", m_name);
+					this.registerModule(m_name);
+				}
+				delete keys;
+				delete modules;
 			}
-			delete keys;
-			delete modules;
 		}
+		
+		/* Add module */
+		this._modules.push(module_name);
 		
 		/* Call entities */
 		fun f = rtl::method(module_description_class_name, "entities");
@@ -196,6 +249,18 @@ class Context extends CoreObject implements ContextInterface
 		fun f = rtl::method(module_description_class_name, "onRegister");
 		Collection<CoreStruct> entities = f([ this ]);
 		
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Register global Context
+	 */
+	ContextInterface registerModules(Collection<string> modules = null, bool recursive = true)
+	{
+		if (modules == null) return this;
+		modules.each( void (string module) use (recursive) => this.registerModule(module, recursive) );
 		return this;
 	}
 	
@@ -313,36 +378,23 @@ class Context extends CoreObject implements ContextInterface
 		}
 		
 		return this;
-		
-		Vector<var> args = new Vector();
-		args.push(this);	
-		args.push(config);	
-		
-		int sz = this._modules.count();
-		for (int i=0; i<sz; i++)
-		{
-			string module_name = this._modules.item(i);
-			string module_description_class_name = module_name ~ ".ModuleDescription";
-			rtl::callStaticMethod(
-				module_description_class_name, 
-				"onReadConfig",
-				args
-			);
-		}
-				
-		delete args;
-		
-		return this;
 	}
 	
 	
 	
+	/**
+	 * Returns config
+	 */
 	Dict<mixed> getConfig()
 	{
 		return this.config;
 	}
 	
 	
+	
+	/**
+	 * Returns config item
+	 */
 	Dict<mixed> getConfigItem
 	(
 		Collection<scalar> path, mixed default_value, string type_value = "mixed", string type_template = ""
@@ -352,10 +404,11 @@ class Context extends CoreObject implements ContextInterface
 	}
 	
 	
+	
 	/**
 	 * Init context
 	 */
-	ContextInterface init()
+	void init()
 	{
 		/* Register providers */
 		Collection<CoreStruct> providers = this._entities.filter
@@ -368,6 +421,17 @@ class Context extends CoreObject implements ContextInterface
 			this._providers.set(item.name, item);
 		}
 		
+		/* Register managers */
+		Collection<CoreStruct> managers = this._entities.filter
+		(
+			bool (CoreStruct item) => item instanceof Manager
+		);
+		for (int i=0; i<managers.count(); i++)
+		{
+			Manager item = managers.item(i);
+			this._managers.set(item.name, item);
+		}
+		
 		/* Call onInitContext */
 		Collection<mixed> args = [ this ];
 		int sz = this._modules.count();
@@ -375,7 +439,8 @@ class Context extends CoreObject implements ContextInterface
 		{
 			string module_name = this._modules.item(i);
 			string module_description_class_name = module_name ~ ".ModuleDescription";
-			rtl::callStaticMethod(
+			rtl::callStaticMethod
+			(
 				module_description_class_name, 
 				"onInitContext",
 				args
@@ -390,23 +455,17 @@ class Context extends CoreObject implements ContextInterface
 	
 	
 	/**
-	 * Set application locale
-	 * @params string locale
+	 * Start context
 	 */
-	void setLocale(string locale)
+	async void start()
 	{
-		this._values.set("default.locale", locale);
-	}
-	
-	
-	
-	/**
-	 * Get application locale
-	 * @params string locale
-	 */
-	string getLocale()
-	{
-		return this._values.get("default.locale", "en", "string");
+		Collection<string> managers = this._managers.keys();
+		for (int i=0; i<managers.count(); i++)
+		{
+			string manager_name = managers.item(i);
+			CoreManager manager = this.getManager(manager_name);
+			await manager.startManager();
+		}
 	}
 	
 	
@@ -418,72 +477,9 @@ class Context extends CoreObject implements ContextInterface
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
-	string translate(string message, Map params = null, string locale = ""){
+	string translate(string message, Map params = null, string locale = "")
+	{
 		return message;
-	}
-	
-	
-	
-	/**
-	 * Fork current context
-	 * @return ContextInterface
-	 */
-	ContextInterface fork()
-	{
-		string class_name = this.getClassName();
-		ContextInterface obj = rtl::newInstance(class_name);
-		
-		/* Add modules */
-		this._modules.each( 
-			void (string item) use (obj)
-			{
-				obj._modules.push(item);
-			}
-		);
-		
-		/* Add services */
-		this._drivers.each( 
-			void (string key, mixed value) use (obj)
-			{
-				obj._drivers.set(key, value);
-			}
-		);
-		
-		/* Add provider names */
-		this._providers_names.each( 
-			void (string key, FactoryInterface value) use (obj)
-			{
-				obj._providers_names.set(key, value);
-			}
-		);
-		
-		/* Add values */
-		this._values.each( 
-			void (string key, mixed value) use (obj)
-			{
-				obj._values.set(key, value);
-			}
-		);
-		
-		return obj;
-	}
-	
-	
-	
-	/**
-	 * Realease context resources
-	 */
-	void release(){}
-	
-	
-	
-	/**
-	 * Returns base path
-	 * @return string
-	 */
-	string getBasePath()
-	{
-		return this.base_path;
 	}
 	
 	
@@ -497,7 +493,7 @@ class Context extends CoreObject implements ContextInterface
 	 */ 
 	async ApiResult busCall(
 		string class_name, string interface_name, string method_name, 
-		Map<mixed> data
+		Collection<primitive> data
 	)
 	{
 		BusInterface provider = this.getProvider("Runtime.Interfaces.BusInterface");
@@ -518,7 +514,7 @@ class Context extends CoreObject implements ContextInterface
 	(
 		string remote_gate,
 		string class_name, string interface_name, string method_name, 
-		Map<mixed> data
+		Collection<primitive> data
 	)
 	{
 		RemoteBusInterface provider = this.getProvider("Runtime.Interfaces.RemoteBusInterface");

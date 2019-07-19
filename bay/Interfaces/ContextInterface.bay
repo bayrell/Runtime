@@ -23,62 +23,103 @@ interface ContextInterface
 {
 	
 	
+	/**
+	 * Returns base path
+	 * @return string
+	 */
+	string getBasePath();
+	
+	
 	
 	/**
-	 * Register module
+	 * Returns registed modules
+	 * @return Vector<string>
 	 */
-	ContextInterface registerModule(string module_name);
+	Collection<string> getModules();
+	
+	
+	
+	/**
+	 * Get manager
+	 *
+	 * @params string manager_name
+	 * @return CoreManager
+	 */
+	public CoreManager getManager(string manager_name);
+	
 	
 	
 	
 	/**
 	 * Returns provider
+	 *
 	 * @params string provider_name
-	 * @return CoreStruct
+	 * @return CoreProvider
 	 */
-	public CoreStruct getProvider(string provider_name);
+	public CoreProvider getProvider(string provider_name, Dict params = null);
 	
 	
 	
 	/**
-	 * Set application locale
-	 * @params string locale
+	 * Apply Lambda Chain
 	 */
-	void setLocale(string locale);
+	CoreStruct chain(string chain_name, Dict args);
 	
 	
 	
 	/**
-	 * Get application locale
-	 * @params string locale
+	 * Apply Lambda Chain Await
 	 */
-	string getLocale();
+	async CoreStruct chainAwait(string chain_name, Dict args);
 	
+	
+	
+	/**
+	 * Returns config item
+	 */
+	Dict<mixed> getConfigItem(Collection<scalar> path, mixed default_value, 
+		string type_value = "mixed", string type_template = "");
 	
 	
 	/**
 	 * Translate message
 	 * @params string message - message need to be translated
-	 * @params MapInterface params - Messages params. Default null.
+	 * @params Map params - Messages params. Default null.
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
-	/*string translate(string message, Map params = null, string locale = "");*/
+	string translate(string message, Map params = null, string locale = "");
 	
 	
 	
 	/**
-	 * For current context
-	 * @return ContextInterface
-	 */
-	ContextInterface fork();
+	 * Local bus call
+	 * @param string class_name
+	 * @param string method_name
+	 * @param ApiRequest request
+	 * @return mixed The result of the api
+	 */ 
+	async ApiResult busCall(
+		string class_name, string interface_name, string method_name, 
+		Collection<primitive> data
+	);
 	
 	
 	
 	/**
-	 * Realease context resources
-	 */
-	void release();
+	 * Remote bus call
+	 * @param string remote_name
+	 * @param string method_name
+	 * @param ApiRequest request
+	 * @return mixed The result of the api
+	 */ 
+	async ApiResult remoteBusCall
+	(
+		string remote_gate,
+		string class_name, string interface_name, string method_name, 
+		Collection<primitive> data
+	);
+	
 	
 	
 }

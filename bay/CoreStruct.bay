@@ -36,7 +36,7 @@ class CoreStruct extends CoreObject implements SerializeInterface
 		parent();
 		if (obj != null)
 		{
-			this.assignMap(obj);
+			this.assignDict(obj);
 			this.initData(null, obj);
 		}
 		#switch
@@ -67,7 +67,7 @@ class CoreStruct extends CoreObject implements SerializeInterface
 		
 		CoreStruct res = rtl::newInstance( this.getClassName(), [] );
 		res.assignObject(this);
-		res.setMap(obj);
+		res.setDict(obj);
 		res.initData(this, obj);
 		
 		/* Return object */
