@@ -29,25 +29,24 @@ use Runtime.Vector;
 
 struct UIStruct extends CoreStruct
 {
-	const string TYPE_ELEMENT = "element";
-	const string TYPE_COMPONENT = "component";
-	const string TYPE_STRING = "string";
-	const string TYPE_RAW = "raw";
+	static const string TYPE_ELEMENT = "element";
+	static const string TYPE_COMPONENT = "component";
+	static const string TYPE_STRING = "string";
+	static const string TYPE_RAW = "raw";
 	
-	
-	public string class_name = "";
-	public string key = "";
-	public string name = "";
-	public string space = "";
-	public string bind = "";
-	public string kind = "element";
-	public string content = "";
-	public string reference = "";
-	public CoreStruct model = null;
-	public Dict<primitive> props = null;
-	public Collection<CoreStruct> annotations = null;
-	public Collection<primitive> mem = null;
-	public Collection<UIStruct> children = null;
+	string class_name = "";
+	string key = "";
+	string name = "";
+	string bind = "";
+	string kind = "element";
+	string content = "";
+	string reference = "";
+	primitive value = null;
+	CoreStruct layout = null;
+	CoreStruct model = null;
+	Dict<primitive> props = null;
+	Collection<CoreStruct> annotations = null;
+	Collection<UIStruct> children = null;
 	
 	
 	
@@ -104,14 +103,15 @@ struct UIStruct extends CoreStruct
 	{
 		return this.model;
 		
-		if (ui.model != null) 
-			return ui.model;
+		if (this.model != null) 
+			return this.model;
 			
-		if (ui.kind == self::TYPE_COMPONENT)
+		if (this.kind == self::TYPE_COMPONENT)
 		{
-			string model_name = (method (ui.name, "modelName"))();
+			fn modelName = rtl::@method (this.name, "modelName");
+			string model_name = modelName();
 			if (model_name == "") return null;
-			CoreStruct model = rtl::newInstance(model_name, [ui.props]);
+			CoreStruct model = rtl::newInstance(model_name, [this.props]);
 			return model;
 		}
 		

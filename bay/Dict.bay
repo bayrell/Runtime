@@ -19,653 +19,150 @@
 namespace Runtime;
 
 use Runtime.rtl;
+use Runtime.Collection;
 use Runtime.Exceptions.KeyNotFound;
 
 #switch
+#case ifcode NODEJS then
+var use = require('bayrell').use; use.platform = "nodejs";
+#case ifcode ES6 then
+var use = function(s){return Runtime.rtl.find_class(s);}
 #case ifcode JAVASCRIPT then
 var isBrowser=function(){return typeof window !== "undefined" && this === window;}
 #endswitch
 
 
-declare class Dict<T>
-{
 
-	
-	/**
-	 * Return true if key exists
-	 * @param string key
-	 * @return bool var
-	 */
-	declare public bool contains(string key);
-	
-	
-	
-	/**
-	 * Return true if key exists
-	 * @param string key
-	 * @return bool var
-	 */
-	declare public bool has(string key);
-	
-	
-	
-	/**
-	 * Returns value from position
-	 * @param string key
-	 * @param T default_value
-	 * @return T
-	 */
-	declare public T get(string key, T default_value, string type_value = "mixed", string type_template = "");
-	
-	
-	
-	/**
-	 * Returns value from position. Throw exception, if position does not exists
-	 * @param string key - position
-	 * @return T
-	 */
-	declare public T item(string key, string type_value, string type_template = "");
-	
-	
-	
-	/**
-	 * Set value size_to position
-	 * @param string key - position
-	 * @param T value 
-	 * @return self
-	 */
-	declare public Dict<T> setIm(string key, T value);
-	
-	
-	
-	/**
-	 * Remove value from position
-	 * @param string key
-	 * @return self
-	 */
-	declare public Dict<T> removeIm(string key);
-
-	
-	
-	/**
-	 * Returns count items in vector
-	 */
-	declare public int count();
-	
-	
-	
-	/**
-	 * Returns vector of the keys
-	 * @return Collection<string>
-	 */
-	declare public Collection<string> keys();
-	
-	
-	
-	/**
-	 * Returns vector of the values
-	 * @return Collection<T>
-	 */
-	declare public Collection<T> values();
-	
-	
-	
-	/**
-	 * Call function for each item
-	 * @param func f
-	 */
-	declare void each(func f);
-	
-	
-	
-	/**
-	 * Call function map
-	 * @param func f
-	 * @return Dict
-	 */
-	declare Dict map(func f);
-	
-	
-	
-	/**
-	 * Filter items
-	 * @param func f
-	 * @return Collection
-	 */
-	declare Dict<T> filter(func f);
-	
-	
-	
-	/**
-	 * Reduce
-	 * @param func f
-	 * @param mixed init_value
-	 * @return init_value
-	 */
-	declare mixed reduce(func f, mixed init_value);
-	
-	
-	
-	/**
-	 * Add values from other map
-	 * @param Dict<T> map
-	 * @return self
-	 */
-	declare public Dict<T> concat(Dict<T> map);
-	
-	
-	
-	/**
-	 * Convert to dict
-	 */
-	declare Dict<T> toDict();
-	
-	
-	
-	/**
-	 * Convert to dict
-	 */
-	declare Dict<T> toMap();
-}
-
-
+declare class _Map{}
 
 #switch
 #case ifcode JAVASCRIPT then
-if (typeof Runtime == "undefined") Runtime = {};
 
-Runtime.Dict = class extends Map
+if (typeof Runtime == 'undefined') Runtime = {};
+
+Runtime._Map = function(__ctx, map)
 {
-	
-	/**
-	 * Returns new Instance
-	 * @return Object
-	 */
-	static createNewInstance(obj)
+	this._map = {};
+	if (map != undefined && typeof map == 'object')
 	{
-		if (obj == undefined) obj = null;
-		return new Runtime.Dict(obj);
-	}
-	
-	
-	
-	/**
-	 * Convert to dict
-	 */
-	toDict()
-	{
-		return new Runtime.Dict(this);
-	}
-	
-	
-	
-	/**
-	 * Convert to dict
-	 */
-	toMap()
-	{
-		var _Map = Runtime.Dict.getMap();
-		return new _Map(this);
-	}
-	
-	
-	
-	/**
-	 * Returns copy of the current Dict
-	 */
-	copy()
-	{
-		return this.constructor.createNewInstance(this);
-	}
-	
-	
-	
-	/**
-	 * Correct items
-	 */
-	_correctItemsByType(type)
-	{
-		if (type == "mixed" || type == "primitive" || type == "var") return this;
-		
-		var obj = this.constructor.createNewInstance();
-		var it = super.keys();
-		var next = it.next();
-		while (!next.done){
-			var key = next.value;
-			var val = super.get(key);
-			if (isBrowser()) val = Runtime.rtl.convert(val, type, null);
-			else val = rtl.convert(val, type, null);
-			obj.set(key, val);
-			next = it.next();
-		}
-		
-		return obj;
-	}
-	
-	
-	
-	/**
-	 * Convert to string
-	 * @param var value
-	 * @return value
-	 */
-	toString(value){
-		if (isBrowser()) return Runtime.rtl.toString(value);
-		return rtl.toString(value);
-	}
-	
-	
-	
-	/**
-	 * Dict constructor
-	 */
-	constructor(map)
-	{
-		super();
-		if (map != undefined && typeof map == 'object')
-		{		
-			if (map instanceof Runtime.Dict)
+		if (map instanceof Runtime.Dict)
+		{
+			for (var i in map._map)
 			{
-				var keys = map.keys();
-				keys.each(
-					(key)=>{
-						super.set(key, map.item(key));
-					}
-				);		
+				this._map[i] = map._map[i];
 			}
-			else
+		}
+		else
+		{
+			for (var i in map)
 			{
-				for (var i in map)
-				{
-					super.set(i, map[i]);
-				}
+				this._map["|" + i] = map[i];
 			}
 		}
-		this.__uq__ = Symbol();
 	}
-	
-	
-	
-	/**
-	 * Return true if key exists
-	 * @param T key
-	 * @return bool var
-	 */
-	contains(key)
+	this.__uq__ = Symbol();
+	return this;
+}
+Runtime._Map.prototype = Object.create(Map.prototype);
+Runtime._Map.prototype.constructor = Runtime._Map;
+Object.assign(Runtime._Map.prototype,
+{
+	toStr: function(value)
+	{ 
+		return use("Runtime.rtl").toStr(value);
+	},
+	toObject: function()
 	{
-		key = this.toString(key);
-		return super.has(key);
-	}
-	
-	
-	
-	/**
-	 * Return true if key exists
-	 * @param T key
-	 * @return bool var
-	 */
-	has(key)
-	{
-		key = this.toString(key);
-		return super.has(key);
-	}
-	
-	
-	
-	/**
-	 * Returns value from position
-	 * @param T key
-	 * @param T default_value
-	 * @return T
-	 */
-	get(key, default_value, type_value = "mixed", type_template = "")
-	{
-		key = this.toString(key);
-		var val = super.get(key);
-		if (val == undefined) return default_value;
-		if (isBrowser()) return Runtime.rtl.convert(val, type_value, default_value, type_template);
-		return rtl.convert(val, type_value, default_value, type_template);
-	}
-	
-	
-	
-	/**
-	 * Returns value from position. Throw exception, if position does not exists
-	 * @param T key - position
-	 * @return T
-	 */
-	item(key)
-	{
-		key = this.toString(key);
-		if (!super.has(key))
-		{
-			if (isBrowser()) throw new Runtime.Exceptions.KeyNotFound(key);
-			throw new KeyNotFound(key);
-		}
-		var val = super.get(key);
-		if (val === null || val == undefined) return null;
-		return val;
-	}
-	
-	
-	
-	/**
-	 * Set value size_to position
-	 * @param T pos - position
-	 * @param T value 
-	 */
-	setIm(key, value)
-	{
-		key = this.toString(key);
-		var res = this.copy();
-		res.set(key, value);
-		return res;
-	}
-	
-	
-	
-	/**
-	 * Remove value from position
-	 * @param T key
-	 */
-	removeIm(key)
-	{
-		key = this.toString(key);
-		if (super.has(key))
-		{
-			var res = this.copy();
-			res.delete(key, value);
-			return res;
-		}
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Returns count items in vector
-	 */
-	count(){
-		return this.size;
-	}
-	
-	
-	
-	/**
-	 * Returns vector of the keys
-	 * @return Vector<T>
-	 */
-	keys()
-	{
-		var it = super.keys();
-		var res = new Runtime.Collection();
-		var next = it.next();
-		while (!next.done)
-		{
-			res.push( next.value );
-			next = it.next();
-		}
-		return res;
-	}
-	
-	
-	
-	/**
-	 * Returns vector of the values
-	 * @return Vector<T>
-	 */
-	values()
-	{
-		var it = super.values();
-		var res = new Runtime.Collection();
-		var next = it.next();
-		while (!next.done)
-		{
-			res.push( next.value );
-			next = it.next();
-		}
-		return res;
-	}
-	
-	
-	
-	/**
-	 * Call function for each item
-	 * @param func f
-	 */
-	each(f)
-	{
-		var keys = this.keys();
-		keys.each(
-			(key)=>{
-				var value = this.item(key);
-				f(key, value);
-			}
-		);
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Call function map
-	 * @param func f
-	 * @return Dict
-	 */
-	map(f)
-	{
-		var obj={};
-		this.each(
-			(key, value)=>{
-				obj[key] = f(key, value);
-			}
-		);
-		return this.constructor.createNewInstance(obj);
-	}
-	
-	
-	
-	/**
-	 * Filter items
-	 * @param func f
-	 * @return Dict
-	 */
-	filter(f)
-	{
-		var obj={};
-		this.each(
-			(key, value)=>{
-				if (f(key, value))
-				{
-					obj[key] = value;
-				}
-			}
-		);
-		return this.constructor.createNewInstance(obj);
-	}
-	
-	
-	
-	/**
-	 * Reduce
-	 * @param func f
-	 * @param mixed init_value
-	 * @return init_value
-	 */
-	reduce(f, init_value)
-	{
-		var res = init_value;
-		this.each(
-			(key, value) => {
-				res = f(res, key, value);
-			}
-		);
-		return res;
-	}
-	
-	
-	
-	/**
-	 * Add values from other map
-	 * @param Dict<T, T> map
-	 * @return self
-	 */
-	concat(map)
-	{
-		if (map != null)
-		{
-			var res = this.copy();
-			map.each(
-				(key)=>{
-					res.set(key, map.item(key));
-				}
-			);
-			return res;
-		}
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Convert Dict to Object
-	 */
-	toObject(){
 		var obj = {};
-		this.each((key)=>{obj[key]=this.get(key, null);});
+		for (var key in this._map)
+		{
+			obj[key.substring(1)] = this._map[key];
+		}
 		return obj;
-	}
-	
-	
-	getClassName(){return "Runtime.Dict";}
-	static getCurrentClassName(){return "Runtime.Dict";}
-	static getParentClassName(){return "Map";}
-	
-}
-
-
-#case ifcode NODEJS then
-Runtime.Dict.getMap = function(){ return require('./Map.js'); }
-
-#case ifcode ES6 then
-Runtime.Dict.getMap = function(){ return Runtime.Map; }
-
-
-#case ifcode NODEJS then
-
-if (false){
-
-module.exports = {
-	"Dict": Runtime.Dict
-}
-
-}
-else{
-
-module.exports = Runtime.Dict;
-
-}
-
-
-#case ifcode PHP then
-
-class Dict implements \JsonSerializable
+	},
+	getClassName: function(){ return "Runtime._Map"; },
+});
+Object.assign(Runtime._Map,
 {
-	
-	
-	protected $_map = null;
-	
-	
-	/**
-	 * Returns map
-	 */
-	public function _getArr()
+	from: function(map)
 	{
-		return $this->_map;
-	}
-	
+		var res = this.Instance(null);
+		for (var i in map)
+		{
+			res._map["|" + i] = map[i];
+		}
+		return res;
+	},
+	getCurrentNamespace: function(){ return "Runtime"; },
+	getCurrentClassName: function(){ return "Runtime._Map"; },
+	getParentClassName: function(){ return ""; },
+});
+#case ifcode NODEJS then
+use.add(Runtime._Map);
+#case ifcode PHP then
+class _Map implements \ArrayAccess, \JsonSerializable
+{
+	public $_map = [];
 	
 	
 	/**
-	 * Returns new Instance
+	 * From
 	 */
-	public static function create($obj=null)
-	{
-		$class_name = static::class;
-		return new $class_name($obj);
-	}
-	
-	
-	
-	/**
-	 * Returns new Instance
-	 */
-	public static function createNewInstance($obj=null)
+	static function from($map)
 	{
 		$class_name = static::class;
-		return new $class_name($obj);
-	}
-	
-	
-	
-	/**
-	 * Returns copy of the current Dict
-	 */
-	function copy()
-	{
-		return static::createNewInstance($this->_map);
-	}
-	
-	
-	
-	/**
-	 * Convert to dict
-	 */
-	public function toDict()
-	{
-		return new \Runtime\Dict($this);
-	}
-	
-	
-	
-	/**
-	 * Convert to map
-	 */
-	public function toMap()
-	{
-		return new \Runtime\Map($this);
-	}
-	
-	
-	
-	/**
-	 * Correct items
-	 */
-	public function _correctItemsByType($type)
-	{
-		if ($type == "mixed" or $type == "primitive" or $type == "var") return $this;
-		
-		return $this->map(
-			function($key, $value) use ($type)
+		$res = new $class_name(null);
+		if ($map != null)
+		{
+			foreach ($map as $key => $value)
 			{
-				return rtl::convert($value, $type, null);
+				$key = $res->toStr($key);
+				$res->_map[$key] = $value;
 			}
-		);
+		}
+		else if (is_object($map))
+		{
+			$values = get_object_vars($map);
+			foreach ($values as $key => $value)
+			{
+				$key = $res->toStr($key);
+				$res->_map[$key] = $value;
+			}
+		}
+		return $res;	
 	}
 	
+	
+	/**
+	 * JsonSerializable
+	 */
+	public function toStr($value)
+	{
+		return rtl::toStr($value);
+	}
+	
+	
+	/**
+	 * JsonSerializable
+	 */
+	public function jsonSerialize()
+	{
+		return (object) $this->_map;
+	}
 	
 	
 	/**
 	 * Constructor
 	 */
-	public function __construct($map = null)
+	public function __construct($__ctx, $map=null)
 	{
 		$this->_map = [];
-		if ($map instanceof Dict)
+		if ($map == null) {}
+		else if ($map instanceof Dict)
 		{
 			foreach ($map->_map as $key => $value)
 			{
-				$key = rtl::toString($key);
+				$key = $this->toStr($key);
 				$this->_map[$key] = $value;
 			}		
 		}
@@ -673,21 +170,20 @@ class Dict implements \JsonSerializable
 		{
 			foreach ($map as $key => $value)
 			{
-				$key = rtl::toString($key);
+				$key = $this->toStr($key);
 				$this->_map[$key] = $value;
-			}		
+			}
 		}
 		else if (is_object($map))
 		{
 			$values = get_object_vars($map);
 			foreach ($values as $key => $value)
 			{
-				$key = rtl::toString($key);
+				$key = $this->toStr($key);
 				$this->_map[$key] = $value;
 			}
 		}
 	}
-	
 	
 	
 	/**
@@ -699,259 +195,465 @@ class Dict implements \JsonSerializable
 	}
 	
 	
+	/**
+	 * Get array
+	 */
+	public function _getArr()
+	{
+		return $this->_map;
+	}
+	
 	
 	/**
-	 * Return true if key exists
-	 * @param T key
-	 * @return bool var
+	 * Get and set methods
 	 */
-	public function contains($key)
+	function __isset($k){return $this->has($k);}
+	function __get($k){return $this->item($k);}
+	function __set($k,$v){throw new \Runtime\Exceptions\AssignStructValueError($k);}
+	function __unset($k){throw new \Runtime\Exceptions\AssignStructValueError($k);}
+	public function offsetExists($k){return $this->has($k);}
+	public function offsetGet($k){return $this->item($k);}
+	public function offsetSet($k,$v){throw new \Runtime\Exceptions\AssignStructValueError($k);}
+	public function offsetUnset($k){throw new \Runtime\Exceptions\AssignStructValueError($k);}
+	
+	/* Class name */
+	public function getClassName(){return "Runtime._Map";}
+	public static function getCurrentClassName(){return "Runtime._Map";}
+	public static function getParentClassName(){return "";}
+}
+
+#endswitch
+
+
+
+class Dict<T> extends _Map
+{
+	
+	/**
+	 * Returns new Instance
+	 * @return Object
+	 */
+	static Dict<T> Instance()
 	{
-		$key = rtl::toString($key);
-		return isset($this->_map[$key]);
+		return new Dict();
+	}
+	
+	
+	
+	/**
+	 * Returns new Instance
+	 * @return Object
+	 */
+	static Dict<T> create(var obj)
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		return new (Function.prototype.bind.apply(this, [null, __ctx, obj]));
+		#case ifcode PHP then
+		$class_name = static::class;
+		return new $class_name($obj);
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Returns copy of Dict
+	 * @param int pos - position
+	 */
+	public Dict<T> copy()
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		var new_obj = this.constructor.Instance(__ctx);
+		new_obj._map = Object.assign({}, this._map);
+		return new_obj;
+		#case ifcode PHP then
+		$new_obj = static::Instance($__ctx);
+		$new_obj->_map = $this->_map;
+		return $new_obj;
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Convert to dict
+	 */
+	Dict<T> toDict()
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		var Dict = use ("Runtime.Dict");
+		return new Dict(__ctx, this);
+		#case ifcode PHP then
+		return new \Runtime\Dict($__ctx, $this);
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Convert to dict
+	 */
+	Dict<T> toMap()
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		var Map = use ("Runtime.Map");
+		return new Map(__ctx, this);
+		#case ifcode PHP then
+		return new \Runtime\Map($__ctx, $this);
+		#endswitch
 	}
 	
 	
 	
 	/**
 	 * Return true if key exists
-	 * @param T key
+	 * @param string key
 	 * @return bool var
 	 */
-	public function has($key)
+	public bool contains(string key)
 	{
-		$key = rtl::toString($key);
+		#switch
+		#case ifcode JAVASCRIPT then
+		key = this.toStr(key);
+		return typeof this._map["|" + key] != "undefined";
+		#case ifcode PHP then
+		$key = $this->toStr($key);
 		return isset($this->_map[$key]);
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Return true if key exists
+	 * @param string key
+	 * @return bool var
+	 */
+	public bool has(string key)
+	{
+		return this.contains(key);
 	}
 	
 	
 	
 	/**
 	 * Returns value from position
-	 * @param T key
+	 * @param string key
 	 * @param T default_value
 	 * @return T
 	 */
-	public function get($key, $default_value, $type_value = "mixed", $type_template = "")
+	public T get(string key, T default_value)
 	{
-		$key = rtl::toString($key);
+		#switch
+		#case ifcode JAVASCRIPT then
+		key = this.toStr(key);
+		var val = this._map["|" + key];
+		if (typeof val == "undefined") return default_value;
+		return val;
+		#case ifcode PHP then
+		$key = $this->toStr($key);
 		$val = isset($this->_map[$key]) ? $this->_map[$key] : $default_value;
-		$val = rtl::convert($val, $type_value, $default_value, $type_template);
 		return $val;
+		#endswitch
 	}
 	
 	
 	
 	/**
 	 * Returns value from position. Throw exception, if position does not exists
-	 * @param T key - position
+	 * @param string key - position
 	 * @return T
 	 */
-	public function item($key, $type_value = "mixed", $type_template = "")
+	public T item(string key)
 	{
-		$key = rtl::toString($key);
-		if (!array_key_exists($key, $this->_map)){
+		#switch
+		#case ifcode JAVASCRIPT then
+		key = this.toStr(key);
+		if (typeof this._map["|" + key] == "undefined")
+		{
+			var _KeyNotFound = use("Runtime.Exceptions.KeyNotFound");
+			throw new _KeyNotFound(key);
+		}
+		var val = this._map["|" + key];
+		if (val === null || typeof val == "undefined") return null;
+		return val;
+		#case ifcode PHP then
+		$key = $this->toStr($key);
+		if (!array_key_exists($key, $this->_map))
+		{
 			throw new KeyNotFound($key);
 		}
 		return $this->_map[$key];
+		#endswitch
 	}
 	
 	
 	
 	/**
 	 * Set value size_to position
-	 * @param T pos - position
+	 * @param string key - position
 	 * @param T value 
 	 * @return self
 	 */
-	public function setIm($key, $value)
+	public Dict<T> setIm(string key, T value)
 	{
-		$res = $this->copy();
-		$key = rtl::toString($key);
+		#switch
+		#case ifcode JAVASCRIPT then
+		var res = this.copy(__ctx);
+		key = this.toStr(key);
+		res._map["|" + key] = value;
+		return res;
+		#case ifcode PHP then
+		$res = $this->copy($__ctx);
+		$key = $this->toStr($key);
 		$res->_map[$key] = $value;
 		return $res;
+		#endswitch
 	}
 	
 	
 	
 	/**
 	 * Remove value from position
-	 * @param T key
+	 * @param string key
 	 * @return self
 	 */
-	public function removeIm($key)
+	public Dict<T> removeIm(string key)
 	{
-		$key = rtl::toString($key);
+		#switch
+		#case ifcode JAVASCRIPT then
+		key = this.toStr(key);
+		if (typeof this._map["|" + key] != "undefined")
+		{
+			var res = this.copy();
+			delete res._map["|" + key];
+			return res;
+		}
+		return this;
+		#case ifcode PHP then
+		$key = $this->toStr($key);
 		if (isset($this->_map[$key]))
 		{
-			$res = $this->copy();
+			$res = $this->copy($__ctx);
 			unset($res->_map[$key]);
 			return $res;
 		}
 		return $this;
-	}
-	
-	
-	
-	/**
-	 * Returns count items in vector
-	 */
-	public function count()
-	{
-		return count($this->_map);
+		#endswitch
 	}
 	
 	
 	
 	/**
 	 * Returns vector of the keys
-	 * @return Vector<T>
+	 * @return Collection<string>
 	 */
-	public function keys()
+	public Collection<string> keys()
 	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		var res = new Runtime.Collection(__ctx);
+		for (var key in this._map) res.push(key.substring(1));
+		return res;
+		#case ifcode PHP then
 		$keys = array_keys($this->_map);
-		$res = \Runtime\Collection::create($keys);
+		$res = \Runtime\Collection::from($keys);
 		return $res;
+		#endswitch
 	}
 	
 	
 	
 	/**
 	 * Returns vector of the values
-	 * @return Vector<T>
+	 * @return Collection<T>
 	 */
-	public function values()
+	public Collection<T> values()
 	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		var res = new Runtime.Collection(__ctx);
+		for (var key in this._map) res.push( this._map[key] );
+		return res;
+		#case ifcode PHP then
 		$values = array_values($this->_map);
-		$res = \Runtime\Collection::create($values);
+		$res = \Runtime\Collection::from($values);
 		return $res;
-	}
-	
-	
-	
-	/**
-	 * Call function for each item
-	 * @param func f
-	 */
-	function each($f)
-	{
-		foreach ($this->_map as $key => $value)
-		{
-			$f( $key, $value );
-		}
-		return $this;
+		#endswitch
 	}
 	
 	
 	
 	/**
 	 * Call function map
-	 * @param func f
+	 * @param fn f
 	 * @return Dict
 	 */
-	function map($f)
+	Dict map(fn f)
 	{
-		$res = [];
+		#switch
+		#case ifcode JAVASCRIPT then
+		var obj = this.constructor.Instance(__ctx);
+		for (var key in this._map)
+		{
+			var new_key = key.substring(1);
+			var new_val = f(__ctx, this._map[key], new_key);
+			obj.set(key, new_val);
+		}
+		return obj;
+		#case ifcode PHP then
+		$map2 = static::Instance($__ctx);
 		foreach ($this->_map as $key => $value)
 		{
-			$res[$key] = $f( $key, $value );
+			$new_val = $f($__ctx, $value, $key);
+			$map2->_map[$key] = $new_val;
 		}
-		return static::createNewInstance($res);
+		return $map2;
+		#endswitch
 	}
 	
 	
 	
 	/**
 	 * Filter items
-	 * @param func f
-	 * @return Dict
+	 * @param fn f
+	 * @return Collection
 	 */
-	function filter($f)
+	Dict<T> filter(fn f)
 	{
-		$arr2 = static::createNewInstance();
-		$arr2->_map = [];
+		#switch
+		#case ifcode JAVASCRIPT then
+		var obj = this.contstructor.Instance(__ctx);
+		for (var key in this._map)
+		{
+			var new_key = key.substring(1);
+			var value = this._map[key];
+			var flag = f(__ctx, value, new_key);
+			if (flag) obj.set(key, value);
+		}
+		return obj;
+		#case ifcode PHP then
+		$map2 = static::Instance($__ctx);
 		foreach ($this->_map as $key => $value)
 		{
-			if ($f($key, $value))
-			{
-				$arr2->_map[$key] = $value;
-			}
+			$flag = $f($__ctx, $value, $key);
+			if ($flag) $map2->_map[$key] = $value;
 		}
-		return $arr2;
+		return $map2;
+		#endswitch
 	}
 	
 	
 	
 	/**
-	 * Reduce
-	 * @param func f
-	 * @param mixed init_value
-	 * @return init_value
+	 * Call function for each item
+	 * @param fn f
 	 */
-	function reduce($f, $init_value)
+	void each(fn f)
 	{
-		$res = $init_value;
+		#switch
+		#case ifcode JAVASCRIPT then
+		for (var key in this._map)
+		{
+			var new_key = key.substring(1);
+			var value = this._map[key];
+			f(__ctx, value, new_key);
+		}
+		#case ifcode PHP then
 		foreach ($this->_map as $key => $value)
 		{
-			$res = $f($res, $key, $value );
+			$f($__ctx, $value, $key);
 		}
-		return $res;
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Transition Dict to Collection
+	 * @param fn f
+	 * @return Collection
+	 */
+	Collection<T> transition(fn f)
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		var Collection = use("Runtime.Collection");
+		var arr = new Collection(__ctx);
+		for (var key in this._map)
+		{
+			var new_value = f(__ctx, this._map[key], key.substring(1));
+			Array.prototype.push.call(arr, new_value);
+		}
+		return arr;
+		#case ifcode PHP then
+		$arr = new \Runtime\Collection($__ctx);
+		foreach ($this->_map as $key => $value)
+		{
+			$arr->_arr[] = $f($__ctx, $value, $key);
+		}
+		return $arr;
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * 	
+	 * @param fn f
+	 * @param var init_value
+	 * @return init_value
+	 */
+	var reduce(fn f, var init_value)
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		for (var key in this._map)
+		{
+			init_value = f(__ctx, init_value, this._map[key], key.substring(1));
+		}
+		return init_value;
+		#case ifcode PHP then
+		foreach ($this->_map as $key => $value)
+		{
+			$init_value = $f($__ctx, $init_value, $value, $key);
+		}
+		return $init_value;
+		#endswitch
 	}
 	
 	
 	
 	/**
 	 * Add values from other map
-	 * @param Dict<T, T> map
+	 * @param Dict<T> map
 	 * @return self
 	 */
-	function concat($map)
+	public Dict<T> concat(Dict<T> map = null)
 	{
-		if ($map != null)
+		#switch
+		#case ifcode JAVASCRIPT then
+		if (map == null) return this;
+		var res = this.copy(__ctx);
+		for (var key in map._map)
 		{
-			$res = $this->copy();
-			$map->each(
-				function ($key) use ($map, $res)
-				{
-					$res->_map[$key] = $map->item($key);
-				}
-			);
-			return $res;
+			res._map[key] = map._map[key];
 		}
-		return $this;
+		return res;
+		#case ifcode PHP then
+		if ($map == null) return $this;
+		$res = $this->copy($__ctx);
+		foreach ($this->_map as $key => $value)
+		{
+			$res->_map[$key] = $value;
+		}
+		return $res;
+		#endswitch
 	}
 	
 	
-	
-	/**
-	 * Get and set methods
-	 */
-	function __set($name, $value){
-		return $this->set($name, $value);
-	}
-	function __get($name){
-		return $this->get($name, null);
-	}
-	function __isset($name){
-		return $this->has($name);
-	}
-	function __unset($name){
-		return $this->remove($name);
-	}
-	
-	
-	
-	/**
-	 * JsonSerializable
-	 */
-	public function jsonSerialize(){
-		return (object) $this->_map;
-	}
-	
-	
-	public function getClassName(){return "Runtime.Dict";}
-	public static function getCurrentClassName(){return "Runtime.Dict";}
-	public static function getParentClassName(){return "";}
 }
-
-#endswitch

@@ -21,16 +21,12 @@ namespace Runtime;
 use Runtime.Interfaces.StringInterface;
 
 
-#switch
-#case ifcode JAVASCRIPT then
-var isBrowser=function(){return typeof window !== "undefined" && this === window;}
-#endswitch
 
-
-class rtl{
+class rtl
+{
 	
-	
-	static bool isBrowser(){
+	static bool @isBrowser()
+	{
 		#switch
 		#case ifcode JAVASCRIPT then
 		return typeof window !== "undefined";
@@ -39,25 +35,60 @@ class rtl{
 	}
 	
 	
-	#switch
-	#case ifcode PHP then
 	
 	/**
-	 * Find class instance by name. If class does not exists return null.
-	 * @return var - class instance
+	 * Define props
 	 */
-	static function find_class($class_name){
-		return "\\" . re::replace("\\.", "\\", $class_name);
+	static bool @defProp(var obj, var name)
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		Object.defineProperty
+		(
+			obj,
+			name,
+			{
+				get:() => { return obj["__" + name] },
+				set:(value) => {
+					var AssignStructValueError = use("Runtime.Exceptions.AssignStructValueError");
+					throw new AssignStructValueError(null, name); 
+				}
+			}
+		);
+		#endswitch
 	}
 	
-	#case ifcode ES6 then
+	
+	
+	/**
+	 * Define class
+	 */
+	static bool @defClass(var obj)
+	{
+		#switch
+		#case ifcode ES6 then
+		if (Runtime.rtl._classes == undefined) Runtime.rtl._classes = {};
+		Runtime.rtl._classes[obj.getCurrentClassName()] = obj;
+		#endswitch
+	}
+	
+	
+	
 	/**
 	 * Find class instance by name. If class does not exists return null.
 	 * @return var - class instance
 	 */
-	static find_class(class_name){
+	static var @find_class(string class_name)
+	{
+		#switch
+		#case ifcode PHP then
+		return "\\" . preg_replace("/\\./", "\\", $class_name);
+		
+		#case ifcode ES6 then
 		if (class_name instanceof Function)
 			return class_name;
+		
+		return Runtime.rtl._classes[class_name];
 		
 		if (class_name instanceof Runtime.CoreObject) class_name = class_name.getClassName();
 		else if (class_name instanceof Object) class_name = class_name.constructor.name;
@@ -77,43 +108,15 @@ class rtl{
 		
 		Runtime.rtl._classes[class_name] = obj;
 		return obj;
-	}
-	#case ifcode NODEJS then
-	/**
-	 * Find class instance by name. If class does not exists return null.
-	 * @return var - class instance
-	 */
-	static find_class(class_name){
+		
+		#case ifcode NODEJS then
 		if (class_name instanceof Function)
 			return class_name;
 		
-		var class_name_arr = class_name.split('.');
-		if (class_name_arr.length < 2)
-			return null;
+		return use(class_name);
 		
-		var module_name = class_name_arr[0];
-		var last_name = class_name_arr[ class_name_arr.length - 1 ];
-		
-		if (module_name == 'Runtime') 
-			module_name = 'BayrellRuntime';
-		
-		module_name = rtl.convertNodeJSModuleName(module_name);
-		var obj = require(module_name);
-		for (var i=1; i<class_name_arr.length - 1; i++){
-			if (!this.exists(obj[class_name_arr[i]])){
-				obj = null;
-				break;
-			}
-			obj = obj[ class_name_arr[i] ];
-		}
-		
-		if (!this.exists(obj))
-			return null;
-		
-		obj = obj[last_name];
-		return obj;
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -121,24 +124,25 @@ class rtl{
 	 * Returns true if class instanceof class_name
 	 * @return bool
 	 */
-	declare static bool is_instanceof(var obj, string class_name);
-	
-	#switch
-	#case ifcode PHP then
-	static function is_instanceof($obj, $class_name){
+	static bool is_instanceof(var obj, string class_name)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		$class_name = self::find_class($class_name);
 		if ($obj == null) return false;
 		if (gettype($obj) != "object") return false;
 		if (is_subclass_of($obj, $class_name)){ return true;}
 		return is_a($obj, $class_name);
-	}
-	#case ifcode JAVASCRIPT then
-	static is_instanceof(obj, class_name){
+	
+		#case ifcode JAVASCRIPT then
+		
 		var c = this.find_class(class_name);
 		if (c == null) return false;
 		return c.prototype.isPrototypeOf(obj);
+	
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -146,24 +150,21 @@ class rtl{
 	 * Returns true if obj implements interface_name
 	 * @return bool
 	 */
-	declare static bool is_implements(var obj, string interface_name);
+	static bool is_implements(var obj, string interface_name)
+	{
+		#switch
+		#case ifcode PHP then
 	
-	#switch
-	#case ifcode PHP then
-	static function is_implements($obj, $interface_name){
 		$class_name = get_class($obj);
 		return self::class_implements($class_name, $interface_name);
-	}
-	#case ifcode JAVASCRIPT then
-	static implements(obj, interface_name){
+	
+		#case ifcode JAVASCRIPT then
 		if (obj == undefined) return false;
-		if (obj.__implements__ == undefined) return false;
-		return obj.__implements__.indexOf(interface_name) != -1;
+		if (obj.constructor.__implements__ == undefined) return false;
+		return obj.constructor.__implements__.indexOf(interface_name) != -1;
+	
+		#endswitch
 	}
-	static is_implements(obj, interface_name){
-		return this.implements(obj, interface_name);
-	}
-	#endswitch
 	
 	
 	
@@ -171,21 +172,20 @@ class rtl{
 	 * Returns true if class exists
 	 * @return bool
 	 */
-	declare static bool class_exists(string class_name);
-	
-	#switch
-	#case ifcode PHP then
-	static function class_exists($class_name){
+	static bool class_exists(string class_name)
+	{
+		#switch
+		#case ifcode PHP then
 		$class_name = static::find_class($class_name);
 		return class_exists($class_name);
-	}
-	#case ifcode JAVASCRIPT then
-	static class_exists(class_name){
+		
+		#case ifcode JAVASCRIPT then
 		var obj = this.find_class(class_name);
-		if (!this.exists(obj)) return false;
+		if (!this.exists(__ctx, obj)) return false;
 		return true;
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -193,11 +193,11 @@ class rtl{
 	 * Returns true if class exists
 	 * @return bool
 	 */
-	declare static bool class_implements(string class_name, string interface_name);
-	
-	#switch
-	#case ifcode PHP then
-	static function class_implements($class_name, $interface_name){
+	static bool class_implements(string class_name, string interface_name)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		$class_name = self::find_class($class_name);
 		$interface_name = self::find_class($interface_name);
 		$arr = @class_implements($class_name, true);
@@ -209,15 +209,14 @@ class rtl{
 				return true;
 		}
 		return false;
-	}
-	#case ifcode JAVASCRIPT then
-	static class_implements(class_name, interface_name){
+		
+		#case ifcode JAVASCRIPT then
 		var obj = this.find_class(class_name);
 		var obj2 = this.find_class(interface_name);
 		
 		while (obj != null){
-			if (obj.__static_implements__){
-				if (obj.__static_implements__.indexOf( obj2 ) > -1 ){
+			if (obj.__implements__){
+				if (obj.__implements__.indexOf( obj2 ) > -1 ){
 					return true;
 				}
 			}
@@ -225,8 +224,9 @@ class rtl{
 		}
 		
 		return false;
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -235,23 +235,21 @@ class rtl{
 	 * @param string class_name
 	 * @return Collection<string>
 	 */
-	declare public static Collection<string> getInterfaces(string class_name);
-	
-	#switch
-	#case ifcode PHP then
-	static function getInterfaces($class_name){
+	static Collection<string> getInterfaces(string class_name)
+	{
+		#switch
+		#case ifcode PHP then
 		$arr = array_values(class_implements(rtl::find_class($class_name)));
-		$v = (new Vector())->_assignArr($arr);
-		$v = $v->map(function ($s){
-			return str_replace("\\", ".", $s);
-		});
-		return $v->toCollection();
+		$arr = array_map
+		(
+			function($s){ return str_replace("\\", ".", $s); },
+			$arr
+		);
+		return \Runtime\Collection::from($arr);
+		#case ifcode JAVASCRIPT then
+		return this.find_class(class_name).__implements__;
+		#endswitch
 	}
-	#case ifcode JAVASCRIPT then
-	static getInterfaces(class_name){
-		return new Collection();
-	}
-	#endswitch
 	
 	
 	
@@ -259,28 +257,29 @@ class rtl{
 	 * Returns true if class exists
 	 * @return bool
 	 */
-	declare static bool method_exists(string class_name, string method_name);
+	static bool method_exists(string class_name, string method_name)
+	{
+		#switch
+		#case ifcode PHP then
 	
-	#switch
-	#case ifcode PHP then
-	static function method_exists($class_name, $method_name){
 		$class_name = static::find_class($class_name);
 		if (!class_exists($class_name)) return false;
 		if (!method_exists($class_name, $method_name)) return false;
 		return true;
-	}
-	#case ifcode JAVASCRIPT then
-	static method_exists(class_name, method_name){
+	
+		#case ifcode JAVASCRIPT then
+	
 		var obj = this.find_class(class_name);
-		if (!this.exists(obj)) return false;
+		if (!this.exists(__ctx, obj)) return false;
 		if (
-			!this.exists(obj[method_name]) && 
-			!this.exists(obj.prototype) && 
-			!this.exists(obj.prototype[method_name])
+			!this.exists(__ctx, obj[method_name]) && 
+			!this.exists(__ctx, obj.prototype) && 
+			!this.exists(__ctx, obj.prototype[method_name])
 		) return false;
 		return true;
+	
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -288,57 +287,49 @@ class rtl{
 	 * Create object by class_name. If class name does not exists return null
 	 * @return Object
 	 */
-	declare static Object newInstance(string class_name, Vector<mixed> args);
-
-	#switch
-	#case ifcode PHP then
-	static function newInstance($class_name, $args = null){
+	static Object newInstance(string class_name, Vector<var> args)
+	{
+		#switch
+		#case ifcode PHP then
+	
 		$class_name = static::find_class($class_name);
 		if ($args == null)
 			return new $class_name();
 		$r = new \ReflectionClass($class_name);
-		return $r->newInstanceArgs($args->_getArr());
-	}
-	#case ifcode JAVASCRIPT then
-	static newInstance(class_name, args){
+		$arr = $args->_arr;
+		array_unshift($arr, $__ctx);
+		return $r->newInstanceArgs($arr);
+	
+		#case ifcode JAVASCRIPT then
+	
 		var obj = this.find_class(class_name);
-		if (!this.exists(obj)) return null;
+		if (!this.exists(__ctx, obj)) return null;
 		if (!(obj instanceof Function)) return null;
 		if (args == undefined) args = [];
 		args = args.slice(); 
 		args.unshift(null);
+		args.unshift(__ctx);
 		var f = Function.prototype.bind.apply(obj, args);
 		return new f;
-	}
-	#endswitch
 	
-	
-	
-	/**
-	 * Call method
-	 * @return Object
-	 */
-	static var f(callback f)
-	{
-		return f;
+		#endswitch
 	}
 	
 	
 	
 	/**
 	 * Returns callback
-	 * @return fun
+	 * @return fn
 	 */
-	declare static fun method(mixed obj, string method_name);
-	
-	#switch
-	#case ifcode PHP then
-	static function method($obj, $method_name){
-		return new \Runtime\Callback($obj, $method_name);
-	}
-	#case ifcode JAVASCRIPT then
-	static method(obj, method_name)
+	static fn method(var obj, string method_name)
 	{
+		#switch
+		#case ifcode PHP then
+	
+		return new \Runtime\Callback($obj, $method_name);
+		
+		#case ifcode JAVASCRIPT then
+		
 		var save = obj;
 		if (!(obj instanceof Object))
 		{
@@ -362,58 +353,152 @@ class rtl{
 		return function(obj, method_name){ return function () {
 			return obj[method_name].apply(obj, arguments);
 		}}(obj, method_name);
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
 	 * Returns callback
-	 * @return fun
+	 * @return fn
 	 */
-	declare static mixed apply(fun f, Collection args);
-	
-	#switch
-	#case ifcode PHP then
-	static function apply($f, $args){
+	static var apply(fn f, Collection args)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		$arr = $args->_getArr();
+		array_unshift($arr, $__ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
-			return $f->invokeArgs($args->_getArr());
+			return $f->invokeArgs($arr);
 		}
-		return call_user_func_array($f, $args->_getArr());
-	}
-	#case ifcode JAVASCRIPT then
-	static apply(f, args)
-	{
+		if (gettype($f) == "string") $f = static::find_class($f);
+		return call_user_func_array($f, $arr);
+	
+		#case ifcode JAVASCRIPT then
+		args.unshift(__ctx);
+		if (this.isString(__ctx, f))
+		{
+			var a = f.split("::");
+			var c = a[0]; var m = a[1];
+			c = this.find_class(c);
+			f = c[m];
+			return f.apply(c, args);
+		}
 		return f.apply(null, args);
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
 	 * Call await method
-	 * @return fun
+	 * @return fn
 	 */
-	declare static mixed applyAwait(fun f, Collection args);
-	
-	#switch
-	#case ifcode PHP then
-	static function applyAwait($f, $args)
+	static var applyAwait(fn f, Collection args)
 	{
+		#switch
+		#case ifcode PHP then
+		
+		$arr = $args->_getArr();
+		array_unshift($arr, $__ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
-			return $f->invokeArgs($agrs->_getArr());
+			return $f->invokeArgs($arr);
 		}
-		return call_user_func_array($f, $args->_getArr());
-	}
-	#case ifcode JAVASCRIPT then
-	static applyAwait(f, args)
-	{
+		return call_user_func_array($f, $arr);
+	
+		#case ifcode JAVASCRIPT then
+		
+		args.unshift(__ctx);
 		var thread = new Runtime.AsyncThread();
 		thread.run( f.apply(null, args) );
+		
+		#endswitch
 	}
-	#endswitch
+	
+	
+	
+	/**
+	 * Returns callback
+	 * @return var
+	 */
+	static var attr(var item, Collection path, var def_val = null)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if ($item == null) return $def_val;
+		if (count($path->_arr) == 0) 
+		{
+			return $item;
+		}
+		$key = $path->first($__ctx);
+		$path = $path->removeFirstIm($__ctx);
+		$val = $def_val;
+		if ($item instanceof \Runtime\Dict or $item instanceof \Runtime\Collection)
+		{
+			$item = $item->get($__ctx, $key, $def_val);
+			$val = static::attr($__ctx, $item, $path, $def_val);
+			return $val;
+		}
+		else if ($item instanceof \Runtime\CoreStruct)
+		{
+			$item = $item->takeValue($__ctx, $key, $def_val);
+			$val = static::attr($__ctx, $item, $path, $def_val);
+			return $val;
+		}
+		return $val;
+		
+		#case ifcode JAVASCRIPT then		
+		if (def_val == undefined) def_val = null;
+		if (item == null) return def_val;
+		if (path.count() == 0)
+		{
+			return item;
+		}
+		var key = path.first(__ctx);
+		var path = path.removeFirstIm(__ctx);
+		var val = def_val;
+		if (item instanceof Runtime.Dict || item instanceof Runtime.Collection)
+		{
+			item = item.get(__ctx, key, def_val);
+			val = this.attr(__ctx, item, path, def_val);
+			return val;
+		}
+		else if (item instanceof Runtime.CoreStruct)
+		{
+			item = item.takeValue(__ctx, key, def_val);
+			val = this.attr(__ctx, item, path, def_val);
+			return val;
+		}
+		return val;
+		
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Returns value
+	 * @param var value
+	 * @param var def_val
+	 * @param var obj
+	 * @return var
+	 */
+	static var @to(var v, var d, var o)
+	{
+		var t = o.e;
+		if (t == "mixed" or t == "primitive" or t == "var" or t == "fn" or t == "callback") return v;
+		if (t == "bool") return static::toBool(null, v, d);
+		else if (t == "string") return static::toString(v, d);
+		else if (t == "int") return static::toInt(null, v, d);
+		else if (t == "float") return static::toFloat(null, v, d);
+		else if (rtl::is_instanceof(null, v, t)) return v;
+		return d;
+	}
 	
 	
 	
@@ -425,98 +510,9 @@ class rtl{
 	 * @param var type_template
 	 * @return var
 	 */
-	static var convert(var value, string type_value, var def_value = null, string type_template = "")
+	static var @convert(var value, string type_value, var def_value = null, string type_template = "")
 	{
-		if (type_value == "mixed" or type_value == "primitive" or type_value == "var" or 
-			type_value == "fun" or type_value == "callback"
-		)
-			return value;
-		
-		if (type_value == "")
-			return def_value;
-		
-		if (value !== null)
-		{
-		
-			/* Is scalar value */
-			if (
-				type_value == "int" or type_value == "float" or type_value == "byte" or
-				type_value == "double" or type_value == "bool" or type_value == "string"
-			){
-				try{
-					if (type_value == "int" or type_value == "byte"){
-						int val = rtl::toInt(value);
-						return val;
-					}
-					else if (type_value == "float" or type_value == "double"){
-						double val = rtl::toFloat(value);
-						return val;
-					}
-					else if (type_value == "bool"){
-						bool val = rtl::toBool(value);
-						return val;
-					}
-					else if (type_value == "string"){
-						string val = rtl::toString(value);
-						return val;
-					}
-				}
-				catch (var e){}
-			}
-			
-			/* Is Collection */
-			else if (
-				(
-					type_value == "Runtime.Vector" or type_value == "Runtime.Collection"
-				) and type_template != ""
-			){
-				#switch
-				#case ifcode PHP then
-				if ($value instanceof \Runtime\Collection)
-				{
-					return $value->_correctItemsByType($type_template);
-				}
-				return null;
-				#case ifcode JAVASCRIPT then
-				if (this.is_instanceof(value, "Runtime.Collection"))
-				{
-					return value._correctItemsByType(type_template);
-				}
-				return null;
-				#endswitch
-			}
-			
-			/* Is Dict */
-			else if (
-				(
-					type_value == "Runtime.Map" or type_value == "Runtime.Dict"
-				) and type_template != ""
-			){
-				#switch
-				#case ifcode PHP then
-				if ($value instanceof \Runtime\Dict)
-				{
-					return $value->_correctItemsByType($type_template);
-				}
-				return null;
-				#case ifcode JAVASCRIPT then
-				if (this.is_instanceof(value, "Runtime.Dict"))
-				{
-					return value._correctItemsByType(type_template);
-				}
-				return null;
-				#endswitch
-			}
-			
-			/* Is instanceof object */
-			else if (rtl::is_instanceof(value, type_value))
-			{
-				return value;
-			}
-		
-		}
-		
-		return def_value;
+		return value;
 	}
 	
 	
@@ -527,7 +523,8 @@ class rtl{
 	 * @param string tp
 	 * @return bool
 	 */
-	static var checkValue(var value, string tp){
+	static var checkValue(var value, string tp)
+	{
 		if (tp == "int") return self::isInt(value);
 		if (tp == "float" or tp == "double") return self::isDouble(value);
 		if (tp == "string") return self::isString(value);
@@ -539,108 +536,30 @@ class rtl{
 	
 	
 	/**
-	 * Clone var
-	 * @param {var} value - Variable
-	 * @return {var} result
-	 */
-	declare static var _clone(var value, ContextInterface context = null);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function _clone($val){
-		if ($val == null) return null;
-		if (self::isScalarValue($val)) return $val;
-		if ($val instanceof \Runtime\Interfaces\CloneableInterface){
-			$class_name = get_class($val);
-			$obj = new $class_name();
-			$obj->assignObject($val);
-			return $obj;
-		}
-		return clone $val;
-	}
-	#case ifcode JAVASCRIPT then
-	static clone(val, context){
-		if (isBrowser()) return Runtime.rtl._clone(val, context);
-		else return rtl._clone(val, context);
-	}
-	static _clone(val){
-		if (val == null)
-			return null;
-		
-		else if (val instanceof Number || typeof val == "number"){
-			return val;
-		}
-		else if (val instanceof String || typeof val == "string"){
-			return (new String(val)).toString();
-		}
-		else if (val instanceof Boolean || typeof val == "boolean"){
-			return val;
-		}
-		else if (val instanceof Date){
-			return new Date(val);
-		}
-		else if (typeof val == 'object' && val.nodeType && typeof val.cloneNode == "function"){
-			return val.cloneNode(true);
-		}
-		else if (typeof val == 'object' && 
-			val.createNewInstance && typeof val.createNewInstance == "function" &&
-			val.assignObject && typeof val.assignObject == "function")
-		{
-			var res = val.createNewInstance();
-			if (res) res.assignObject(val);
-			return res;
-		}
-		else if (typeof val == 'object' && 
-			val.getClassName && typeof val.getClassName == "function" &&
-			val.assignObject && typeof val.assignObject == "function")
-		{
-			var res = null;
-			if (isBrowser()) res = Runtime.rtl.newInstance( val.getClassName() );
-			else res = rtl.newInstance( val.getClassName() );
-			if (res) res.assignObject(val);
-			return res;
-		}
-		else if (Array.isArray(val)){	
-			var res = [];
-			for (var i=0;i<val.length;i++){
-				if (isBrowser()) res[i] = Runtime.rtl._clone(val[i]);
-				else res[i] = rtl._clone(val[i]);
-			}
-			return res;
-		}
-		
-		return null;
-	}
-	#endswitch
-	
-	
-	
-	/**
 	 * Return true if value is exists
 	 * @param var value
-	 * @return boolean
+	 * @return bool
 	 */
-	declare static boolean exists(var value);
-
-	#switch
-	#case ifcode PHP then
-	static function exists(&$value){ 
+	static bool exists(var value)
+	{
+		#switch
+		#case ifcode PHP then
 		return isset($value);
-	}
-	#case ifcode JAVASCRIPT then
-	static exists(value){
+		
+		#case ifcode JAVASCRIPT then
+		
 		return (value != null) && (value != undefined);
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
 	 * Returns true if value is scalar value
-	 * @return boolean 
+	 * @return bool 
 	 */
-	static bool isScalarValue(var value){
+	static bool isScalarValue(var value)
+	{
 		if (value == null) return true;
 		if (rtl::isString(value)) return true;
 		if (rtl::isNumber(value)) return true;
@@ -653,9 +572,10 @@ class rtl{
 	/**
 	 * Return true if value is boolean
 	 * @param var value
-	 * @return boolean
+	 * @return bool
 	 */
-	static boolean isBoolean(var value){
+	static bool isBoolean(var value)
+	{
 		if (value === false or value === true) return true;
 		return false;
 	}
@@ -665,86 +585,88 @@ class rtl{
 	/**
 	 * Return true if value is number
 	 * @param var value
-	 * @return boolean
+	 * @return bool
 	 */
-	declare static boolean isInt(var value);
-
-	#switch
-	#case ifcode PHP then
-	static function isInt($value){
+	static bool isInt(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		return is_int($value);
-	}
-	#case ifcode JAVASCRIPT then
-	static isInt(value){
+		
+		#case ifcode JAVASCRIPT then
+		
 		if (typeof value != "number") return false;
 		if (value % 1 !== 0) return false;
 		return true;
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
 	 * Return true if value is number
 	 * @param var value
-	 * @return boolean
+	 * @return bool
 	 */
-	declare static boolean isDouble(var value);
-
-	#switch
-	#case ifcode PHP then
-	static function isDouble($value){
+	static bool isDouble(var value)
+	{
+		#switch
+		#case ifcode PHP then
 		return is_int($value) or is_float($value);
-	}
-	#case ifcode JAVASCRIPT then
-	static isDouble(value){
+		
+		#case ifcode JAVASCRIPT then
+		
 		if (typeof value == "number") return true;
 		return false;
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
 	 * Return true if value is number
 	 * @param var value
-	 * @return boolean
+	 * @return bool
 	 */
-	declare static boolean isNumber(var value);
-
-	#switch
-	#case ifcode PHP then
-	static function isNumber($value){
+	static bool isNumber(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		return is_int($value) or is_float($value);
-	}
-	#case ifcode JAVASCRIPT then
-	static isNumber(value){
+		#case ifcode JAVASCRIPT then
+		
 		if (typeof value == "number") return true;
 		return false;
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
 	 * Return true if value is string
 	 * @param var value
-	 * @return boolean
+	 * @return bool
 	 */
-	declare static boolean isString(var value);
-
-	#switch
-	#case ifcode PHP then
-	static function isString($value){
+	static bool isString(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		return is_string($value);
-	}
-	#case ifcode JAVASCRIPT then
-	static isString(value){
+	
+		#case ifcode JAVASCRIPT then
+		
 		if (typeof value == 'string') return true;
 		else if (value instanceof String) return true;
 		return false;
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -753,25 +675,39 @@ class rtl{
 	 * @param var value
 	 * @return string
 	 */
-	declare static string toString(var value);
-
-	#switch
-	#case ifcode PHP then
-	static function toString($value){
+	static string @toString(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		if ($value instanceof StringInterface) return $value->toString();
 		return (string)$value;
-	}
-	#case ifcode JAVASCRIPT then
-	static toString(value){
-		var _StringInterface = null;
-		if (isBrowser()) _StringInterface = Runtime.Interfaces.StringInterface; 
-		else _StringInterface = StringInterface;
+		
+		#case ifcode JAVASCRIPT then
+		
+		var _StringInterface = use("Runtime.Interfaces.StringInterface");
+		/*if (isBrowser()) _StringInterface = Runtime.Interfaces.StringInterface; 
+		else _StringInterface = StringInterface;*/
+		
 		if (typeof value == 'string') return value;
 		if (value instanceof String) return ""+value;
-		if (this.implements(value, _StringInterface)) return value.toString();
+		if (this.is_implements(null, value, _StringInterface)) return value.toString();
 		return ""+value;
+		
+		#endswitch
 	}
-	#endswitch
+	
+	
+	
+	/**
+	 * Convert value to string
+	 * @param var value
+	 * @return string
+	 */
+	static string @toStr(var value)
+	{
+		return static::toString(value);
+	}
 	
 	
 	
@@ -780,28 +716,31 @@ class rtl{
 	 * @param var value
 	 * @return int
 	 */
-	declare static int toInt(var val);
-
-	#switch
-	#case ifcode PHP then
-	static function toInt($val){
+	static int toInt(var val)
+	{
+		#switch
+		#case ifcode PHP then
+	
 		$res = (int)$val;
 		$s_res = (string)$res;
 		$s_val = (string)$val;
 		if ($s_res == $s_val)
 			return $res;
+		
 		throw new \Exception("Error convert to int");
-	}
-	#case ifcode JAVASCRIPT then
-	static toInt(val){
+		
+		#case ifcode JAVASCRIPT then
+		
 		var res = parseInt(val);
 		var s_res = new String(res);
 		var s_val = new String(val);
 		if (s_res.localeCompare(s_val) == 0)
 			return res;
+		
 		throw new Error("Error convert to int");
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -810,11 +749,11 @@ class rtl{
 	 * @param var value
 	 * @return bool
 	 */
-	declare static bool toBool(var val);
-
-	#switch
-	#case ifcode PHP then
-	static function toBool($val){
+	static bool toBool(var val)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		if ($val === false || $val === "false") return false;
 		if ($val === true || $val === "true") return true;
 		$res = (bool)$val;
@@ -823,9 +762,9 @@ class rtl{
 		if ($s_res == $s_val)
 			return $res;
 		throw new \Exception("Error convert to boolean");
-	}
-	#case ifcode JAVASCRIPT then
-	static toBool(val){
+		
+		#case ifcode JAVASCRIPT then
+		
 		var res = false;
 		if (val == false || val == 'false') return false;
 		if (val == true || val == 'true') return true;
@@ -834,8 +773,9 @@ class rtl{
 		if (s_res.localeCompare(s_val) == 0)
 			return res;
 		throw new Error("Error convert to boolean");
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -844,28 +784,29 @@ class rtl{
 	 * @param var value
 	 * @return float
 	 */
-	declare static bool toFloat(var val);
-
-	#switch
-	#case ifcode PHP then
-	static function toFloat($val){
+	static bool toFloat(var val)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		$res = floatval($val);
 		$s_res = (string)$res;
 		$s_val = (string)$val;
 		if ($s_res == $s_val)
 			return $res;
 		throw new \Exception("Error convert to float");
-	}
-	#case ifcode JAVASCRIPT then
-	static toFloat(val){
+		
+		#case ifcode JAVASCRIPT then
+		
 		var res = parseFloat(val);
 		var s_res = new String(res);
 		var s_val = new String(val);
 		if (s_res.localeCompare(s_val) == 0)
 			return res;
 		throw new Error("Error convert to float");
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -874,19 +815,19 @@ class rtl{
 	 * @param double value
 	 * @return int
 	 */
-	declare static string ceil(double value);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function ceil($value){
+	static string ceil(double value)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		return ceil($value);
-	}
-	#case ifcode JAVASCRIPT then
-	static ceil(value){
+		
+		#case ifcode JAVASCRIPT then
+		
 		return Math.ceil(value);
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -895,19 +836,19 @@ class rtl{
 	 * @param double value
 	 * @return int
 	 */
-	declare static string floor(double value);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function floor($value){
+	static string floor(double value)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		return floor($value);
-	}
-	#case ifcode JAVASCRIPT then
-	static floor(value){
+		
+		#case ifcode JAVASCRIPT then
+		
 		return Math.floor(value);
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -916,30 +857,543 @@ class rtl{
 	 * @param double value
 	 * @return int
 	 */
-	declare static string round(double value);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function round($value){
+	static string round(double value)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		return round($value);
-	}
-	#case ifcode JAVASCRIPT then
-	static round(value){
+		
+		#case ifcode JAVASCRIPT then
+		
 		return Math.round(value);
+		
+		#endswitch
 	}
-	#endswitch
+	
+	
+	
+	/* ====================== Chains ====================== */
+	
+	/**
+	 * Apply async chain
+	 */
+	static async Collection<var> chainAwait(Collection<string> chain, Collection<var> args)
+	{
+		for (int i=0; i<chain.count(); i++)
+		{
+			string chain_name = chain.item(i);
+			args = await rtl::apply(chain_name, args);
+		}
+		return args;
+	}
+	
+	
+	
+	/**
+	 * Apply chain
+	 */
+	static Collection<var> chain(Collection<string> chain, Collection<var> args)
+	{
+		for (int i=0; i<chain.count(); i++)
+		{
+			string chain_name = chain.item(i);
+			args = rtl::apply(chain_name, args);
+		}
+		return args;
+	}
+	
+	
+	
+	/* ================ Memorize functions ================ */
+	
+	
+	static var _memorize_cache = null;
+	static var _memorize_not_found = null;
+	static var _memorize_hkey = null;
+	
+	
+	static bool @_memorizeValidHKey(var hkey, var key)
+	{
+		#switch
+		#case ifcode PHP then
+		if ( static::$_memorize_hkey == null ) static::$_memorize_hkey = [];
+		if ( !isset(static::$_memorize_hkey[$hkey]) ) return false;
+		if ( static::$_memorize_hkey[$hkey] == $key ) return true;
+		return false;
+		
+		#case ifcode JAVASCRIPT then
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Clear memorize cache
+	 */
+	static void @_memorizeClear()
+	{
+		static::_memorize_cache = null;
+		
+		#switch
+		#case ifcode PHP then
+		static::$_memorize_hkey = [];
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Returns cached value
+	 */
+	static string @_memorizeValue(string name, var args)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if (static::$_memorize_cache == null) return static::$_memorize_not_found;
+		if (!isset(static::$_memorize_cache[$name])) return static::$_memorize_not_found;
+		
+		$arr = &static::$_memorize_cache[$name];
+		$sz = count($args);
+		for ($i=0; $i<$sz; $i++)
+		{
+			$key = &$args[$i];
+			$hkey = null; 
+			if (gettype($key) == 'object') $hkey = spl_object_hash($key); else $hkey = $key;
+			if ($i == $sz - 1)
+			{
+				if (in_array($hkey, array_keys($arr)))
+				{
+					return $arr[$hkey];
+				}
+				return static::$_memorize_not_found;
+			}
+			else
+			{
+				if (!isset($arr[$hkey])) return static::$_memorize_not_found;
+				$arr = &$arr[$hkey];
+			}
+		}
+		
+		return static::$_memorize_not_found;
+		
+		#case ifcode JAVASCRIPT then
+		if (this._memorize_cache == null) return this._memorize_not_found;
+		if (this._memorize_cache[name] == undefined) return this._memorize_not_found;
+		var arr = this._memorize_cache[name];
+		var sz = args.length;
+		for (var i=0; i<sz; i++)
+		{
+			var key = args[i];
+			var hkey = null;
+			if (key != null && typeof key == 'object')
+			{
+				if (key.__uq__ != undefined) hkey = key.__uq__;
+				else return this._memorize_not_found;
+			}
+			else if (typeof key == 'string') hkey = "__s_" + key;
+			else hkey = key;
+			if (i == sz - 1)
+			{
+				if (arr[hkey] == undefined) return this._memorize_not_found;
+				return arr[hkey];
+			}
+			else
+			{
+				if (arr[hkey] == undefined) arr[hkey] = {};
+				arr = arr[hkey];
+			}
+		}
+		
+		return this._memorize_not_found;
+		
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Returns cached value
+	 */
+	static string @_memorizeSave(string name, var args, var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if (static::$_memorize_cache == null) static::$_memorize_cache = [];
+		if (!isset(static::$_memorize_cache[$name])) static::$_memorize_cache[$name] = [];
+		
+		$arr = &static::$_memorize_cache[$name];
+		$sz = count($args);
+		for ($i=0; $i<$sz; $i++)
+		{
+			$key = &$args[$i];
+			$hkey = null; 
+			if (gettype($key) == 'object') $hkey = spl_object_hash($key); else $hkey = $key;
+			if ($i == $sz - 1)
+			{
+				$arr[$hkey] = $value;
+			}
+			else
+			{
+				if (!isset($arr[$hkey])) $arr[$hkey] = [];
+				else if (!static::_memorizeValidHKey($hkey, $key)) $arr[$hkey] = [];
+				$arr = &$arr[$hkey];
+			}
+		}
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (this._memorize_cache == null) this._memorize_cache = {};
+		if (this._memorize_cache[name] == undefined) this._memorize_cache[name] = {};
+		var arr = this._memorize_cache[name];
+		var sz = args.length;
+		for (var i=0; i<sz; i++)
+		{
+			var key = args[i];
+			var hkey = null;
+			if (key != null && typeof key == 'object')
+			{
+				if (key.__uq__ != undefined) hkey = key.__uq__;
+				else hkey = null;
+			}
+			else if (typeof key == 'string') hkey = "__s_" + key;
+			else hkey = key;
+			if (i == sz - 1)
+			{
+				arr[hkey] = value;
+			}
+			else
+			{
+				if (arr[hkey] == undefined) arr[hkey] = {};
+				arr = arr[hkey];
+			}
+		}
+		
+		#endswitch
+	}
+	
+	
+	
+	/* ================ Dirty functions ================ */
+	
+	
+	/**
+	 * Returns unique value
+	 * @param bool flag If true returns as text. Default true
+	 * @return string
+	 */
+	static string unique(bool flag = true)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return uniqid();
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (flag == undefined) flag = true;
+		if (flag)
+			return "" + (new Date).getTime() + Math.floor((Math.random() * 899999 + 100000));
+		return Symbol();
+		
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Round down
+	 * @param double value
+	 * @return int
+	 */
+	static string dump(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		var_dump($value);
+		
+		#case ifcode JAVASCRIPT then
+		
+		console.log(value);
+		
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Returns random value x, where a <= x <= b
+	 * @param int a
+	 * @param int b
+	 * @return int
+	 */
+	static int random(int a, int b)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if (PHP_VERSION_ID < 70000) return mt_rand($a, $b);
+		return random_int($a, $b);
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (window != undefined && window.crypto != undefined && window.crypto.getRandomValues != undefined)
+		{
+			var s = new Uint32Array(1);
+			window.crypto.getRandomValues(s);
+			return Math.floor(s[0] / 4294967296 * (b - a + 1) + a);
+		}
+		return Math.floor(Math.random() * (b - a + 1) + a);
+			
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Returns current unix time in seconds
+	 * @return int
+	 */
+	static int time()
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return time();
+		
+		#case ifcode JAVASCRIPT then
+		
+		return Math.round((new Date()).getTime() / 1000);
+		
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Clone var
+	 * @param {var} value - Variable
+	 * @return {var} result
+	 */
+	static var clone(var val)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if ($val == null) return null;
+		if (self::isScalarValue($val)) return $val;
+		return clone $val;
+		
+		#case ifcode JAVASCRIPT then
+		
+		var Collection = use("Runtime.Collection");
+		var Dict = use("Runtime.Dict");
+		var CoreObject = use("Runtime.CoreObject");
+		var CoreStruct = use("Runtime.CoreStruct");
+		var FakeStruct = use("Runtime.FakeStruct");
+		var Reference = use("Runtime.Reference");
+		
+		if (val == null)
+			return null;
+		
+		else if (val instanceof Number || typeof val == "number")
+		{
+			return val;
+		}
+		else if (val instanceof String || typeof val == "string")
+		{
+			return (new String(val)).toString();
+		}
+		else if (val instanceof Boolean || typeof val == "boolean")
+		{
+			return val;
+		}
+		else if (typeof val == "symbol")
+		{
+			return Symbol();
+		}
+		else if (val instanceof Date)
+		{
+			return new Date(val);
+		}
+		else if (typeof val == 'object' && val.nodeType && typeof val.cloneNode == "function")
+		{
+			return val.cloneNode(true);
+		}
+		else if (val instanceof Collection)
+		{
+			var res = val.constructor.Instance();
+			for (var i=0;i<val.length;i++)
+			{
+				res.push(__ctx, this.clone(__ctx, val[i]));
+			}
+			return res;
+		}
+		else if (val instanceof Dict)
+		{
+			var res = val.constructor.Instance();
+			for (var key in val._map)
+			{
+				res._map[key] = this.clone(__ctx, val._map[key]);
+			}
+			return res;
+		}
+		else if (Array.isArray(val))
+		{	
+			var proto = Object.getPrototypeOf(val);
+			var res = Object.create(proto);
+			for (var i=0;i<val.length;i++)
+			{
+				res.push(__ctx, this.clone(__ctx, val[i]));
+			}
+			return res;
+		}
+		else if (val instanceof CoreStruct)
+		{
+			return val;
+		}
+		else if (val instanceof FakeStruct)
+		{
+			return val.clone(__ctx);
+		}
+		else if (val instanceof Reference)
+		{
+			return new Reference(__ctx, val.ref);
+		}
+		else if (val instanceof CoreObject || typeof val == 'object')
+		{
+			var proto = Object.getPrototypeOf(val);
+			var res = Object.create(proto);
+			var a = Object.getOwnPropertyNames(val);
+			for (var i=0;i<a.length;i++)
+			{
+				var key = a[i];
+				res[key] = this.clone(__ctx, val[key]);
+			}
+			return res;
+		}
+		
+		return null;
+		
+		#endswitch
+	}
+	
+	
+	/* =================== Deprecated =================== */
+	
+	/**
+	 * Translate message
+	 * @params string message - message need to be translated
+	 * @params MapInterface params - Messages params. Default null.
+	 * @params string locale - Different locale. Default "".
+	 * @return string - translated string
+	 */
+	public static string translate
+	(
+		string message, 
+		Dict params = null, 
+		string locale = "", 
+		Object context = null
+	)
+	{
+		#switch
+		#case ifcode PHP then
+		return self::callStaticMethod("Runtime.RuntimeUtils", "translate", [$message, $params, $locale, $context]);
+		#case ifcode JAVASCRIPT then
+		return this.callStaticMethod("Runtime.RuntimeUtils", "translate", [message, params, locale, context]);
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Json encode data
+	 * @param var data
+	 * @return string
+	 */
+	public static string json_encode(var data)
+	{
+		#switch
+		#case ifcode PHP then
+		return self::callStaticMethod("Runtime.RuntimeUtils", "json_encode", [$data]);
+		#case ifcode JAVASCRIPT then
+		return this.callStaticMethod("Runtime.RuntimeUtils", "json_encode", [data]);
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Normalize UIStruct
+	 * @param var data
+	 * @return var
+	 */
+	public static var normalizeUI(var data)
+	{
+		#switch
+		#case ifcode PHP then
+		return self::callStaticMethod("Runtime.RuntimeUtils", "normalizeUI", [$data]);
+		#case ifcode JAVASCRIPT then
+		return this.callStaticMethod("Runtime.RuntimeUtils", "normalizeUI", [data]);
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Normalize UIStruct
+	 * @param var data
+	 * @return var
+	 */
+	public static var normalizeUIVector(var data)
+	{
+		#switch
+		#case ifcode PHP then
+		return self::callStaticMethod("Runtime.RuntimeUtils", "normalizeUIVector", [$data]);
+		#case ifcode JAVASCRIPT then
+		return this.callStaticMethod("Runtime.RuntimeUtils", "normalizeUIVector", [data]);
+		#endswitch
+	}
+	
+	
+	
+	
+	/**
+	 * Call method
+	 * @return Object
+	 */
+	static var f(fn f)
+	{
+		return f;
+	}
+	
+	
+	
+	/**
+	 * Returns value if value instanceof type_value, else returns def_value
+	 * @param var value
+	 * @param string type_value
+	 * @param var def_value
+	 * @param var type_template
+	 * @return var
+	 */
+	static var correct(var value, var def_value = null, string type_value, string type_template = ""){
+		return static::convert(value, type_value, def_value, type_template);
+	}
 	
 	
 	
 	/**
 	 * Convert module name to node js package
 	 */
-	declare static string convertNodeJSModuleName(string name);
-	
-	#switch
-	#case ifcode PHP then
-	static function convertNodeJSModuleName($name){
+	static string convertNodeJSModuleName(string name)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		$arr1 = "qazwsxedcrfvtgbyhnujmikolp";
 		$arr2 = "0123456789";
 		$res = "";
@@ -955,21 +1409,21 @@ class rtl{
 				$res .= "-";
 			}
 			$res .= $ch3;
-			if ($ch == $ch2 && $isAlphaNum){
+			if ($ch == $ch2){
 				$previsbig = true;
 			}
 			else {
 				$previsbig = false;
 			}
-			if (!$isAlphaNum && !$isNum){
+			if (!$isAlpha && !$isNum){
 				$previsbig = true;
 			}
 		}
 		$res .= "-nodejs";
 		return $res;
-	}
-	#case ifcode JAVASCRIPT then
-	static convertNodeJSModuleName(name){
+		
+		#case ifcode JAVASCRIPT then
+		
 		name = new String(name);
 		var arr1 = "qazwsxedcrfvtgbyhnujmikolp";
 		var arr2 = "01234567890";
@@ -998,495 +1452,8 @@ class rtl{
 		}
 		res += "-nodejs";
 		return res;
-	}
-	#endswitch
-	
-	
-	
-	/* ================ Memorize functions ================ */
-	
-	
-	static mixed _memorize_cache = null;
-	
-	
-	#switch
-	#case ifcode PHP then
-	static $_memorize_not_found = null;
-	static $_memorize_hkey = [];
-	static function _memorizeValidHKey($hkey, $key)
-	{
-		if ( !isset(static::$_memorize_hkey[$hkey]) ) return false;
-		if ( static::$_memorize_hkey[$hkey] == $key ) return true;
-		return false;
-	}
-	#case ifcode JAVASCRIPT then
-	#endswitch
-	
-	
-	
-	/**
-	 * Clear memorize cache
-	 */
-	static void _memorizeClear()
-	{
-		static::_memorize_cache = null;
 		
-		#switch
-		#case ifcode PHP then
-		static::$_memorize_hkey = [];
 		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Returns cached value
-	 */
-	declare static string _memorizeValue(string name, mixed args);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function &_memorizeValue($name, $args)
-	{
-		if (static::$_memorize_cache == null) return static::$_memorize_not_found;
-		if (!isset(static::$_memorize_cache[$name])) return static::$_memorize_not_found;
-		
-		$arr = &static::$_memorize_cache[$name];
-		$sz = count($args);
-		for ($i=0; $i<$sz; $i++)
-		{
-			$key = &$args[$i];
-			$hkey = null; 
-			if (gettype($key) == 'object') $hkey = spl_object_hash($key); else $hkey = $key;
-			if ($i == $sz - 1)
-			{
-				if (array_key_exists($hkey, $arr))
-				{
-					return $arr[$hkey];
-				}
-				return static::$_memorize_not_found;
-			}
-			else
-			{
-				if (!isset($arr[$hkey])) return static::$_memorize_not_found;
-				$arr = &$arr[$hkey];
-			}
-		}
-	}
-	#case ifcode JAVASCRIPT then
-	static _memorizeValue(name, args, f)
-	{
-		if (this._memorize_cache == null) return this._memorize_not_found;
-		if (this._memorize_cache[name] == undefined) return this._memorize_not_found;
-		var arr = this._memorize_cache[name];
-		var sz = args.length;
-		for (var i=0; i<sz; i++)
-		{
-			var key = args[i];
-			var hkey = null;
-			if (typeof key == 'object')
-			{
-				if (key.__uq__ != undefined) hkey = key.__uq__;
-				else return this._memorize_not_found;
-			}
-			else hkey = key;
-			if (i == sz - 1)
-			{
-				if (arr[hkey] == undefined) return this._memorize_not_found;
-				return arr[hkey];
-			}
-			else
-			{
-				if (arr[hkey] == undefined) arr[hkey] = {};
-				arr = arr[hkey];
-			}
-		}
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Returns cached value
-	 */
-	declare static string _memorizeSave(string name, mixed args, mixed value);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function _memorizeSave($name, $args, $value)
-	{
-		if (static::$_memorize_cache == null) static::$_memorize_cache = [];
-		if (!isset(static::$_memorize_cache[$name])) static::$_memorize_cache[$name] = [];
-		
-		$arr = &static::$_memorize_cache[$name];
-		$sz = count($args);
-		for ($i=0; $i<$sz; $i++)
-		{
-			$key = &$args[$i];
-			$hkey = null; 
-			if (gettype($key) == 'object') $hkey = spl_object_hash($key); else $hkey = $key;
-			if ($i == $sz - 1)
-			{
-				$arr[$hkey] = $value;
-			}
-			else
-			{
-				if (!isset($arr[$hkey])) $arr[$hkey] = [];
-				else if (!static::_memorizeValidHKey($hkey, $key)) $arr[$hkey] = [];
-				$arr = &$arr[$hkey];
-			}
-		}
-	}
-	#case ifcode JAVASCRIPT then
-	static _memorizeSave(name, args, value)
-	{
-		if (this._memorize_cache == null) this._memorize_cache = {};
-		if (this._memorize_cache[name] == undefined) this._memorize_cache[name] = {};
-		var arr = this._memorize_cache[name];
-		var sz = args.length;
-		for (var i=0; i<sz; i++)
-		{
-			var key = args[i];
-			var hkey = null;
-			if (typeof key == 'object')
-			{
-				if (key.__uq__ != undefined) hkey = key.__uq__;
-				else hkey = null;
-			}
-			else hkey = key;
-			if (i == sz - 1)
-			{
-				arr[hkey] = value;
-			}
-			else
-			{
-				if (arr[hkey] == undefined) arr[hkey] = {};
-				arr = arr[hkey];
-			}
-		}
-	}
-	#endswitch
-	
-	
-	
-	/* ================ Dirty functions ================ */
-	
-	
-	/**
-	 * Returns unique value
-	 * @param bool flag If true returns as text. Default true
-	 * @return string
-	 */
-	declare static string unique(bool flag = true);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function unique(){
-		return uniqid();
-	}
-	#case ifcode JAVASCRIPT then
-	static unique(flag){
-		if (flag == undefined) flag = true;
-		if (flag)
-			return "" + (new Date).getTime() + Math.floor((Math.random() * 899999 + 100000));
-		return Symbol();
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Round down
-	 * @param double value
-	 * @return int
-	 */
-	declare static string dump(var value);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function dump($value){
-		var_dump($value);
-	}
-	#case ifcode JAVASCRIPT then
-	static dump(value){
-		console.log(value);
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Returns random value x, where a <= x <= b
-	 * @param int a
-	 * @param int b
-	 * @return int
-	 */
-	declare static int random(int a, int b);
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function random($a, $b){
-		if (PHP_VERSION_ID < 70000) return mt_rand($a, $b);
-		return random_int($a, $b);
-	}
-	#case ifcode JAVASCRIPT then
-	static random(a, b){
-		if (window != undefined && window.crypto != undefined && window.crypto.getRandomValues != undefined)
-		{
-			var s = new Uint32Array(1);
-			window.crypto.getRandomValues(s);
-			return Math.floor(s[0] / 4294967296 * (b - a + 1) + a);
-		}
-		return Math.floor(Math.random() * (b - a + 1) + a);
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Returns current unix time in seconds
-	 * @return int
-	 */
-	declare static int time();
-	
-	
-	#switch
-	#case ifcode PHP then
-	static function time(){
-		return time();
-	}
-	#case ifcode JAVASCRIPT then
-	static time(){
-		return Math.round((new Date()).getTime() / 1000);
-	}
-	#endswitch
-	
-	
-	
-	
-	/**
-	 * Translate message
-	 * @params string message - message need to be translated
-	 * @params MapInterface params - Messages params. Default null.
-	 * @params string locale - Different locale. Default "".
-	 * @return string - translated string
-	 */
-	public static string translate
-	(
-		string message, 
-		MapInterface params = null, 
-		string locale = "", 
-		Object context = null
-	)
-	{
-		#switch
-		#case ifcode PHP then
-		return self::callStaticMethod("Runtime.RuntimeUtils", "translate", [$message, $params, $locale, $context]);
-		#case ifcode JAVASCRIPT then
-		return this.callStaticMethod("Runtime.RuntimeUtils", "translate", [message, params, locale, context]);
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Json encode data
-	 * @param mixed data
-	 * @return string
-	 */
-	public static string json_encode(mixed data)
-	{
-		#switch
-		#case ifcode PHP then
-		return self::callStaticMethod("Runtime.RuntimeUtils", "json_encode", [$data]);
-		#case ifcode JAVASCRIPT then
-		return this.callStaticMethod("Runtime.RuntimeUtils", "json_encode", [data]);
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Normalize UIStruct
-	 * @param mixed data
-	 * @return UIStruct
-	 */
-	public static UIStruct normalizeUI(mixed data)
-	{
-		#switch
-		#case ifcode PHP then
-		return self::callStaticMethod("Runtime.RuntimeUtils", "normalizeUI", [$data]);
-		#case ifcode JAVASCRIPT then
-		return this.callStaticMethod("Runtime.RuntimeUtils", "normalizeUI", [data]);
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Normalize UIStruct
-	 * @param mixed data
-	 * @return UIStruct
-	 */
-	public static UIStruct normalizeUIVector(mixed data)
-	{
-		#switch
-		#case ifcode PHP then
-		return self::callStaticMethod("Runtime.RuntimeUtils", "normalizeUIVector", [$data]);
-		#case ifcode JAVASCRIPT then
-		return this.callStaticMethod("Runtime.RuntimeUtils", "normalizeUIVector", [data]);
-		#endswitch
-	}
-	
-	
-	/* =================== Deprecated =================== */
-	
-	/**
-	 * Call method
-	 * @return Object
-	 */
-	declare static var callOld(callback f, Vector args = null);
-	
-	#switch
-	#case ifcode PHP then
-	static function callOld($f, $args = null){
-		if ($args == null) return call_user_func($f);
-		if ($args instanceof \Runtime\Vector) $args = $args->_getArr();
-		return call_user_func_array($f, $args);
-	}
-	#case ifcode JAVASCRIPT then
-	static callOld(f, args){
-		if (args == undefined) return f.apply(null);
-		return f.apply(null, args);
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Call method
-	 * @return Object
-	 */
-	declare static var callMethodOld(Object obj, string method_name, Vector args = null);
-	
-	#switch
-	#case ifcode PHP then
-	static function callMethodOld($obj, $method_name, $args = null){
-		if ($args != null)
-			return call_user_func_array([$obj, $method_name], $args->_getArr());
-		return call_user_func([$obj, $method_name]);
-	}
-	#case ifcode JAVASCRIPT then
-	static callMethodOld(obj, method_name, args){
-		var f = obj[method_name];
-		return f.apply(obj, args);
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Returns callback
-	 * @return fun
-	 */
-	declare static mixed callAwaitOld(fun apply, Collection args);
-	
-	#switch
-	#case ifcode PHP then
-	static function callAwaitOld($obj, $method_name){
-		return new \Runtime\Callback($obj, $method_name);
-	}
-	#case ifcode JAVASCRIPT then
-	static callAwaitOld(obj, method_name){
-		if (!(obj instanceof Object))
-		{
-			obj = this.find_class(obj);
-		}
-		return function ()
-		{
-			var thread = new Runtime.AsyncThread();
-			thread.run( obj[method_name].apply(obj, arguments) );
-		}
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Returns callback
-	 * @return fun
-	 */
-	declare static fun methodAwaitOld(mixed obj, string method_name);
-	
-	#switch
-	#case ifcode PHP then
-	static function methodAwaitOld($obj, $method_name){
-		return new \Runtime\Callback($obj, $method_name);
-	}
-	#case ifcode JAVASCRIPT then
-	static methodAwaitOld(obj, method_name){
-		if (!(obj instanceof Object))
-		{
-			obj = this.find_class(obj);
-		}
-		return function ()
-		{
-			var thread = new Runtime.AsyncThread();
-			thread.run( obj[method_name].apply(obj, arguments) );
-		}
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Call method
-	 * @return Object
-	 */
-	declare static var callStaticMethodOld(string class_name, string method_name, Vector args = null);
-	
-	#switch
-	#case ifcode PHP then
-	static function callStaticMethod($class_name, $method_name, $args=null){
-		$class_name = static::find_class($class_name);
-		if (!class_exists($class_name)){
-			throw new \Exception($class_name . " not found ");
-		}
-		if (!method_exists($class_name, $method_name)){
-			throw new \Exception("Method '" . $method_name . "' not found in " . $class_name);
-		}
-		if (gettype($args) == 'array')
-			return call_user_func_array([$class_name, $method_name], $args);
-		return call_user_func_array([$class_name, $method_name], ($args!=null)?$args->_getArr():[]);
-	}
-	#case ifcode JAVASCRIPT then
-	static callStaticMethod(class_name, method_name, args){
-		var obj = this.find_class(class_name);
-		var f = obj[method_name];
-		if (f == null || f == undefined){
-			throw new Error(class_name + "." + method_name + " not found");
-		}
-		return f.apply(obj, args);
-	}
-	#endswitch
-	
-	
-	
-	/**
-	 * Returns value if value instanceof type_value, else returns def_value
-	 * @param var value
-	 * @param string type_value
-	 * @param var def_value
-	 * @param var type_template
-	 * @return var
-	 */
-	static var correct(var value, var def_value = null, string type_value, string type_template = ""){
-		return static::convert(value, type_value, def_value, type_template);
 	}
 	
 }
@@ -1495,8 +1462,7 @@ class rtl{
 #switch
 #case ifcode PHP then
 rtl::$_memorize_not_found = (object) ['s' => 'memorize_key_not_found'];
-#case ifcode NODEJS then
-rtl._memorize_not_found = {'s':'memorize_key_not_found'};
-#case ifcode ES6 then
-Runtime.rtl._memorize_not_found = {'s':'memorize_key_not_found','id':Symbol()};
+#case ifcode JAVASCRIPT then
+if (typeof rtl != 'undefined') rtl._memorize_not_found = {'s':'memorize_key_not_found','id':Symbol()};
+if (typeof Runtime != 'undefined') Runtime.rtl._memorize_not_found = {'s':'memorize_key_not_found','id':Symbol()};
 #endswitch

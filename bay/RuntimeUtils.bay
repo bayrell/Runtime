@@ -27,8 +27,8 @@ use Runtime.rs;
 use Runtime.rtl;
 use Runtime.UIStruct;
 use Runtime.Vector;
-use Runtime.Interfaces.ContextInterface;
-use Runtime.Interfaces.FactoryInterface;
+use Runtime.Annotations.IntrospectionClass;
+use Runtime.Annotations.IntrospectionInfo;
 use Runtime.Interfaces.SerializeInterface;
 
 
@@ -38,7 +38,8 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 #endswitch
 
 
-export class RuntimeUtils{
+static class RuntimeUtils
+{
 	
 	
 	
@@ -51,9 +52,9 @@ export class RuntimeUtils{
 	
 	/**
 	 * Returns global context
-	 * @return ContextInterface
+	 * @return Context
 	 */
-	public static ContextInterface getContext()
+	public static Context getContext()
 	{
 		#switch
 		#case ifcode PHP then
@@ -69,41 +70,18 @@ export class RuntimeUtils{
 	
 	/**
 	 * Set global context
-	 * @param ContextInterface context
+	 * @param Context context
 	 */
-	public static ContextInterface setContext(ContextInterface context)
+	public static Context @setContext(Context context)
 	{
 		#switch
 		#case ifcode PHP then
 		self::$_global_context = $context;
 		#case ifcode JAVASCRIPT then
-		if (isBrowser()) Runtime.RuntimeUtils._global_context = context;
-		else RuntimeUtils._global_context = context;
+		/*if (isBrowser()) Runtime.RuntimeUtils._global_context = context;
+		else RuntimeUtils._global_context = context;*/
+		use("Runtime.RuntimeUtils")._global_context = context;
 		#endswitch
-		return context;
-	}
-	
-	
-	
-	/**
-	 * Register global Context
-	 */
-	public static ContextInterface createContext(Collectiom<string> modules = null, bool recursive = true)
-	{
-		ContextInterface context = new Context();
-		context.registerModules(modules, recursive);
-		return context;
-	}
-	
-	
-	
-	/**
-	 * Register global Context
-	 */
-	public static ContextInterface registerContext(Collectiom<string> modules = null, bool recursive = true)
-	{
-		ContextInterface context = self::createContext(modules, recursive);
-		self::setContext(context);
 		return context;
 	}
 	
@@ -116,9 +94,10 @@ export class RuntimeUtils{
 	 * Returns parents class names
 	 * @return Vector<string>
 	 */
-	public static Vector<string> getParents(string class_name)
+	static Collection<string> getParents(string class_name)
 	{
 		Vector<string> res = new Vector();
+		res.push(class_name);
 		
 		while (class_name != "")
 		{
@@ -130,53 +109,36 @@ export class RuntimeUtils{
 			}
 		}
 		
-		return res;
+		return res.toCollection();
 	}
 	
 	
 	
 	/**
-	 * Returns names of variables to serialization
-	 * @param Vector<string>
+	 * Returns Introspection of the class name
+	 * @param string class_name
+	 * @return Vector<IntrospectionInfo>
 	 */
-	lambda Collection<string> getVariablesNames(string class_name, int flag=0)
+	lambda memorize Collection<string> getVariablesNames(string class_name, int flag = 2)
 	{
-		Vector<string> names = new Vector();
+		/* Get parents names */
+		Collection<string> class_names = self::getParents(class_name);
 		
-		var variables_names = RuntimeUtils::_variables_names;
-		if (variables_names == null) RuntimeUtils::_variables_names = new Map();
-		if (RuntimeUtils::_variables_names.has(class_name))
-		{
-			Map m = RuntimeUtils::_variables_names;
-			Map v = m.item(class_name);
-			if ( v.has(flag) )
+		Vector<string> names = class_names.reduce
+		(
+			Vector<string> (Vector<string> names, string item_class_name) use (flag)
 			{
-				names.appendVector( v.item(flag) );
-				return names.toCollection();
-			}
-		}
-		
-		
-		Vector<string> classes = self::getParents(class_name);
-		classes.prepend(class_name);
-		classes.each(
-			void (string class_name) use (names, flag)
-			{
-				try{ rtl::method(class_name, "getFieldsList")(names, flag); } catch (var e) {}
-				try{ rtl::method(class_name, "getVirtualFieldsList")(names, flag); } catch (var e) {}
-			}
+				Collection<string> item_fields = null;
+				fn f = rtl::method(item_class_name, "getFieldsList");
+				try { item_fields = f(flag); } catch (var e) {}
+				if (item_fields != null)
+				{
+					names.appendVector(item_fields);
+				}
+				return names;
+			},
+			new Vector()
 		);
-		names = names.removeDublicatesIm();
-		
-		var variables_names = RuntimeUtils::_variables_names;
-		if (not RuntimeUtils::_variables_names.has(class_name))
-		{
-			RuntimeUtils::_variables_names.set(class_name, {});
-		}
-		
-		var v = RuntimeUtils::_variables_names.item(class_name);
-		v.set(flag, names.copy());
-		RuntimeUtils::_variables_names.set(class_name, v);
 		
 		return names.toCollection();
 	}
@@ -188,126 +150,69 @@ export class RuntimeUtils{
 	 * @param string class_name
 	 * @return Vector<IntrospectionInfo>
 	 */
-	lambda Collection<IntrospectionInfo> getIntrospection(string class_name)
+	lambda memorize IntrospectionClass getClassIntrospection(string class_name)
 	{
-		Vector<IntrospectionInfo> res = new Vector();
-		Vector<string> class_names = self::getParents(class_name);
-		class_names.prepend(class_name);
+		Collection<CoreStruct> class_info = null;
+		Map<Collection> fields = new Map();
+		Map<Collection> methods = new Map();
+		IntrospectionInfo info = null;
 		
-		class_names.each(
-			void (string item_class_name) use (res)
-			{
-				Vector<string> names = new Vector();
-				
-				
-				/* Get fields introspection */
-				try{ rtl::method(item_class_name, "getFieldsList")(names); } catch (var e) {}
-				names.each(
-					void (string field_name) use (res, item_class_name)
-					{
-						IntrospectionInfo info = null;
-						try
-						{ 
-							info = rtl::method(item_class_name, "getFieldInfoByName")(field_name);
-						}
-						catch (var e) { info = null; }
-						
-						if (info != null)
-						{
-							info <= class_name <= item_class_name;
-							res.push(info);
-						}
-					}
-				);
-				
-				
-				/* Get virtual fields introspection */
-				names.clear();
-				try{ rtl::method(item_class_name, "getVirtualFieldsList")(names); } catch (var e) {}
-				names.each(
-					void (string field_name) use (res, item_class_name)
-					{
-						IntrospectionInfo info = null;
-						try
-						{ 
-							info = rtl::method(item_class_name, "getVirtualFieldInfo")(field_name);
-						}
-						catch (var e) { info = null; }
-						
-						if (info != null)
-						{
-							info <= class_name <= item_class_name;
-							res.push(info);
-						}
-					}
-				);
-				
-				
-				/* Get methods introspection */
-				names.clear();
-				try{ rtl::method(item_class_name, "getMethodsList")(names); } catch (var e) {}
-				names.each(
-					void (string method_name) use (res, item_class_name)
-					{
-						IntrospectionInfo info = null;
-						try
-						{ 
-							info = rtl::method(item_class_name, "getMethodInfoByName")(method_name);
-						}
-						catch (var e) { info = null; }
-						
-						if (info != null)
-						{
-							info <= class_name <= item_class_name;
-							res.push(info);
-						}
-					}
-				);
-				
-				
-				/* Get class introspection */
-				IntrospectionInfo info = null;
-				try
-				{ 
-					info = rtl::method(item_class_name, "getClassInfo")();
-				}
-				catch (var e) { info = null; }
-				if (info != null)
-				{
-					info <= class_name <= item_class_name;
-					res.push(info);
-				}
-				
-			}
-		);
-		
-		return res.toCollection();
-	}
-	
-	
-	
-	/**
-	 * Returns item
-	 */
-	static mixed getItem
-	(
-		mixed obj, Collection<scalar> path, mixed default_value, 
-		string type_value = "mixed", string type_template = ""
-	)
-	{
-		if (path.count() == 0) return rtl::convert(obj, type_value, default_value, type_template);
-		if (obj == null) return default_value;
-		if (obj instanceof Dict or obj instanceof Collection)
+		/* Append annotations */
+		fn appendAnnotations = void (Map<Collection> arr, string name, IntrospectionInfo info)
 		{
-			scalar item = path.first(); 
-			path = path.removeFirstIm();
-			
-			obj = obj.get(item, default_value);
-			return static::getItem(obj, path, default_value, type_value, type_template);
+			if (not arr.has(name)) arr.set(name, new Vector());
+			Vector v = arr.item(name);
+			v.appendVector(info.annotations);
+		};
+		
+		/* Get Class Info */
+		try
+		{ 
+			info = rtl::method(class_name, "getClassInfo")();
+			if (info != null) class_info = info.annotations;
 		}
-		return default_value;
+		catch (var e){}
+		
+		/* Get parents names */
+		Collection<string> class_names = self::getParents(class_name);
+		for (int i=0; i<class_names.count(); i++)
+		{
+			string item_class_name = class_names.item(i);
+			
+			/* Get fields introspection */
+			Collection<string> item_fields = null;
+			try { item_fields = rtl::method(item_class_name, "getFieldsList")(3); } catch (var e) {}
+			for (int j=0; j<item_fields.count(); j++)
+			{
+				string field_name = item_fields.item(j);
+				info = rtl::method(item_class_name, "getFieldInfoByName")(field_name);
+				appendAnnotations(fields, field_name, info);
+			}
+			
+			/* Get methods introspection */
+			Collection<string> item_methods = null;
+			try { item_methods = rtl::method(item_class_name, "getMethodsList")(); } catch (var e) {}
+			for (int j=0; j<item_methods.count(); j++)
+			{
+				string method_name = item_methods.item(j);
+				info = rtl::method(item_class_name, "getMethodInfoByName")(method_name);
+				appendAnnotations(methods, method_name, info);
+			}
+		}
+		
+		/* To Collection */
+		methods = methods.map(Collection (Vector item, string name) => item.toCollection());
+		fields = fields.map(Collection (Vector item, string name) => item.toCollection());
+		
+		return new IntrospectionClass
+		{
+			"class_name": class_name,
+			"class_info": (class_info != null) ? class_info.toCollection() : null,
+			"fields": fields.toDict(),
+			"methods": methods.toDict(),
+			"interfaces": rtl::getInterfaces(class_name),
+		};
 	}
-	
 	
 	
 	
@@ -329,10 +234,10 @@ export class RuntimeUtils{
 	
 	/**
 	 * Returns object to primitive value
-	 * @param mixed obj
-	 * @return mixed
+	 * @param var obj
+	 * @return var
 	 */
-	public static mixed ObjectToPrimitive(mixed obj, bool force_class_name = false){
+	public static var ObjectToPrimitive(var obj, bool force_class_name = false){
 	
 		if (obj === null) return null;
 		if (rtl::isScalarValue(obj)) return obj;
@@ -340,17 +245,17 @@ export class RuntimeUtils{
 		if (obj instanceof Collection)
 		{
 			return obj.map(
-				mixed (mixed value) use (force_class_name)
+				var (var value) use (force_class_name)
 				{
 					return static::ObjectToPrimitive( value, force_class_name );
 				}
 			);
 			
 			/*
-			Vector<mixed> res = new Vector();
+			Vector<var> res = new Vector();
 			for (int i=0; i<obj.count(); i++)
 			{
-				mixed value = obj.item(i);
+				var value = obj.item(i);
 				value = self::ObjectToPrimitive( value, force_class_name );
 				res.push(value);
 			}
@@ -362,20 +267,20 @@ export class RuntimeUtils{
 		{
 			
 			obj = obj.map(
-				mixed (string key, mixed value) use (force_class_name)
+				var (string key, var value) use (force_class_name)
 				{
 					return static::ObjectToPrimitive( value, force_class_name );
 				}
 			);
 			
 			/*
-			Map<mixed> res = new Map();
+			Map<var> res = new Map();
 			Vector<string> keys = obj.keys();
 			
 			for (int i=0; i<keys.count(); i++)
 			{
 				string key = keys.item(i);
-				mixed value = obj.item(key);
+				var value = obj.item(key);
 				value = self::ObjectToPrimitive( value, force_class_name );
 				res.set(key, value);
 			}
@@ -392,7 +297,7 @@ export class RuntimeUtils{
 		
 		if (obj implements SerializeInterface)
 		{
-			Map<string, mixed> values = new Map();
+			Map<var> values = new Map();
 			Collection<string> names = static::getVariablesNames(obj.getClassName(), 1);
 			
 			for (int i=0; i<names.count(); i++)
@@ -417,9 +322,9 @@ export class RuntimeUtils{
 	/**
 	 * Returns object to primitive value
 	 * @param SerializeContainer container
-	 * @return mixed
+	 * @return var
 	 */
-	public static mixed PrimitiveToObject(mixed obj)
+	public static var PrimitiveToObject(var obj)
 	{
 		
 		if (obj === null) return null;
@@ -427,10 +332,10 @@ export class RuntimeUtils{
 		
 		if (obj instanceof Collection)
 		{
-			Vector<mixed> res = new Vector();
+			Vector<var> res = new Vector();
 			for (int i=0; i<obj.count(); i++)
 			{
-				mixed value = obj.item(i);
+				var value = obj.item(i);
 				value = self::PrimitiveToObject(value);
 				res.push(value);
 			}
@@ -439,13 +344,13 @@ export class RuntimeUtils{
 		
 		if (obj instanceof Dict)
 		{
-			Map<mixed> res = new Map();
+			Map<var> res = new Map();
 			Vector<string> keys = obj.keys();
 		
 			for (int i=0; i<keys.count(); i++)
 			{
 				string key = keys.item(i);
-				mixed value = obj.item(key);
+				var value = obj.item(key);
 				value = self::PrimitiveToObject(value);
 				res.set(key, value);
 			}
@@ -473,19 +378,21 @@ export class RuntimeUtils{
 			SerializeInterface instance = rtl::newInstance(class_name, null);
 			
 			/* Assign values */
-			Collection<string> names = static::getVariablesNames(instance.getClassName(), 1);
+			Map<var> obj = new Map();
+			Collection<string> names = static::getVariablesNames(class_name, 1);
 			for (int i=0; i<names.count(); i++)
 			{
 				string variable_name = names.item(i);
 				if (variable_name != "__class_name__") 
 				{
 					var value = res.get(variable_name, null);
+					obj.set(variable_name, value);
 					instance.assignValue(variable_name, value);
 				}
 			}
 			if (instance instanceof CoreStruct)
 			{
-				instance.initData();
+				instance.initData(null, obj);
 			}
 			
 			delete res;
@@ -535,10 +442,15 @@ export class RuntimeUtils{
 	#case ifcode JAVASCRIPT then
 	static NativeToPrimitive(value){
 		
-		var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
+		/*var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
 		var _Utils = null; if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
 		var _Vector=null; if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
-		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
+		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;*/
+		
+		var _rtl = use("Runtime.rtl");
+		var _Utils = use("Runtime.RuntimeUtils");
+		var _Vector = use("Runtime.Vector");
+		var _Map = use("Runtime.Map");
 		
 		if (value === null)
 			return null;
@@ -562,22 +474,27 @@ export class RuntimeUtils{
 	}
 	static PrimitiveToNative(value){
 		
-		var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
+		/*var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
 		var _Utils = null; if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=Utils;
-		var _Vector=null; if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
-		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;
+		var _Collection=null; if (isBrowser()) _Collection=Runtime.Collection; else _Collection=Collection;
+		var _Dict=null; if (isBrowser()) _Dict=Runtime.Dict; else _Dict=Dict;*/
+		
+		var _rtl = use("Runtime.rtl");
+		var _Utils = use("Runtime.RuntimeUtils");
+		var _Collection = use("Runtime.Collection");
+		var _Dict = use("Runtime.Dict");
 		
 		if (value === null)
 			return null;
 		
-		if (value instanceof _Vector){
+		if (value instanceof _Collection){
 			var arr = [];
 			value.each((v)=>{
 				arr.push( _Utils.PrimitiveToNative(v) );
 			});
 			return arr;
 		}
-		if (value instanceof _Map){
+		if (value instanceof _Dict){
 			var obj = {};
 			value.each((k, v)=>{
 				obj[k] = _Utils.PrimitiveToNative(v);
@@ -592,7 +509,7 @@ export class RuntimeUtils{
 	
 	
 	
-	const int JSON_PRETTY = 1;
+	static const int JSON_PRETTY = 1;
 	
 	
 	/**
@@ -601,77 +518,91 @@ export class RuntimeUtils{
 	 * @param SerializeContainer container
 	 * @return string 
 	 */
-	declare export static string json_encode(mixed value, int flags = 0, bool convert = true);
-
-	#switch
-	#case ifcode PHP then
-	static function json_encode($value, $flags = 0, $convert = true){
+	static string json_encode(var value, int flags = 0, bool convert = true)
+	{
+		#switch
+		#case ifcode PHP then
 		if ($convert){
-			$value = self::ObjectToPrimitive($value);
+			$value = self::ObjectToPrimitive($__ctx, $value);
 		}
 		$json_flags = JSON_UNESCAPED_UNICODE;
 		if ( ($flags & 1) == 1 ) $json_flags = $json_flags | JSON_PRETTY_PRINT;
 		return json_encode($value, $json_flags);
-	}
-	#case ifcode JAVASCRIPT then
-	static json_encode(value, flags, convert){
+		
+		#case ifcode JAVASCRIPT then
 		if (flags == undefined) flags = 0;
 		if (convert == undefined) convert = true;
+		/*
 		var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
 		var _Collection=null;if (isBrowser()) _Collection=Runtime.Collection; else _Collection=Collection;
 		var _Dict=null;if (isBrowser()) _Dict=Runtime.Dict; else _Dict=Dict;
 		var _rtl=null;if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
-		if (convert) value = _Utils.ObjectToPrimitive(value);
+		*/
+		
+		var _rtl = use("Runtime.rtl");
+		var _Utils = use("Runtime.RuntimeUtils");
+		var _Collection = use("Runtime.Collection");
+		var _Dict = use("Runtime.Dict");
+		
+		if (convert) value = _Utils.ObjectToPrimitive(__ctx, value);
 		return JSON.stringify(value, function (key, value){
 			if (_rtl.isScalarValue(value)) return value;
 			if (value instanceof _Collection) return value;
 			if (value instanceof _Dict) return value.toObject();
 			return null;
 		});
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
 	 * Json decode to primitive values
 	 * @param string s Encoded string
-	 * @return mixed 
+	 * @return var 
 	 */
-	declare export static mixed json_decode(string s);
-
-	#switch
-	#case ifcode PHP then
-	static function json_decode($obj){
+	static var json_decode(string s)
+	{
+		#switch
+		#case ifcode PHP then
+	
 		$res = @json_decode($obj, false);
-		if (!$res)
+		if ($res === null || $res === false)
 			return null;
 		return self::NativeToObject($res);
-	}
-	#case ifcode JAVASCRIPT then
-	static json_decode(s, context){
+	
+		#case ifcode JAVASCRIPT then
 		try{
+			/*
 			var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
 			var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
-			var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;			
+			var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;	
+			*/
+			
+			var _rtl = use("Runtime.rtl");
+			var _Utils = use("Runtime.RuntimeUtils");
+			var _Collection = use("Runtime.Collection");
+			var _Dict = use("Runtime.Dict");
+			
 			var obj = JSON.parse(s, function (key, value){
 				if (value == null) return value;
 				if (Array.isArray(value)){
-					return _Vector.createNewInstance(value);
+					return _Collection.from(value);
 				}
 				if (typeof value == 'object'){
-					return new _Map(value);
+					return _Dict.from(value);
 				}
 				return value;
 			});
-			return _Utils.PrimitiveToObject(obj);
+			return _Utils.PrimitiveToObject(__ctx, obj);
 		}
 		catch(e){
 			throw e;
-			return null;
 		}
+		return null;
+		#endswitch
 	}
-	#endswitch
+	
 	
 	
 	/**
@@ -679,22 +610,18 @@ export class RuntimeUtils{
 	 * @param string s
 	 * @return string 
 	 */
-	declare export static string base64_encode(string s);
-	
-	#switch
-	#case ifcode PHP then
-	static function base64_encode($s){
+	static string base64_encode(string s)
+	{
+		#switch
+		#case ifcode PHP then
 		return base64_encode($s);
-	}
-	#case ifcode ES6 then
-	static base64_encode(s){
-		return window.btoa(s);
-	}
-	#case ifcode NODEJS then
-	static base64_encode(s){
+		#case ifcode ES6 then
+		return window.btoa(window.unescape(window.encodeURIComponent(s)));
+		#case ifcode NODEJS then
 		return Buffer.from(s).toString('base64');
+		#endswitch
 	}
-	#endswitch
+	
 	
 	
 	/**
@@ -702,23 +629,75 @@ export class RuntimeUtils{
 	 * @param string s
 	 * @return string 
 	 */
-	declare export static string base64_decode(string s);
-	
-	#switch
-	#case ifcode PHP then
-	static function base64_decode($s){
+	static string base64_decode(string s)
+	{
+		#switch
+		#case ifcode PHP then
 		return base64_decode($s);
-	}
-	#case ifcode ES6 then
-	static base64_decode(s){
-		return window.atob(s);
-	}
-	#case ifcode NODEJS then
-	static base64_decode(s){
+		#case ifcode ES6 then
+		return window.decodeURIComponent(window.escape(window.atob(s)));
+		#case ifcode NODEJS then
 		return Buffer.from(s, 'base64').toString('ascii');
+		#endswitch
 	}
-	#endswitch
 	
+	
+	
+	/**
+	 * Base64 encode
+	 * @param string s
+	 * @return string 
+	 */
+	static string base64_encode_url(string s)
+	{
+		#switch
+		#case ifcode PHP then
+	
+		$s = base64_encode($s);
+		$s = str_replace('+', '-', $s);
+		$s = str_replace('/', '_', $s);
+		$s = str_replace('=', '', $s);
+		return $s;
+	
+		#case ifcode ES6 then
+		s = this.base64_encode(__ctx, s)
+			.replace(new RegExp('\\+', 'g'), '-')
+			.replace(new RegExp('\\/', 'g'), '_')
+			.replace(new RegExp('=', 'g'), '')
+		;
+		return s;
+		#case ifcode NODEJS then
+		return Buffer.from(s).toString('base64');
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Base64 decode
+	 * @param string s
+	 * @return string 
+	 */
+	static string base64_decode_url(string s)
+	{
+		#switch
+		#case ifcode PHP then
+		$c = 4 - strlen($s) % 4;
+		if ($c < 4 && $c > 0) $s .= str_repeat('=', $c);
+		$s = str_replace('-', '+', $s);
+		$s = str_replace('_', '/', $s);
+		return base64_decode($s);
+		#case ifcode ES6 then
+		var c = 4 - s.length % 4;
+		if (c < 4 && c > 0) s = s + '='.repeat(c);
+		s = s.replace(new RegExp('-', 'g'), '+')
+			.replace(new RegExp('_', 'g'), '/')
+		;
+		return this.base64_decode(__ctx, s);
+		#case ifcode NODEJS then
+		return Buffer.from(s, 'base64').toString('ascii');
+		#endswitch
+	}
 	
 	
 
@@ -737,7 +716,8 @@ export class RuntimeUtils{
 	 *   d - special chars !@#$%^&?*_-+=~(){}[]<>|/,.:;\\
 	 *   e - quotes `"'
 	 */	
-	public static string randomString(int length=16, string options="abc"){
+	public static string randomString(int length=16, string options="abc")
+	{
 		string s = "";
 		if (rs::strpos(options, "a") >= 0) s ~= "abcdefghjkmnpqrstuvwxyz";
 		if (rs::strpos(options, "b") >= 0) s ~= "ABCDEFGHJKMNPQRSTUVWXYZ";
@@ -778,6 +758,9 @@ export class RuntimeUtils{
 	{
 		#switch
 		#case ifcode PHP then
+		$arr = array_map( function($byte){ return chr($byte); }, $arr->_getArr() );
+		$s = implode("", $arr);
+		return $s;
 		#case ifcode ES6 then
 		var decoder = new TextDecoder(charset);
 		var bytes = new Uint8Array(arr);
@@ -814,7 +797,7 @@ export class RuntimeUtils{
 		#case ifcode ES6 then
 		var encoder = new TextEncoder(charset);
 		var bytes = encoder.encode(s);
-		return Runtime.Collection.create(bytes);
+		return Runtime.Collection.from(bytes);
 		#case ifcode NODEJS then
 		#endswitch
 	}
@@ -837,27 +820,20 @@ export class RuntimeUtils{
 	/**
 	 * Translate message
 	 * @params string message - message need to be translated
-	 * @params MapInterface params - Messages params. Default null.
+	 * @params Dict params - Messages params. Default null.
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
-	public static string translate(
-		string message, MapInterface params = null, string locale = "", 
+	public static string translate
+	(
+		string message, Dict params = null, string locale = "", 
 		Object context = null
 	)
 	{
 		if (context == null) context = self::getContext();
-		if (context != null) {
-			Vector<var> args = (new Vector<var>())
-				.push(message)
-				.push(params)
-				.push(locale)
-			;
-			return rtl::callMethod(
-				context,
-				"translate",
-				args
-			);
+		if (context != null)
+		{
+			context.translate(message, params, locale);
 		}	
 		return message;
 	}
@@ -869,31 +845,26 @@ export class RuntimeUtils{
 	 * @param string component class name
 	 * @return string hash
 	 */
-	static string getCssHash(string s)
+	static memorize string getCssHash(string s)
 	{
-		string arr = "1234567890abcdef";
-		int arr_sz = 16;
-		int arr_mod = 65536;
+		string r = "";
+		string a = "1234567890abcdef";
 		int sz = rs::strlen(s);
-		int hash = 0;
+		int h = 0;
 		for (int i=0; i<sz; i++)
 		{
-			int ch = rs::ord(s[i]);
-			hash = ((hash << 2) + (hash >> 14) + ch) & 65535;
+			int c = rs::ord( rs::substr(s, i, 1) );
+			h = ((h << 2) + (h >> 14) + c) & 65535;
 		}
-		
-		string res = "";
-		int pos = 0;
-		int c = 0;
-		while (hash != 0 or pos < 4)
+		int p = 0;
+		while (h != 0 or p < 4)
 		{
-			c = hash & 15;
-			hash = hash >> 4;
-			res ~= arr[c];
-			pos++;
+			int c = h & 15;
+			h = h >> 4;
+			r ~= rs::substr(a, c, 1);
+			p = p + 1;
 		}
-		
-		return res;
+		return r;
 	}
 	
 	
@@ -901,14 +872,14 @@ export class RuntimeUtils{
 	/**
 	 * Normalize UIStruct
 	 */
-	static Collection<UIStruct> normalizeUIVector(mixed data)
+	static Collection<UIStruct> normalizeUIVector(var data)
 	{
 		if (data instanceof Collection)
 		{
 			Vector<UIStruct> res = new Vector();
 			for (int i=0; i<data.count(); i++)
 			{
-				mixed item = data.item(i);
+				var item = data.item(i);
 				if (item instanceof Collection)
 				{
 					Vector<UIStruct> new_item = static::normalizeUIVector(item);
@@ -951,7 +922,7 @@ export class RuntimeUtils{
 	/**
 	 * Normalize UIStruct
 	 */
-	static UIStruct normalizeUI(mixed data)
+	static UIStruct normalizeUI(var data)
 	{
 		if (data instanceof UIStruct)
 		{
@@ -983,16 +954,16 @@ export class RuntimeUtils{
 	/* Lambda Functions */
 	
 	
-	lambda fun isInstance(string class_name) =>
-		bool (mixed item) => rtl::is_instance(item, class_name)
+	lambda fn isInstance(string class_name) =>
+		bool (var item) use (class_name) => rtl::is_instance(item, class_name)
 	;
 	
 	
 	/**
 	 * Equal two struct by key
 	 */
-	lambda fun equal(mixed value)
-		=> bool (mixed item) use (value)
+	lambda fn equal(var value)
+		=> bool (var item) use (value)
 			=> item == value
 	;
 	
@@ -1001,8 +972,8 @@ export class RuntimeUtils{
 	/**
 	 * Equal two struct by key
 	 */
-	lambda fun equalNot(mixed value)
-		=> bool (mixed item) use (value)
+	lambda fn equalNot(var value)
+		=> bool (var item) use (value)
 			=> item != value
 	;
 	
@@ -1011,7 +982,7 @@ export class RuntimeUtils{
 	/**
 	 * Returns attr of item
 	 */
-	lambda fun attr(string key, mixed def_value)
+	lambda fn attr(string key, var def_value)
 		=> bool (CoreStruct item1) use (key, def_value)
 			=> item1.takeValue(key, def_value)
 	;
@@ -1021,8 +992,8 @@ export class RuntimeUtils{
 	/**
 	 * Equal two struct by key
 	 */
-	lambda fun equalItemKey(string key)
-		=> bool (CoreStruct item1, mixed value) use (key)
+	lambda fn equalItemKey(string key)
+		=> bool (CoreStruct item1, var value) use (key)
 			=> item1.takeValue(key) == value
 	;
 	
@@ -1031,7 +1002,7 @@ export class RuntimeUtils{
 	/**
 	 * Returns max id from items
 	 */
-	lambda int getMaxIdFromItems(Collectior<CoreStruct> items, int start = 0) =>
+	lambda int getMaxIdFromItems(Collection<CoreStruct> items, int start = 0) =>
 		items.reduce
 		(
 			int (int value, CoreStruct item) => item.id > value ? item.id : value,

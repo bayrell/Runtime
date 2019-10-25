@@ -31,19 +31,21 @@ struct BusResult<primitive> extends CoreStruct
 	public bool success = false;
 	public int code = 0;
 	public string error = "";
-	public string class_name = "";
+	public string url = "";
+	public string api_name = "";
+	public string interface_name = "";
 	public string method_name = "";
 	public string text = "";
 	public primitive data = null;
 	public primitive params = null;
-	
+	public Collection<string> logs = null;
 	
 	
 	/**
 	 * Returns true if success
 	 * @return bool
 	 */
-	bool isSuccess() => this.success and this.code >= RuntimeConstant::ERROR_OK;
+	static bool isSuccess(BusResult bus) => bus.success and bus.code >= RuntimeConstant::ERROR_OK;
 	
 	
 	
@@ -53,11 +55,11 @@ struct BusResult<primitive> extends CoreStruct
 	 * @param string error
 	 * @return BusResult
 	 */
-	BusResult setError(int code, string error = "") =>
-		this.copy({
+	static BusResult setError(BusResult bus, string error = "", int code) =>
+		bus.copy({
 			"code": code,
 			"error": error,
-			"success": (code >= RuntimeConstant::ERROR_OK) ? true : false
+			"success": false
 		})
 	;
 	
@@ -68,8 +70,40 @@ struct BusResult<primitive> extends CoreStruct
 	 * @param primitive res
 	 * @return BusResult
 	 */
-	BusResult setResult(primitive res) =>
-		this.copy({ "code": RuntimeConstant::ERROR_OK, "error": "Ok", "success": true, "data": res })
+	static BusResult setSuccess(BusResult bus, primitive res) =>
+		bus.copy({ "code": RuntimeConstant::ERROR_OK, "error": "", "success": true, "data": res })
 	;
 	
+	
+	
+	/**
+	 * Set result
+	 * @param primitive res
+	 * @return BusResult
+	 */
+	static BusResult setResult(BusResult bus, BusResult res) =>
+		bus.copy( res.takeDict() )
+	;
+	
+	
+	
+	/**
+	 * Set result
+	 * @param primitive res
+	 * @return BusResult
+	 */
+	static BusResult create(primitive res) =>
+		new BusResult({ "code": RuntimeConstant::ERROR_OK, "error": "", "success": true, "data": res })
+	;
+	
+	
+	
+	/**
+	 * Set result
+	 * @param primitive res
+	 * @return BusResult
+	 */
+	static BusResult fail(primitive res, string error = "", int code = -1) =>
+		new BusResult({ "code": code, "error": error, "success": false, "data": res })
+	;
 }

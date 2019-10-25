@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2019 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2018 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,17 +16,34 @@
  *  limitations under the License.
  */
  
-namespace Runtime;
+namespace Runtime.Interfaces;
 
-use Runtime.CoreObject;
-use Runtime.Vector;
+use Runtime.BusResult;
+use Runtime.Context;
 
 
-class AsyncTask extends CoreObject
+interface LocalBusInterface
 {
 	
-	string pos = null;
-	callback f = null;
-	Vector<string> catch_stack = null;
+	/**
+	 * Remote procedure call
+	 */
+	static async BusResult call
+	(
+		LocalBusInterface bus, Context context,
+		string api_name, string space, string method_name, 
+		Collection<var> data
+	);
+	
+	
+	
+	/**
+	 * Remote procedure call route
+	 */
+	static async BusResult callRoute
+	(
+		LocalBusInterface bus, Context context,
+		string url, Collection<var> data
+	);
 	
 }

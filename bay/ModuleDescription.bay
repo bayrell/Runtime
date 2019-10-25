@@ -18,12 +18,13 @@
 
 namespace Runtime;
 
-use Runtime.Emitter;
 use Runtime.Map;
 use Runtime.rtl;
 use Runtime.Vector;
+use Runtime.Annotations.LambdaChain;
+use Runtime.Annotations.LambdaChainDeclare;
+use Runtime.Annotations.Provider;
 use Runtime.Interfaces.AssetsInterface;
-use Runtime.Interfaces.ContextInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
@@ -43,7 +44,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 * Returns module name
 	 * @return string
 	 */
-	lambda string getModuleVersion() => "0.7.3";
+	lambda string getModuleVersion() => "0.8.0-alpha.9";
 	
 	
 	
@@ -66,50 +67,56 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 * Returns module files load order
 	 * @return Collection<string>
 	 */
-	lambda Collection<string> getModuleFiles() => 
+	lambda Collection<string> assets() => 
 	[
-		"Runtime.rs",
-		"Runtime.re",
-		"Runtime.rtl",
-		"Runtime.Collection",
-		"Runtime.Container",
-		"Runtime.CoreObject",
-		"Runtime.Dict",
-		"Runtime.Emitter",
-		"Runtime.RuntimeConstant",
-		"Runtime.RuntimeUtils",
-		"Runtime.Exceptions.RuntimeException",
-		"Runtime.Interfaces.CloneableInterface",
-		"Runtime.Interfaces.ContextInterface",
-		"Runtime.Interfaces.FactoryInterface",
-		"Runtime.Interfaces.ModuleDescriptionInterface",
-		"Runtime.Interfaces.SerializeInterface",
-		"Runtime.Interfaces.StringInterface",
-		"Runtime.Interfaces.SubscribeInterface",
-		"Runtime.AsyncTask",
-		"Runtime.AsyncThread",
-		"Runtime.Context",
-		"Runtime.ContextObject",
-		"Runtime.CoreStruct",
-		"Runtime.CoreProvider",
-		"Runtime.CoreEvent",
-		"Runtime.BusResult",
-		"Runtime.Map",
-		"Runtime.Maybe",
-		"Runtime.PathInfo",
-		"Runtime.ModuleDescription",
-		"Runtime.Reference",
-		"Runtime.Vector",
-		"Runtime.Exceptions.ApiException",
-		"Runtime.Exceptions.IndexOutOfRange",
-		"Runtime.Exceptions.KeyNotFound",
-		"Runtime.Exceptions.UnknownError",
-		"Runtime.DateTime",
-		"Runtime.Annotations.IntrospectionInfo",
-		"Runtime.Annotations.LambdaChain",
-		"Runtime.Annotations.Provider",
-		"Runtime.Annotations.Manager",
-		"Runtime.UIStruct",
+		"Runtime/rtl",
+		"Runtime/rs",
+		"Runtime/re",
+		"Runtime/lib",
+		"Runtime/Collection",
+		"Runtime/Container",
+		"Runtime/CoreObject",
+		"Runtime/Dict",
+		"Runtime/Emitter",
+		"Runtime/RuntimeConstant",
+		"Runtime/RuntimeUtils",
+		"Runtime/Exceptions/RuntimeException",
+		"Runtime/Interfaces/CloneableInterface",
+		"Runtime/Interfaces/FactoryInterface",
+		"Runtime/Interfaces/LocalBusInterface",
+		"Runtime/Interfaces/ModuleDescriptionInterface",
+		"Runtime/Interfaces/RemoteBusInterface",
+		"Runtime/Interfaces/SerializeInterface",
+		"Runtime/Interfaces/StringInterface",
+		"Runtime/Interfaces/SubscribeInterface",
+		"Runtime/AsyncTask",
+		"Runtime/AsyncThread",
+		"Runtime/CoreStruct",
+		"Runtime/CoreProvider",
+		"Runtime/CoreEvent",
+		"Runtime/BusResult",
+		"Runtime/Map",
+		"Runtime/Message",
+		"Runtime/MessageRPC",
+		"Runtime/PathInfo",
+		"Runtime/ModuleDescription",
+		"Runtime/Reference",
+		"Runtime/Vector",
+		"Runtime/Exceptions/ApiException",
+		"Runtime/Exceptions/IndexOutOfRange",
+		"Runtime/Exceptions/KeyNotFound",
+		"Runtime/Exceptions/UnknownError",
+		"Runtime/DateTime",
+		"Runtime/Annotations/Entity",
+		"Runtime/Annotations/IntrospectionClass",
+		"Runtime/Annotations/IntrospectionInfo",
+		"Runtime/Annotations/LambdaChain",
+		"Runtime/Annotations/LambdaChainDeclare",
+		"Runtime/Annotations/Driver",
+		"Runtime/Annotations/Provider",
+		"Runtime/UIStruct",
+		"Runtime/Context",
+		"Runtime/ContextObject",
 	];
 	
 	
@@ -117,7 +124,15 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	/**
 	 * Returns enities
 	 */
-	lambda Collection<Dict> entities() => null;
+	lambda Collection<Dict> entities() => 
+	[
+		/* Declare BusInterface */
+		new Provider{ "name": "Runtime.Interfaces.LocalBusInterface", "kind": "interface" },
+		new Provider{ "name": "Runtime.Interfaces.RemoteBusInterface", "kind": "interface" },
+		
+		/* Declare Lambda chains */
+		new LambdaChainDeclare{ "name": "Runtime.Entities" },
+	];
 	
 	
 	
@@ -126,35 +141,5 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 */
 	lambda Collection<Dict> resources() => null;
 	
-	
-	
-	/**
-	 * Called then module registed in context
-	 * @param ContextInterface context
-	 */
-	public static void onRegister(ContextInterface context)
-	{
-	}
-	
-	
-	
-	/**
-	 * Called then context read config
-	 * @param ContextInterface context
-	 * @param Map<mixed> config
-	 */
-	public static void onReadConfig(ContextInterface context, Map<mixed> config)
-	{
-	}
-	
-	
-	
-	/**
-	 * Init context
-	 * @param ContextInterface context
-	 */
-	public static void onInitContext(ContextInterface context)
-	{
-	}
 	
 }

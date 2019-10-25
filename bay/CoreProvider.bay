@@ -18,6 +18,7 @@
 
 namespace Runtime;
 
+use Runtime.Context;
 use Runtime.CoreStruct;
 use Runtime.rtl;
 use Runtime.RuntimeUtils;
@@ -31,7 +32,7 @@ struct CoreProvider extends CoreStruct
 	/**
 	 * Init data
 	 */
-	static Dict<primitive> getDefaultProviderData(ContextInterface context)
+	static Dict<primitive> initProviderData(Context context)
 	{
 		return null;
 	}

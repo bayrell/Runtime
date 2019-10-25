@@ -34,37 +34,23 @@ class CoreObject
 	{
 		#switch
 		#case ifcode PHP then
-		$this->_init();
+		$this->_init($__ctx);
 		#case ifcode JAVASCRIPT then
-		this._init();
+		this._init(__ctx);
 		#endswitch
 	}
 	
 	
-	
-	#switch
-	#case ifcode PHP then
-	protected function _init(){}
-	#case ifcode JAVASCRIPT then
-	_init()
+	/**
+	 * Init function
+	 */
+	protected void _init()
 	{
-		this.__implements__ = new Array();
+		#switch
+		#case ifcode PHP then
+		#case ifcode JAVASCRIPT then
+		#endswitch
 	}
-	#endswitch
-	
-	
-	
-	#switch
-	#case ifcode JAVASCRIPT then
-	_del()
-	{
-	}
-	#case ifcode PHP then
-	function __destruct()
-	{
-		/*this._is_destroyed = true;*/
-	}
-	#endswitch
 	
 	
 	
@@ -129,13 +115,14 @@ class CoreObject
 	
 	/**
 	 * Set new values instance by Map
-	 * @param Map<mixed> map
+	 * @param Map<var> map
 	 * @return CoreObject
 	 */
-	public CoreObject assignDict(Dict<mixed> values = null)
+	public CoreObject assignDict(Dict<var> values = null)
 	{
-		if (values == null) return;
-		Collection<string> names = (method ("Runtime.RuntimeUtils", "getVariablesNames")) (this.getClassName(), 2);
+		if (values == null) return null;
+		fn f = rtl::@method ("Runtime.RuntimeUtils", "getVariablesNames");
+		Collection<string> names = f(this.getClassName(), 2);
 		for (int i=0; i<names.count(); i++)
 		{
 			string name = names.item(i);
@@ -148,13 +135,13 @@ class CoreObject
 	
 	/**
 	 * Set new values instance by Map
-	 * @param Dict<mixed> map
+	 * @param Dict<var> map
 	 * @return CoreObject
 	 */
-	public CoreObject setDict(Dict<mixed> values = null)
+	public CoreObject setDict(Dict<var> values = null)
 	{
-		if (values == null) return;
-		values.each( method (this, "assignValue") );
+		if (values == null) return null;
+		values.each( rtl::@method (this, "assignValue") );
 		return this;
 	}
 	
@@ -162,20 +149,63 @@ class CoreObject
 	
 	/**
 	 * Dump serializable object to Map
-	 * @return Map<mixed>
+	 * @return Map<var>
 	 */
-	public Map<mixed> takeDict(int flag=2)
+	public Map<var> takeDict(Collection<string> fields = null, int flag=2)
 	{
-		Map<mixed> values = new Map();
-		Collection<string> names = (method ("Runtime.RuntimeUtils", "getVariablesNames")) (this.getClassName(), flag);
-		for (int i=0; i<names.count(); i++)
+		Map<var> values = new Map();
+		if (fields == null)
+		{		
+			fn f = rtl::@method ("Runtime.RuntimeUtils", "getVariablesNames");
+			Collection<string> names = f(this.getClassName(), flag);
+			for (int i=0; i<names.count(); i++)
+			{
+				string name = names.item(i);
+				values.set(name, this.takeValue(name, null));
+			}
+		}
+		else
 		{
-			string name = names.item(i);
-			values.set(name, this.takeValue(name, null));
+			for (int i=0; i<fields.count(); i++)
+			{
+				string name = fields.item(i);
+				values.set(name, this.takeValue(name, null));
+			}
 		}
 		return values.toDict();
 	}
 	
+	public fn @staticMethod(string method_name)
+	{
+		return rtl::method(null, this.getClassName(), method_name);
+	}
+	
+	public var callStatic(string method_name)
+	{
+		#switch
+		#case ifcode PHP then
+		$args = func_get_args();
+		$class_name = static::class;
+		$method_name = array_shift($args);
+		return call_user_func_array([$class_name, $method_name], $args);
+		#endswitch
+		return null;
+	}
+	
+	
+	
+	public var callStaticParent(string method_name)
+	{
+		#switch
+		#case ifcode PHP then
+		$args = func_get_args();
+		$class_name = static::class; 
+		$class_name = $class_name::getParentClassName();
+		$method_name = array_shift($args);
+		return call_user_func_array([$class_name, $method_name], $args);
+		#endswitch
+		return null;
+	}
 	
 	
 	/* --------------------------- Introspection --------------------------- */
@@ -184,9 +214,7 @@ class CoreObject
 	 * Returns public fields list
 	 * @param Vector<string> names
 	 */
-	public static void getFieldsList(Vector<string> names, int flag=0)
-	{
-	}
+	declare static void getFieldsList(Vector<string> names, int flag=0);
 	
 	
 	
@@ -194,9 +222,7 @@ class CoreObject
 	 * Returns public virtual fields names
 	 * @param Vector<string> names
 	 */
-	public static void getVirtualFieldsList(Vector<string> names, int flag=0)
-	{
-	}
+	declare static void getVirtualFieldsList(Vector<string> names, int flag=0);
 	
 	
 	
@@ -205,10 +231,7 @@ class CoreObject
 	 * @param string field_name
 	 * @return IntrospectionInfo
 	 */
-	public static IntrospectionInfo getFieldInfoByName(string field_name)
-	{
-		return null;
-	}
+	declare static var getFieldInfoByName(string field_name);
 	
 	
 	
@@ -217,10 +240,7 @@ class CoreObject
 	 * @param string field_name
 	 * @return IntrospectionInfo
 	 */
-	public static IntrospectionInfo getVirtualFieldInfoByName(string field_name)
-	{
-		return null;
-	}
+	declare static var getVirtualFieldInfoByName(string field_name);
 	
 	
 	
@@ -228,9 +248,7 @@ class CoreObject
 	 * Returns list of the public methods
 	 * @param Vector<string> methods
 	 */
-	public static void getMethodsList(Vector<string> methods)
-	{
-	}
+	declare static void getMethodsList(Vector<string> methods);
 	
 	
 	
@@ -239,10 +257,7 @@ class CoreObject
 	 * @param string method_name
 	 * @return IntrospectionInfo
 	 */
-	public static IntrospectionInfo getMethodInfoByName(string method_name)
-	{
-		return null;
-	}
+	declare static var getMethodInfoByName(string method_name);
 	
 	
 }

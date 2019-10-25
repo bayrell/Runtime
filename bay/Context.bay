@@ -20,126 +20,354 @@ namespace Runtime;
 
 use Runtime.rs;
 use Runtime.rtl;
+use Runtime.BusResult;
+use Runtime.Collection;
+use Runtime.CoreDriver;
 use Runtime.CoreObject;
+use Runtime.CoreStruct;
 use Runtime.CoreProvider;
 use Runtime.Dict;
 use Runtime.Map;
 use Runtime.Vector;
 use Runtime.RuntimeConstant;
-use Runtime.Annotations.Manager;
+use Runtime.RuntimeUtils;
+use Runtime.Annotations.Driver;
+use Runtime.Annotations.Entity;
+use Runtime.Annotations.IntrospectionClass;
+use Runtime.Annotations.IntrospectionInfo;
 use Runtime.Annotations.LambdaChain;
 use Runtime.Annotations.Provider;
 use Runtime.Exceptions.RuntimeException;
-use Runtime.Interfaces.ContextInterface;
-use Runtime.Interfaces.FactoryInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
-class Context extends CoreObject implements ContextInterface
+struct Context extends CoreStruct
 {
-	protected string base_path = null;
-	protected Dict<mixed> config = null;
-	protected Vector<string> _modules = null;
-	protected Vector<string> _modules_cache = null;
-	protected Vector<CoreStruct> _entities = null;
-	protected Map<Manager> _managers = null;
-	protected Map<Provider> _providers = null;
-	protected Map<mixed> _managers_obj = null;
-	protected Map<mixed> _providers_obj = null;
+	/* Struct data */
+	string base_path = null;
+	Dict<var> env = null;
+	Dict<var> settings = null;
+	Collection<string> modules = null;
+	Collection<CoreStruct> entities = null;
+	Dict<CoreDriver> drivers = null;
+	Dict<CoreStruct> providers = null;
+	Dict<var> tags = null;
+	
+	/* Variable data */
+	bool initialized = false;
+	bool started = false;
 	
 	
 	/**
-	 * Constructor
-	 */
-	void constructor()
-	{
-		parent();
-		this._entities = new Vector<CoreStruct>();
-		this._modules = new Vector<string>();
-		this._modules_cache = new Vector<string>();
-		this._managers = new Map<Manager>();
-		this._providers = new Map<Provider>();
-		this._managers_obj = new Map<mixed>();
-		this._providers_obj = new Map<mixed>();
-	}
-	
-	
-	
-	/**
-	 * Destructor
-	 */
-	public void destructor()
-	{
-		delete this._managers;
-		delete this._providers;
-		delete this._providers_obj;
-		delete this._entities;
-		delete this._modules;
-		delete this._modules_cache;
-		parent();
-	}
-	
-	
-	
-	/**
-	 * Returns base path
+	 * Returns app name
 	 * @return string
 	 */
-	string getBasePath()
-	{
-		return this.base_path;
-	}
+	lambda string @appName() => "";
 	
 	
 	
 	/**
-	 * Returns registed modules
-	 * @return Vector<string>
+	 * Returns required modules
+	 * @return Dict<string>
 	 */
-	Collection<string> getModules()
-	{
-		return this._modules.toCollection();
-	}
+	lambda Dict<string> @getModules(Dict env) => null;
 	
 	
 	
 	/**
-	 * Create manager
+	 * Extend entities
+	 */
+	lambda Collection<CoreStruct> @getEntities(Dict env) => null;
+	
+	
+	
+	/**
+	 * Returns settings
+	 * @return Dict<string>
+	 */
+	lambda Dict<primitive> @getSettings(Dict env) => null;
+	
+	
+	
+	/**
+	 * Create context
 	 *
-	 * @params string manager_name
-	 * @return CoreManager
+	 * @params Dict env
+	 * @params Collection<string> modules
+	 * @params Dict settings
+	 * @return Context
 	 */
-	public CoreManager getManager(string manager_name)
+	public static Context @create(Dict env, Collection<string> modules = null, Dict settings = null)
 	{
-		if (this._managers_obj.has(manager_name))
+		/* Get modules */
+		if (modules == null)
 		{
-			return this._managers_obj.item(manager_name);
+			Dict<string> m = static::getModules(env);
+			modules = (m != null) ? m.keys(null) : [];
 		}
 		
-		CoreManager manager = null;
-		if (this._managers.has(manager_name))
+		/* Get settings */
+		if (settings == null)
 		{
-			Manager info = this._managers.item(manager_name);
-			string class_name = info.value;
-			if (class_name == "") class_name = info.name;
-			
-			manager = rtl::newInstance(class_name);
-			manager = this.chain(class_name, [this, manager]);
-			
-			if (manager_name != class_name) manager = this.chain(manager_name, [this, manager]);
-		}
-		else
-		{
-			manager = rtl::newInstance(manager_name, [ this ]);
-			manager = this.chain(manager_name, [this, manager]);
+			settings = static::getSettings(env);
 		}
 		
-		manager.flushModel();
-		this._managers_obj.set(manager_name, manager);
-		return manager;
+		/* Extends modules */
+		modules = static::getRequiredModules(modules);
+		
+		/* Get modules entities */
+		Collection<CoreStruct> entities = static::getModulesEntities(modules);
+		entities = entities.prependCollectionIm( null, static::getEntities(env) );
+		
+		/* Base path */
+		string base_path = rtl::attr(null, settings, ["base_path"], "", "string");
+		if (base_path == "") base_path = rtl::attr(null, env, ["BASE_PATH"], "", "string");
+		
+		/* Context data */
+		Dict obj = {
+			"env": env,
+			"settings": settings,
+			"modules": modules,
+			"entities": entities,
+			"base_path": base_path,
+		};
+		
+		/* Create context */
+		Context context = static::newInstance(null, obj);
+		
+		return context;
 	}
 	
 	
+	
+	/**
+	 * Returns required modules
+	 * @param string class_name
+	 * @return Collection<string>
+	 */
+	static void @_getRequiredModules
+	(
+		Vector<string> res,
+		Map<string> cache,
+		Collection<string> modules,
+		fn filter = null
+	)
+	{
+		if (modules == null) return;
+		if (filter) modules = modules.filter(null, filter);
+		for (int i=0; i<modules.count(null); i++)
+		{
+			string module_name = modules.item(null, i);
+			if (cache.get(null, module_name, false) == false)
+			{
+				cache.set(null, module_name, true);
+				fn f = rtl::method(null, module_name ~ ".ModuleDescription", "requiredModules");
+				Dict<string> sub_modules = f(null);
+				if (sub_modules != null)
+				{
+					Collection<string> sub_modules = sub_modules.keys(null);
+					static::_getRequiredModules(res, cache, sub_modules);
+				}
+				res.push(null, module_name);
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Returns all modules
+	 * @param Collection<string> modules
+	 * @return Collection<string>
+	 */
+	lambda Collection<string> @getRequiredModules(Collection<string> modules)
+	{
+		Vector<string> res = new Vector(null);
+		Map<string> cache = new Map(null);
+		static::_getRequiredModules(res, cache, modules);
+		res = res.removeDublicatesIm(null);
+		return res.toCollection(null);
+	}
+	
+	
+	
+	/**
+	 * Returns modules entities
+	 */
+	lambda Collection<CoreStruct> @getModulesEntities(Collection<string> modules)
+	{
+		Vector<CoreStruct> entities = new Vector(null);
+		for (int i=0; i<modules.count(null); i++)
+		{
+			string module_class_name = modules.item(null, i) ~ ".ModuleDescription";
+			fn f = rtl::method(null, module_class_name, "entities");
+			Collection<CoreStruct> arr = f(null);
+			entities.appendVector(null, arr);
+		}
+		return entities.toCollection(null);
+	}
+	
+	
+	
+	/**
+	 * Extend entities
+	 */
+	lambda Collection<CoreStruct> @extendEntities(Collection<CoreStruct> entities, Context context)
+	{
+		Vector<CoreStruct> e = entities.toVector(context);
+		for (int i=0; i<entities.count(context); i++)
+		{
+			CoreStruct item1 = entities.item(context, i);
+			string item1_class_name = item1.getClassName();
+			if (item1_class_name == "Runtime.Annotations.Entity")
+			{
+				string class_name = (item1.value != "") ? item1.value : item1.name;
+				IntrospectionClass info = RuntimeUtils::getClassIntrospection(context, class_name);
+				if (info.class_info)
+				{
+					for (int j=0; j<info.class_info.count(context); j++)
+					{
+						CoreStruct item2 = info.class_info.item(context, j);
+						string item2_class_name = item2.getClassName();
+						if (item2 instanceof Entity and item2_class_name != "Runtime.Annotations.Entity")
+						{
+							item2 = item2.copy(context, { "name": class_name });
+							e.push(context, item2);
+						}
+					}
+				}
+			}	
+		}
+		return e.toCollection(context);
+	}
+	
+	
+	
+	/**
+	 * Init context
+	 */
+	lambda void @init(Context context)
+	{
+		if (context.initialized) return context;
+		
+		Collection<CoreStruct> entities = context.entities;
+		
+		/* Extend entities */
+		entities = static::extendEntities(entities, context);
+		entities = static::chain("Runtime.Entities", [ context, entities ], context);
+		
+		/* Get providers */
+		Dict<CoreStruct> providers = static::getProvidersFromEntities(context);
+		
+		/* Register drivers */
+		Dict<CoreDriver> drivers = static::getDriversFromEntities(context);
+		
+		return context.copy(context, {
+			"entities": entities,
+			"providers": providers,
+			"drivers": drivers,
+			"initialized": true,
+		});
+	}
+	
+	
+	
+	/**
+	 * Start context
+	 */
+	static async Context @start(Context context)
+	{
+		if (context.started) return context;
+		Collection<string> drivers = context.drivers.keys(context);
+		for (int i=0; i<drivers.count(context); i++)
+		{
+			string driver_name = drivers.item(context, i);
+			CoreDriver driver = context.drivers.item(context, driver_name);
+			await driver.startDriver(context);
+		}
+		
+		return context.copy(context, {"started": true});
+	}	
+	
+	
+	
+	
+	/**
+	 * Returns providers from entities
+	 */
+	lambda Dict<CoreStruct> @getProvidersFromEntities(Context context)
+	{
+		Collection<CoreStruct> arr = context.entities.filter
+		(
+			context,
+			bool (CoreStruct item) => item instanceof Provider
+		);
+		Map<CoreStruct> providers = new Map(context);
+		for (int i=0; i<arr.count(context); i++)
+		{
+			Provider item = arr.item(context, i);
+			providers.set(context, item.name, item);
+		}
+		return providers.toDict(context);
+	}
+	
+	
+	
+	/**
+	 * Register drivers
+	 */
+	lambda Dict<Driver> @getDriversFromEntities(Context context)
+	{
+		Collection<CoreStruct> arr = context.entities.filter
+		(
+			context,
+			bool (CoreStruct item) => item instanceof Driver
+		);
+		Map<CoreStruct> drivers = new Map(context);
+		for (int i=0; i<arr.count(context); i++)
+		{
+			Driver item = arr.item(context, i);
+			
+			string driver_name = item.name;
+			string class_name = item.value;
+			if (class_name == "") class_name = item.name;
+			
+			CoreDriver driver = rtl::newInstance(context, class_name, []);
+			driver = static::chain(context, class_name, [context, driver]);
+			if (class_name != driver_name)
+			{
+				driver = static::chain(context, driver_name, [context, driver]);
+			}
+			
+			drivers.set(context, item.name, driver);
+		}
+		
+		return drivers.toDict(context);
+	}
+	
+	
+	
+	/* ---------------------- Driver -------------------- */
+	
+	/**
+	 * Get driver
+	 *
+	 * @params string driver_name
+	 * @return Runtime.anager
+	 */
+	lambda CoreDriver @getDriver(Context context, string driver_name)
+	{
+		if (context.drivers.has(context, driver_name))
+		{
+			return context.drivers.item(context, driver_name);
+		}
+		
+		return null;
+	}
+	
+	
+	
+	/* --------------------- Provider ------------------- */
 	
 	/**
 	 * Create provider
@@ -147,23 +375,32 @@ class Context extends CoreObject implements ContextInterface
 	 * @params string provider_name
 	 * @return CoreProvider
 	 */
-	protected CoreProvider createProvider(string class_name, Dict params = null)
+	lambda CoreStruct @createProvider(string provider_name, Dict params = null, Context context)
 	{
-		if (params == null)
+		if (params == null) params = {};
+		
+		CoreProvider provider = null;
+		if (context.providers.has(context, provider_name))
 		{
-			if (this._providers_obj.has(class_name))
+			Provider info = context.providers.item(context, provider_name);
+			if (info.kind == "interface")
 			{
-				params = this._providers_obj.item(class_name);
+				throw new RuntimeException(context, "Provider " ~ provider_name ~ " does not declared");
 			}
-			else
+			string class_name = info.value;
+			if (class_name == "") class_name = info.name;
+			
+			provider = rtl::newInstance(context, class_name, [ params ]);
+			provider = static::chain(context, class_name, [context, provider]);
+			if (provider_name != class_name)
 			{
-				params = (method (class_name, "getDefaultProviderData"))(this);
-				this._providers_obj.set(class_name, params);
+				provider = static::chain(context, provider_name, [context, provider]);
 			}
 		}
-		
-		CoreProvider provider = rtl::newInstance(class_name, [ params ]);
-		provider = this.chain(class_name, [this, provider]);
+		else
+		{
+			throw new RuntimeException(context, "Provider " ~ provider_name ~ " not found");
+		}
 		
 		return provider;
 	}
@@ -176,103 +413,25 @@ class Context extends CoreObject implements ContextInterface
 	 * @params string provider_name
 	 * @return CoreProvider
 	 */
-	public CoreProvider getProvider(string provider_name, Dict params = null)
+	lambda CoreProvider @getProvider(string provider_name, string settings_name = "default", Context context)
 	{
-		CoreProvider provider = null;
-		if (this._providers.has(provider_name))
-		{
-			Provider info = this._providers.item(provider_name);
-			string class_name = info.value;
-			if (class_name == "") class_name = info.name;
-			provider = this.createProvider(class_name, params);
-			if (provider_name != class_name) provider = this.chain(provider_name, [this, provider]);
-		}
-		else
-		{
-			provider = this.createProvider(provider_name, params);
-		}
+		Dict params = rtl::attr(context, context.settings, ["providers", provider_name, settings_name]);
+		CoreProvider provider = static::createProvider(provider_name, params, context);
 		return provider;
 	}
 	
 	
 	
-	/**
-	 * Register module
-	 */
-	ContextInterface registerModule(string module_name, bool recursive = true)
-	{
-		if (this._modules.indexOf(module_name) != -1) return;
-		if (this._modules_cache.indexOf(module_name) != -1) return;
-		
-		string module_description_class_name = module_name ~ ".ModuleDescription";
-		if (not rtl::class_exists(module_description_class_name))
-		{
-			throw new RuntimeException("Module " ~ module_name ~ " not found", RuntimeConstant::ERROR_FILE_NOT_FOUND);
-		}
-		
-		/* Add module */
-		this._modules_cache.push(module_name);
-		
-		/* Register required Modules*/
-		if (recursive)
-		{
-			fun f = rtl::method(module_description_class_name, "requiredModules");
-			Dict<string> modules = f();
-			
-			if (modules != null)
-			{
-				Vector<string> keys = modules.keys();
-				int sz = keys.count();
-				for (int i=0; i<sz; i++)
-				{
-					string m_name = keys.item(i);
-					m_name = rs::replace("/", ".", m_name);
-					this.registerModule(m_name);
-				}
-				delete keys;
-				delete modules;
-			}
-		}
-		
-		/* Add module */
-		this._modules.push(module_name);
-		
-		/* Call entities */
-		fun f = rtl::method(module_description_class_name, "entities");
-		Collection<CoreStruct> entities = f([ this ]);
-		if (entities != null)
-		{
-			this._entities = this._entities.appendVector(entities);
-		}
-		
-		/* Call onRegister */
-		fun f = rtl::method(module_description_class_name, "onRegister");
-		Collection<CoreStruct> entities = f([ this ]);
-		
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Register global Context
-	 */
-	ContextInterface registerModules(Collection<string> modules = null, bool recursive = true)
-	{
-		if (modules == null) return this;
-		modules.each( void (string module) use (recursive) => this.registerModule(module, recursive) );
-		return this;
-	}
-	
-	
+	/* ---------------------- Chain --------------------- */
 	
 	/**
 	 * Apply Lambda Chain
 	 */
-	CoreStruct chain(string chain_name, Dict args)
+	lambda CoreStruct @chain( string chain_name, Dict args, Context context)
 	{
-		Collection<CoreStruct> entities = this._entities.filter
+		Collection<CoreStruct> entities = context.entities.filter
 		(
+			context,
 			bool (CoreStruct item) use (chain_name) => 
 				item instanceof LambdaChain and 
 				item.name == chain_name and 
@@ -280,29 +439,30 @@ class Context extends CoreObject implements ContextInterface
 		);
 		entities = entities.sortIm
 		(
-			int (LambdaChain a, LambdaChain b) => a.pos > b.pos
+			context,
+			int @(LambdaChain a, LambdaChain b) => a.pos > b.pos
 		);
 		
-		for (int i=0; i<entities.count(); i++)
+		for (int i=0; i<entities.count(context); i++)
 		{
-			LambdaChain item = entities.item(i);
+			LambdaChain item = entities.item(context, i);
 			string item_chain_name = item.chain;
 			if (item_chain_name != "")
 			{
-				mixed res = this.chain(item_chain_name, args);
-				args = args.setIm( args.count() - 1, res);
+				var res = static::chain(item_chain_name, args, context);
+				args = args.setIm(context, args.count(context) - 1, res);
 			}
 			else
 			{
-				Collection arr = rs::split("::", item.value);
-				string class_name = arr.get(0, "");
-				string method_name = arr.get(1, "");
-				fun f = rtl::method(class_name, method_name);
-				mixed res = rtl::apply(f, args);
-				args = args.setIm( args.count() - 1, res);
+				Collection arr = rs::split(context, "::", item.value);
+				string class_name = arr.get(context, 0, "");
+				string method_name = arr.get(context, 1, "");
+				fn f = rtl::method(context, class_name, method_name);
+				var res = rtl::apply(context, f, args);
+				args = args.setIm(context, args.count(context) - 1, res);
 			}
 		}
-		mixed res = args.last();
+		var res = args.last(context);
 		return res;
 	}
 	
@@ -311,161 +471,51 @@ class Context extends CoreObject implements ContextInterface
 	/**
 	 * Apply Lambda Chain Await
 	 */
-	async CoreStruct chainAwait(string chain_name, Dict args)
+	static async CoreStruct @chainAwait(string chain_name, Dict args, Context context)
 	{
-		Collection<CoreStruct> entities = this._entities.filter
+		Collection<CoreStruct> entities = context.entities.filter
 		(
+			context,
 			bool (CoreStruct item) use (chain_name) => 
 				item instanceof LambdaChain and 
 				item.name == chain_name
 		);
 		entities = entities.sortIm
 		(
-			int (LambdaChain a, LambdaChain b) => a.pos > b.pos
+			context,
+			int @(LambdaChain a, LambdaChain b) => a.pos > b.pos
 		);
 		
-		mixed obj = args.last();
-		for (int i=0; i<entities.count(); i++)
+		for (int i=0; i<entities.count(context); i++)
 		{
-			LambdaChain item = entities.item(i);
+			LambdaChain item = entities.item(context, i);
 			string item_chain_name = item.chain;
 			if (item_chain_name != "")
 			{
-				mixed res = await this.chainAwait(item_chain_name, args);
-				args = args.setIm( args.count() - 1, res);
+				var res = await static::chainAwait(item_chain_name, args, context);
+				args = args.setIm(context, args.count(context) - 1, res);
 			}
 			else
 			{
-				Collection arr = rs::split("::", item.value);
-				string class_name = arr.get(0, "");
-				string method_name = arr.get(1, "");
-				fun f = rtl::method(class_name, method_name);
+				Collection arr = rs::split(context, "::", item.value);
+				string class_name = arr.get(context, 0, "");
+				string method_name = arr.get(context, 1, "");
+				fn f = rtl::method(context, class_name, method_name);
 				
 				if (item.is_async)
 				{
-					mixed res = await rtl::apply(f, args);
-					args = args.setIm( args.count() - 1, res);
+					var res = await rtl::apply(context, f, args);
+					args = args.setIm(context, args.count(context) - 1, res);
 				}
 				else
 				{
-					mixed res = rtl::apply(f, args);
-					args = args.setIm( args.count() - 1, res);
+					var res = rtl::apply(context, f, args);
+					args = args.setIm(context, args.count(context) - 1, res);
 				}
 			}
 		}
-		mixed res = args.last();
+		var res = args.last(context);
 		return res;
-	}
-	
-	
-	
-	/**
-	 * Read config
-	 */
-	ContextInterface readConfig(Dict<mixed> config)
-	{
-		this.config = config;
-		
-		/* Set base path */
-		mixed runtime = config.get("Runtime", null);
-		if (runtime != null and runtime instanceof Dict)
-		{
-			mixed base_path = runtime.get("base_path", null, "string");
-			if (base_path != null)
-			{
-				this.base_path = base_path;
-			}
-		}
-		
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Returns config
-	 */
-	Dict<mixed> getConfig()
-	{
-		return this.config;
-	}
-	
-	
-	
-	/**
-	 * Returns config item
-	 */
-	Dict<mixed> getConfigItem
-	(
-		Collection<scalar> path, mixed default_value, string type_value = "mixed", string type_template = ""
-	)
-	{
-		return RuntimeUtils::getItem(this.config, path, default_value, type_value, type_template);
-	}
-	
-	
-	
-	/**
-	 * Init context
-	 */
-	void init()
-	{
-		/* Register providers */
-		Collection<CoreStruct> providers = this._entities.filter
-		(
-			bool (CoreStruct item) => item instanceof Provider
-		);
-		for (int i=0; i<providers.count(); i++)
-		{
-			Provider item = providers.item(i);
-			this._providers.set(item.name, item);
-		}
-		
-		/* Register managers */
-		Collection<CoreStruct> managers = this._entities.filter
-		(
-			bool (CoreStruct item) => item instanceof Manager
-		);
-		for (int i=0; i<managers.count(); i++)
-		{
-			Manager item = managers.item(i);
-			this._managers.set(item.name, item);
-		}
-		
-		/* Call onInitContext */
-		Collection<mixed> args = [ this ];
-		int sz = this._modules.count();
-		for (int i=0; i<sz; i++)
-		{
-			string module_name = this._modules.item(i);
-			string module_description_class_name = module_name ~ ".ModuleDescription";
-			rtl::callStaticMethod
-			(
-				module_description_class_name, 
-				"onInitContext",
-				args
-			);
-		}
-		
-		delete args;
-		
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Start context
-	 */
-	async void start()
-	{
-		Collection<string> managers = this._managers.keys();
-		for (int i=0; i<managers.count(); i++)
-		{
-			string manager_name = managers.item(i);
-			CoreManager manager = this.getManager(manager_name);
-			await manager.startManager();
-		}
 	}
 	
 	
@@ -477,9 +527,30 @@ class Context extends CoreObject implements ContextInterface
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
-	string translate(string message, Map params = null, string locale = "")
+	string @translate(string message, Map params = null, string locale = "")
 	{
 		return message;
+	}
+	
+	
+	
+	/* ----------------------- Bus ---------------------- */
+	
+	/**
+	 * Local bus call
+	 * @param string class_name
+	 * @param string method_name
+	 * @param ApiRequest request
+	 * @return var The result of the api
+	 */ 
+	async BusResult @busCall(
+		string class_name, string interface_name, string method_name, 
+		Collection<primitive> data
+	)
+	{
+		/*BusInterface provider = static::getProvider(this, "Runtime.Interfaces.LocalBusInterface");
+		BusResult res = await provider::call(provider, this, class_name, interface_name, method_name, data);
+		return res;*/
 	}
 	
 	
@@ -489,38 +560,108 @@ class Context extends CoreObject implements ContextInterface
 	 * @param string class_name
 	 * @param string method_name
 	 * @param ApiRequest request
-	 * @return mixed The result of the api
+	 * @return var The result of the api
 	 */ 
-	async ApiResult busCall(
-		string class_name, string interface_name, string method_name, 
+	async BusResult @busCallRoute(
+		string url, 
 		Collection<primitive> data
 	)
 	{
-		BusInterface provider = this.getProvider("Runtime.Interfaces.BusInterface");
-		ApiResult res = await provider.call(this, class_name, interface_name, method_name, data);
-		return res;
+		/*BusInterface provider = this.getProvider("Runtime.Interfaces.LocalBusInterface");
+		BusResult res = await provider::callRoute(provider, this, url, data);
+		return res;*/
+	}
+	
+	
+	
+	/* ---------------------- Logs ---------------------- */
+	
+	/**
+	 * Log message
+	 * @param string message
+	 * @param int loglevel
+	 */
+	void @log(string message, int loglevel = 0)
+	{
+		/*this.logs.push(message ~ "\n");*/
 	}
 	
 	
 	
 	/**
-	 * Remote bus call
-	 * @param string remote_name
-	 * @param string method_name
-	 * @param ApiRequest request
-	 * @return mixed The result of the api
-	 */ 
-	async ApiResult remoteBusCall
-	(
-		string remote_gate,
-		string class_name, string interface_name, string method_name, 
-		Collection<primitive> data
-	)
+	 * Dump var to log
+	 * @param var v
+	 * @param int loglevel
+	 */
+	void @dump(var v, int loglevel = 0)
 	{
-		RemoteBusInterface provider = this.getProvider("Runtime.Interfaces.RemoteBusInterface");
-		provider = provider.setRemoteGate(remote_gate);
-		ApiResult res = await provider.call(this, class_name, interface_name, method_name, data);
-		return res;
+		#switch
+		#case ifcode PHP then
+		ob_start();
+		var_dump($v);
+		$content = ob_get_contents();
+		ob_end_clean();
+		/*$this->logs->push($content);*/
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Append logs message
+	 * @param Collection<string> logs
+	 */
+	void @logAppend(Collection<string> logs)
+	{
+		/*this.logs.appendVector(logs);*/
+	}
+	
+	
+	
+	/**
+	 * Return logs
+	 */
+	Collection<string> @getLogs()
+	{
+		/*return this.logs.toCollection();*/
+		return [];
+	}
+	
+	
+	
+	/* ---------------------- Tags ---------------------- */
+	
+	/**
+	 * Set tag
+	 */
+	Context @setTagIm(string tag_name, var value)
+	{
+		return this.copy({ "tags": this._tags.setIm(this, tag_name, value) });
+	}
+	
+	
+	
+	/**
+	 * Returns tag
+	 */
+	var @getTag(string tag_name)
+	{
+		return this._tags.get(this, tag_name, null);
+	}
+	
+	
+	
+	/* ---------------------- Other --------------------- */
+	
+	/**
+	 * Returns unix timestamp
+	 */
+	int @time()
+	{
+		#switch
+		#case ifcode PHP then
+		return time();
+		#endswitch
 	}
 	
 }

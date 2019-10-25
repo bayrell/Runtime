@@ -28,11 +28,7 @@ use Runtime.Vector;
 
 
 struct LambdaChain extends CoreStruct
-{
-	const int POS_LOW = -100;
-	const int POS_NORMAL = 0;
-	const int POS_HIGHT = 100;
-	
+{	
 	string name = "";
 	string value = "";
 	string chain = "";

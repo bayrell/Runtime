@@ -16,29 +16,15 @@
  *  limitations under the License.
  */
  
-namespace Runtime.Interfaces;
+namespace Runtime;
 
-use Runtime.CoreObject;
+use Runtime.CoreStruct;
+use Runtime.Collection;
 use Runtime.Map;
-use Runtime.Vector;
-use Runtime.Interfaces.ContextInterface;
+use Runtime.rtl;
+use Runtime.RuntimeConstant;
 
 
-interface CloneableInterface{
-	
-	
-	/**
-	 * Returns new Instance
-	 */
-	/* public CoreObject createNewInstance(); */
-	
-	
-
-	/**
-	 * Assign and clone data from other object
-	 * @param CoreObject obj
-	 */
-	void assignObject(CoreObject obj);
-	
-	
+struct MessageSession extends CoreStruct
+{
 }

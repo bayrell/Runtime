@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.rtl;
 use Runtime.PathInfo;
+use Runtime.Collection;
 use Runtime.Vector;
 
 
@@ -29,7 +30,7 @@ var isBrowser=function(){return typeof window !== "undefined" && this === window
 #endswitch
 
 
-export class rs
+class rs
 {
 
 
@@ -38,39 +39,36 @@ export class rs
 	 * @param string s The string
 	 * @return int
 	 */
-	declare export static int strlen(string s);
-	 
-	#switch
-	#case ifcode PHP then
-	static function strlen($s)
+	static int strlen(string s)
 	{
+		#switch
+		#case ifcode PHP then
+		
 		if (gettype($s) != "string") return 0;
 		return @mb_strlen($s);
-	}
-	#case ifcode JAVASCRIPT then
-	static strlen(s){
+		
+		#case ifcode JAVASCRIPT then
+		
+		return use("Runtime.rtl").toString(s).length;
+		/*
 		if (isBrowser())
 			return Runtime.rtl.toString(s).length;
 		return rtl.toString(s).length;
+		*/
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
-	 * Ищет позицию первого вхождения подстроки search в строке s.
-	 * @param {string} s - строка, в которой производится поиск 
-	 * @param {string} search - строка, которую ищем 
-	 * @param {string} offset - если этот параметр указан, 
-	 *                 то поиск будет начат с указанного количества символов с начала строки.  
-	 * @return {variable} Если строка найдена, то возвращает позицию вхождения, начиная с 0.
-	 *                    Если строка не найдена, то вернет -1
+	 * Search 'search' in s.
 	 */
-	declare export static int search(string s, string search, string offset = 0);
-
-	#switch
-	#case ifcode PHP then
-	static function search($s, $search, $offset = 0){
+	static int search(string s, string search, string offset = 0)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		if ($search == ""){
 			return -1;
 		}
@@ -78,15 +76,19 @@ export class rs
 		if ($res === false)
 			return -1;
 		return $res;
-	}
-	#case ifcode JAVASCRIPT then
-	static search(s, search, offset){
-		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
+		
+		#case ifcode JAVASCRIPT then
+		
+		var _rtl = use("Runtime.rtl");
+		/*
+		if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
 		if (!_rtl.exists(offset)) offset = 0;
+		*/
 		var res = _rtl.toString(s).indexOf(search);
 		return res;
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -97,29 +99,38 @@ export class rs
 	 * @param int length
 	 * @return string
 	 */
-	declare export static string substr(string s, int start, int length);
-	 
-	#switch
-	#case ifcode PHP then
-	static function substr(&$s, $start, $length = null){
+	static string substr(string s, int start, int length = null)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if ($length === null)
+		{
+			return mb_substr($s, $start);
+		}
 		return mb_substr($s, $start, $length);
-	}
-	#case ifcode JAVASCRIPT then
-	static substr(s, start, length){
+		
+		#case ifcode JAVASCRIPT then
+		
+		/*
 		var _rtl = null; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
 		var _rs = null; if (isBrowser()) _rs = Runtime.rs; else _rs = rs;
-		var end = start + length;
-		if (length == undefined){
+		*/
+		var _rtl = use("Runtime.rtl");
+		var _rs = use("Runtime.rs");
+		if (start < 0) start = s.length + start;
+		if (length === null){
 			return _rtl.toString(s).substring(start);
 		}
+		var end = start + length;
 		if (length < 0){
 			var sz = _rs.strlen(s);
 			end = sz + length;
 		}
 		return _rtl.toString(s).substring(start, end);
+		
+		#endswitch
 	}
-	#endswitch
-	
 	
 	
 	
@@ -129,10 +140,11 @@ export class rs
 	 * @param int pos The position
 	 * @return string
 	 */
-	static string charAt(string s, int pos){
+	static string charAt(string s, int pos)
+	{
 		int sz = static::strlen(s);
 		if (pos >= 0 and pos < sz)
-			return s[pos];
+			return static::substr(s, pos, 1);
 		return "";
 	}
 	
@@ -142,25 +154,29 @@ export class rs
 	 * Returns ASCII symbol code
 	 * @param char ch
 	 */
-	declare export static int ord(char ch);
-
-	#switch
-	#case ifcode PHP then
-	static function ord($s){	
-		if ($s == "") return 0;
-		$s1 = mb_convert_encoding($s, 'UCS-4LE', 'UTF-8');
-		$result = @unpack('V', $s1);
-		if ($result) return $result[1];
-		/*return mb_ord($s);*/
+	static int ord(char ch)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if ($ch == "") return 0;
+		$ch = mb_convert_encoding($ch, 'UCS-4LE', 'UTF-8');
+		$r = @unpack('V', $ch);
+		if ($r) return $r[1];
 		return 0;
-	}
-	#case ifcode JAVASCRIPT then
-	static ord(s){
+		
+		#case ifcode JAVASCRIPT then
+		
+		/*
 		if (isBrowser())
-			return Runtime.rtl.toString(s).charCodeAt(0);
-		return rtl.toString(s).charCodeAt(0);
+			return Runtime.rtl.toString(ch).charCodeAt(0);
+		return rtl.toString(ch).charCodeAt(0);
+		*/
+		
+		return use("Runtime.rtl").toString(ch).charCodeAt(0);
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -169,20 +185,25 @@ export class rs
 	 * @param string s 
 	 * @return string
 	 */
-	declare export static string strtolower(string s);
-
-	#switch
-	#case ifcode PHP then
-	static function strtolower($s){
+	static string strtolower(string s)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		return mb_strtolower($s);
-	}
-	#case ifcode JAVASCRIPT then
-	static strtolower(s){
+		
+		#case ifcode JAVASCRIPT then
+		
+		/*
 		if (isBrowser())
 			return Runtime.rtl.toString(s).toLowerCase();
 		return rtl.toString(s).toLowerCase();
+		*/
+		
+		return use("Runtime.rtl").toString(s).toLowerCase();
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -191,39 +212,44 @@ export class rs
 	 * @param string s
 	 * @return string
 	 */
-	declare export static string strtoupper(string s);
-
-	#switch
-	#case ifcode PHP then
-	static function strtoupper($s){
+	static string strtoupper(string s)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		return mb_strtoupper($s);
-	}
-	#case ifcode JAVASCRIPT then
-	static strtoupper(s){
+		
+		#case ifcode JAVASCRIPT then
+		
+		/*
 		if (isBrowser())
 			return Runtime.rtl.toString(s).toUpperCase();
 		return rtl.toString(s).toUpperCase();
+		*/
+		
+		return use("Runtime.rtl").toString(s).toUpperCase();
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
 	 * Заменяет одну строку на другую
 	 */
-	declare export static int replace(string search, string item, string s);
-
-	#switch
-	#case ifcode PHP then
-	static function replace($search, $item, $s)
+	static int replace(string search, string item, string s)
 	{
+		#switch
+		#case ifcode PHP then
+		
 		return str_replace($search, $item, $s);
-	}
-	#case ifcode JAVASCRIPT then
-	static replace(search, item, s){
+		
+		#case ifcode JAVASCRIPT then
+		
 		return s.replace(new RegExp(search, "g"), item);
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -233,48 +259,52 @@ export class rs
 	 * @param {integer} n - количество раз, которые нужно повторить строку s
 	 * @return {string} строка
 	 */
-	declare export static string str_repeat(string s, int n);
-	 
-	#switch
-	#case ifcode PHP then
-	static function str_repeat($s, $n){
+	static string str_repeat(string s, int n)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		if ($n <= 0) return "";
 		return str_repeat($s, $n);
-	}
-	#case ifcode JAVASCRIPT then
-	static str_repeat(s, n){
+		
+		#case ifcode JAVASCRIPT then
+		
 		if (n <= 0) return "";
 		var res = '';
 		for (var i=0; i < n; i++){
 			res += s;
 		}
 		return res;
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
 	 * Разбивает строку на подстроки
-	 * @param string reg - regular expression
+	 * @param string delimiter - regular expression
 	 * @param string s - строка, которую нужно разбить
 	 * @param integer limit - ограничение 
 	 * @return Collection<string>
 	 */
-	declare lambda string split(string reg, string s, int limit = -1);
-	
-	#switch
-	#case ifcode PHP then
-	static function split($delimiter, $s, $limit = -1)
+	lambda string split(string delimiter, string s, int limit = -1)
 	{
+		#switch
+		#case ifcode PHP then
+		
 		$arr = preg_split("/".$delimiter."/", $s, $limit);
-		return Collection::create($arr);
-	}
-	#case ifcode JAVASCRIPT then
-	static split(delimiter, s, limit)
-	{
+		return Collection::from($arr);
+		
+		#case ifcode JAVASCRIPT then
+		
+		/*
 		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
 		var _Collection; if (isBrowser()) _Collection = Runtime.Collection; else _Collection = Collection;
+		*/
+		var _rtl = use("Runtime.rtl");
+		var _Collection = use("Runtime.Collection");
+		
 		var arr = null;
 		var delimiter = new RegExp(delimiter, "g");
 		if (!_rtl.exists(limit))
@@ -285,9 +315,10 @@ export class rs
 		{
 			arr = s.split(delimiter, limit);
 		}
-		return _Collection.create(arr);
+		return _Collection.from(arr);
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -298,22 +329,25 @@ export class rs
 	 * @param integer limit - ограничение 
 	 * @return Collection<string>
 	 */
-	declare lambda Collection<string> splitArr(Collection<string> delimiters, string s, int limit = -1);
-	
-	#switch
-	#case ifcode PHP then
-	static function splitArr($delimiters, $s, $limit = -1)
+	lambda Collection<string> splitArr(Collection<string> delimiters, string s, int limit = -1)
 	{
+		#switch
+		#case ifcode PHP then
+		
 		$pattern = "[".implode("", $delimiters->_getArr())."]";
 		$pattern = str_replace("/", "\/", $pattern);
 		$arr = preg_split("/".$pattern."/", $s, $limit);
-		return Collection::create($arr);
-	}
-	#case ifcode JAVASCRIPT then
-	static splitArr(delimiters, s, limit)
-	{
+		return Collection::from($arr);
+		
+		#case ifcode JAVASCRIPT then
+		
+		/*
 		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
 		var _Collection; if (isBrowser()) _Collection = Runtime.Collection; else _Collection = Collection;
+		*/
+		var _rtl = use("Runtime.rtl");
+		var _Collection = use("Runtime.Collection");
+		
 		var arr = null;
 		var delimiter = new RegExp("[" + delimiters.join("") + "]", "g");
 		if (!_rtl.exists(limit))
@@ -324,31 +358,35 @@ export class rs
 		{
 			arr = s.split(delimiter, limit);
 		}
-		return _Collection.create(arr);
+		return _Collection.from(arr);
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
 	/**
-	 * Разбивает строку на подстроки
+	 * Соединяет строки
 	 * @param string ch - разделитель
 	 * @param string s - строка, которую нужно разбить
 	 * @param integer limit - ограничение 
 	 * @return Vector<string>
 	 */
-	declare static string join(string ch, Vector<string> arr);
-	 
-	#switch
-	#case ifcode PHP then
-	static function join($s, $arr){
-		return implode($s, $arr->_getArr());
-	}
-	#case ifcode JAVASCRIPT then
-	static join(ch, arr){
+	static string join(string ch, Vector<string> arr)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if ($arr == null) return "";
+		return implode($ch, $arr->_getArr());
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (arr == null) return "";
 		return arr.join(ch);
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -357,26 +395,33 @@ export class rs
 	 * @param {string} s - входная строка
 	 * @return {integer} новая строка
 	 */
-	declare export static string trim(string s, string ch = "");
-
-	#switch
-	#case ifcode PHP then
-	static function trim($s, $ch=""){
+	static string trim(string s, string ch = "")
+	{
+		#switch
+		#case ifcode PHP then
+		
 		if ($ch=="")
 			return trim($s);
 		return trim($s, $ch);
-	}
-	#case ifcode JAVASCRIPT then
-	static trim(s, ch){
+		
+		#case ifcode JAVASCRIPT then
+		
 		if (ch == undefined) ch = "";
+		
+		/*
 		if (isBrowser()) s = Runtime.rtl.toString(s);
 		else s = rtl.toString(s);
+		*/
+		
+		s = use("Runtime.rtl").toString(s);
+		
 		if (ch == ""){
 			return s.trim();
 		}
 		return s.replace(new RegExp("^[" + ch + "]+", "g"),"").replace(new RegExp("[" + ch + "]+$", "g"),"");
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -386,21 +431,23 @@ export class rs
 	 * @param {int} flags - Флаги
 	 * @return {string} json строка
 	 */
-	declare export static string json_encode(var s, int flags);
+	static string json_encode(var s, int flags)
+	{
 
-	#switch
-	#case ifcode PHP then
-	static function json_encode($s, $flags = 0){
+		#switch
+		#case ifcode PHP then
+		
 		$flags = $flags || JSON_UNESCAPED_UNICODE;
 		return json_encode($s, JSON_UNESCAPED_UNICODE);
-	}
-	#case ifcode JAVASCRIPT then
-	static json_encode(obj, flags = 0){
+		
+		#case ifcode JAVASCRIPT then
+		
 		if (flags & 128 == 128) 
 			return JSON.stringify(obj, null, 2);
 		return JSON.stringify(obj);
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -409,17 +456,17 @@ export class rs
 	 * @param string s
 	 * @return string
 	 */
-	declare export static string htmlEscape(string s);
-
-	#switch
-	#case ifcode PHP then
-	static function htmlEscape($s){
+	lambda string htmlEscape(string s)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		if ($s instanceof \Runtime\Collection) return $s;
 		if ($s instanceof \Runtime\UIStruct) return $s;
 		return htmlspecialchars($s, ENT_QUOTES | ENT_HTML401);
-	}
-	#case ifcode JAVASCRIPT then
-	static htmlEscape(s){
+		
+		#case ifcode JAVASCRIPT then
+		
 		if (s instanceof Runtime.Collection) return s;
 		if (s instanceof Runtime.UIStruct) return s;
 		var obj = {
@@ -432,8 +479,10 @@ export class rs
 			'=': '&#x3D;'
 		};
 		return (new String(s)).replace(/[<>&"'`=]/g, function(v){ return obj[v]; });
+		
+		#endswitch
 	}
-	#endswitch
+	lambda string escapeHtml(string s) => static::htmlEscape(s);
 	
 	
 	
@@ -446,7 +495,7 @@ export class rs
 	 *         extension  - расширение файла
 	 *         filename   - имя файла без расширения
 	 */
-	public static PathInfo pathinfo(string filepath)
+	static PathInfo pathinfo(string filepath)
 	{
 		Vector<string> arr1 = rs::explode(".", filepath).toVector();
 		Vector<string> arr2 = rs::explode("/", filepath).toVector();
@@ -475,7 +524,7 @@ export class rs
 	 * @param {string} filepath - путь к файлу
 	 * @return {string} полное имя файла
 	 */
-	public static string filename(string filepath)
+	static string filename(string filepath)
 	{
 		PathInfo ret = self::pathinfo(filepath);
 		string res = ret.basename;
@@ -496,7 +545,7 @@ export class rs
 	 * @param {string} filepath - путь к файлу
 	 * @return {string} полное имя файла
 	 */
-	public static string basename(string filepath)
+	static string basename(string filepath)
 	{
 		PathInfo ret = self::pathinfo(filepath);
 		string res = ret.basename;
@@ -511,7 +560,7 @@ export class rs
 	 * @param {string} filepath - путь к файлу
 	 * @return {string} расширение файла
 	 */
-	public static string extname(string filepath)
+	static string extname(string filepath)
 	{
 		PathInfo ret = self::pathinfo(filepath);
 		string res = ret.extension;
@@ -526,7 +575,7 @@ export class rs
 	 * @param {string} filepath - путь к файлу
 	 * @return {string} путь к папке, содержащий файл
 	 */
-	public static string dirname(string filepath)
+	static string dirname(string filepath)
 	{
 		PathInfo ret = self::pathinfo(filepath);
 		string res = ret.dirname;
@@ -543,7 +592,7 @@ export class rs
 	 * @param string ch - Directory separator
 	 * @return string relative path
 	 */
-	public static string relativePath(string filepath, string basepath, string ch = "/")
+	static string relativePath(string filepath, string basepath, string ch = "/")
 	{
 		Vector<string> source = rs::explode(ch, filepath);
 		Vector<string> base = rs::explode(ch, basepath);
@@ -575,7 +624,7 @@ export class rs
 	 * @param string filepath - File path
 	 * @return string
 	 */
-	public static string normalize(string filepath)
+	static string normalize(string filepath)
 	{
 		return filepath;
 	}
@@ -585,7 +634,7 @@ export class rs
 	/**
 	 * New line to br
 	 */
-	public static string nl2br(string s)
+	static string nl2br(string s)
 	{
 		return static::replace("\n", "<br/>", s);
 	}
@@ -596,38 +645,41 @@ export class rs
 	/* =================== Deprecated =================== */
 	
 	
-	
-	
-	
 	/**
 	 * Разбивает строку на подстроки
-	 * @param string ch - разделитель
+	 * @param string delimiter - разделитель
 	 * @param string s - строка, которую нужно разбить
 	 * @param integer limit - ограничение 
 	 * @return Vector<string>
 	 */
-	declare export static Vector<string> explode(string ch, string s, int limit = -1);
-	
-	#switch
-	#case ifcode PHP then
-	static function explode($delimiter, $s, $limit = -1)
+	static Vector<string> explode(string delimiter, string s, int limit = -1)
 	{
+		#switch
+		#case ifcode PHP then
+		
 		$arr = [];
 		if ($limit < 0) $arr = explode($delimiter, $s);
 		else $arr = explode($delimiter, $s, $limit);
-		return Collection::create($arr);
-	}
-	#case ifcode JAVASCRIPT then
-	static explode(delimiter, s, limit){
+		return Collection::from($arr);
+		
+		#case ifcode JAVASCRIPT then
+		
+		/*
 		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
-		var _Collection; if (isBrowser()) _Collection = Runtime.Collection; else _Vector = Collection;
+		var _Collection; if (isBrowser()) _Collection = Runtime.Collection; else _Collection = Collection;
+		*/
+		
+		var _rtl = use("Runtime.rtl");
+		var _Collection = use("Runtime.Collection");
+		
 		var arr = null;
 		if (!_rtl.exists(limit))
 			arr = s.split(delimiter);
 		arr = s.split(delimiter, limit);
-		return _Collection.create(arr);
+		return _Collection.from(arr);
+		
+		#endswitch
 	}
-	#endswitch
 	
 	
 	
@@ -638,18 +690,20 @@ export class rs
 	 * @param integer limit - ограничение 
 	 * @return Vector<string>
 	 */
-	declare export static string implode(string ch, Vector<string> arr);
-	 
-	#switch
-	#case ifcode PHP then
-	static function implode($s, $arr){
+	static string implode(string ch, Vector<string> arr)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		return implode($s, $arr->_getArr());
-	}
-	#case ifcode JAVASCRIPT then
-	static implode(ch, arr){
+		
+		#case ifcode JAVASCRIPT then
+		
 		return arr.join(ch);
+		
+		#endswitch
 	}
-	#endswitch
+	
 	
 	
 	/**
@@ -661,11 +715,11 @@ export class rs
 	 * @return {variable} Если строка найдена, то возвращает позицию вхождения, начиная с 0.
 	 *                    Если строка не найдена, то вернет -1
 	 */
-	declare export static int strpos(string s, string search, string offset = 0);
-
-	#switch
-	#case ifcode PHP then
-	static function strpos($s, $search, $offset = 0){
+	static int strpos(string s, string search, string offset = 0)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		if ($search == ""){
 			return -1;
 		}
@@ -673,14 +727,17 @@ export class rs
 		if ($res === false)
 			return -1;
 		return $res;
-	}
-	#case ifcode JAVASCRIPT then
-	static strpos(s, search, offset){
-		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
+		
+		#case ifcode JAVASCRIPT then
+		
+		/*var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;*/
+		var _rtl = use("Runtime.rtl");
+		
 		if (!_rtl.exists(offset)) offset = 0;
 		var res = _rtl.toString(s).indexOf(search);
 		return res;
+		
+		#endswitch
 	}
-	#endswitch
 	
 }

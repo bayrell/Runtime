@@ -22,12 +22,16 @@ use Runtime.rtl;
 use Runtime.RuntimeConstant;
 use Runtime.Exceptions.RuntimeException;
 use Runtime.Interfaces.ContextInterface;
+use Runtime.BusResult;
 
 
 class ApiException extends RuntimeException
 {
-	
-	void constructor(string message = "", int code = 0, ContextInterface context = null, Object prev = null)
+	void constructor
+	(
+		string message = "", int code = -1,
+		ContextInterface context = null, Object prev = null
+	)
 	{
 		parent(
 			message, 

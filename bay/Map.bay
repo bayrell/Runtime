@@ -22,14 +22,20 @@ use Runtime.rtl;
 use Runtime.Vector;
 use Runtime.Exceptions.KeyNotFound;
 
-#switch
-#case ifcode JAVASCRIPT then
-var isBrowser=function(){return typeof window !== "undefined" && this === window;}
-#endswitch
 
-
-declare class Map<T> extends Dict<T>
+class Map<T> extends Dict<T>
 {
+
+	/**
+	 * Returns new Instance
+	 * @return Object
+	 */
+	static Collection<T> Instance()
+	{
+		return new Map();
+	}
+	
+	
 	
 	/**
 	 * Set value size_to position
@@ -37,7 +43,19 @@ declare class Map<T> extends Dict<T>
 	 * @param T value 
 	 * @return self
 	 */
-	declare public Map<T> set(string key, T value);
+	public Map<T> set(string key, T value)
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		key = this.toStr(key);
+		this._map["|" + key] = value;
+		return this;
+		#case ifcode PHP then
+		$key = rtl::toStr($key);
+		$this->_map[$key] = $value;
+		return $this;
+		#endswitch
+	}
 	
 	
 	
@@ -46,164 +64,22 @@ declare class Map<T> extends Dict<T>
 	 * @param string key
 	 * @return self
 	 */
-	declare public Map<T> remove(string key);
-	
-	
-	
-	/**
-	 * Clear all values from vector
-	 * @return self
-	 */
-	declare public Map<T> clear();
-}
-
-
-
-#switch
-
-#case ifcode JAVASCRIPT then
-if (typeof Runtime == "undefined") Runtime = {};
-
-
-#case ifcode NODEJS then
-var _Dict = require('./Dict.js');
-Runtime.Map = class extends _Dict
-
-
-#case ifcode ES6 then
-Runtime.Map = class extends Runtime.Dict
-
-
-#case ifcode JAVASCRIPT then
-{
-
-	/**
-	 * Returns new Instance
-	 * @return Object
-	 */
-	static createNewInstance(obj)
+	public Map<T> remove(string key)
 	{
-		if (obj == undefined) obj = null;
-		return new Runtime.Map(obj);
-	}
-	
-	
-	
-	/**
-	 * Assign objects
-	 */
-	assignObject(obj)
-	{
-		if (obj instanceof Runtime.Map)
+		#switch
+		#case ifcode JAVASCRIPT then
+		key = this.toStr(key);
+		if (this.has("|" + key))
 		{
-			obj.each(
-				(key, value) => {
-					if (isBrowser()) this.set(key, Runtime.rtl._clone(value));
-					else this.set(key, rtl._clone(value));
-				}
-			);
-		}
-	}
-	
-	
-	
-	/**
-	 * Set value size_to position
-	 * @param T pos - position
-	 * @param T value 
-	 */
-	set(key, value)
-	{
-		key = this.toString(key);
-		super.set(key, value);
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Remove value from position
-	 * @param T key
-	 */
-	remove(key)
-	{
-		key = this.toString(key);
-		if (super.has(key)){
-			super.delete(key);
+			delete this._map["|" + key];
 		}
 		return this;
-	}
-	
-	
-	
-	/**
-	 * Clear all values from vector
-	 */
-	clear()
-	{
-		super.clear();
-		return this;
-	}
-	
-	
-	getClassName(){return "Runtime.Map";}
-	static getCurrentClassName(){return "Runtime.Map";}
-	static getParentClassName(){return "Runtime.Dict";}
-	
-}
-
-#case ifcode NODEJS then
-
-if (false){
-
-module.exports = {
-	"Map": Runtime.Map
-}
-
-}
-else{
-
-module.exports = Runtime.Map;
-
-}
-
-
-#case ifcode PHP then
-
-class Map extends Dict
-{
-	
-	
-	protected $_map = null;
-	
-		
-	
-	/**
-	 * Set value size_to position
-	 * @param T pos - position
-	 * @param T value 
-	 * @return self
-	 */
-	public function set($key, $value)
-	{
-		$key = rtl::toString($key);
-		$this->_map[$key] = $value;
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Remove value from position
-	 * @param T key
-	 * @return self
-	 */
-	public function remove($key)
-	{
-		$key = rtl::toString($key);
+		#case ifcode PHP then
+		$key = rtl::toStr($key);
 		if (isset($this->_map[$key]))
 			unset($this->_map[$key]);
 		return $this;
+		#endswitch
 	}
 	
 	
@@ -212,15 +88,17 @@ class Map extends Dict
 	 * Clear all values from vector
 	 * @return self
 	 */
-	public function clear(){
+	public Map<T> clear()
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		this._map = {};
+		return this;
+		#case ifcode PHP then
 		$this->_map = [];
 		return $this;
+		#endswitch
 	}
 	
-	
-	function getClassName(){return "Runtime.Map";}
-	public static function getCurrentClassName(){return "Runtime.Map";}
-	public static function getParentClassName(){return "Runtime.Dict";}
 }
 
-#endswitch

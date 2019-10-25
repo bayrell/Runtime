@@ -27,7 +27,7 @@ use Runtime.Vector;
 use Runtime.Interfaces.SerializeInterface;
 
 
-class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterface
+class FakeStruct extends CoreObject implements ArrayInterface, SerializeInterface
 {	
 	
 	/** 
@@ -42,10 +42,10 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 			{
 				#switch
 				#case ifcode PHP then
-				$obj = \Runtime\Dict::from($obj);
+				$obj = \Runtime\Dict::create($obj);
 				#case ifcode JAVASCRIPT then
 				var _Dict = use("Runtime.Dict");
-				if (typeof obj == "object") obj = _Dict.from(obj);
+				if (typeof obj == "object") obj = _Dict.create(obj);
 				#endswitch
 			}
 			#switch
@@ -74,7 +74,7 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Init struct data
 	 */
-	protected void initData(CoreStruct old, Dict changed = null)
+	protected void initData(FakeStruct old, Dict changed = null)
 	{
 	}
 	
@@ -83,56 +83,56 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Copy this struct with new values
 	 * @param Map obj = null
-	 * @return CoreStruct
+	 * @return FakeStruct
 	 */
-	public CoreStruct copy(Dict obj = null)
+	public FakeStruct copy(Dict obj = null)
 	{
-		if (obj == null) return this;
-		
 		#switch
 		#case ifcode PHP then
 		
-		$item = clone $this;
-		if ($obj instanceof \Runtime\Dict)
+		if ($obj == null){}
+		else if ($obj instanceof \Runtime\Dict)
 		{
 			foreach ($obj->_map as $key => $value)
 			{
-				$k = "__".$key;
-				if (property_exists($item, $k))
-					$item->$k = $value;
+				if (property_exists($this, $key))
+					$this->$key = clone $value;
 			}
 		}
 		else if (gettype($obj) == "array")
 		{
 			foreach ($obj as $key => $value)
 			{
-				$k = "__".$key;
-				if (property_exists($item, $k))
-					$item->$k = $value;
+				if (property_exists($this, $key))
+					$this->$key = clone $value;
 			}
 		}
 		
-		return $item;
+		return $this;
 		
 		#case ifcode JAVASCRIPT then
 		
-		var proto = Object.getPrototypeOf(this);
-		var item = Object.create(proto); item._init();
-		item = Object.assign(item, this);
-		
+		var _rtl = use("Runtime.rtl");
 		var _Dict = use("Runtime.Dict");
-		if (obj instanceof _Dict)
+		if (obj == null){}
+		else if (obj instanceof _Dict)
 		{
-			for (var key in obj._map) item["__" + key.substring(1)] = obj._map[key];
+			for (var key in obj._map)
+			{
+				this[key.substring(1)] = _rtl.clone(__ctx, obj._map[key]);
+			}
 		}
 		else
 		{
-			for (var key in obj) item["__" + key] = obj[key];
+			for (var key in obj)
+			{
+				this[key] = _rtl.clone(__ctx, obj[key]);
+			}
 		}
 		
-		item.initData(this, obj);
+		this.initData(this, obj);
 		
-		return item;
+		return this;
 		
 		#endswitch
 		
@@ -142,11 +142,11 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	
 	
 	/**
-	 * Copy this struct with new values
+	 * Clone this struct with same values
 	 * @param Map obj = null
-	 * @return CoreStruct
+	 * @return FakeStruct
 	 */
-	public CoreStruct clone(Collection fields)
+	public FakeStruct clone(Collection fields = null)
 	{
 		Map obj = new Map();
 		if (fields != null)
@@ -155,17 +155,22 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 			( 
 				void (string field_name) use (obj)
 				{
-					obj.set(field_name, this.takeValue(field_name));
+					obj.set(field_name, rtl::clone( this.takeValue(field_name) ));
 				}
 			);
 		}
 		else
 		{
-			return this;
+			Collection names = RuntimeUtils::getVariablesNames(this.getClassName());
+			for (int i=0; i<names.count(); i++)
+			{
+				string field_name = names.item(i);
+				obj.set(field_name, rtl::clone( this.takeValue(field_name) ));
+			}
 		}
 		
 		/* Return object */
-		CoreStruct res = rtl::newInstance( this.getClassName(), [ obj.toDict() ] );
+		FakeStruct res = static::newInstance( obj.toDict() );
 		return res;
 	}
 	
@@ -175,9 +180,9 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	 * Create new struct with new value
 	 * @param string field_name
 	 * @param fn f
-	 * @return CoreStruct
+	 * @return FakeStruct
 	 */
-	public CoreStruct map(string field_name, fn f)
+	public FakeStruct map(string field_name, fn f)
 	{
 		return this.copy( (new Map()).set(field_name, f(this.takeValue(field_name))).toDict() );
 	}
@@ -187,14 +192,14 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Returns new instance
 	 */
-	lambda CoreStruct newInstance(Dict items)
+	lambda FakeStruct newInstance(Dict items)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
 		return new (Function.prototype.bind.apply(this, [null, __ctx, items]));
 		#case ifcode PHP then
 		$class_name = static::class;
-		return new $class_name($__ctx, $items);
+		return new $class_name($items);
 		#endswitch
 	}
 	

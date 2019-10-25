@@ -16,18 +16,49 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Interfaces;
+namespace Runtime;
+
+use Runtime.Context;
+use Runtime.CoreObject;
+use Runtime.rtl;
+use Runtime.RuntimeUtils;
+use Runtime.Vector;
 
 
-interface SubscribeInterface{
+class CoreDriver extends CoreObject
+{
+	
+	protected Context _context = null;
 	
 	
 	/**
-	 * Handler event
-	 * var e
+	 * Returns context
+	 *
+	 * @return Context 
 	 */
-	public void handlerEvent(var e);
+	public Context context()
+	{
+		return this._context;
+	}
 	
+	
+	
+	/**
+	 * Constructor
+	 */
+	public void constructor(Context context = null)
+	{
+		parent();
+		this._context = context;
+	}
+	
+	
+	
+	/**
+	 * Start driver
+	 */
+	public async void startDriver()
+	{
+	}
 	
 }
-

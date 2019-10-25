@@ -27,8 +27,8 @@ use Runtime.Collection;
 use Runtime.Vector;
 
 
-struct Manager extends CoreStruct
+struct LambdaChainDeclare extends CoreStruct
 {
 	string name = "";
-	string value = "";
+	bool is_await = false;
 }

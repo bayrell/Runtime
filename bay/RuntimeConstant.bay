@@ -21,6 +21,13 @@ namespace Runtime;
 
 class RuntimeConstant
 {
+	/* CHAINS */
+	static const string CHAIN_ENTITIES = "Runtime.Entities";
+	
+	
+	/* Providers */
+	static const string LOCAL_BUS = "Runtime.Interfaces.LocalBusInterface";
+	static const string REMOTE_BUS = "Runtime.Interfaces.RemoteBusInterface";
 	
 	
 	/* Log level */
@@ -89,6 +96,13 @@ class RuntimeConstant
 	static const int ERROR_VALIDATION = -12;
 	static const int ERROR_PARSE_SERIALIZATION_ERROR = -14;
 	static const int ERROR_ASSIGN_DATA_STRUCT_VALUE = -15;
+	static const int ERROR_AUTH = -16;
+	static const int ERROR_DUPLICATE = -17;
 	static const int ERROR_FATAL = -99;
+	static const int ERROR_HTTP_CONTINUE = -100;
+	static const int ERROR_HTTP_SWITCH = -101;
+	static const int ERROR_HTTP_PROCESSING = -102;
+	static const int ERROR_HTTP_OK = -200;
+	static const int ERROR_HTTP_BAD_GATEWAY = -502;
 	
 }

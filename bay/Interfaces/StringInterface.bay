@@ -19,8 +19,8 @@
 namespace Runtime.Interfaces;
 
 
-interface StringInterface{
-	
+interface StringInterface
+{
 	
 	/**
 	 * Returns string

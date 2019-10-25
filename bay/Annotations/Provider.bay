@@ -25,10 +25,9 @@ use Runtime.rs;
 use Runtime.rtl;
 use Runtime.Collection;
 use Runtime.Vector;
+use Runtime.Annotations.Entity;
 
 
-struct Provider extends CoreStruct
+struct Provider extends Entity
 {
-	string name = "";
-	string value = "";
 }

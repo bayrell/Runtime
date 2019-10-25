@@ -20,6 +20,8 @@ namespace Runtime;
 
 use Runtime.rtl;
 use Runtime.CoreStruct;
+use Runtime.Dict;
+
 
 struct DateTime extends CoreStruct
 {
@@ -37,7 +39,7 @@ struct DateTime extends CoreStruct
 	#switch
 	
 	#case ifcode PHP then
-	public static function assignDatetime($dt, $obj)
+	public static function fromObject($dt)
 	{
 		$y = (int)$dt->format("Y");
 		$m = (int)$dt->format("m");
@@ -45,65 +47,12 @@ struct DateTime extends CoreStruct
 		$h = (int)$dt->format("H");
 		$i = (int)$dt->format("i");
 		$s = (int)$dt->format("s");
-		return $obj->copy({"y":$y,"m":$m,"d":$d,"h":$h,"i":$i,"s":$s});
-	}
-	public static function createDatetime($dt, $tz="UTC")
-	{
-		return static::assignDatetime($dt, new DateTime({"tz":tz}));
-	}
-	public static function getDatetime($obj)
-	{
-		$dt = new \DateTime("now", new \DateTimeZone($obj->tz));
-		$dt->setDate($obj->y, $obj->m, $obj->d);
-		$dt->setTime($obj->h, $obj->i, $obj->s);
-		return $dt;
+		$tz = $dt->getTimezone()->getName();
+		return new DateTime( Dict::create(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"tz"=>$tz]) );
 	}
 	
 	#case ifcode JAVASCRIPT then
-	static getTimezoneOffset(obj)
-	{
-		if (obj.tz == "GMT") return 0;
-		if (obj.tz == "GMT+1") return -60;
-		if (obj.tz == "GMT+2") return -120;
-		if (obj.tz == "GMT+3") return -180;
-		if (obj.tz == "GMT+4") return -240;
-		if (obj.tz == "GMT+5") return -300;
-		if (obj.tz == "GMT+6") return -360;
-		if (obj.tz == "GMT+7") return -420;
-		if (obj.tz == "GMT+8") return -480;
-		if (obj.tz == "GMT+9") return -540;
-		if (obj.tz == "GMT+10") return -600;
-		if (obj.tz == "GMT+11") return -660;
-		if (obj.tz == "GMT+13") return -780;
-		if (obj.tz == "GMT+14") return -840;
-		if (obj.tz == "GMT-1") return 60;
-		if (obj.tz == "GMT-2") return 120;
-		if (obj.tz == "GMT-3") return 180;
-		if (obj.tz == "GMT-4") return 240;
-		if (obj.tz == "GMT-5") return 300;
-		if (obj.tz == "GMT-6") return 360;
-		if (obj.tz == "GMT-7") return 420;
-		if (obj.tz == "GMT-8") return 480;
-		if (obj.tz == "GMT-9") return 540;
-		if (obj.tz == "GMT-10") return 600;
-		if (obj.tz == "GMT-11") return 660;
-		if (obj.tz == "GMT-12") return 720;		
-		return 0;
-	}
-	static getTimezoneOffsetString(obj)
-	{
-		var offset = this.getTimezoneOffset(obj);
-		var sign = 1;
-		if (offset <= 0){ sign = -1; offset = -offset; }
-		var h = Math.floor(offset / 60);
-		var m = offset % 60;
-		h = (h < 10) ? "0" + h : "" + h;
-		m = (m < 10) ? "0" + m : "" + m;
-		var s = h + m;
-		if (sign == 1) s = "-" + s; else s = "+" + s;
-		return s;
-	}
-	static shiftTimezone(dt, offset)
+	static shiftOffset(dt, offset)
 	{
 		var h = Math.floor(offset / 60);
 		var m = offset % 60;
@@ -111,30 +60,98 @@ struct DateTime extends CoreStruct
 		dt.setHours(dt.getHours() + h);
 		return dt;
 	}
-	static assignDatetime(dt, obj)
+	static getTimezoneOffset(tz)
 	{
-		var offset = dt.getTimezoneOffset() - this.getTimezoneOffset(obj);
-		dt = this.shiftTimezone(dt, offset);
+		if (tz == "UTC") return 0;
+		if (tz == "GMT") return 0;
+		if (tz == "GMT+1") return -60;
+		if (tz == "GMT+2") return -120;
+		if (tz == "GMT+3") return -180;
+		if (tz == "GMT+4") return -240;
+		if (tz == "GMT+5") return -300;
+		if (tz == "GMT+6") return -360;
+		if (tz == "GMT+7") return -420;
+		if (tz == "GMT+8") return -480;
+		if (tz == "GMT+9") return -540;
+		if (tz == "GMT+10") return -600;
+		if (tz == "GMT+11") return -660;
+		if (tz == "GMT+13") return -780;
+		if (tz == "GMT+14") return -840;
+		if (tz == "GMT-1") return 60;
+		if (tz == "GMT-2") return 120;
+		if (tz == "GMT-3") return 180;
+		if (tz == "GMT-4") return 240;
+		if (tz == "GMT-5") return 300;
+		if (tz == "GMT-6") return 360;
+		if (tz == "GMT-7") return 420;
+		if (tz == "GMT-8") return 480;
+		if (tz == "GMT-9") return 540;
+		if (tz == "GMT-10") return 600;
+		if (tz == "GMT-11") return 660;
+		if (tz == "GMT-12") return 720;		
+		return 0;
+	}
+	static fromObject(dt, tz)
+	{
+		var offset = this.getTimezoneOffset(tz);
+		var offset = offset - dt.getTimezoneOffset();
+		dt = this.shiftOffset(dt, offset);
 		var y = Number(dt.getFullYear());
 		var m = Number(dt.getMonth()) + 1;
 		var d = Number(dt.getDate());
 		var h = Number(dt.getHours());
 		var i = Number(dt.getMinutes());
 		var s = Number(dt.getSeconds());
-		return obj.copy( new Map({"y":y, "m":m, "d":d, "h":h, "i":i, "s":s}) );
-	}
-	static createDatetime(dt, tz)
-	{
-		return this.assignDatetime(dt, new Runtime.DateTime( new Map({"tz":tz}) ));
-	}
-	static getDatetime(obj)
-	{
-		var dt = new Date(obj.y, obj.m - 1, obj.d, obj.h, obj.i, obj.s);
-		var offset = this.getTimezoneOffset(obj) - dt.getTimezoneOffset();
-		dt = this.shiftTimezone(dt, offset);
+		var dt = new DateTime( Dict.create({"y":y,"m":m,"d":d,"h":h,"i":i,"s":s,"tz":tz}) );
 		return dt;
 	}
+	
 	#endswitch
+	
+	
+	
+	/**
+	 * Create date time from timestamp
+	 */
+	lambda DateTime timestamp(int time, string tz = "UTC")
+	{
+		#switch
+		#case ifcode PHP then
+		$dt = new \DateTime();
+		$dt->setTimezone(new \DateTimeZone($tz));
+		$dt->setTimestamp($time);		
+		return static::fromObject($dt);
+		
+		#case ifcode JAVASCRIPT then
+		var dt = new Date(time*1000);
+		return this.fromObject(dt, tz);
+		#endswitch
+		
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Output dbtime
+	 */
+	lambda string dbtime (int time, string tz = "UTC")
+	{
+		#switch
+		#case ifcode PHP then
+		$dt = new \DateTime();
+		$dt->setTimezone(new \DateTimeZone($tz));
+		$dt->setTimestamp($time);
+		return $dt->format('Y-m-d H:i:s');
+		
+		#case ifcode JAVASCRIPT then
+		var dt = new Date(time*1000);
+		var obj = this.fromObject(dt, tz);
+		return obj.getDBTime();		
+		#endswitch
+		
+		return "";
+	}
 	
 	
 	
@@ -165,10 +182,9 @@ struct DateTime extends CoreStruct
 	
 	/**
 	 * Returns day of week
-	 * @param DateTime obj
 	 * @return int
 	 */
-	lambda int getDayOfWeek (DateTime obj)
+	int getDayOfWeek ()
 	{
 		#switch
 		
@@ -189,10 +205,9 @@ struct DateTime extends CoreStruct
 	
 	/**
 	 * Returns timestamp
-	 * @param DateTime obj
 	 * @return int
 	 */
-	lambda int getTimestamp (DateTime obj)
+	int getTimestamp ()
 	{
 		#switch
 		
@@ -214,10 +229,9 @@ struct DateTime extends CoreStruct
 	/**
 	 * Set timestamp
 	 * @param int timestamp
-	 * @param DateTime obj
 	 * @return DateTime instance
 	 */
-	lambda DateTime setTimestamp (int timestamp, DateTime obj)
+	DateTime setTimestamp (int timestamp)
 	{
 		#switch
 		
@@ -239,10 +253,9 @@ struct DateTime extends CoreStruct
 	/**
 	 * Change time zone
 	 * @param string tz
-	 * @param DateTime obj
 	 * @return DateTime instance
 	 */
-	lambda DateTime changeTimezone (string tz, DateTime obj)
+	DateTime changeTimezone (string tz)
 	{
 		#switch
 		
@@ -264,10 +277,9 @@ struct DateTime extends CoreStruct
 	
 	/**
 	 * Return datetime in RFC822
-	 * @param DateTime obj
 	 * @return string
 	 */
-	lambda DateTime getRFC822(DateTime obj)
+	DateTime getRFC822()
 	{
 		#switch
 		
@@ -324,10 +336,9 @@ struct DateTime extends CoreStruct
 	
 	/**
 	 * Return datetime in ISO8601
-	 * @param DateTime obj
 	 * @return string
 	 */
-	lambda DateTime getISO8601(DateTime obj)
+	DateTime getISO8601()
 	{
 		#switch
 		
@@ -352,11 +363,10 @@ struct DateTime extends CoreStruct
 	
 	
 	/**
-	 * Return datetime by GMT
-	 * @param DateTime obj
+	 * Return db datetime
 	 * @return string
 	 */
-	lambda DateTime getGMT(DateTime obj)
+	DateTime getDBTime()
 	{
 		#switch
 		
@@ -381,15 +391,14 @@ struct DateTime extends CoreStruct
 	
 	/**
 	 * Return datetime by UTC
-	 * @param DateTime obj
 	 * @return string
 	 */
-	lambda DateTime getUTC(DateTime obj)
+	DateTime getUTC()
 	{
 		#switch
 		
 		#case ifcode PHP then
-		$dt = static::getDatetime($obj);
+		$dt = this.getDatetime($obj);
 		$dt->setTimezone( new \DateTimeZone("UTC") ); 
 		return $dt->format("Y-m-d H:i:s");
 		

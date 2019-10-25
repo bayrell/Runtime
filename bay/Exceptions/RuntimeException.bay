@@ -25,91 +25,137 @@ use Runtime.Interfaces.ContextInterface;
 declare class ClassException{}
 
 #switch
-#case ifcode ES6 then
+#case ifcode JAVASCRIPT then
 if (typeof Runtime == 'undefined') Runtime = {};
 if (typeof Runtime.Exceptions == 'undefined') Runtime.Exceptions = {};
-Runtime.Exceptions.ClassException = class extends Error { _init(){} }
+Runtime.Exceptions.ClassException = function()
+{
+	Error.call(this);
+	Error.captureStackTrace(this, this.constructor);
+}
+Runtime.Exceptions.ClassException.prototype = Object.create(Error.prototype);
+Runtime.Exceptions.ClassException.prototype.constructor = Runtime.Exceptions.ClassException;
+Object.assign(Runtime.Exceptions.ClassException.prototype,
+{
+	_init: function(){},
+	getClassName: function(){ return "Runtime.Exceptions.ClassException"; },
+});
+Object.assign(Runtime.Exceptions.ClassException,
+{
+	getCurrentNamespace: function(){ return "Runtime.Exceptions"; },
+	getCurrentClassName: function(){ return "Runtime.Exceptions.ClassException"; },
+	getParentClassName: function(){ return ""; },
+});
 #case ifcode NODEJS then
-class ClassException extends Error { _init(){} }
+use.add(Runtime.Exceptions.ClassException);
 #case ifcode PHP then
-class ClassException extends \Exception {}
+class Error extends \Exception{function _init(){}}
 #endswitch
 
 
 class RuntimeException extends ClassException
 {
-	
-	
 	protected ContextInterface context = null;
 	protected Object prev = null;
-	protected string error_str = "";
-	protected string message = "";
-	protected int code = 0;
-	protected string file = "";
-	protected int line = -1;
-	protected int pos = -1;
+	public string error_message = "";
+	public string error_str = "";
+	public int error_code = 0;
+	public string error_file = "";
+	public int error_line = -1;
+	public int error_pos = -1;
 	
 	
-	void constructor(string message = "", int code = 0, ContextInterface context = null, Object prev = null){
+	void constructor(string message = "", int code = -1, ContextInterface context = null, Object prev = null)
+	{
 		parent(message, code, prev);
-		
+		this._init();
 		this.error_str = message;
+		this.error_code = code;
 		this.context = context;
-		this.message = message;
-		this.code = code;
 		this.prev = prev;
-		
+		this.updateError();
 	}
 	
-	public Exception getPreviousException(){
+	public Object getPreviousException()
+	{
 		return this.prev;
 	}
 	
-	public string getErrorMessage(){
-		return this.message;
+	public string getErrorMessage()
+	{
+		return this.error_message;
 	}
 	
-	public int getErrorCode(){
-		return this.code;
+	public string getErrorString()
+	{
+		return this.error_str;
 	}
 	
-	public string getFileName(){
-		return this.file;
+	public int getErrorCode()
+	{
+		return this.error_code;
 	}
 	
-	public void setFileName(string file){
-		this.file = file;
+	public string getFileName()
+	{
+		#switch
+		#case ifcode PHP then
+		if ($this->error_file == "")
+		{
+			return $this->getFile();
+		}
+		#endswitch
+		return this.error_file;
 	}
 	
-	public string getErrorLine(){
-		return this.line;
+	public string getErrorLine()
+	{
+		#switch
+		#case ifcode PHP then
+		if ($this->error_line == "")
+		{
+			return $this->getLine();
+		}
+		#endswitch
+		return this.error_line;
 	}
 	
-	public void setErrorLine(int line){
-		this.line = line;
+	public string getErrorPos()
+	{
+		return this.error_pos;
 	}
 	
-	public string getErrorPos(){
-		return this.pos;
-	}
-	
-	public void setErrorPos(int pos){
-		this.pos = pos;
-	}
-	
-	public string toString(){
-		return this.message;
+	public string toString()
+	{
+		return this.buildMessage();
 	}
 
-	public string buildMessage(){
-		this.message = this.error_str;
+	public string buildMessage()
+	{
+		string error_str = this.error_str;
+		string file = this.getFileName();
+		string line = this.getErrorLine();
+		string pos = this.getErrorPos();
 		
-		if (this.line != -1 and this.pos != -1){
-			this.message ~= " at Ln:" ~ this.line ~ ", Pos:" ~ this.pos;
+		if (line != -1)
+		{
+			error_str ~= " at Ln:" ~ line ~ ( (pos != "") ? ", Pos:" ~ pos : "" );
 		}
-		if (this.file != ""){
-			this.message ~= " in file:'" ~ this.file ~ "'";
+		if (file != "")
+		{
+			error_str ~= " in file:'" ~ file ~ "'";
 		}
+		
+		return error_str;
+	}
+	
+	void updateError()
+	{
+		this.error_message = this.buildMessage();
+		#switch
+		#case ifcode ES6 then
+		this.message = this.error_message;
+		#endswitch
 	}
 	
 	#switch
@@ -122,43 +168,14 @@ class RuntimeException extends ClassException
 	
 	
 	/**
-	 * Apply function and return new container
-	 * @param fun f
-	 * @return RuntimeException
+	 * Returns trace
 	 */
-	public RuntimeException map(fun f)
+	string getTraceStr()
 	{
-		return this;
-	}
-
-	
-	
-	/**
-	 * Return values of the container
-	 * @return mixed
-	 */
-	public mixed value()
-	{
-		return null;
+		#switch
+		#case ifcode PHP then
+		return $this->getTraceAsString();
+		#endswitch
 	}
 	
-	
-	
-	/**
-	 * Returns true if value is empty
-	 */
-	public bool isEmpty()
-	{
-		return true;
-	}
-	
-	
-	
-	/**
-	 * Returns true if is error
-	 */
-	public bool isError()
-	{
-		return true;
-	}
 }

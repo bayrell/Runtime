@@ -26,10 +26,9 @@ use Runtime.Collection;
 
 struct IntrospectionInfo extends CoreStruct
 {
-	
-	const string ITEM_CLASS = "class";
-	const string ITEM_FIELD = "field";
-	const string ITEM_METHOD = "method";
+	static const string ITEM_CLASS = "class";
+	static const string ITEM_FIELD = "field";
+	static const string ITEM_METHOD = "method";
 	
 	public string class_name = "";
 	public string kind = "";

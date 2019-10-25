@@ -15,41 +15,57 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
- 
-namespace Runtime.Interfaces;
 
+namespace Runtime;
+
+use Runtime.Context;
 use Runtime.CoreObject;
-use Runtime.Map;
+use Runtime.rtl;
+use Runtime.RuntimeUtils;
 use Runtime.Vector;
-use Runtime.Interfaces.ContextInterface;
 
 
-interface SerializeInterface
+/**
+ * Deprecated
+ */
+class ContextObject extends CoreObject
 {
 	
-	/**
-	 * Assign and clone data from other object
-	 * @param CoreObject obj
-	 */
-	void assignObject(CoreObject obj);
-	
+	protected Context _context = null;
 	
 	
 	/**
-	 * Set new value instance by variable name
-	 * @param string variable_name
-	 * @param var value
+	 * Returns context
+	 *
+	 * @return ContextInterface 
 	 */
-	public void assignValue(string variable_name, var value);
+	public Context context()
+	{
+		return this._context;
+	}
 	
 	
 	
 	/**
-	 * Returns instance of the value by variable name
-	 * @param string variable_name
-	 * @return var
+	 * Constructor
 	 */
-	public var takeValue(string variable_name, var default_value = null);
+	public void constructor(Context context)
+	{
+		parent();
+		this._context = context;
+	}
 	
+	
+	
+	/**
+	 * Translate message
+	 * @params string message - message need to be translated
+	 * @params Map params - Messages params. Default null.
+	 * @params string locale - Different locale. Default "".
+	 * @return string - translated string
+	 */
+	string translate(string message, Map params = null, string locale = ""){
+		return this._context.translate(message, params, locale);
+	}
 	
 }

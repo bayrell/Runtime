@@ -21,7 +21,7 @@ namespace Runtime;
 use Runtime.Vector;
 
 
-export class re
+class re
 {
 	
 	

@@ -15,47 +15,23 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
- 
-namespace Runtime.Interfaces;
+
+namespace Runtime.Annotations;
 
 use Runtime.CoreStruct;
-use Runtime.Map;
-use Runtime.Vector;
-use Runtime.Interfaces.ContextInterface;
+use Runtime.rtl;
+use Runtime.lib;
+use Runtime.Collection;
+use Runtime.Dict;
+use Runtime.Annotations.IntrospectionInfo;
 
 
-interface ModuleDescriptionInterface
+struct IntrospectionClass extends CoreStruct
 {
-	
-	
-	/**
-	 * Returns module name
-	 * @return string
-	 */
-	lambda string getModuleName();
-	
-	
-	
-	/**
-	 * Returns module name
-	 * @return string
-	 */	
-	lambda string getModuleVersion();
-	
-	
-	
-	/**
-	 * Returns required modules
-	 * @return Map<string>
-	 */	
-	lambda Map<string> requiredModules();
-	
-	
-	
-	/**
-	 * Returns enities
-	 */
-	lambda Collection<CoreStruct> entities();
-	
-	
+	string class_name = "";
+	Collection<CoreStruct> class_info = null;
+	Dict<Collection> fields = null;
+	Dict<Collection> methods = null;
+	Collection<string> interfaces = null;
 }
+
