@@ -181,7 +181,7 @@ class rtl
 		
 		#case ifcode JAVASCRIPT then
 		var obj = this.find_class(class_name);
-		if (!this.exists(__ctx, obj)) return false;
+		if (!this.exists(ctx, obj)) return false;
 		return true;
 		
 		#endswitch
@@ -270,11 +270,11 @@ class rtl
 		#case ifcode JAVASCRIPT then
 	
 		var obj = this.find_class(class_name);
-		if (!this.exists(__ctx, obj)) return false;
+		if (!this.exists(ctx, obj)) return false;
 		if (
-			!this.exists(__ctx, obj[method_name]) && 
-			!this.exists(__ctx, obj.prototype) && 
-			!this.exists(__ctx, obj.prototype[method_name])
+			!this.exists(ctx, obj[method_name]) && 
+			!this.exists(ctx, obj.prototype) && 
+			!this.exists(ctx, obj.prototype[method_name])
 		) return false;
 		return true;
 	
@@ -287,28 +287,28 @@ class rtl
 	 * Create object by class_name. If class name does not exists return null
 	 * @return Object
 	 */
-	static Object newInstance(string class_name, Vector<var> args)
+	static Object newInstance(string class_name, Vector<var> args = null)
 	{
 		#switch
 		#case ifcode PHP then
 	
 		$class_name = static::find_class($class_name);
 		if ($args == null)
-			return new $class_name();
+			return new $class_name($ctx);
 		$r = new \ReflectionClass($class_name);
 		$arr = $args->_arr;
-		array_unshift($arr, $__ctx);
+		array_unshift($arr, $ctx);
 		return $r->newInstanceArgs($arr);
 	
 		#case ifcode JAVASCRIPT then
 	
 		var obj = this.find_class(class_name);
-		if (!this.exists(__ctx, obj)) return null;
+		if (!this.exists(ctx, obj)) return null;
 		if (!(obj instanceof Function)) return null;
-		if (args == undefined) args = [];
+		if (args == undefined || args == null) args = [];
 		args = args.slice(); 
 		args.unshift(null);
-		args.unshift(__ctx);
+		args.unshift(ctx);
 		var f = Function.prototype.bind.apply(obj, args);
 		return new f;
 	
@@ -368,8 +368,8 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$arr = $args->_getArr();
-		array_unshift($arr, $__ctx);
+		$arr = ($args != null) ? $args->_getArr() : [];
+		array_unshift($arr, $ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
 			return $f->invokeArgs($arr);
@@ -378,8 +378,10 @@ class rtl
 		return call_user_func_array($f, $arr);
 	
 		#case ifcode JAVASCRIPT then
-		args.unshift(__ctx);
-		if (this.isString(__ctx, f))
+		
+		if (args == null) args = [];
+		args.unshift(ctx);
+		if (this.isString(ctx, f))
 		{
 			var a = f.split("::");
 			var c = a[0]; var m = a[1];
@@ -403,7 +405,7 @@ class rtl
 		#case ifcode PHP then
 		
 		$arr = $args->_getArr();
-		array_unshift($arr, $__ctx);
+		array_unshift($arr, $ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
 			return $f->invokeArgs($arr);
@@ -412,7 +414,7 @@ class rtl
 	
 		#case ifcode JAVASCRIPT then
 		
-		args.unshift(__ctx);
+		args.unshift(ctx);
 		var thread = new Runtime.AsyncThread();
 		thread.run( f.apply(null, args) );
 		
@@ -435,19 +437,19 @@ class rtl
 		{
 			return $item;
 		}
-		$key = $path->first($__ctx);
-		$path = $path->removeFirstIm($__ctx);
+		$key = $path->first($ctx);
+		$path = $path->removeFirstIm($ctx);
 		$val = $def_val;
 		if ($item instanceof \Runtime\Dict or $item instanceof \Runtime\Collection)
 		{
-			$item = $item->get($__ctx, $key, $def_val);
-			$val = static::attr($__ctx, $item, $path, $def_val);
+			$item = $item->get($ctx, $key, $def_val);
+			$val = static::attr($ctx, $item, $path, $def_val);
 			return $val;
 		}
 		else if ($item instanceof \Runtime\CoreStruct)
 		{
-			$item = $item->takeValue($__ctx, $key, $def_val);
-			$val = static::attr($__ctx, $item, $path, $def_val);
+			$item = $item->takeValue($ctx, $key, $def_val);
+			$val = static::attr($ctx, $item, $path, $def_val);
 			return $val;
 		}
 		return $val;
@@ -459,19 +461,19 @@ class rtl
 		{
 			return item;
 		}
-		var key = path.first(__ctx);
-		var path = path.removeFirstIm(__ctx);
+		var key = path.first(ctx);
+		var path = path.removeFirstIm(ctx);
 		var val = def_val;
 		if (item instanceof Runtime.Dict || item instanceof Runtime.Collection)
 		{
-			item = item.get(__ctx, key, def_val);
-			val = this.attr(__ctx, item, path, def_val);
+			item = item.get(ctx, key, def_val);
+			val = this.attr(ctx, item, path, def_val);
 			return val;
 		}
 		else if (item instanceof Runtime.CoreStruct)
 		{
-			item = item.takeValue(__ctx, key, def_val);
-			val = this.attr(__ctx, item, path, def_val);
+			item = item.takeValue(ctx, key, def_val);
+			val = this.attr(ctx, item, path, def_val);
 			return val;
 		}
 		return val;
@@ -488,16 +490,16 @@ class rtl
 	 * @param var obj
 	 * @return var
 	 */
-	static var @to(var v, var d, var o)
+	static var @to(var v, var o)
 	{
-		var t = o.e;
-		if (t == "mixed" or t == "primitive" or t == "var" or t == "fn" or t == "callback") return v;
-		if (t == "bool") return static::toBool(null, v, d);
-		else if (t == "string") return static::toString(v, d);
-		else if (t == "int") return static::toInt(null, v, d);
-		else if (t == "float") return static::toFloat(null, v, d);
-		else if (rtl::is_instanceof(null, v, t)) return v;
-		return d;
+		var e = o["e"];
+		if (e == "mixed" or e == "primitive" or e == "var" or e == "fn" or e == "callback") return v;
+		if (e == "bool") return static::toBool(null, v);
+		else if (e == "string") return static::toString(v);
+		else if (e == "int") return static::toInt(null, v);
+		else if (e == "float") return static::toFloat(null, v);
+		else if (rtl::is_instanceof(null, v, e)) return v;
+		return v;
 	}
 	
 	
@@ -727,8 +729,6 @@ class rtl
 		if ($s_res == $s_val)
 			return $res;
 		
-		throw new \Exception("Error convert to int");
-		
 		#case ifcode JAVASCRIPT then
 		
 		var res = parseInt(val);
@@ -737,9 +737,8 @@ class rtl
 		if (s_res.localeCompare(s_val) == 0)
 			return res;
 		
-		throw new Error("Error convert to int");
-		
 		#endswitch
+		return 0;
 	}
 	
 	
@@ -761,7 +760,6 @@ class rtl
 		$s_val = (string)$val;
 		if ($s_res == $s_val)
 			return $res;
-		throw new \Exception("Error convert to boolean");
 		
 		#case ifcode JAVASCRIPT then
 		
@@ -772,9 +770,9 @@ class rtl
 		var s_val = new String(val);
 		if (s_res.localeCompare(s_val) == 0)
 			return res;
-		throw new Error("Error convert to boolean");
 		
 		#endswitch
+		return false;
 	}
 	
 	
@@ -794,7 +792,6 @@ class rtl
 		$s_val = (string)$val;
 		if ($s_res == $s_val)
 			return $res;
-		throw new \Exception("Error convert to float");
 		
 		#case ifcode JAVASCRIPT then
 		
@@ -803,9 +800,9 @@ class rtl
 		var s_val = new String(val);
 		if (s_res.localeCompare(s_val) == 0)
 			return res;
-		throw new Error("Error convert to float");
 		
 		#endswitch
+		return 0;
 	}
 	
 	
@@ -1228,7 +1225,7 @@ class rtl
 			var res = val.constructor.Instance();
 			for (var i=0;i<val.length;i++)
 			{
-				res.push(__ctx, this.clone(__ctx, val[i]));
+				res.push(ctx, this.clone(ctx, val[i]));
 			}
 			return res;
 		}
@@ -1237,7 +1234,7 @@ class rtl
 			var res = val.constructor.Instance();
 			for (var key in val._map)
 			{
-				res._map[key] = this.clone(__ctx, val._map[key]);
+				res._map[key] = this.clone(ctx, val._map[key]);
 			}
 			return res;
 		}
@@ -1247,7 +1244,7 @@ class rtl
 			var res = Object.create(proto);
 			for (var i=0;i<val.length;i++)
 			{
-				res.push(__ctx, this.clone(__ctx, val[i]));
+				res.push(ctx, this.clone(ctx, val[i]));
 			}
 			return res;
 		}
@@ -1257,11 +1254,11 @@ class rtl
 		}
 		else if (val instanceof FakeStruct)
 		{
-			return val.clone(__ctx);
+			return val.clone(ctx);
 		}
 		else if (val instanceof Reference)
 		{
-			return new Reference(__ctx, val.ref);
+			return new Reference(ctx, val.ref);
 		}
 		else if (val instanceof CoreObject || typeof val == 'object')
 		{
@@ -1271,7 +1268,7 @@ class rtl
 			for (var i=0;i<a.length;i++)
 			{
 				var key = a[i];
-				res[key] = this.clone(__ctx, val[key]);
+				res[key] = this.clone(ctx, val[key]);
 			}
 			return res;
 		}

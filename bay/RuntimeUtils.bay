@@ -54,7 +54,7 @@ static class RuntimeUtils
 	 * Returns global context
 	 * @return Context
 	 */
-	public static Context getContext()
+	public static Context @getContext()
 	{
 		#switch
 		#case ifcode PHP then
@@ -157,9 +157,12 @@ static class RuntimeUtils
 		Map<Collection> methods = new Map();
 		IntrospectionInfo info = null;
 		
+		if (not rtl::class_exists(class_name)) return null;
+		
 		/* Append annotations */
 		fn appendAnnotations = void (Map<Collection> arr, string name, IntrospectionInfo info)
 		{
+			if (info == null) return;
 			if (not arr.has(name)) arr.set(name, new Vector());
 			Vector v = arr.item(name);
 			v.appendVector(info.annotations);
@@ -404,18 +407,18 @@ static class RuntimeUtils
 	}
 	
 	
-	
-	#switch
-	#case ifcode PHP then
-	
-	static function NativeToPrimitive($value){
+	static var NativeToPrimitive(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
 		if ($value === null)
 			return null;
 			
 		if (is_object($value)){
 			$res = new \Runtime\Map($value);
-			$res = $res->map(function ($key, $val){
-				return self::NativeToPrimitive($val);
+			$res = $res->map($ctx, function ($ctx, $val, $key){
+				return self::NativeToPrimitive($ctx, $val);
 			});
 			return $res;
 		}
@@ -423,24 +426,22 @@ static class RuntimeUtils
 		if (is_array($value)){
 			if ( isset($value['__class_name__']) ){
 				$res = new \Runtime\Map($value);
-				$res = $res->map(function ($key, $val){
-					return self::NativeToPrimitive($val);
+				$res = $res->map($ctx, function ($ctx, $val, $key){
+					return self::NativeToPrimitive($ctx, $val);
 				});
 				return $res;
 			}
 			$arr = array_values($value);
-			$res = (new \Runtime\Vector())->_assignArr($arr);
-			$res = $res->map(function ($item){
-				return self::NativeToPrimitive($item);
+			$res = \Runtime\Vector::from($arr);
+			$res = $res->map($ctx, function ($ctx, $item){
+				return self::NativeToPrimitive($ctx, $item);
 			});
 			return $res;
 		}
 		
 		return $value;
-	}
 	
-	#case ifcode JAVASCRIPT then
-	static NativeToPrimitive(value){
+		#case ifcode JAVASCRIPT then
 		
 		/*var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
 		var _Utils = null; if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
@@ -457,22 +458,28 @@ static class RuntimeUtils
 		
 		if (Array.isArray(value)){
 			var new_value = (new _Vector()).concat(value);
-			new_value = new_value.map((val)=>{
-				return _Utils.NativeToPrimitive(val);
+			new_value = new_value.map(ctx, (ctx, val)=>{
+				return _Utils.NativeToPrimitive(ctx, val);
 			});
 			return new_value;
 		}
 		if (typeof value == 'object'){
 			var new_value = new _Map(value);
-			new_value = new_value.map((key, val)=>{
-				return _Utils.NativeToPrimitive(val);
+			new_value = new_value.map(ctx, (ctx, val, key)=>{
+				return _Utils.NativeToPrimitive(ctx, val);
 			});
 			return new_value;
 		}
 		
 		return value;
+		#endswitch
 	}
-	static PrimitiveToNative(value){
+	
+	static var PrimitiveToNative(var value)
+	{
+		
+		#switch
+		#case ifcode JAVASCRIPT then
 		
 		/*var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
 		var _Utils = null; if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=Utils;
@@ -503,9 +510,9 @@ static class RuntimeUtils
 		}
 		
 		return value;
+		
+		#endswitch
 	}
-	#endswitch
-	
 	
 	
 	
@@ -523,7 +530,7 @@ static class RuntimeUtils
 		#switch
 		#case ifcode PHP then
 		if ($convert){
-			$value = self::ObjectToPrimitive($__ctx, $value);
+			$value = self::ObjectToPrimitive($ctx, $value);
 		}
 		$json_flags = JSON_UNESCAPED_UNICODE;
 		if ( ($flags & 1) == 1 ) $json_flags = $json_flags | JSON_PRETTY_PRINT;
@@ -544,7 +551,7 @@ static class RuntimeUtils
 		var _Collection = use("Runtime.Collection");
 		var _Dict = use("Runtime.Dict");
 		
-		if (convert) value = _Utils.ObjectToPrimitive(__ctx, value);
+		if (convert) value = _Utils.ObjectToPrimitive(ctx, value);
 		return JSON.stringify(value, function (key, value){
 			if (_rtl.isScalarValue(value)) return value;
 			if (value instanceof _Collection) return value;
@@ -561,7 +568,7 @@ static class RuntimeUtils
 	 * @param string s Encoded string
 	 * @return var 
 	 */
-	static var json_decode(string s)
+	static var json_decode(var obj)
 	{
 		#switch
 		#case ifcode PHP then
@@ -569,7 +576,7 @@ static class RuntimeUtils
 		$res = @json_decode($obj, false);
 		if ($res === null || $res === false)
 			return null;
-		return self::NativeToObject($res);
+		return self::NativeToObject($ctx, $res);
 	
 		#case ifcode JAVASCRIPT then
 		try{
@@ -584,7 +591,7 @@ static class RuntimeUtils
 			var _Collection = use("Runtime.Collection");
 			var _Dict = use("Runtime.Dict");
 			
-			var obj = JSON.parse(s, function (key, value){
+			var obj = JSON.parse(obj, function (key, value){
 				if (value == null) return value;
 				if (Array.isArray(value)){
 					return _Collection.from(value);
@@ -594,7 +601,7 @@ static class RuntimeUtils
 				}
 				return value;
 			});
-			return _Utils.PrimitiveToObject(__ctx, obj);
+			return _Utils.PrimitiveToObject(ctx, obj);
 		}
 		catch(e){
 			throw e;
@@ -660,7 +667,7 @@ static class RuntimeUtils
 		return $s;
 	
 		#case ifcode ES6 then
-		s = this.base64_encode(__ctx, s)
+		s = this.base64_encode(ctx, s)
 			.replace(new RegExp('\\+', 'g'), '-')
 			.replace(new RegExp('\\/', 'g'), '_')
 			.replace(new RegExp('=', 'g'), '')
@@ -693,7 +700,7 @@ static class RuntimeUtils
 		s = s.replace(new RegExp('-', 'g'), '+')
 			.replace(new RegExp('_', 'g'), '/')
 		;
-		return this.base64_decode(__ctx, s);
+		return this.base64_decode(ctx, s);
 		#case ifcode NODEJS then
 		return Buffer.from(s, 'base64').toString('ascii');
 		#endswitch

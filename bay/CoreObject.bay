@@ -34,9 +34,9 @@ class CoreObject
 	{
 		#switch
 		#case ifcode PHP then
-		$this->_init($__ctx);
+		$this->_init($ctx);
 		#case ifcode JAVASCRIPT then
-		this._init(__ctx);
+		this._init(ctx);
 		#endswitch
 	}
 	

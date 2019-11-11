@@ -24,16 +24,12 @@ use Runtime.Exceptions.RuntimeException;
 use Runtime.Interfaces.ContextInterface;
 
 
-class IndexOutOfRange extends RuntimeException{
+class IndexOutOfRange extends RuntimeException
+{
 	
-	void constructor(ContextInterface context = null, Object prev = null){
-		
-		parent(
-			rtl::translate("Index out of range", null, "", context), 
-			RuntimeConstant::ERROR_INDEX_OUT_OF_RANGE, 
-			context,
-			prev
-		);
+	void constructor()
+	{
+		parent(_("Index out of range", null), RuntimeConstant::ERROR_INDEX_OUT_OF_RANGE);
 	}
 
 }

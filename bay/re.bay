@@ -38,7 +38,8 @@ class re
 		#case ifcode PHP then
 		
 		$matches = [];
-		if (preg_match("/" . $r . "/", $s, $matches)){
+		if (preg_match("/" . $r . "/", $s, $matches))
+		{
 			return $matches != null;
 		}
 		
@@ -65,11 +66,13 @@ class re
 		#case ifcode PHP then
 		
 		$matches = [];
-		if (preg_match_all("/" . $r . "/i", $s, $matches)){
+		if (preg_match_all("/" . $r . "/i", $s, $matches))
+		{
 			$res = new Vector();
 			array_shift($matches);
-			foreach ($matches as $arr){
-				$res->push( (new Vector())->_assignArr($arr) );
+			foreach ($matches as $arr)
+			{
+				$res->push($ctx, Vector::from($arr) );
 			}
 			return $res;
 		}

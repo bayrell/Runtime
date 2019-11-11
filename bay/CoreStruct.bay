@@ -53,12 +53,12 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 			var rtl = use("Runtime.rtl");
 			for (var key in obj._map)
 			{
-				this.assignValue(__ctx, key.substring(1), obj._map[key]);
+				this.assignValue(ctx, key.substring(1), obj._map[key]);
 			}
 			#case ifcode PHP then
 			foreach ($obj->_map as $key => $value)
 			{
-				$this->assignValue($__ctx, $key, $value);
+				$this->assignValue($ctx, $key, $value);
 			}
 			#endswitch
 			this.initData(null, obj);
@@ -191,10 +191,10 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		return new (Function.prototype.bind.apply(this, [null, __ctx, items]));
+		return new (Function.prototype.bind.apply(this, [null, ctx, items]));
 		#case ifcode PHP then
 		$class_name = static::class;
-		return new $class_name($__ctx, $items);
+		return new $class_name($ctx, $items);
 		#endswitch
 	}
 	

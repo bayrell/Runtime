@@ -29,18 +29,26 @@ use Runtime.Session;
 
 struct MessageRPC<primitive> extends Message
 {
-	int code = 0;
-	string error = "";	
-	primitive response = null;
-	Collection<string> logs = null;
+	/* Data */
+	string uri = "";
+	string api_name = "";
+	string space_name = "";
+	string method_name = "";
+	Dict data = null;
 	
+	/* Result */
+	int code = 0;
+	string error = "";
+	primitive response = null;
+	Collection<string> logs = null;	
+	bool have_result = false;
 	
 	
 	/**
 	 * Returns true if success
 	 * @return bool
 	 */
-	static bool isSuccess(Message msg) => msg.code >= RuntimeConstant::ERROR_OK;
+	static bool isSuccess(Message msg) => msg.have_result and msg.code >= RuntimeConstant::ERROR_OK;
 	
 	
 	
@@ -49,8 +57,8 @@ struct MessageRPC<primitive> extends Message
 	 * @param primitive res
 	 * @return Message
 	 */
-	static Message success(primitive response) =>
-		new Message({ "code": RuntimeConstant::ERROR_OK, "error": "", "response": response })
+	static Message success(primitive response, Message msg) =>
+		msg.copy{ "code": RuntimeConstant::ERROR_OK, "error": "", "response": response }
 	;
 	
 	
@@ -60,7 +68,7 @@ struct MessageRPC<primitive> extends Message
 	 * @param primitive res
 	 * @return Message
 	 */
-	static Message fail(string error = "", int code = -1, primitive response = null) =>
-		new Message({ "code": code, "error": error, "response": response })
+	static Message fail(string error = "", int code = -1, primitive response, Message msg) =>
+		msg.copy{ "code": code, "error": error, "response": response }
 	;
 }

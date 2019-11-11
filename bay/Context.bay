@@ -28,6 +28,7 @@ use Runtime.CoreStruct;
 use Runtime.CoreProvider;
 use Runtime.Dict;
 use Runtime.Map;
+use Runtime.Message;
 use Runtime.Vector;
 use Runtime.RuntimeConstant;
 use Runtime.RuntimeUtils;
@@ -38,6 +39,7 @@ use Runtime.Annotations.IntrospectionInfo;
 use Runtime.Annotations.LambdaChain;
 use Runtime.Annotations.Provider;
 use Runtime.Exceptions.RuntimeException;
+use Runtime.Interfaces.BusInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
@@ -223,7 +225,7 @@ struct Context extends CoreStruct
 			{
 				string class_name = (item1.value != "") ? item1.value : item1.name;
 				IntrospectionClass info = RuntimeUtils::getClassIntrospection(context, class_name);
-				if (info.class_info)
+				if (info != null and info.class_info)
 				{
 					for (int j=0; j<info.class_info.count(context); j++)
 					{
@@ -333,10 +335,10 @@ struct Context extends CoreStruct
 			if (class_name == "") class_name = item.name;
 			
 			CoreDriver driver = rtl::newInstance(context, class_name, []);
-			driver = static::chain(context, class_name, [context, driver]);
+			driver = static::chain(class_name, [driver], context);
 			if (class_name != driver_name)
 			{
-				driver = static::chain(context, driver_name, [context, driver]);
+				driver = static::chain(driver_name, [driver], context);
 			}
 			
 			drivers.set(context, item.name, driver);
@@ -355,7 +357,7 @@ struct Context extends CoreStruct
 	 * @params string driver_name
 	 * @return Runtime.anager
 	 */
-	lambda CoreDriver @getDriver(Context context, string driver_name)
+	lambda CoreDriver @getDriver(string driver_name, Context context)
 	{
 		if (context.drivers.has(context, driver_name))
 		{
@@ -375,10 +377,8 @@ struct Context extends CoreStruct
 	 * @params string provider_name
 	 * @return CoreProvider
 	 */
-	lambda CoreStruct @createProvider(string provider_name, Dict params = null, Context context)
+	lambda CoreStruct @createProvider(string provider_name, Dict params, string settings_name, Context context)
 	{
-		if (params == null) params = {};
-		
 		CoreProvider provider = null;
 		if (context.providers.has(context, provider_name))
 		{
@@ -390,11 +390,18 @@ struct Context extends CoreStruct
 			string class_name = info.value;
 			if (class_name == "") class_name = info.name;
 			
-			provider = rtl::newInstance(context, class_name, [ params ]);
-			provider = static::chain(context, class_name, [context, provider]);
+			/* Set default params */
+			if (params == null)
+			{
+				params = rtl::attr(context, context.settings, ["providers", class_name, settings_name]);
+			}
+			if (params == null) params = {};
+			
+			provider = rtl::newInstance(context, class_name, [params]);
+			provider = static::chain(class_name, [provider], context);
 			if (provider_name != class_name)
 			{
-				provider = static::chain(context, provider_name, [context, provider]);
+				provider = static::chain(provider_name, [provider], context);
 			}
 		}
 		else
@@ -413,10 +420,9 @@ struct Context extends CoreStruct
 	 * @params string provider_name
 	 * @return CoreProvider
 	 */
-	lambda CoreProvider @getProvider(string provider_name, string settings_name = "default", Context context)
+	lambda memorize CoreProvider @getProvider(string provider_name, string settings_name, Context context)
 	{
-		Dict params = rtl::attr(context, context.settings, ["providers", provider_name, settings_name]);
-		CoreProvider provider = static::createProvider(provider_name, params, context);
+		CoreProvider provider = static::createProvider(provider_name, null, settings_name, context);
 		return provider;
 	}
 	
@@ -427,7 +433,7 @@ struct Context extends CoreStruct
 	/**
 	 * Apply Lambda Chain
 	 */
-	lambda CoreStruct @chain( string chain_name, Dict args, Context context)
+	lambda CoreStruct @chain(string chain_name, Dict args, Context context)
 	{
 		Collection<CoreStruct> entities = context.entities.filter
 		(
@@ -537,39 +543,16 @@ struct Context extends CoreStruct
 	/* ----------------------- Bus ---------------------- */
 	
 	/**
-	 * Local bus call
-	 * @param string class_name
-	 * @param string method_name
-	 * @param ApiRequest request
-	 * @return var The result of the api
+	 * Send message
+	 * @param Message msg
+	 * @param Context context
+	 * @return Message
 	 */ 
-	async BusResult @busCall(
-		string class_name, string interface_name, string method_name, 
-		Collection<primitive> data
-	)
+	static async Message @sendMessage(Message msg, Context context)
 	{
-		/*BusInterface provider = static::getProvider(this, "Runtime.Interfaces.LocalBusInterface");
-		BusResult res = await provider::call(provider, this, class_name, interface_name, method_name, data);
-		return res;*/
-	}
-	
-	
-	
-	/**
-	 * Local bus call
-	 * @param string class_name
-	 * @param string method_name
-	 * @param ApiRequest request
-	 * @return var The result of the api
-	 */ 
-	async BusResult @busCallRoute(
-		string url, 
-		Collection<primitive> data
-	)
-	{
-		/*BusInterface provider = this.getProvider("Runtime.Interfaces.LocalBusInterface");
-		BusResult res = await provider::callRoute(provider, this, url, data);
-		return res;*/
+		BusInterface provider = static::getProvider(RuntimeConstant::BUS_INTERFACE, "default", context);
+		msg = await provider->sendMessage(context, msg);
+		return msg;
 	}
 	
 	

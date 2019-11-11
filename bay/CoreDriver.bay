@@ -28,28 +28,12 @@ use Runtime.Vector;
 class CoreDriver extends CoreObject
 {
 	
-	protected Context _context = null;
-	
-	
-	/**
-	 * Returns context
-	 *
-	 * @return Context 
-	 */
-	public Context context()
-	{
-		return this._context;
-	}
-	
-	
-	
 	/**
 	 * Constructor
 	 */
-	public void constructor(Context context = null)
+	public void constructor()
 	{
 		parent();
-		this._context = context;
 	}
 	
 	

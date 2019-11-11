@@ -26,8 +26,7 @@ class RuntimeConstant
 	
 	
 	/* Providers */
-	static const string LOCAL_BUS = "Runtime.Interfaces.LocalBusInterface";
-	static const string REMOTE_BUS = "Runtime.Interfaces.RemoteBusInterface";
+	static const string BUS_INTERFACE = "Runtime.Interfaces.BusInterface";
 	
 	
 	/* Log level */

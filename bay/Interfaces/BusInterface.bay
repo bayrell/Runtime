@@ -18,32 +18,16 @@
  
 namespace Runtime.Interfaces;
 
-use Runtime.BusResult;
+use Runtime.Message;
 use Runtime.Context;
 
 
-interface LocalBusInterface
+interface BusInterface
 {
 	
 	/**
-	 * Remote procedure call
+	 * Send message
 	 */
-	static async BusResult call
-	(
-		LocalBusInterface bus, Context context,
-		string api_name, string space, string method_name, 
-		Collection<var> data
-	);
-	
-	
-	
-	/**
-	 * Remote procedure call route
-	 */
-	static async BusResult callRoute
-	(
-		LocalBusInterface bus, Context context,
-		string url, Collection<var> data
-	);
+	static async Message sendMessage(Message msg, BusInterface provider);
 	
 }
