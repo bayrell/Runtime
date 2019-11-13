@@ -49,11 +49,11 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		return use("Runtime.rtl").toString(s).length;
+		return use("Runtime.rtl").toStr(s).length;
 		/*
 		if (isBrowser())
-			return Runtime.rtl.toString(s).length;
-		return rtl.toString(s).length;
+			return Runtime.rtl.toStr(s).length;
+		return rtl.toStr(s).length;
 		*/
 		
 		#endswitch
@@ -84,7 +84,7 @@ class rs
 		if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
 		if (!_rtl.exists(offset)) offset = 0;
 		*/
-		var res = _rtl.toString(s).indexOf(search);
+		var res = _rtl.toStr(s).indexOf(search);
 		return res;
 		
 		#endswitch
@@ -120,14 +120,14 @@ class rs
 		var _rs = use("Runtime.rs");
 		if (start < 0) start = s.length + start;
 		if (length === null){
-			return _rtl.toString(s).substring(start);
+			return _rtl.toStr(s).substring(start);
 		}
 		var end = start + length;
 		if (length < 0){
 			var sz = _rs.strlen(s);
 			end = sz + length;
 		}
-		return _rtl.toString(s).substring(start, end);
+		return _rtl.toStr(s).substring(start, end);
 		
 		#endswitch
 	}
@@ -169,11 +169,11 @@ class rs
 		
 		/*
 		if (isBrowser())
-			return Runtime.rtl.toString(ch).charCodeAt(0);
-		return rtl.toString(ch).charCodeAt(0);
+			return Runtime.rtl.toStr(ch).charCodeAt(0);
+		return rtl.toStr(ch).charCodeAt(0);
 		*/
 		
-		return use("Runtime.rtl").toString(ch).charCodeAt(0);
+		return use("Runtime.rtl").toStr(ch).charCodeAt(0);
 		
 		#endswitch
 	}
@@ -196,11 +196,11 @@ class rs
 		
 		/*
 		if (isBrowser())
-			return Runtime.rtl.toString(s).toLowerCase();
-		return rtl.toString(s).toLowerCase();
+			return Runtime.rtl.toStr(s).toLowerCase();
+		return rtl.toStr(s).toLowerCase();
 		*/
 		
-		return use("Runtime.rtl").toString(s).toLowerCase();
+		return use("Runtime.rtl").toStr(s).toLowerCase();
 		
 		#endswitch
 	}
@@ -223,11 +223,11 @@ class rs
 		
 		/*
 		if (isBrowser())
-			return Runtime.rtl.toString(s).toUpperCase();
-		return rtl.toString(s).toUpperCase();
+			return Runtime.rtl.toStr(s).toUpperCase();
+		return rtl.toStr(s).toUpperCase();
 		*/
 		
-		return use("Runtime.rtl").toString(s).toUpperCase();
+		return use("Runtime.rtl").toStr(s).toUpperCase();
 		
 		#endswitch
 	}
@@ -409,11 +409,11 @@ class rs
 		if (ch == undefined) ch = "";
 		
 		/*
-		if (isBrowser()) s = Runtime.rtl.toString(s);
-		else s = rtl.toString(s);
+		if (isBrowser()) s = Runtime.rtl.toStr(s);
+		else s = rtl.toStr(s);
 		*/
 		
-		s = use("Runtime.rtl").toString(s);
+		s = use("Runtime.rtl").toStr(s);
 		
 		if (ch == ""){
 			return s.trim();
@@ -734,7 +734,7 @@ class rs
 		var _rtl = use("Runtime.rtl");
 		
 		if (!_rtl.exists(offset)) offset = 0;
-		var res = _rtl.toString(s).indexOf(search);
+		var res = _rtl.toStr(s).indexOf(search);
 		return res;
 		
 		#endswitch

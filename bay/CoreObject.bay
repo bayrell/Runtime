@@ -141,7 +141,7 @@ class CoreObject
 	public CoreObject setDict(Dict<var> values = null)
 	{
 		if (values == null) return null;
-		values.each( rtl::@method (this, "assignValue") );
+		values.each( void (var v, var k) => this.assignValue(k, v) );
 		return this;
 	}
 	

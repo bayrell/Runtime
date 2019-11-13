@@ -502,7 +502,7 @@ class Dict<T> extends _Map
 		{
 			var new_key = key.substring(1);
 			var new_val = f(ctx, this._map[key], new_key);
-			obj.set(key, new_val);
+			obj._map[key] = new_val;
 		}
 		return obj;
 		#case ifcode PHP then
@@ -533,7 +533,7 @@ class Dict<T> extends _Map
 			var new_key = key.substring(1);
 			var value = this._map[key];
 			var flag = f(ctx, value, new_key);
-			if (flag) obj.set(key, value);
+			if (flag) obj._map[key] = new_val;
 		}
 		return obj;
 		#case ifcode PHP then

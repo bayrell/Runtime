@@ -989,7 +989,8 @@ class Collection<T> extends _Collection
 	/**
 	 * Remove dublicate values
 	 */
-	public Collection<T> removeDublicatesIm()
+	public Collection<T> removeDublicatesIm() => this.removeDuplicatesIm();
+	public Collection<T> removeDuplicatesIm()
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
