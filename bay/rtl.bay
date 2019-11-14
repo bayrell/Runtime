@@ -411,13 +411,18 @@ class rtl
 			return $f->invokeArgs($arr);
 		}
 		return call_user_func_array($f, $arr);
-	
+		
 		#case ifcode JAVASCRIPT then
-		
 		args.unshift(ctx);
-		var thread = new Runtime.AsyncThread();
-		thread.run( f.apply(null, args) );
-		
+		var t = new Runtime.AsyncThread(ctx, {
+			"tasks": Runtime.Collection.from([
+				new Runtime.AsyncTask(ctx, {
+					"pos": "0",
+					"f": f.apply(null, args),
+				})
+			])
+		});
+		Runtime.AsyncThread.run(ctx, t);
 		#endswitch
 	}
 	

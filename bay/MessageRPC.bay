@@ -58,7 +58,7 @@ struct MessageRPC<primitive> extends Message
 	 * @return Message
 	 */
 	static Message success(primitive response, Message msg) =>
-		msg.copy{ "code": RuntimeConstant::ERROR_OK, "error": "", "response": response }
+		msg.copy{ "code": RuntimeConstant::ERROR_OK, "error": "", "response": response, "have_result": true }
 	;
 	
 	
@@ -69,6 +69,6 @@ struct MessageRPC<primitive> extends Message
 	 * @return Message
 	 */
 	static Message fail(string error = "", int code = -1, primitive response, Message msg) =>
-		msg.copy{ "code": code, "error": error, "response": response }
+		msg.copy{ "code": code, "error": error, "response": response, "have_result": response != null }
 	;
 }

@@ -156,7 +156,7 @@ class CoreObject
 		Map<var> values = new Map();
 		if (fields == null)
 		{		
-			fn f = rtl::@method ("Runtime.RuntimeUtils", "getVariablesNames");
+			fn f = rtl::method ("Runtime.RuntimeUtils", "getVariablesNames");
 			Collection<string> names = f(this.getClassName(), flag);
 			for (int i=0; i<names.count(); i++)
 			{

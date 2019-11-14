@@ -885,7 +885,7 @@ class Collection<T> extends _Collection
 		#case ifcode PHP then
 		if ($arr == null) return $this;
 		$arr2 = static::Instance($ctx);
-		$arr2->_arr = array_merge($this->_arr, $v->_arr);
+		$arr2->_arr = array_merge($this->_arr, $arr->_arr);
 		return $arr2;
 		#endswitch
 	}

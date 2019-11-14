@@ -135,9 +135,9 @@ struct Context extends CoreStruct
 		};
 		
 		/* Create context */
-		Context context = static::newInstance(null, obj);
+		Context ctx = static::newInstance(null, obj);
 		
-		return context;
+		return ctx;
 	}
 	
 	
@@ -214,33 +214,33 @@ struct Context extends CoreStruct
 	/**
 	 * Extend entities
 	 */
-	lambda Collection<CoreStruct> @extendEntities(Collection<CoreStruct> entities, Context context)
+	lambda Collection<CoreStruct> @extendEntities(Collection<CoreStruct> entities, Context ctx)
 	{
-		Vector<CoreStruct> e = entities.toVector(context);
-		for (int i=0; i<entities.count(context); i++)
+		Vector<CoreStruct> e = entities.toVector(ctx);
+		for (int i=0; i<entities.count(ctx); i++)
 		{
-			CoreStruct item1 = entities.item(context, i);
+			CoreStruct item1 = entities.item(ctx, i);
 			string item1_class_name = item1.getClassName();
 			if (item1_class_name == "Runtime.Annotations.Entity")
 			{
 				string class_name = (item1.value != "") ? item1.value : item1.name;
-				IntrospectionClass info = RuntimeUtils::getClassIntrospection(context, class_name);
+				IntrospectionClass info = RuntimeUtils::getClassIntrospection(ctx, class_name);
 				if (info != null and info.class_info)
 				{
-					for (int j=0; j<info.class_info.count(context); j++)
+					for (int j=0; j<info.class_info.count(ctx); j++)
 					{
-						CoreStruct item2 = info.class_info.item(context, j);
+						CoreStruct item2 = info.class_info.item(ctx, j);
 						string item2_class_name = item2.getClassName();
 						if (item2 instanceof Entity and item2_class_name != "Runtime.Annotations.Entity")
 						{
-							item2 = item2.copy(context, { "name": class_name });
-							e.push(context, item2);
+							item2 = item2.copy(ctx, { "name": class_name });
+							e.push(ctx, item2);
 						}
 					}
 				}
 			}	
 		}
-		return e.toCollection(context);
+		return e.toCollection(ctx);
 	}
 	
 	
@@ -248,23 +248,23 @@ struct Context extends CoreStruct
 	/**
 	 * Init context
 	 */
-	lambda void @init(Context context)
+	lambda void @init(Context ctx)
 	{
-		if (context.initialized) return context;
+		if (ctx.initialized) return ctx;
 		
-		Collection<CoreStruct> entities = context.entities;
+		Collection<CoreStruct> entities = ctx.entities;
 		
 		/* Extend entities */
-		entities = static::extendEntities(entities, context);
-		entities = static::chain("Runtime.Entities", [ context, entities ], context);
+		entities = static::extendEntities(entities, ctx);
+		entities = static::chain("Runtime.Entities", [ ctx, entities ], ctx);
 		
 		/* Get providers */
-		Dict<CoreStruct> providers = static::getProvidersFromEntities(context);
+		Dict<CoreStruct> providers = static::getProvidersFromEntities(ctx);
 		
 		/* Register drivers */
-		Dict<CoreDriver> drivers = static::getDriversFromEntities(context);
+		Dict<CoreDriver> drivers = static::getDriversFromEntities(ctx);
 		
-		return context.copy(context, {
+		return ctx.copy(ctx, {
 			"entities": entities,
 			"providers": providers,
 			"drivers": drivers,
@@ -277,18 +277,18 @@ struct Context extends CoreStruct
 	/**
 	 * Start context
 	 */
-	static async Context @start(Context context)
+	static async Context @start(Context ctx)
 	{
-		if (context.started) return context;
-		Collection<string> drivers = context.drivers.keys(context);
-		for (int i=0; i<drivers.count(context); i++)
+		if (ctx.started) return ctx;
+		Collection<string> drivers = ctx.drivers.keys(ctx);
+		for (int i=0; i<drivers.count(ctx); i++)
 		{
-			string driver_name = drivers.item(context, i);
-			CoreDriver driver = context.drivers.item(context, driver_name);
-			await driver.startDriver(context);
+			string driver_name = drivers.item(ctx, i);
+			CoreDriver driver = ctx.drivers.item(ctx, driver_name);
+			await driver.startDriver(ctx);
 		}
 		
-		return context.copy(context, {"started": true});
+		return ctx.copy(ctx, {"started": true});
 	}	
 	
 	
@@ -297,20 +297,20 @@ struct Context extends CoreStruct
 	/**
 	 * Returns providers from entities
 	 */
-	lambda Dict<CoreStruct> @getProvidersFromEntities(Context context)
+	lambda Dict<CoreStruct> @getProvidersFromEntities(Context ctx)
 	{
-		Collection<CoreStruct> arr = context.entities.filter
+		Collection<CoreStruct> arr = ctx.entities.filter
 		(
-			context,
+			ctx,
 			bool (CoreStruct item) => item instanceof Provider
 		);
-		Map<CoreStruct> providers = new Map(context);
-		for (int i=0; i<arr.count(context); i++)
+		Map<CoreStruct> providers = new Map(ctx);
+		for (int i=0; i<arr.count(ctx); i++)
 		{
-			Provider item = arr.item(context, i);
-			providers.set(context, item.name, item);
+			Provider item = arr.item(ctx, i);
+			providers.set(ctx, item.name, item);
 		}
-		return providers.toDict(context);
+		return providers.toDict(ctx);
 	}
 	
 	
@@ -318,33 +318,33 @@ struct Context extends CoreStruct
 	/**
 	 * Register drivers
 	 */
-	lambda Dict<Driver> @getDriversFromEntities(Context context)
+	lambda Dict<Driver> @getDriversFromEntities(Context ctx)
 	{
-		Collection<CoreStruct> arr = context.entities.filter
+		Collection<CoreStruct> arr = ctx.entities.filter
 		(
-			context,
+			ctx,
 			bool (CoreStruct item) => item instanceof Driver
 		);
-		Map<CoreStruct> drivers = new Map(context);
-		for (int i=0; i<arr.count(context); i++)
+		Map<CoreStruct> drivers = new Map(ctx);
+		for (int i=0; i<arr.count(ctx); i++)
 		{
-			Driver item = arr.item(context, i);
+			Driver item = arr.item(ctx, i);
 			
 			string driver_name = item.name;
 			string class_name = item.value;
 			if (class_name == "") class_name = item.name;
 			
-			CoreDriver driver = rtl::newInstance(context, class_name, []);
-			driver = static::chain(class_name, [driver], context);
+			CoreDriver driver = rtl::newInstance(ctx, class_name, []);
+			driver = static::chain(class_name, [driver], ctx);
 			if (class_name != driver_name)
 			{
-				driver = static::chain(driver_name, [driver], context);
+				driver = static::chain(driver_name, [driver], ctx);
 			}
 			
-			drivers.set(context, item.name, driver);
+			drivers.set(ctx, item.name, driver);
 		}
 		
-		return drivers.toDict(context);
+		return drivers.toDict(ctx);
 	}
 	
 	
@@ -357,11 +357,11 @@ struct Context extends CoreStruct
 	 * @params string driver_name
 	 * @return Runtime.anager
 	 */
-	lambda CoreDriver @getDriver(string driver_name, Context context)
+	lambda CoreDriver @getDriver(string driver_name, Context ctx)
 	{
-		if (context.drivers.has(context, driver_name))
+		if (ctx.drivers.has(ctx, driver_name))
 		{
-			return context.drivers.item(context, driver_name);
+			return ctx.drivers.item(ctx, driver_name);
 		}
 		
 		return null;
@@ -377,15 +377,15 @@ struct Context extends CoreStruct
 	 * @params string provider_name
 	 * @return CoreProvider
 	 */
-	lambda CoreStruct @createProvider(string provider_name, Dict params, string settings_name, Context context)
+	lambda CoreStruct @createProvider(string provider_name, Dict params, string settings_name, Context ctx)
 	{
 		CoreProvider provider = null;
-		if (context.providers.has(context, provider_name))
+		if (ctx.providers.has(ctx, provider_name))
 		{
-			Provider info = context.providers.item(context, provider_name);
+			Provider info = ctx.providers.item(ctx, provider_name);
 			if (info.kind == "interface")
 			{
-				throw new RuntimeException(context, "Provider " ~ provider_name ~ " does not declared");
+				throw new RuntimeException(ctx, "Provider " ~ provider_name ~ " does not declared");
 			}
 			string class_name = info.value;
 			if (class_name == "") class_name = info.name;
@@ -393,20 +393,20 @@ struct Context extends CoreStruct
 			/* Set default params */
 			if (params == null)
 			{
-				params = rtl::attr(context, context.settings, ["providers", class_name, settings_name]);
+				params = rtl::attr(ctx, ctx.settings, ["providers", class_name, settings_name]);
 			}
 			if (params == null) params = {};
 			
-			provider = rtl::newInstance(context, class_name, [params]);
-			provider = static::chain(class_name, [provider], context);
+			provider = rtl::newInstance(ctx, class_name, [params]);
+			provider = static::chain(class_name, [provider], ctx);
 			if (provider_name != class_name)
 			{
-				provider = static::chain(provider_name, [provider], context);
+				provider = static::chain(provider_name, [provider], ctx);
 			}
 		}
 		else
 		{
-			throw new RuntimeException(context, "Provider " ~ provider_name ~ " not found");
+			throw new RuntimeException(ctx, "Provider " ~ provider_name ~ " not found");
 		}
 		
 		return provider;
@@ -420,9 +420,9 @@ struct Context extends CoreStruct
 	 * @params string provider_name
 	 * @return CoreProvider
 	 */
-	lambda memorize CoreProvider @getProvider(string provider_name, string settings_name, Context context)
+	lambda memorize CoreProvider @getProvider(string provider_name, string settings_name, Context ctx)
 	{
-		CoreProvider provider = static::createProvider(provider_name, null, settings_name, context);
+		CoreProvider provider = static::createProvider(provider_name, null, settings_name, ctx);
 		return provider;
 	}
 	
@@ -433,11 +433,11 @@ struct Context extends CoreStruct
 	/**
 	 * Apply Lambda Chain
 	 */
-	lambda CoreStruct @chain(string chain_name, Dict args, Context context)
+	lambda CoreStruct @chain(string chain_name, Dict args, Context ctx)
 	{
-		Collection<CoreStruct> entities = context.entities.filter
+		Collection<CoreStruct> entities = ctx.entities.filter
 		(
-			context,
+			ctx,
 			bool (CoreStruct item) use (chain_name) => 
 				item instanceof LambdaChain and 
 				item.name == chain_name and 
@@ -445,30 +445,30 @@ struct Context extends CoreStruct
 		);
 		entities = entities.sortIm
 		(
-			context,
+			ctx,
 			int @(LambdaChain a, LambdaChain b) => a.pos > b.pos
 		);
 		
-		for (int i=0; i<entities.count(context); i++)
+		for (int i=0; i<entities.count(ctx); i++)
 		{
-			LambdaChain item = entities.item(context, i);
+			LambdaChain item = entities.item(ctx, i);
 			string item_chain_name = item.chain;
 			if (item_chain_name != "")
 			{
-				var res = static::chain(item_chain_name, args, context);
-				args = args.setIm(context, args.count(context) - 1, res);
+				var res = static::chain(item_chain_name, args, ctx);
+				args = args.setIm(ctx, args.count(ctx) - 1, res);
 			}
 			else
 			{
-				Collection arr = rs::split(context, "::", item.value);
-				string class_name = arr.get(context, 0, "");
-				string method_name = arr.get(context, 1, "");
-				fn f = rtl::method(context, class_name, method_name);
-				var res = rtl::apply(context, f, args);
-				args = args.setIm(context, args.count(context) - 1, res);
+				Collection arr = rs::split(ctx, "::", item.value);
+				string class_name = arr.get(ctx, 0, "");
+				string method_name = arr.get(ctx, 1, "");
+				fn f = rtl::method(ctx, class_name, method_name);
+				var res = rtl::apply(ctx, f, args);
+				args = args.setIm(ctx, args.count(ctx) - 1, res);
 			}
 		}
-		var res = args.last(context);
+		var res = args.last(ctx);
 		return res;
 	}
 	
@@ -477,50 +477,50 @@ struct Context extends CoreStruct
 	/**
 	 * Apply Lambda Chain Await
 	 */
-	static async CoreStruct @chainAwait(string chain_name, Dict args, Context context)
+	static async CoreStruct @chainAwait(string chain_name, Dict args, Context ctx)
 	{
-		Collection<CoreStruct> entities = context.entities.filter
+		Collection<CoreStruct> entities = ctx.entities.filter
 		(
-			context,
+			ctx,
 			bool (CoreStruct item) use (chain_name) => 
 				item instanceof LambdaChain and 
 				item.name == chain_name
 		);
 		entities = entities.sortIm
 		(
-			context,
+			ctx,
 			int @(LambdaChain a, LambdaChain b) => a.pos > b.pos
 		);
 		
-		for (int i=0; i<entities.count(context); i++)
+		for (int i=0; i<entities.count(ctx); i++)
 		{
-			LambdaChain item = entities.item(context, i);
+			LambdaChain item = entities.item(ctx, i);
 			string item_chain_name = item.chain;
 			if (item_chain_name != "")
 			{
-				var res = await static::chainAwait(item_chain_name, args, context);
-				args = args.setIm(context, args.count(context) - 1, res);
+				var res = await static::chainAwait(item_chain_name, args, ctx);
+				args = args.setIm(ctx, args.count(ctx) - 1, res);
 			}
 			else
 			{
-				Collection arr = rs::split(context, "::", item.value);
-				string class_name = arr.get(context, 0, "");
-				string method_name = arr.get(context, 1, "");
-				fn f = rtl::method(context, class_name, method_name);
+				Collection arr = rs::split(ctx, "::", item.value);
+				string class_name = arr.get(ctx, 0, "");
+				string method_name = arr.get(ctx, 1, "");
+				fn f = rtl::method(ctx, class_name, method_name);
 				
 				if (item.is_async)
 				{
-					var res = await rtl::apply(context, f, args);
-					args = args.setIm(context, args.count(context) - 1, res);
+					var res = await rtl::apply(ctx, f, args);
+					args = args.setIm(ctx, args.count(ctx) - 1, res);
 				}
 				else
 				{
-					var res = rtl::apply(context, f, args);
-					args = args.setIm(context, args.count(context) - 1, res);
+					var res = rtl::apply(ctx, f, args);
+					args = args.setIm(ctx, args.count(ctx) - 1, res);
 				}
 			}
 		}
-		var res = args.last(context);
+		var res = args.last(ctx);
 		return res;
 	}
 	
@@ -545,13 +545,13 @@ struct Context extends CoreStruct
 	/**
 	 * Send message
 	 * @param Message msg
-	 * @param Context context
+	 * @param Context ctx
 	 * @return Message
 	 */ 
-	static async Message @sendMessage(Message msg, Context context)
+	static async Message @sendMessage(Message msg, Context ctx)
 	{
-		BusInterface provider = static::getProvider(RuntimeConstant::BUS_INTERFACE, "default", context);
-		msg = await provider->sendMessage(context, msg);
+		BusInterface provider = static::getProvider(RuntimeConstant::BUS_INTERFACE, "default", ctx);
+		msg = await provider->sendMessage(ctx, msg);
 		return msg;
 	}
 	

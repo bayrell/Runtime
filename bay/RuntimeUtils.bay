@@ -270,7 +270,7 @@ static class RuntimeUtils
 		{
 			
 			obj = obj.map(
-				var (string key, var value) use (force_class_name)
+				var (var value, string key) use (force_class_name)
 				{
 					return static::ObjectToPrimitive( value, force_class_name );
 				}
@@ -415,17 +415,19 @@ static class RuntimeUtils
 		if ($value === null)
 			return null;
 			
-		if (is_object($value)){
-			$res = new \Runtime\Map($value);
+		if (is_object($value))
+		{
+			$res = \Runtime\Map::from($value);
 			$res = $res->map($ctx, function ($ctx, $val, $key){
 				return self::NativeToPrimitive($ctx, $val);
 			});
 			return $res;
 		}
 		
-		if (is_array($value)){
+		if (is_array($value))
+		{
 			if ( isset($value['__class_name__']) ){
-				$res = new \Runtime\Map($value);
+				$res = \Runtime\Map::from($value);
 				$res = $res->map($ctx, function ($ctx, $val, $key){
 					return self::NativeToPrimitive($ctx, $val);
 				});
@@ -552,10 +554,10 @@ static class RuntimeUtils
 		var _Dict = use("Runtime.Dict");
 		
 		if (convert) value = _Utils.ObjectToPrimitive(ctx, value);
-		return JSON.stringify(value, function (key, value){
-			if (_rtl.isScalarValue(value)) return value;
+		return JSON.stringify(value, (key, value) => {
 			if (value instanceof _Collection) return value;
 			if (value instanceof _Dict) return value.toObject();
+			if (_rtl.isScalarValue(value)) return value;
 			return null;
 		});
 		#endswitch

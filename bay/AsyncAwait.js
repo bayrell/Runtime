@@ -38,13 +38,13 @@ Runtime.AsyncTask.prototype = Object.create(use('Runtime.CoreStruct').prototype)
 Runtime.AsyncTask.prototype.constructor = Runtime.AsyncTask;
 Object.assign(Runtime.AsyncTask.prototype,
 {
-	_init: function()
+	_init: function(ctx)
 	{
-		var defProp = use("Runtime.rtl.defProp");
+		var defProp = use("Runtime.rtl").defProp;
 		var a = Object.getOwnPropertyNames(this);
 		this.__pos = null;
 		this.__err = null;
-		this.__vars = use('Runtime.Dict').create({});
+		this.__vars = use('Runtime.Dict').from({});
 		this.__res = null;
 		this.__res_name = null;
 		this.__f = null;
@@ -54,9 +54,9 @@ Object.assign(Runtime.AsyncTask.prototype,
 		if (a.indexOf("res") == -1) defProp(this, "res");
 		if (a.indexOf("res_name") == -1) defProp(this, "res_name");
 		if (a.indexOf("f") == -1) defProp(this, "f");
-		Runtime.CoreStruct.prototype._init.call(this);
+		Runtime.CoreStruct.prototype._init.call(this,ctx);
 	},
-	assignObject: function(o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof use("Runtime.AsyncTask"))
 		{
@@ -67,9 +67,9 @@ Object.assign(Runtime.AsyncTask.prototype,
 			this.__res_name = o.__res_name;
 			this.__f = o.__f;
 		}
-		use("Runtime.CoreStruct").prototype.assignObject.call(this,o);
+		use("Runtime.CoreStruct").prototype.assignObject.call(this,ctx,o);
 	},
-	assignValue: function(k,v)
+	assignValue: function(ctx,k,v)
 	{
 		if (k == "pos") this.__pos = v;
 		else if (k == "err") this.__err = v;
@@ -77,9 +77,9 @@ Object.assign(Runtime.AsyncTask.prototype,
 		else if (k == "res") this.__res = v;
 		else if (k == "res_name") this.__res_name = v;
 		else if (k == "f") this.__f = v;
-		else use("Runtime.CoreStruct").prototype.assignValue.call(this,k,v);
+		else use("Runtime.CoreStruct").prototype.assignValue.call(this,ctx,k,v);
 	},
-	takeValue: function(k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
 		if (k == "pos")return this.__pos;
@@ -88,7 +88,7 @@ Object.assign(Runtime.AsyncTask.prototype,
 		else if (k == "res")return this.__res;
 		else if (k == "res_name")return this.__res_name;
 		else if (k == "f")return this.__f;
-		return use("Runtime.CoreStruct").prototype.takeValue.call(this,k,d);
+		return use("Runtime.CoreStruct").prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function()
 	{
@@ -116,14 +116,14 @@ Object.assign(Runtime.AsyncTask,
 		var Collection = use("Runtime.Collection");
 		var Dict = use("Runtime.Dict");
 		var IntrospectionInfo = use("Runtime.Annotations.IntrospectionInfo");
-		return new IntrospectionInfo({
+		return new IntrospectionInfo(ctx,{
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Runtime.AsyncTask",
 			"name": "Runtime.AsyncTask",
-			"annotations": Collection.create([]),
+			"annotations": Collection.from([]),
 		});
 	},
-	getFieldsList: function(f)
+	getFieldsList: function(ctx,f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
@@ -136,17 +136,17 @@ Object.assign(Runtime.AsyncTask,
 			a.push("res_name");
 			a.push("f");
 		}
-		return use("Runtime.Collection").create(a);
+		return use("Runtime.Collection").from(a);
 	},
-	getFieldInfoByName: function(field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},
-	getMethodsList: function()
+	getMethodsList: function(ctx)
 	{
 		return use("Runtime.Collection").create([]);
 	},
-	getMethodInfoByName: function(field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},
@@ -164,130 +164,135 @@ Runtime.AsyncThread.prototype = Object.create(use('Runtime.CoreStruct').prototyp
 Runtime.AsyncThread.prototype.constructor = Runtime.AsyncThread;
 Object.assign(Runtime.AsyncThread.prototype,
 {
-	_init: function()
+	_init: function(ctx)
 	{
 		var Collection = use("Runtime.Collection");
-		var defProp = use("Runtime.rtl.defProp");
+		var defProp = use("Runtime.rtl").defProp;
 		var a = Object.getOwnPropertyNames(this);
-		this.__err = new Collection();
-		this.__tasks = new Collection();
+		this.__err = new Collection(ctx);
+		this.__tasks = new Collection(ctx);
 		if (a.indexOf("err") == -1) defProp(this, "err");
 		if (a.indexOf("tasks") == -1) defProp(this, "tasks");
-		Runtime.CoreStruct.prototype._init.call(this);
+		Runtime.CoreStruct.prototype._init.call(this,ctx);
 	},
-	assignObject: function(o)
+	assignObject: function(ctx,o)
 	{
 		if (o instanceof use("Runtime.AsyncThread"))
 		{
 			this.__err = o.__err;
 			this.__tasks = o.__tasks;
 		}
-		use("Runtime.CoreStruct").prototype.assignObject.call(this,o);
+		use("Runtime.CoreStruct").prototype.assignObject.call(this,ctx,o);
 	},
-	assignValue: function(k,v)
+	assignValue: function(ctx,k,v)
 	{
 		if (k == "err") this.__err = v;
 		else if (k == "tasks") this.__tasks = v;
-		else use("Runtime.CoreStruct").prototype.assignValue.call(this,k,v);
+		else use("Runtime.CoreStruct").prototype.assignValue.call(this,ctx,k,v);
 	},
-	takeValue: function(k,d)
+	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
 		if (k == "err")return this.__err;
 		if (k == "tasks")return this.__tasks;
-		return use("Runtime.CoreStruct").prototype.takeValue.call(this,k,d);
+		return use("Runtime.CoreStruct").prototype.takeValue.call(this,ctx,k,d);
 	},
-	getClassName: function()
+	getClassName: function(ctx)
 	{
 		return "Runtime.AsyncThread";
 	},
-	last: function()
+	lastTask: function(ctx)
 	{
-		return this.tasks.last();
+		return this.tasks.last(ctx);
 	},
-	pos: function()
+	pos: function(ctx)
 	{
-		return this.tasks.last().pos;
+		return this.tasks.last(ctx).pos;
 	},
-	copyLast: function(obj)
+	copyLastTask: function(ctx, obj)
 	{
-		return this.copy({
-			"tasks": this.tasks.setIm(t.tasks.count() - 1, this.tasks.last().copy(obj))
+		return this.copy(ctx,{
+			"tasks": this.tasks.setIm(ctx, this.tasks.count(ctx) - 1, this.tasks.last(ctx).copy(ctx,obj))
 		});
 	},
-	setVar: function(var_name, value)
+	setVar: function(ctx, var_name, value)
 	{
-		var item = this.tasks.last();
-		return t.copyLast({ "vars": item.vars.setIm(var_name, var_name) });
+		var item = this.tasks.last(ctx);
+		return t.copyLastTask(ctx, { "vars": item.vars.setIm(ctx, var_name, value) });
 	},
-	getVar: function(var_name)
+	getVar: function(ctx, var_name)
 	{
-		var item = this.tasks.last();
-		return vars.get(var_name);
+		var item = this.tasks.last(ctx);
+		return item.vars.get(ctx, var_name);
 	},
-	call: function(f, res_name)
+	call: function(ctx, f, res_name)
 	{
-		var tasks = this.tasks.pushIm(new Runtime.AsyncTask{"pos":0,"f":f,"res_name":res_name});
-		return this.copy({ "tasks": tasks });
+		var tasks = this.tasks.pushIm(ctx, new Runtime.AsyncTask(ctx, {"pos":"0","f":f,"res_name":res_name} ));
+		return this.copy(ctx, { "tasks": tasks });
 	},
-	ret: function(res)
+	ret: function(ctx, res)
 	{
-		var item = this.tasks.last();
-		t = this.copy({ "tasks": this.tasks.removeLastIm() });
-		return t.setVar(item.res_name,res);
+		var item = this.tasks.last(ctx);
+		t = this.copy(ctx, { "tasks": this.tasks.removeLastIm(ctx) });
+		return t.setVar(ctx, item.res_name, res);
 	},
-	ret_void: function()
+	ret_void: function(ctx)
 	{
-		return this.copy({ "tasks": this.tasks.removeLastIm() });
+		return this.copy(ctx, { "tasks": this.tasks.removeLastIm(ctx) });
 	},
-	jump: function(pos)
+	jump: function(ctx, pos)
 	{
-		return this.copyLast({"pos":pos});
+		return this.copyLastTask(ctx, {"pos":pos});
 	},
-	catch_push: function(catch_pos)
+	catch_push: function(ctx, catch_pos)
 	{
-		var err = t.err.pushIm({ "catch_pos": catch_pos, "count": t.tasks.count() - 1 });
-		return t.copy({ "err": err });
+		var err = t.err.pushIm(ctx, { "catch_pos": catch_pos, "count": t.tasks.count(ctx) - 1 });
+		return t.copy(ctx, { "err": err });
 	},
-	catch_pop: function()
+	catch_pop: function(ctx)
 	{
-		var err = this.err.removeLastIm();
-		return t.copy({ "err": err });
+		var err = this.err.removeLastIm(ctx);
+		return t.copy(ctx, { "err": err });
 	},
-	resolve: function(res)
+	resolve: function(ctx, res)
 	{
-		setTimeout(()=>{this.run(this.ret(res))},1);
+		setTimeout(()=>{ this.constructor.run(ctx,this.ret(ctx,res)) },1);
 		return null;
 	},
 });
 Object.assign(Runtime.AsyncThread, use("Runtime.CoreStruct"));
 Object.assign(Runtime.AsyncThread,
 {
-	run: function(t)
+	run: function(ctx, t)
 	{
-		while (t.tasks != null and t.tasks.count() > 0)
+		while (t.tasks != null && t.tasks.count() > 0)
 		{
 			try
 			{
-				var item = t.last();
+				var item = t.lastTask(ctx);
 				t = item.f(t);
-				while (t.err.count() > 0 && t.err.last().count >= t.tasks.count())
+				if (t == null)
 				{
-					t.copy({ "err": t.err.removeLastIm() });
+					break;
+				}
+				while (t.err.count(ctx) > 0 && t.err.lastTask(ctx).count >= t.tasks.count(ctx))
+				{
+					t.copy(ctx, { "err": t.err.removeLastIm(ctx) });
 				}
 			}
-			catch (var e)
+			catch (e)
 			{
-				if (t.err.count() > 0)
+				if (t.err.count(ctx) > 0)
 				{
-					var item = t.err.last();
-					var err = t.err.removeLastIm();
-					var tasks = t.tasks.slice(0, item.count + 1);
-					t = t.copy({ "err": err, "tasks": tasks }).copyLast({ "pos": item.catch_pos });
+					var item = t.err.lastTask(ctx);
+					var err = t.err.removeLastIm(ctx);
+					var tasks = t.tasks.slice(ctx, 0, item.count + 1);
+					t = t.copy(ctx,{ "err": err, "tasks": tasks }).copyLastTask({ "pos": item.catch_pos });
 				}
 				else
 				{
-					throw e;
+					console.log(e.stack);
+					break;
 				}
 			}
 		}
@@ -310,14 +315,14 @@ Object.assign(Runtime.AsyncThread,
 		var Collection = use("Runtime.Collection");
 		var Dict = use("Runtime.Dict");
 		var IntrospectionInfo = use("Runtime.Annotations.IntrospectionInfo");
-		return new IntrospectionInfo({
+		return new IntrospectionInfo(ctx,{
 			"kind": IntrospectionInfo.ITEM_CLASS,
 			"class_name": "Runtime.AsyncThread",
 			"name": "Runtime.AsyncThread",
-			"annotations": Collection.create([]),
+			"annotations": Collection.from([]),
 		});
 	},
-	getFieldsList: function(f)
+	getFieldsList: function(ctx,f)
 	{
 		var a = [];
 		if (f==undefined) f=0;
@@ -325,21 +330,21 @@ Object.assign(Runtime.AsyncThread,
 		{
 			a.push("tasks");
 		}
-		return use("Runtime.Collection").create(a);
+		return use("Runtime.Collection").from(a);
 	},
-	getFieldInfoByName: function(field_name)
+	getFieldInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},
 	getMethodsList: function()
 	{
-		return use("Runtime.Collection").create([]);
+		return use("Runtime.Collection").from([]);
 	},
-	getMethodInfoByName: function(field_name)
+	getMethodInfoByName: function(ctx,field_name)
 	{
 		return null;
 	},
-};
+});
 
 if (isBrowser()) window["class.Runtime.AsyncThread"] = Runtime.AsyncThread;
 else{ use.add(Runtime.AsyncThread); module.exports.Runtime.AsyncThread = Runtime.AsyncThread; }
