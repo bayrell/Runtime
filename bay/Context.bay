@@ -529,11 +529,12 @@ struct Context extends CoreStruct
 	/**
 	 * Translate message
 	 * @params string message - message need to be translated
+	 * @params string space - message space
 	 * @params Map params - Messages params. Default null.
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
-	string @translate(string message, Map params = null, string locale = "")
+	string @translate(string message, string space, Map params = null, string locale = "")
 	{
 		return message;
 	}

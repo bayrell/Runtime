@@ -1066,4 +1066,14 @@ class Collection<T> extends _Collection
 		int pos = this.find(f);
 		return this.get(pos, def_value);
 	}
+	
+	
+	
+	/**
+	 * Join collection to string
+	 */
+	public string join(string ch)
+	{
+		return rs::join(ch, this);
+	}
 }

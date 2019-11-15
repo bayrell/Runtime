@@ -360,7 +360,7 @@ static class RuntimeUtils
 			
 			delete keys;
 			
-			if ( !res.has("__class_name__") ) return res;
+			if ( !res.has("__class_name__") ) return res.toDict();
 			if ( res.item("__class_name__") == "Runtime.Map" or res.item("__class_name__") == "Runtime.Dict" )
 			{
 				res.remove("__class_name__");

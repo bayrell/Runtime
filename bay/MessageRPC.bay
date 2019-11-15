@@ -69,6 +69,6 @@ struct MessageRPC<primitive> extends Message
 	 * @return Message
 	 */
 	static Message fail(string error = "", int code = -1, primitive response, Message msg) =>
-		msg.copy{ "code": code, "error": error, "response": response, "have_result": response != null }
+		msg.copy{ "code": code, "error": error, "response": response, "have_result": true }
 	;
 }

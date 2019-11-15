@@ -372,7 +372,7 @@ class rs
 	 * @param integer limit - ограничение 
 	 * @return Vector<string>
 	 */
-	static string join(string ch, Vector<string> arr)
+	static string join(string ch, Collection<string> arr)
 	{
 		#switch
 		#case ifcode PHP then
@@ -383,7 +383,7 @@ class rs
 		#case ifcode JAVASCRIPT then
 		
 		if (arr == null) return "";
-		return arr.join(ch);
+		return Array.prototype.join.call(arr, ch);
 		
 		#endswitch
 	}

@@ -97,6 +97,7 @@ class RuntimeConstant
 	static const int ERROR_ASSIGN_DATA_STRUCT_VALUE = -15;
 	static const int ERROR_AUTH = -16;
 	static const int ERROR_DUPLICATE = -17;
+	static const int ERROR_API_NOT_FOUND = -18;
 	static const int ERROR_FATAL = -99;
 	static const int ERROR_HTTP_CONTINUE = -100;
 	static const int ERROR_HTTP_SWITCH = -101;
