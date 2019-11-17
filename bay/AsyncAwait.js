@@ -218,6 +218,7 @@ Object.assign(Runtime.AsyncThread.prototype,
 	setVar: function(ctx, var_name, value)
 	{
 		var item = this.tasks.last(ctx);
+		if (item == null) return t;
 		return t.copyLastTask(ctx, { "vars": item.vars.setIm(ctx, var_name, value) });
 	},
 	getVar: function(ctx, var_name)

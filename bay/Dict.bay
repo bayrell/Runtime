@@ -364,6 +364,19 @@ class Dict<T> extends _Map
 	
 	
 	/**
+	 * Returns value from position
+	 * @param string key
+	 * @param T default_value
+	 * @return T
+	 */
+	public var attr(Collection items, T default_value)
+	{
+		return rtl::attr(this, items, default_value);
+	}
+	
+	
+	
+	/**
 	 * Returns value from position. Throw exception, if position does not exists
 	 * @param string key - position
 	 * @return T

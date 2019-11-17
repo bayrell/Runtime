@@ -30,7 +30,7 @@ struct DateTime extends CoreStruct
 	public int m = 0;
 	public int d = 0;
 	public int h = 0;
-	public int u = 0;
+	public int i = 0;
 	public int s = 0;
 	public int ms = 0;
 	public string tz = "UTC";
@@ -39,6 +39,16 @@ struct DateTime extends CoreStruct
 	#switch
 	
 	#case ifcode PHP then
+	
+	private function getDatetime()
+	{
+		$dt = new \DateTime();
+		$dt->setTimezone( new \DateTimeZone($this->tz) );
+		$dt->setDate($this->y, $this->m, $this->d);
+		$dt->setTime($this->h, $this->i, $this->s);
+		return $dt;
+	}
+	
 	public static function fromObject($dt)
 	{
 		$y = (int)$dt->format("Y");
@@ -48,7 +58,7 @@ struct DateTime extends CoreStruct
 		$i = (int)$dt->format("i");
 		$s = (int)$dt->format("s");
 		$tz = $dt->getTimezone()->getName();
-		return new DateTime( Dict::create(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"tz"=>$tz]) );
+		return new DateTime( null, Dict::from(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"tz"=>$tz]) );
 	}
 	
 	#case ifcode JAVASCRIPT then
@@ -102,7 +112,7 @@ struct DateTime extends CoreStruct
 		var h = Number(dt.getHours());
 		var i = Number(dt.getMinutes());
 		var s = Number(dt.getSeconds());
-		var dt = new DateTime( Dict.create({"y":y,"m":m,"d":d,"h":h,"i":i,"s":s,"tz":tz}) );
+		var dt = new DateTime( null, Dict.from({"y":y,"m":m,"d":d,"h":h,"i":i,"s":s,"tz":tz}) );
 		return dt;
 	}
 	
@@ -398,7 +408,7 @@ struct DateTime extends CoreStruct
 		#switch
 		
 		#case ifcode PHP then
-		$dt = this.getDatetime($obj);
+		$dt = $this->getDatetime();
 		$dt->setTimezone( new \DateTimeZone("UTC") ); 
 		return $dt->format("Y-m-d H:i:s");
 		

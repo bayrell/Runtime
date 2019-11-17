@@ -92,6 +92,16 @@ struct Context extends CoreStruct
 	
 	
 	/**
+	 * Returns settings
+	 * @return Dict<string>
+	 */
+	var @config(Collection items, primitive d = null) =>
+		(this.settings != null) ? rtl::attr(this, this.settings, items, d) : null
+	;
+	
+	
+	
+	/**
 	 * Create context
 	 *
 	 * @params Dict env
