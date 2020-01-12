@@ -118,10 +118,6 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 */
 	lambda Collection<Dict> entities() => 
 	[
-		/* Declare BusInterface */
-		new Provider{ "name": "Runtime.Interfaces.LocalBusInterface", "kind": "interface" },
-		new Provider{ "name": "Runtime.Interfaces.RemoteBusInterface", "kind": "interface" },
-		
 		/* Declare Lambda chains */
 		new LambdaChainDeclare{ "name": "Runtime.Entities" },
 	];
