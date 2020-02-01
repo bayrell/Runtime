@@ -58,6 +58,11 @@ struct Context extends CoreStruct
 	/* Variable data */
 	bool initialized = false;
 	bool started = false;
+	int start_time = 0;
+	
+	/* Private data */
+	private Vector logs = new Vector();
+	
 	
 	
 	/**
@@ -124,7 +129,7 @@ struct Context extends CoreStruct
 	 * @params Dict settings
 	 * @return Context
 	 */
-	static Context create(Dict env)
+	static Context create(Dict env, Collection<CoreStruct> entities = null)
 	{
 		Dict<var> settings = static::getSettings(env);
 		
@@ -133,6 +138,7 @@ struct Context extends CoreStruct
 			"enviroments": env,
 			"settings": settings,
 			"modules": (settings != null) ? settings.get("modules", null) : null,
+			"entities": entities,
 		};
 		
 		/* Create context */
@@ -161,6 +167,7 @@ struct Context extends CoreStruct
 		string base_path = (c.base_path != "") ? c.base_path : rtl::attr(c.env, ["BASE_PATH"], "", "string");
 		
 		/* Add entities */
+		if (c.entities != null) entities = entities.appendCollectionIm(c.entities);
 		c <= entities <= entities;
 		
 		/* Extend entities */
@@ -234,7 +241,7 @@ struct Context extends CoreStruct
 	 * @params string provider_name
 	 * @return CoreProvider
 	 */
-	pure CoreStruct createProvider(Context c, string provider_name, Dict params, string settings_name)
+	pure CoreStruct createProvider(Context c, string provider_name, Dict params, string settings_name = "default")
 	{
 		CoreProvider provider = null;
 		if (c.providers.has(provider_name))
@@ -255,10 +262,10 @@ struct Context extends CoreStruct
 			if (params == null) params = {};
 			
 			provider = rtl::newInstance(class_name, [params]);
-			provider = static::chain(class_name, [provider]);
+			provider = static::chain(c, class_name, [provider]);
 			if (provider_name != class_name)
 			{
-				provider = static::chain(provider_name, [provider]);
+				provider = static::chain(c, provider_name, [provider]);
 			}
 		}
 		else
@@ -279,7 +286,7 @@ struct Context extends CoreStruct
 	 */
 	pure CoreProvider getProvider(Context c, string provider_name, string settings_name = "default")
 	{
-		CoreProvider provider = c.createProvider(provider_name, null, settings_name);
+		CoreProvider provider = static::createProvider(c, provider_name, null, settings_name);
 		return provider;
 	}
 	
@@ -404,7 +411,7 @@ struct Context extends CoreStruct
 	 */ 
 	static async Message sendMessage(Context c, Message msg)
 	{
-		BusInterface provider = static::getProvider(RuntimeConstant::BUS_INTERFACE, "default", c);
+		BusInterface provider = static::getProvider(c, RuntimeConstant::BUS_INTERFACE, "default");
 		msg = await provider->sendMessage(msg);
 		return msg;
 	}
@@ -418,9 +425,27 @@ struct Context extends CoreStruct
 	 * @param string message
 	 * @param int loglevel
 	 */
-	static void log(Context c, string message, int loglevel = 0)
+	static void debug(Context c, string message, int loglevel = 0)
 	{
-		/*this.logs.push(message ~ "\n");*/
+		this.logs.push(message ~ "\n");
+	}
+	
+	
+	
+	/**
+	 * Timer message
+	 * @param string message
+	 * @param int loglevel
+	 */
+	static void log_timer(Context c, string message, int loglevel = 0)
+	{
+		int time = static::utime(c) - c.start_time;
+		string s = "[" ~ rtl::round(time * 1000) ~ "]ms " ~ message ~ "\n";
+		c.logs.push(s);
+		#switch
+		#case ifcode PHP then
+		/*var_dump($s);*/
+		#endswitch
 	}
 	
 	
@@ -438,7 +463,7 @@ struct Context extends CoreStruct
 		var_dump($v);
 		$content = ob_get_contents();
 		ob_end_clean();
-		/*$this->logs->push($content);*/
+		$this->logs->push($content);
 		#endswitch
 	}
 	
@@ -501,6 +526,18 @@ struct Context extends CoreStruct
 		#endswitch
 	}
 	
+	
+	
+	/**
+	 * Returns unix timestamp
+	 */
+	static int utime(Context c)
+	{
+		#switch
+		#case ifcode PHP then
+		return microtime(true);
+		#endswitch
+	}
 	
 	
 	/* -------------------- Functions ------------------- */

@@ -28,6 +28,6 @@ interface BusInterface
 	/**
 	 * Send message
 	 */
-	static async Message sendMessage(Message msg, BusInterface provider);
+	static async Message sendMessage(BusInterface provider, Message msg);
 	
 }

@@ -60,6 +60,19 @@ class CoreObject
 	 * @param string default_value
 	 * @return var
 	 */
+	public var get(string variable_name, var default_value = null)
+	{
+		return this.takeValue(variable_name, default_value);
+	}
+	
+	
+	
+	/**
+	 * Returns instance of the value by variable name
+	 * @param string variable_name
+	 * @param string default_value
+	 * @return var
+	 */
 	public var takeValue(string variable_name, var default_value = null)
 	{
 		return this.takeVirtualValue(variable_name, default_value);

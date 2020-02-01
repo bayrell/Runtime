@@ -23,15 +23,4 @@ use Runtime.CoreStruct;
 
 struct CoreProvider extends CoreStruct
 {
-	
-	
-	/**
-	 * Init provider data
-	 */
-	static Dict<primitive> initProviderData()
-	{
-		return null;
-	}
-	
-	
 }

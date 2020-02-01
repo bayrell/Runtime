@@ -31,6 +31,7 @@ class Loader
 	public $main_class = "";
 	public $include_path = [];
 	public $return_code = 0;
+	public $start_time = 0;
 	
 	
 	/**
@@ -40,6 +41,7 @@ class Loader
 	{
 		spl_autoload_register([ $this, 'load' ]);
 		register_shutdown_function([ $this, "shutdown" ]);
+		$this->start_time = microtime(true);
 	}
 	
 	
@@ -91,15 +93,27 @@ class Loader
 		$env = getenv();
 		$env['BASE_PATH'] = $this->base_path;
 		
+		$time = microtime(true) - $this->start_time;
+		$s = "[" . round($time * 1000) . "]ms " . "Start create context" . "\n";
+		/*var_dump($s);*/
+		
 		/* Create app */
 		$ctx = $class_name::create( null, Dict::from($env) );
+		$ctx = $ctx->copy($ctx, Dict::from([ "start_time" => $this->start_time ]) );
 		
 		/* Set global context */
 		\Runtime\RuntimeUtils::setContext($ctx);
 		
+		$ctx::log_timer($ctx, $ctx, "before init");
+		
 		/* Start app */
 		$ctx = $ctx->init($ctx, $ctx);
+		
+		$ctx::log_timer($ctx, $ctx, "before start");
+		
 		$ctx = $ctx->start($ctx, $ctx);
+		
+		$ctx::log_timer($ctx, $ctx, "after start");
 		
 		return $ctx;
 	}

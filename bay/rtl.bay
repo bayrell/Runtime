@@ -19,7 +19,9 @@
 namespace Runtime;
 
 use Runtime.Interfaces.StringInterface;
-
+use Runtime.Collection;
+use Runtime.CoreStruct;
+use Runtime.Dict;
 
 
 class rtl
@@ -484,6 +486,48 @@ class rtl
 		return val;
 		
 		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Update current item
+	 * @return var
+	 */
+	static var setAttr(var item, Collection attrs, var new_value)
+	{
+		fn f = var (Collection attrs, var data, var new_value, var f)
+		{
+			if (attrs.count() == 0) return new_value;
+			if (data == null) return null;
+			
+			var new_data = null;
+			var attr_name = attrs.first();
+			
+			if (data instanceof CoreStruct)
+			{
+				var attr_data = data.get(attr_name, null);
+				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);			
+				new_data = data.copy( (new Map()).set(attr_name, res) );
+			}
+			else if (data instanceof Dict)
+			{
+				var attr_data = data.get(attr_name, null);
+				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);			
+				new_data = data.setIm( attr_name, res );
+			}
+			else if (data instanceof Collection)
+			{
+				var attr_data = data.get(attr_name, null);
+				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);			
+				new_data = data.setIm( attr_name, res );
+			}
+			
+			return new_data;
+		};
+		
+		var new_item = f(attrs, item, new_value, f);
+		return new_item;
 	}
 	
 	
@@ -1108,27 +1152,6 @@ class rtl
 	
 	
 	/**
-	 * Round down
-	 * @param double value
-	 * @return int
-	 */
-	static string dump(var value)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		var_dump($value);
-		
-		#case ifcode JAVASCRIPT then
-		
-		console.log(value);
-		
-		#endswitch
-	}
-	
-	
-	
-	/**
 	 * Returns random value x, where a <= x <= b
 	 * @param int a
 	 * @param int b
@@ -1286,7 +1309,67 @@ class rtl
 	}
 	
 	
+	
+	#ifdef BACKEND then
+	
+	/**
+	 * Returns module path. For backend only
+	 */
+	static string getModulePath(string module_name)
+	{
+		#switch
+		#case ifcode PHP then
+		$class = "\\" . preg_replace("/\\./", "\\", $module_name . ".ModuleDescription");
+		$reflector = new \ReflectionClass($class);
+		$path = $reflector->getFileName();
+		return dirname( dirname($path) );
+		#endswitch
+		return "";
+	}
+	
+	
+	/**
+	 * Read local file
+	 */
+	static async string readLocalFile(string path, string ch = "utf8", string chroot = "")
+	{
+		if (rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		#switch
+		#case ifcode PHP then
+		if (!file_exists($filepath)) return "";
+		return file_get_contents($filepath);
+		#endswitch
+		return "";
+	}
+	
+	
+	#endif
+	
+	
+	
 	/* =================== Deprecated =================== */
+	
+	
+	/**
+	 * Round down
+	 * @param double value
+	 * @return int
+	 */
+	static string dump(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		var_dump($value);
+		
+		#case ifcode JAVASCRIPT then
+		
+		console.log(value);
+		
+		#endswitch
+	}
+	
 	
 	/**
 	 * Translate message

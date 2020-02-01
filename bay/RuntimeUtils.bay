@@ -222,15 +222,17 @@ static class RuntimeUtils
 	/* ============================= Serialization Functions ============================= */
 	
 	
-	static var ObjectToNative(var value, bool force_class_name = false){
-		value = self::ObjectToPrimitive(value, force_class_name);
-		value = self::PrimitiveToNative(value);
-		return value;
+	static var ObjectToNative(var value, bool force_class_name = false)
+	{
+		var value1 = self::ObjectToPrimitive(value, force_class_name);
+		var value2 = self::PrimitiveToNative(value1);
+		return value2;
 	}
-	static var NativeToObject(var value){
-		value = self::NativeToPrimitive(value);
-		value = self::PrimitiveToObject(value);
-		return value;
+	static var NativeToObject(var value)
+	{
+		var value1 = self::NativeToPrimitive(value);
+		var value2 = self::PrimitiveToObject(value1);
+		return value2;
 	}
 	
 	
@@ -417,7 +419,7 @@ static class RuntimeUtils
 			
 		if (is_object($value))
 		{
-			$res = \Runtime\Map::from($value);
+			$res = \Runtime\Dict::from($value);
 			$res = $res->map($ctx, function ($ctx, $val, $key){
 				return self::NativeToPrimitive($ctx, $val);
 			});
@@ -427,14 +429,14 @@ static class RuntimeUtils
 		if (is_array($value))
 		{
 			if ( isset($value['__class_name__']) ){
-				$res = \Runtime\Map::from($value);
+				$res = \Runtime\Dict::from($value);
 				$res = $res->map($ctx, function ($ctx, $val, $key){
 					return self::NativeToPrimitive($ctx, $val);
 				});
 				return $res;
 			}
 			$arr = array_values($value);
-			$res = \Runtime\Vector::from($arr);
+			$res = \Runtime\Collection::from($arr);
 			$res = $res->map($ctx, function ($ctx, $item){
 				return self::NativeToPrimitive($ctx, $item);
 			});
@@ -452,21 +454,21 @@ static class RuntimeUtils
 		
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
-		var _Vector = use("Runtime.Vector");
-		var _Map = use("Runtime.Map");
+		var _Collection = use("Runtime.Collection");
+		var _Dict = use("Runtime.Dict");
 		
 		if (value === null)
 			return null;
 		
 		if (Array.isArray(value)){
-			var new_value = (new _Vector()).concat(value);
+			var new_value = _Collection.from(value);
 			new_value = new_value.map(ctx, (ctx, val)=>{
 				return _Utils.NativeToPrimitive(ctx, val);
 			});
 			return new_value;
 		}
 		if (typeof value == 'object'){
-			var new_value = new _Map(value);
+			var new_value = _Dict.from(value);
 			new_value = new_value.map(ctx, (ctx, val, key)=>{
 				return _Utils.NativeToPrimitive(ctx, val);
 			});
@@ -496,14 +498,16 @@ static class RuntimeUtils
 		if (value === null)
 			return null;
 		
-		if (value instanceof _Collection){
+		if (value instanceof _Collection)
+		{
 			var arr = [];
 			value.each((v)=>{
 				arr.push( _Utils.PrimitiveToNative(v) );
 			});
 			return arr;
 		}
-		if (value instanceof _Dict){
+		if (value instanceof _Dict)
+		{
 			var obj = {};
 			value.each((k, v)=>{
 				obj[k] = _Utils.PrimitiveToNative(v);
