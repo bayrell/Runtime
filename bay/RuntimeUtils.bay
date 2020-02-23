@@ -379,9 +379,6 @@ static class RuntimeUtils
 				return null;
 			}
 			
-			/* New instance */
-			SerializeInterface instance = rtl::newInstance(class_name, null);
-			
 			/* Assign values */
 			Map<var> obj = new Map();
 			Collection<string> names = static::getVariablesNames(class_name, 1);
@@ -392,15 +389,14 @@ static class RuntimeUtils
 				{
 					var value = res.get(variable_name, null);
 					obj.set(variable_name, value);
-					instance.assignValue(variable_name, value);
 				}
 			}
-			if (instance instanceof CoreStruct)
-			{
-				instance.initData(null, obj);
-			}
+			
+			/* New instance */
+			SerializeInterface instance = rtl::newInstance(class_name, [obj]);
 			
 			delete res;
+			delete obj;
 			
 			return instance;
 		}

@@ -125,7 +125,7 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 		#case ifcode PHP then
 		
 		$item = clone $this;		
-		static::_assign($item, $this, obj);
+		static::_assign($ctx, $item, $this, $obj);
 		return $item;
 		
 		#case ifcode JAVASCRIPT then
