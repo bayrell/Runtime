@@ -28,7 +28,62 @@ use Runtime.Interfaces.SerializeInterface;
 
 
 class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterface
-{	
+{
+	
+	
+	/**
+	 * Assign
+	 */
+	protected static void _assign(CoreStruct item, CoreStruct old_item, Map obj)
+	{
+		if (obj == null)
+		{
+			item.initData(old_item, obj);
+			return;
+		}
+		
+		#switch
+		#case ifcode PHP then
+		
+		if ($obj instanceof \Runtime\Dict)
+		{
+			foreach ($obj->_map as $key => $value)
+			{
+				$k = "__".$key;
+				if (property_exists($item, $k))
+					$item->$k = $value;
+			}
+		}
+		else if (gettype($obj) == "array")
+		{
+			foreach ($obj as $key => $value)
+			{
+				$k = "__".$key;
+				if (property_exists($item, $k))
+					$item->$k = $value;
+			}
+		}
+		
+		$item->initData($old_item, $obj);
+		
+		#case ifcode JAVASCRIPT then
+		
+		var _Dict = use("Runtime.Dict");
+		if (obj instanceof _Dict)
+		{
+			for (var key in obj._map) item[key.substring(1)] = obj._map[key];
+		}
+		else
+		{
+			for (var key in obj) item[key] = obj[key];
+		}
+		
+		item.initData(ctx, old_item, obj);
+		
+		#endswitch
+	}
+	
+	
 	
 	/** 
 	 * Constructor
@@ -36,36 +91,13 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	public void constructor(Map obj = null)
 	{
 		parent();
-		if (obj != null)
-		{
-			if (not (obj instanceof Dict))
-			{
-				#switch
-				#case ifcode PHP then
-				$obj = \Runtime\Dict::from($obj);
-				#case ifcode JAVASCRIPT then
-				var _Dict = use("Runtime.Dict");
-				if (typeof obj == "object") obj = _Dict.from(obj);
-				#endswitch
-			}
-			#switch
-			#case ifcode JAVASCRIPT then
-			var rtl = use("Runtime.rtl");
-			for (var key in obj._map)
-			{
-				this.assignValue(ctx, key.substring(1), obj._map[key]);
-			}
-			#case ifcode PHP then
-			foreach ($obj->_map as $key => $value)
-			{
-				$this->assignValue($ctx, $key, $value);
-			}
-			#endswitch
-			this.initData(null, obj);
-		}
+		
+		static::_assign(this, null, obj);
+		
 		#switch
 		#case ifcode JAVASCRIPT then
 		if (this.__uq__ == undefined || this.__uq__ == null) this.__uq__ = Symbol();
+		Object.freeze(this);
 		#endswitch
 	}
 	
@@ -92,45 +124,19 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 		#switch
 		#case ifcode PHP then
 		
-		$item = clone $this;
-		if ($obj instanceof \Runtime\Dict)
-		{
-			foreach ($obj->_map as $key => $value)
-			{
-				$k = "__".$key;
-				if (property_exists($item, $k))
-					$item->$k = $value;
-			}
-		}
-		else if (gettype($obj) == "array")
-		{
-			foreach ($obj as $key => $value)
-			{
-				$k = "__".$key;
-				if (property_exists($item, $k))
-					$item->$k = $value;
-			}
-		}
-		
+		$item = clone $this;		
+		static::_assign($item, $this, obj);
 		return $item;
 		
 		#case ifcode JAVASCRIPT then
 		
 		var proto = Object.getPrototypeOf(this);
-		var item = Object.create(proto); item._init();
+		var item = Object.create(proto); /* item._init(); */
 		item = Object.assign(item, this);
 		
-		var _Dict = use("Runtime.Dict");
-		if (obj instanceof _Dict)
-		{
-			for (var key in obj._map) item["__" + key.substring(1)] = obj._map[key];
-		}
-		else
-		{
-			for (var key in obj) item["__" + key] = obj[key];
-		}
+		this.constructor._assign(ctx, item, this, obj);
 		
-		item.initData(this, obj);
+		Object.freeze(item);
 		
 		return item;
 		
@@ -146,23 +152,18 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	 * @param Map obj = null
 	 * @return CoreStruct
 	 */
-	public CoreStruct clone(Collection fields)
+	public CoreStruct clone(Collection fields = null)
 	{
+		if (fields == null) return this;
+		
 		Map obj = new Map();
-		if (fields != null)
-		{
-			fields.each
-			( 
-				void (string field_name) use (obj)
-				{
-					obj.set(field_name, this.takeValue(field_name));
-				}
-			);
-		}
-		else
-		{
-			return this;
-		}
+		fields.each
+		( 
+			void (string field_name) use (obj)
+			{
+				obj.set(field_name, this.takeValue(field_name));
+			}
+		);
 		
 		/* Return object */
 		CoreStruct res = rtl::newInstance( this.getClassName(), [ obj.toDict() ] );
@@ -179,7 +180,7 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	 */
 	public CoreStruct map(string field_name, fn f)
 	{
-		return this.copy( (new Map()).set(field_name, f(this.takeValue(field_name))).toDict() );
+		return this.copy( (new Map()).set( field_name, f(this.takeValue(field_name)) ).toDict() );
 	}
 	
 	

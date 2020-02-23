@@ -27,7 +27,7 @@ use Runtime.Vector;
 use Runtime.Interfaces.SerializeInterface;
 
 
-class FakeStruct extends CoreObject implements ArrayInterface, SerializeInterface
+class FakeStructOld extends CoreObject implements ArrayInterface, SerializeInterface
 {	
 	
 	/** 
@@ -74,7 +74,7 @@ class FakeStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Init struct data
 	 */
-	protected void initData(FakeStruct old, Dict changed = null)
+	protected void initData(FakeStructOld old, Dict changed = null)
 	{
 	}
 	
@@ -83,9 +83,9 @@ class FakeStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Copy this struct with new values
 	 * @param Map obj = null
-	 * @return FakeStruct
+	 * @return FakeStructOld
 	 */
-	public FakeStruct copy(Dict obj = null)
+	public FakeStructOld copy(Dict obj = null)
 	{
 		#switch
 		#case ifcode PHP then
@@ -144,9 +144,9 @@ class FakeStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Clone this struct with same values
 	 * @param Map obj = null
-	 * @return FakeStruct
+	 * @return FakeStructOld
 	 */
-	public FakeStruct clone(Collection fields = null)
+	public FakeStructOld clone(Collection fields = null)
 	{
 		Map obj = new Map();
 		if (fields != null)
@@ -170,7 +170,7 @@ class FakeStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 		}
 		
 		/* Return object */
-		FakeStruct res = static::newInstance( obj.toDict() );
+		FakeStructOld res = static::newInstance( obj.toDict() );
 		return res;
 	}
 	
@@ -180,9 +180,9 @@ class FakeStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	 * Create new struct with new value
 	 * @param string field_name
 	 * @param fn f
-	 * @return FakeStruct
+	 * @return FakeStructOld
 	 */
-	public FakeStruct map(string field_name, fn f)
+	public FakeStructOld map(string field_name, fn f)
 	{
 		return this.copy( (new Map()).set(field_name, f(this.takeValue(field_name))).toDict() );
 	}
@@ -192,7 +192,7 @@ class FakeStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Returns new instance
 	 */
-	lambda FakeStruct newInstance(Dict items)
+	lambda FakeStructOld newInstance(Dict items)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
