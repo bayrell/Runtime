@@ -1414,41 +1414,6 @@ class rtl
 	
 	
 	/**
-	 * Normalize UIStruct
-	 * @param var data
-	 * @return var
-	 */
-	public static var normalizeUI(var data)
-	{
-		#switch
-		#case ifcode PHP then
-		return self::callStaticMethod("Runtime.RuntimeUtils", "normalizeUI", [$data]);
-		#case ifcode JAVASCRIPT then
-		return this.callStaticMethod("Runtime.RuntimeUtils", "normalizeUI", [data]);
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Normalize UIStruct
-	 * @param var data
-	 * @return var
-	 */
-	public static var normalizeUIVector(var data)
-	{
-		#switch
-		#case ifcode PHP then
-		return self::callStaticMethod("Runtime.RuntimeUtils", "normalizeUIVector", [$data]);
-		#case ifcode JAVASCRIPT then
-		return this.callStaticMethod("Runtime.RuntimeUtils", "normalizeUIVector", [data]);
-		#endswitch
-	}
-	
-	
-	
-	
-	/**
 	 * Call method
 	 * @return Object
 	 */
