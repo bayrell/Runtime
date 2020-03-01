@@ -40,20 +40,12 @@ Object.assign(Runtime.AsyncTask.prototype,
 {
 	_init: function(ctx)
 	{
-		var defProp = use("Runtime.rtl").defProp;
-		var a = Object.getOwnPropertyNames(this);
-		this.__pos = null;
-		this.__err = null;
-		this.__vars = use('Runtime.Dict').from({});
-		this.__res = null;
-		this.__res_name = null;
-		this.__f = null;
-		if (a.indexOf("pos") == -1) defProp(this, "pos");
-		if (a.indexOf("err") == -1) defProp(this, "err");
-		if (a.indexOf("vars") == -1) defProp(this, "vars");
-		if (a.indexOf("res") == -1) defProp(this, "res");
-		if (a.indexOf("res_name") == -1) defProp(this, "res_name");
-		if (a.indexOf("f") == -1) defProp(this, "f");
+		this.pos = null;
+		this.err = null;
+		this.vars = use('Runtime.Dict').from({});
+		this.res = null;
+		this.res_name = null;
+		this.f = null;
 		Runtime.CoreStruct.prototype._init.call(this,ctx);
 	},
 	assignObject: function(ctx,o)
@@ -167,12 +159,8 @@ Object.assign(Runtime.AsyncThread.prototype,
 	_init: function(ctx)
 	{
 		var Collection = use("Runtime.Collection");
-		var defProp = use("Runtime.rtl").defProp;
-		var a = Object.getOwnPropertyNames(this);
-		this.__err = new Collection(ctx);
-		this.__tasks = new Collection(ctx);
-		if (a.indexOf("err") == -1) defProp(this, "err");
-		if (a.indexOf("tasks") == -1) defProp(this, "tasks");
+		this.err = new Collection(ctx);
+		this.tasks = new Collection(ctx);
 		Runtime.CoreStruct.prototype._init.call(this,ctx);
 	},
 	assignObject: function(ctx,o)
