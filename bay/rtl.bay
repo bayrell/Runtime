@@ -1337,6 +1337,9 @@ class rtl
 		string filepath = chroot ~ path;
 		#switch
 		#case ifcode PHP then
+		$filepath = realpath($filepath);
+		if ($filepath == false) return "";
+		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
 		if (!file_exists($filepath)) return "";
 		return file_get_contents($filepath);
 		#endswitch
