@@ -91,8 +91,8 @@ struct Context extends CoreStruct
 	/**
 	 * Returns enviroment by eky
 	 */
-	pure string env(Context c, string key) =>
-		(c.enviroments != null) ? c.enviroments.get(key, "") : ""
+	pure string env(Context c, string key, var def_value = "") =>
+		(c.enviroments != null) ? c.enviroments.get(key, def_value) : def_value
 	;
 	
 	
