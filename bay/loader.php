@@ -27,6 +27,7 @@ use Runtime\Dict;
 class Loader
 {
 	public $ctx = null;
+	public $env = [];
 	public $base_path = "";
 	public $main_class = "";
 	public $include_path = [];
@@ -69,6 +70,17 @@ class Loader
 	
 	
 	/**
+	 * Set env
+	 */
+	function set_env($env)
+	{
+		$this->env = $env;
+		return $this;
+	}
+	
+	
+	
+	/**
 	 * Add include path
 	 */
 	function add_src($src_path)
@@ -91,6 +103,7 @@ class Loader
 		}
 		
 		$env = getenv();
+		$env = array_merge($env, $this->env);
 		$env['BASE_PATH'] = $this->base_path;
 		
 		$time = microtime(true) - $this->start_time;

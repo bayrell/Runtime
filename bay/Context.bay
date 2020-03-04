@@ -444,7 +444,7 @@ struct Context extends CoreStruct
 		c.logs.push(s);
 		#switch
 		#case ifcode PHP then
-		/*var_dump($s);*/
+		/*if (isset($_GET['aaa']) && $_GET['aaa'] == 'bbb') var_dump($s);*/
 		#endswitch
 	}
 	
