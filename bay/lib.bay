@@ -153,4 +153,12 @@ class lib
 		bool (var item) use (fields) => item.takeDict(fields)
 	;
 	
+	
+	
+	/**
+	 * Filter
+	 */
+	lambda fn filter(fn f) =>
+		bool (var m) use (f) => m.filter(f)
+	;
 }

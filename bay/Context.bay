@@ -412,7 +412,7 @@ struct Context extends CoreStruct
 	static async Message sendMessage(Context c, Message msg)
 	{
 		BusInterface provider = static::getProvider(c, RuntimeConstant::BUS_INTERFACE, "default");
-		msg = await provider->sendMessage(msg);
+		msg = await provider::sendMessage(provider, msg);
 		return msg;
 	}
 	
