@@ -117,16 +117,16 @@ class Loader
 		/* Set global context */
 		\Runtime\RuntimeUtils::setContext($ctx);
 		
-		$ctx::log_timer($ctx, $ctx, "before init");
+		$ctx::log_timer($ctx, "before init")($ctx, $ctx);
 		
 		/* Start app */
 		$ctx = $ctx->init($ctx, $ctx);
 		
-		$ctx::log_timer($ctx, $ctx, "before start");
+		$ctx::log_timer($ctx, "before start")($ctx, $ctx);
 		
 		$ctx = $ctx->start($ctx, $ctx);
 		
-		$ctx::log_timer($ctx, $ctx, "after start");
+		$ctx::log_timer($ctx, "after start")($ctx, $ctx);
 		
 		return $ctx;
 	}
@@ -308,7 +308,7 @@ class Loader
 		$error = error_get_last();
 		if ($ctx != null)
 		{
-			$logs = $ctx::getLogs($ctx, $ctx);
+			$logs = $ctx::getLogs($ctx)($ctx, $ctx);
 			if ($error !== NULL && $logs != null && $logs->count($ctx) > 0)
 			{
 				echo "Log:\n";

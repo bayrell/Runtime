@@ -92,6 +92,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 		"Runtime/MessageRPC",
 		"Runtime/PathInfo",
 		"Runtime/ModuleDescription",
+		"Runtime/Monad",
 		"Runtime/Reference",
 		"Runtime/Vector",
 		"Runtime/Exceptions/ApiException",
