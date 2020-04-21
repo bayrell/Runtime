@@ -44,7 +44,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 * Returns module name
 	 * @return string
 	 */
-	lambda string getModuleVersion() => "0.8.2";
+	lambda string getModuleVersion() => "0.9.0";
 	
 	
 	
@@ -92,6 +92,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 		"Runtime/MessageRPC",
 		"Runtime/PathInfo",
 		"Runtime/ModuleDescription",
+		"Runtime/Monad",
 		"Runtime/Reference",
 		"Runtime/Vector",
 		"Runtime/Exceptions/ApiException",

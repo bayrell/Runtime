@@ -100,7 +100,7 @@ class Monad
 	/**
 	 * Call method on value
 	 */
-	public async var callMethod(string method_name, Collection args = null)
+	public var callMethod(string method_name, Collection args = null)
 	{
 		if (this.val == null or this.err != null) return this;
 		
@@ -109,6 +109,7 @@ class Monad
 		try
 		{
 			fn f = rtl::method(this.val.getClassName(), method_name);
+			if (args != null) f = rtl::apply(f, args);
 			res = f(this.val);
 		}
 		catch (RuntimeException e)
@@ -134,6 +135,7 @@ class Monad
 		try
 		{
 			fn f = rtl::method(this.val.getClassName(), method_name);
+			if (args != null) f = rtl::apply(f, args);
 			res = await f(this.val);
 		}
 		catch (RuntimeException e)

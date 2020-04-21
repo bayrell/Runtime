@@ -161,4 +161,14 @@ class lib
 	lambda fn filter(fn f) =>
 		bool (var m) use (f) => m.filter(f)
 	;
+	
+	
+	
+	/**
+	 * To
+	 */
+	lambda fn to(string type_value, var def_value = null) =>
+		bool (var m) use (type_value, def_value) =>
+			rtl::@convert( m.value(), type_value, def_value )
+	;
 }
