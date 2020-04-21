@@ -167,7 +167,7 @@ class lib
 	/**
 	 * To
 	 */
-	lambda fn to(string type_value, var def_value = null) =>
+	pure fn to(string type_value, var def_value = null) =>
 		bool (var m) use (type_value, def_value) =>
 			rtl::@convert( m.value(), type_value, def_value )
 	;
