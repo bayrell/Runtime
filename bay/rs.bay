@@ -288,7 +288,7 @@ class rs
 	 * @param integer limit - ограничение 
 	 * @return Collection<string>
 	 */
-	lambda string split(string delimiter, string s, int limit = -1)
+	pure string split(string delimiter, string s, int limit = -1)
 	{
 		#switch
 		#case ifcode PHP then
@@ -329,7 +329,7 @@ class rs
 	 * @param integer limit - ограничение 
 	 * @return Collection<string>
 	 */
-	lambda Collection<string> splitArr(Collection<string> delimiters, string s, int limit = -1)
+	pure Collection<string> splitArr(Collection<string> delimiters, string s, int limit = -1)
 	{
 		#switch
 		#case ifcode PHP then
@@ -456,7 +456,7 @@ class rs
 	 * @param string s
 	 * @return string
 	 */
-	lambda string htmlEscape(string s)
+	pure string htmlEscape(string s)
 	{
 		#switch
 		#case ifcode PHP then
@@ -482,7 +482,7 @@ class rs
 		
 		#endswitch
 	}
-	lambda string escapeHtml(string s) => static::htmlEscape(s);
+	pure string escapeHtml(string s) => static::htmlEscape(s);
 	
 	
 	

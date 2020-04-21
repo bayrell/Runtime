@@ -31,6 +31,6 @@ struct Message extends CoreStruct
 	bool is_external = false;
 	MessageSession session = null;
 	
-	lambda bool isExternal(MessageSession s) => s.is_external == true;
-	lambda bool isInternal(MessageSession s) => s.is_external == false;
+	pure bool isExternal(MessageSession s) => s.is_external == true;
+	pure bool isInternal(MessageSession s) => s.is_external == false;
 }

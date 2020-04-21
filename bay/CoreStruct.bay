@@ -188,7 +188,7 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Returns new instance
 	 */
-	lambda CoreStruct newInstance(Dict items)
+	pure CoreStruct newInstance(Dict items)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then

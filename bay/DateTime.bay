@@ -123,7 +123,7 @@ struct DateTime extends CoreStruct
 	/**
 	 * Create date time from timestamp
 	 */
-	lambda DateTime timestamp(int time, string tz = "UTC")
+	pure DateTime timestamp(int time, string tz = "UTC")
 	{
 		#switch
 		#case ifcode PHP then
@@ -145,7 +145,7 @@ struct DateTime extends CoreStruct
 	/**
 	 * Output dbtime
 	 */
-	lambda string dbtime (int time, string tz = "UTC")
+	pure string dbtime (int time, string tz = "UTC")
 	{
 		#switch
 		#case ifcode PHP then
@@ -171,7 +171,7 @@ struct DateTime extends CoreStruct
 	 * @param string tz
 	 * @return DateTime
 	 */
-	lambda DateTime now (string tz = "UTC")
+	pure DateTime now (string tz = "UTC")
 	{
 		#switch
 		

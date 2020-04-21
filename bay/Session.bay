@@ -26,8 +26,8 @@ struct Session extends CoreProvider
 	int user_id = 0;
 	string session_key = "";
 	
-	lambda bool isApp(Session s) => s.user_id < 0;
-	lambda bool isUser(Session s) => s.user_id > 0;
-	lambda bool isValid(Session s) => s.user_id != 0 and s.session_key != 0;
+	pure bool isApp(Session s) => s.user_id < 0;
+	pure bool isUser(Session s) => s.user_id > 0;
+	pure bool isValid(Session s) => s.user_id != 0 and s.session_key != 0;
 	
 }

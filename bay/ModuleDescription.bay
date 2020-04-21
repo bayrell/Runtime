@@ -36,7 +36,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 * Returns module name
 	 * @return string
 	 */
-	lambda string getModuleName() => "Runtime";
+	pure string getModuleName() => "Runtime";
 	
 	
 	
@@ -44,7 +44,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 * Returns module name
 	 * @return string
 	 */
-	lambda string getModuleVersion() => "0.8.2";
+	pure string getModuleVersion() => "0.9.0";
 	
 	
 	
@@ -52,14 +52,14 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 * Returns required modules
 	 * @return Map<string>
 	 */	
-	lambda Map<string> requiredModules() => null;
+	pure Map<string> requiredModules() => null;
 	
 	
 	
 	/**
 	 * Compatibility with older versions
 	 */
-	lambda Map<string> getRequiredModules() => static::requiredModules();
+	pure Map<string> getRequiredModules() => static::requiredModules();
 	
 	
 	
@@ -67,7 +67,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 * Returns module files load order
 	 * @return Collection<string>
 	 */
-	lambda Collection<string> assets() => 
+	pure Collection<string> assets() => 
 	[
 		"Runtime/rtl",
 		"Runtime/rs",
@@ -116,7 +116,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	/**
 	 * Returns enities
 	 */
-	lambda Collection<Dict> entities() => 
+	pure Collection<Dict> entities() => 
 	[
 		/* Declare Lambda chains */
 		new LambdaChainDeclare{ "name": "Runtime.Entities" },
@@ -127,7 +127,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	/**
 	 * Returns enities
 	 */
-	lambda Collection<Dict> resources() => null;
+	pure Collection<Dict> resources() => null;
 	
 	
 }

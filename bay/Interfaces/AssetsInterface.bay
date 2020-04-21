@@ -26,14 +26,14 @@ interface AssetsInterface
 	 * Returns module name
 	 * @return string
 	 */
-	lambda string getModuleName();
+	pure string getModuleName();
 	
 	
 	/**
 	 * Returns required modules
 	 * @return Dict<string>
 	 */
-	lambda Dict<string> requiredModules();
+	pure Dict<string> requiredModules();
 	
 	
 	
@@ -41,13 +41,13 @@ interface AssetsInterface
 	 * Returns module files load order
 	 * @return Collection<string>
 	 */
-	lambda Collection<string> assets();
+	pure Collection<string> assets();
 	
 	
 	
 	/**
 	 * Returns sync loaded files
 	 */		
-	lambda Collection<string> resources();
+	pure Collection<string> resources();
 	
 }

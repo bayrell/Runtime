@@ -36,7 +36,7 @@ class lib
 	/**
 	 * Check object is istance
 	 */
-	lambda fn isInstance(string class_name) =>
+	pure fn isInstance(string class_name) =>
 		bool (var item) use (class_name) => rtl::is_instanceof(item, class_name)
 	;
 	
@@ -45,7 +45,7 @@ class lib
 	/**
 	 * Check object is implements interface
 	 */	
-	lambda fn isImplements(string class_name) =>
+	pure fn isImplements(string class_name) =>
 		bool (var item) use (class_name) => rtl::is_implements(item, class_name)
 	;
 	
@@ -54,7 +54,7 @@ class lib
 	/**
 	 * Check class is implements interface
 	 */	
-	lambda fn classImplements(string class_name) =>
+	pure fn classImplements(string class_name) =>
 		bool (string item) use (class_name) => rtl::class_implements(item, class_name)
 	;
 	
@@ -63,7 +63,7 @@ class lib
 	/**
 	 * Create struct
 	 */
-	lambda fn createStruct(string class_name) =>
+	pure fn createStruct(string class_name) =>
 		CoreStruct(Dict data) use (class_name) => rtl::newInstance(class_name, [data])
 	;
 	
@@ -72,7 +72,7 @@ class lib
 	/**
 	 * Equal two struct by key
 	 */
-	lambda fn equal(var value)
+	pure fn equal(var value)
 		=> bool (var item) use (value)
 			=> item == value
 	;
@@ -82,7 +82,7 @@ class lib
 	/**
 	 * Equal two struct by key
 	 */
-	lambda fn equalNot(var value)
+	pure fn equalNot(var value)
 		=> bool (var item) use (value)
 			=> item != value
 	;
@@ -92,7 +92,7 @@ class lib
 	/**
 	 * Returns attr of item
 	 */
-	lambda fn attr(string key, var def_value)
+	pure fn attr(string key, var def_value)
 		=> var (CoreStruct item1) use (key, def_value)
 			=> (item1 != null) ? item1.takeValue(key, def_value) : def_value
 	;
@@ -102,7 +102,7 @@ class lib
 	/**
 	 * Equal two struct by key
 	 */
-	lambda fn equalAttr(string key, var value)
+	pure fn equalAttr(string key, var value)
 		=> bool (CoreStruct item1) use (key, value)
 			=> (item1 != null) ? item1.takeValue(key) == value : false
 	;
@@ -112,7 +112,7 @@ class lib
 	/**
 	 * Equal two struct by key
 	 */
-	lambda fn equalNotAttr(string key, var value)
+	pure fn equalNotAttr(string key, var value)
 		=> bool (CoreStruct item1) use (key, value)
 			=> (item1 != null) ? item1.takeValue(key) != value : false
 	;
@@ -122,7 +122,7 @@ class lib
 	/**
 	 * Equal two struct by key
 	 */
-	lambda fn equalMethod(string method_name, var value)
+	pure fn equalMethod(string method_name, var value)
 		=> bool (CoreStruct item1) use (method_name, value)
 		{
 			if (item1 == null) return false;
@@ -136,7 +136,7 @@ class lib
 	/**
 	 * Returns max id from items
 	 */
-	lambda int getMaxIdFromItems(Collection<CoreStruct> items, int start = 0) =>
+	pure int getMaxIdFromItems(Collection<CoreStruct> items, int start = 0) =>
 		items.reduce
 		(
 			int (int value, CoreStruct item) => item.id > value ? item.id : value,
@@ -149,7 +149,7 @@ class lib
 	/**
 	 * Take dict
 	 */
-	lambda fn takeDict(Collection<string> fields) =>
+	pure fn takeDict(Collection<string> fields) =>
 		bool (var item) use (fields) => item.takeDict(fields)
 	;
 	
@@ -158,7 +158,7 @@ class lib
 	/**
 	 * Filter
 	 */
-	lambda fn filter(fn f) =>
+	pure fn filter(fn f) =>
 		bool (var m) use (f) => m.filter(f)
 	;
 }

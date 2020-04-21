@@ -119,7 +119,7 @@ static class RuntimeUtils
 	 * @param string class_name
 	 * @return Vector<IntrospectionInfo>
 	 */
-	lambda memorize Collection<string> getVariablesNames(string class_name, int flag = 2)
+	pure memorize Collection<string> getVariablesNames(string class_name, int flag = 2)
 	{
 		/* Get parents names */
 		Collection<string> class_names = self::getParents(class_name);
@@ -150,7 +150,7 @@ static class RuntimeUtils
 	 * @param string class_name
 	 * @return Vector<IntrospectionInfo>
 	 */
-	lambda memorize IntrospectionClass getClassIntrospection(string class_name)
+	pure memorize IntrospectionClass getClassIntrospection(string class_name)
 	{
 		Collection<CoreStruct> class_info = null;
 		Map<Collection> fields = new Map();
@@ -786,7 +786,7 @@ static class RuntimeUtils
 	 * @param charset - Result bytes charset. Default utf8
 	 * @return Collection<byte> output collection
 	 */
-	lambda Collection<byte> toString(Collection<byte> arr, string charset="utf8")
+	pure Collection<byte> toString(Collection<byte> arr, string charset="utf8")
 	{
 		return static::bytesToString(arr, charset);
 	}
@@ -799,7 +799,7 @@ static class RuntimeUtils
 	 * @param Vector<byte> arr - output vector
 	 * @param charset - Result bytes charset. Default utf8
 	 */
-	lambda Collection<byte> stringToBytes(string s, Vector<byte> arr, string charset="utf8")
+	pure Collection<byte> stringToBytes(string s, Vector<byte> arr, string charset="utf8")
 	{
 		#switch
 		#case ifcode PHP then
@@ -819,7 +819,7 @@ static class RuntimeUtils
 	 * @param charset - Result bytes charset. Default utf8
 	 * @return Collection<byte> output collection
 	 */
-	lambda Collection<byte> toBytes(string s, string charset="utf8")
+	pure Collection<byte> toBytes(string s, string charset="utf8")
 	{
 		return static::stringToBytes(s, charset);
 	}
