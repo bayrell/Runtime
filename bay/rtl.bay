@@ -206,7 +206,8 @@ class rtl
 		if ($arr == false){
 			return false;
 		}
-		foreach ($arr as $name){
+		foreach ($arr as $name)
+		{
 			if ($name == $interface_name or "\\" . $name == $interface_name)
 				return true;
 		}

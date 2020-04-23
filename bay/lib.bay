@@ -23,6 +23,7 @@ use Runtime.Context;
 use Runtime.CoreStruct;
 use Runtime.Dict;
 use Runtime.Map;
+use Runtime.Monad;
 use Runtime.rs;
 use Runtime.rtl;
 use Runtime.UIStruct;
@@ -92,9 +93,19 @@ class lib
 	/**
 	 * Returns attr of item
 	 */
-	pure fn attr(string key, var def_value)
-		=> var (CoreStruct item1) use (key, def_value)
-			=> (item1 != null) ? item1.takeValue(key, def_value) : def_value
+	pure fn attr(Collection<string> path, var def_value = null) =>
+		var (var obj) use (path, def_value) =>
+			rtl::attr(obj, path, def_value)
+	;
+	
+	
+	
+	/**
+	 * Set dict attr
+	 */
+	pure fn setAttr(Collection<string> path, var value) =>
+		var (var obj) use (path, value) =>
+			rtl::setAttr(obj, path, value)
 	;
 	
 	
@@ -165,10 +176,14 @@ class lib
 	
 	
 	/**
-	 * To
+	 * Convert monad by type
 	 */
 	pure fn to(string type_value, var def_value = null) =>
 		bool (var m) use (type_value, def_value) =>
-			rtl::@convert( m.value(), type_value, def_value )
+			new Monad
+			(
+				m.err != null ? rtl::@convert( m.value(), type_value, def_value ) : def_value
+			)
 	;
+	
 }

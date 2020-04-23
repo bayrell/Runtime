@@ -30,9 +30,12 @@ class Loader
 	public $env = [];
 	public $base_path = "";
 	public $main_class = "";
+	public $main_module = "";
 	public $include_path = [];
 	public $return_code = 0;
 	public $start_time = 0;
+	public $main_module_class = "";
+	public $main_class_name = "";
 	
 	
 	/**
@@ -56,6 +59,15 @@ class Loader
 		return $this;
 	}
 	
+	
+	/**
+	 * Set main module
+	 */
+	function main_module($value)
+	{
+		$this->main_module = $value;
+		return $this;
+	}
 	
 	
 	/**
@@ -92,26 +104,73 @@ class Loader
 	
 	
 	/**
+	 * Init
+	 */
+	function init()
+	{
+		$main_module = $this->main_module;
+		$main_module_class = "";
+		if ($main_module != "")
+		{
+			$main_module_class = $main_module . ".ModuleDescription";
+			$main_module_class = \Runtime\rtl::find_class($main_module_class);
+			if ($main_module_class == "")
+			{
+				throw new \Exception("Module " . $main_module . " not found");
+			}
+		}
+		
+		$main_class = $this->main_class;
+		if ($main_class == "")
+		{
+			$main_class = "Runtime.Context";
+		}
+		
+		$class_name = \Runtime\rtl::find_class($main_class);
+		if ($class_name == "")
+		{
+			throw new \Exception("Context " . $main_class . " not found");
+		}
+		
+		$this->main_module_class = $main_module_class;
+		$this->main_class_name = $class_name;
+	}
+	
+	
+	
+	/**
 	 * Create context
 	 */
 	function create_context()
 	{
-		$class_name = \Runtime\rtl::find_class($this->main_class);
-		if ($class_name == "")
-		{
-			throw new \Exception("Context " . $this->main_class . " not found");
-		}
+		$main_module_class = $this->main_module_class;
+		$main_class_name = $this->main_class_name;
 		
 		$env = getenv();
 		$env = array_merge($env, $this->env);
 		$env['BASE_PATH'] = $this->base_path;
+		$env = Dict::from($env);
 		
 		$time = microtime(true) - $this->start_time;
 		$s = "[" . round($time * 1000) . "]ms " . "Start create context" . "\n";
 		/*var_dump($s);*/
 		
+		/* Set settings */
+		$settings = null;
+		if ($main_module_class != "")
+		{
+			$settings = $main_module_class::appSettings(null, $env);
+		}
+		
+		/* Set modules */
+		$modules = null;
+		if ($this->main_module != "")
+		{
+			$modules = Collection::from([ $this->main_module ]);
+		}
+		
 		/* Create app */
-		$ctx = $class_name::create( null, Dict::from($env) );
+		$ctx = $main_class_name::create( null, $env, $settings, $modules );
 		$ctx = $ctx->copy($ctx, Dict::from([ "start_time" => $this->start_time ]) );
 		
 		/* Set global context */
@@ -119,12 +178,27 @@ class Loader
 		
 		$ctx::log_timer($ctx, "before init")($ctx, $ctx);
 		
-		/* Start app */
-		$ctx = $ctx->init($ctx, $ctx);
+		/* Init app */
+		if ($main_module_class != "")
+		{
+			$ctx = $main_module_class::appInit($ctx, $ctx);
+		}
+		else
+		{
+			$ctx = $ctx->init($ctx, $ctx);
+		}
 		
 		$ctx::log_timer($ctx, "before start")($ctx, $ctx);
 		
-		$ctx = $ctx->start($ctx, $ctx);
+		/* Start app */
+		if ($main_module_class != "")
+		{
+			$ctx = $main_module_class::appStart($ctx, $ctx);
+		}
+		else
+		{
+			$ctx = $ctx->start($ctx, $ctx);
+		}
 		
 		$ctx::log_timer($ctx, "after start")($ctx, $ctx);
 		
@@ -198,11 +272,10 @@ class Loader
 	 */
 	function run_web_request()
 	{
-		$class_name = \Runtime\rtl::find_class($this->main_class);
-		if ($class_name == "")
-		{
-			return $this;
-		}
+		/* Init */
+		$this->init();
+		$main_module_class = $this->main_module_class;
+		$main_class_name = $this->main_class_name;
 		
 		/* Create context */
 		$ctx = $this->create_context();
@@ -218,7 +291,18 @@ class Loader
 		
 		try
 		{
-			$container = $class_name::request($ctx, $ctx, $request);
+			if ($main_module_class)
+			{
+				$container = $main_module_class::appRequest($ctx, $ctx, $request);
+			}
+			else if ($main_class_name)
+			{
+				$container = $main_class_name::request($ctx, $ctx, $request);
+			}
+			else
+			{
+				throw new \Exception("Main class is not set");
+			}
 			
 			/* Output web response */
 			$this->output_web_response($ctx, $container);

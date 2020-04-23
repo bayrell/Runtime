@@ -139,17 +139,23 @@ struct Context extends CoreStruct
 	 * @params Dict settings
 	 * @return Context
 	 */
-	static Context create(Dict env, Collection<CoreStruct> entities = null)
+	static Context create(Dict env, Dict<var> settings = null, Collection<string> modules = null)
 	{
-		Dict<var> settings = static::getSettings(env);
+		if (settings == null)
+		{
+			settings = static::getSettings(env);
+		}
 		
 		/* Context data */
 		Dict obj = {
 			"enviroments": env,
 			"settings": settings,
-			"modules": (settings != null) ? settings.get("modules", null) : null,
-			"entities": entities,
 		};
+		
+		if (modules != null)
+		{
+			obj <= obj.setIm("modules", modules);
+		}
 		
 		/* Create context */
 		Context ctx = static::newInstance(obj);
@@ -183,7 +189,7 @@ struct Context extends CoreStruct
 		/* Extend entities */
 		entities = c -> method chain("Runtime.Entities", [c, entities]);
 		entities = static::extendEntities(c, entities);
-		entities = static::extendEntitiesFromAnnotations(entities);
+		entities = static::getRequiredEntities(entities);
 		
 		/* Get providers */
 		Dict<CoreStruct> providers = static::getProvidersFromEntities(entities);
@@ -254,7 +260,7 @@ struct Context extends CoreStruct
 	 * @params string provider_name
 	 * @return CoreProvider
 	 */
-	pure fn createProvider(string provider_name, Dict params, string settings_name = "default")
+	pure fn createProvider(string provider_name, Dict params = null, string settings_name = "default")
 	{
 		return CoreStruct (Context c) use (provider_name, params, settings_name)
 		{
@@ -277,10 +283,10 @@ struct Context extends CoreStruct
 				if (params == null) params = {};
 				
 				provider = rtl::newInstance(class_name, [params]);
-				provider = static::chain(c, class_name, [provider]);
+				provider = c -> method chain(class_name, [provider]);
 				if (provider_name != class_name)
 				{
-					provider = static::chain(c, provider_name, [provider]);
+					provider = c -> method chain(provider_name, [provider]);
 				}
 			}
 			else
@@ -300,14 +306,9 @@ struct Context extends CoreStruct
 	 * @params string provider_name
 	 * @return CoreProvider
 	 */
-	pure fn getProvider(string provider_name, string settings_name = "default")
-	{
-		return CoreProvider (Context c) use (provider_name, settings_name)
-		{
-			CoreProvider provider = static::createProvider(c, provider_name, null, settings_name);
-			return provider;
-		}
-	}
+	pure fn getProvider(string provider_name, string settings_name = "default") =>
+		static::createProvider(provider_name, null, settings_name)
+	;
 	
 	
 	
@@ -437,16 +438,12 @@ struct Context extends CoreStruct
 	 * @param Context ctx
 	 * @return Message
 	 */ 
-	static async fn sendMessage(Message msg)
-	{
-		return Message (Context c) use (msg)
-		{
-			BusInterface provider = static::getProvider(c, RuntimeConstant::BUS_INTERFACE, "default");
-			msg = await provider::sendMessage(provider, msg);
-			return msg;
-		}
-	}
-	
+	static fn sendMessage(Message msg) =>
+		async Message (Context c) use (msg) =>
+			c
+				-> method getProvider(RuntimeConstant::BUS_INTERFACE, "default")
+				-> await method sendMessage(msg)
+			;
 	
 	
 	/* ---------------------- Logs ---------------------- */
@@ -673,7 +670,7 @@ struct Context extends CoreStruct
 	/**
 	 * Extend entities
 	 */
-	pure Collection<CoreStruct> extendEntitiesFromAnnotations(Collection<CoreStruct> entities)
+	pure Collection<CoreStruct> getRequiredEntities(Collection<CoreStruct> entities)
 	{
 		Vector<CoreStruct> e = entities.toVector();
 		for (int i=0; i<entities.count(); i++)

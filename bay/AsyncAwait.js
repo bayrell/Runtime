@@ -206,8 +206,8 @@ Object.assign(Runtime.AsyncThread.prototype,
 	setVar: function(ctx, var_name, value)
 	{
 		var item = this.tasks.last(ctx);
-		if (item == null) return t;
-		return t.copyLastTask(ctx, { "vars": item.vars.setIm(ctx, var_name, value) });
+		if (item == null) return this;
+		return this.copyLastTask(ctx, { "vars": item.vars.setIm(ctx, var_name, value) });
 	},
 	getVar: function(ctx, var_name)
 	{
@@ -222,7 +222,7 @@ Object.assign(Runtime.AsyncThread.prototype,
 	ret: function(ctx, res)
 	{
 		var item = this.tasks.last(ctx);
-		t = this.copy(ctx, { "tasks": this.tasks.removeLastIm(ctx) });
+		var t = this.copy(ctx, { "tasks": this.tasks.removeLastIm(ctx) });
 		return t.setVar(ctx, item.res_name, res);
 	},
 	ret_void: function(ctx)
@@ -235,13 +235,13 @@ Object.assign(Runtime.AsyncThread.prototype,
 	},
 	catch_push: function(ctx, catch_pos)
 	{
-		var err = t.err.pushIm(ctx, { "catch_pos": catch_pos, "count": t.tasks.count(ctx) - 1 });
-		return t.copy(ctx, { "err": err });
+		var err = this.err.pushIm(ctx, { "catch_pos": catch_pos, "count": this.tasks.count(ctx) - 1 });
+		return this.copy(ctx, { "err": err });
 	},
 	catch_pop: function(ctx)
 	{
 		var err = this.err.removeLastIm(ctx);
-		return t.copy(ctx, { "err": err });
+		return this.copy(ctx, { "err": err });
 	},
 	resolve: function(ctx, res)
 	{
@@ -264,7 +264,7 @@ Object.assign(Runtime.AsyncThread,
 				{
 					break;
 				}
-				while (t.err.count(ctx) > 0 && t.err.lastTask(ctx).count >= t.tasks.count(ctx))
+				while (t.err.count(ctx) > 0 && t.err.last(ctx).count >= t.tasks.count(ctx))
 				{
 					t.copy(ctx, { "err": t.err.removeLastIm(ctx) });
 				}
@@ -273,10 +273,10 @@ Object.assign(Runtime.AsyncThread,
 			{
 				if (t.err.count(ctx) > 0)
 				{
-					var item = t.err.lastTask(ctx);
+					var item = t.err.last(ctx);
 					var err = t.err.removeLastIm(ctx);
 					var tasks = t.tasks.slice(ctx, 0, item.count + 1);
-					t = t.copy(ctx,{ "err": err, "tasks": tasks }).copyLastTask({ "pos": item.catch_pos });
+					t = t.copy(ctx,{ "err": err, "tasks": tasks }).copyLastTask({ "pos": item.catch_pos, "err": e });
 				}
 				else
 				{
