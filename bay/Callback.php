@@ -28,9 +28,10 @@ class Callback
 	{
 		if (gettype($obj) == "string")
 		{
-			$obj = \Runtime\rtl::find_class($obj);
-			if (!class_exists($obj)){
-				throw new \Exception($obj . " not found ");
+			//$obj = \Runtime\rtl::find_class($obj);
+			if (!class_exists($obj))
+			{
+				throw new \Exception("Class " . $obj . " not found ");
 			}
 			if (!method_exists($obj, $name)){
 				throw new \Exception("Method '" . $name . "' not found in " . $obj);

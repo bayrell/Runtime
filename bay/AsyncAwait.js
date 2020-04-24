@@ -276,7 +276,10 @@ Object.assign(Runtime.AsyncThread,
 					var item = t.err.last(ctx);
 					var err = t.err.removeLastIm(ctx);
 					var tasks = t.tasks.slice(ctx, 0, item.count + 1);
-					t = t.copy(ctx,{ "err": err, "tasks": tasks }).copyLastTask({ "pos": item.catch_pos, "err": e });
+					t = t
+						.copy(ctx,{"err": err, "tasks": tasks})
+						.copyLastTask(ctx,{"pos": item.catch_pos, "err": e})
+					;
 				}
 				else
 				{

@@ -91,6 +91,16 @@ class lib
 	
 	
 	/**
+	 * Returns key value of obj
+	 */
+	pure fn get(string key, var def_value) =>
+		var (var obj) use (key, def_value) =>
+			rtl::attr(obj, [key], def_value)
+	;
+	
+	
+	
+	/**
 	 * Returns attr of item
 	 */
 	pure fn attr(Collection<string> path, var def_value = null) =>
@@ -182,7 +192,7 @@ class lib
 		bool (var m) use (type_value, def_value) =>
 			new Monad
 			(
-				m.err != null ? rtl::@convert( m.value(), type_value, def_value ) : def_value
+				m.err == null ? rtl::@convert( m.value(), type_value, def_value ) : def_value
 			)
 	;
 	

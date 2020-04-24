@@ -329,7 +329,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 	
-		return new \Runtime\Callback($obj, $method_name);
+		return new \Runtime\Callback(static::find_class($obj), $method_name);
 		
 		#case ifcode JAVASCRIPT then
 		
@@ -440,7 +440,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		if ($item == null) return $def_val;
+		if ($item === null) return $def_val;
 		if (count($path->_arr) == 0) 
 		{
 			return $item;
@@ -464,7 +464,7 @@ class rtl
 		
 		#case ifcode JAVASCRIPT then		
 		if (def_val == undefined) def_val = null;
-		if (item == null) return def_val;
+		if (item === null) return def_val;
 		if (path.count() == 0)
 		{
 			return item;
@@ -982,10 +982,11 @@ class rtl
 	 */
 	static void @_memorizeClear()
 	{
-		static::_memorize_cache = null;
-		
 		#switch
+		#case ifcode JAVASCRIPT then
+		this._memorize_cache = null;
 		#case ifcode PHP then
+		static::$_memorize_cache = [];
 		static::$_memorize_hkey = [];
 		#endswitch
 	}

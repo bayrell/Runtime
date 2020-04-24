@@ -48,7 +48,7 @@ struct MessageRPC<primitive> extends Message
 	 * Returns true if success
 	 * @return bool
 	 */
-	static bool isSuccess(Message msg) => msg.have_result and msg.code >= RuntimeConstant::ERROR_OK;
+	pure bool isSuccess(Message msg) => msg.have_result and msg.code >= RuntimeConstant::ERROR_OK;
 	
 	
 	
@@ -57,8 +57,9 @@ struct MessageRPC<primitive> extends Message
 	 * @param primitive res
 	 * @return Message
 	 */
-	static Message success(Message msg, primitive response) =>
-		msg.copy{ "code": RuntimeConstant::ERROR_OK, "error": "", "response": response, "have_result": true }
+	pure fn success(primitive response) =>
+		Message (Message msg) use (response) =>
+			msg.copy{ "code": RuntimeConstant::ERROR_OK, "error": "", "response": response, "have_result": true }
 	;
 	
 	
@@ -68,7 +69,8 @@ struct MessageRPC<primitive> extends Message
 	 * @param primitive res
 	 * @return Message
 	 */
-	static Message fail(Message msg, primitive response, string error = "", int code = -1) =>
-		msg.copy{ "code": code, "error": error, "response": response, "have_result": true }
+	pure fn fail(primitive response, string error = "", int code = -1) =>
+		Message (Message msg) use (response, error, code) =>
+			msg.copy{ "code": code, "error": error, "response": response, "have_result": true }
 	;
 }

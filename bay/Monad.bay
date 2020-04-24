@@ -43,7 +43,7 @@ class Monad
 	 */
 	public var attr(string attr_name)
 	{
-		if (this.val == null or this.err != null) return this;
+		if (this.val === null or this.err != null) return this;
 		return new Monad( rtl::attr(this.val, [ attr_name ], null) );
 	}
 	
@@ -54,7 +54,7 @@ class Monad
 	 */
 	public var call(fn f)
 	{
-		if (this.val == null or this.err != null) return this;
+		if (this.val === null or this.err != null) return this;
 		
 		var res = null;
 		var err = null;
@@ -78,7 +78,7 @@ class Monad
 	 */
 	public async var callAsync(fn f)
 	{
-		if (this.val == null or this.err != null) return this;
+		if (this.val === null or this.err != null) return this;
 		
 		var res = null;
 		var err = null;
@@ -102,7 +102,7 @@ class Monad
 	 */
 	public var callMethod(string method_name, Collection args = null)
 	{
-		if (this.val == null or this.err != null) return this;
+		if (this.val === null or this.err != null) return this;
 		
 		var res = null;
 		var err = null;
@@ -128,7 +128,7 @@ class Monad
 	 */
 	public async var callMethodAsync(string method_name, Collection args = null)
 	{
-		if (this.val == null or this.err != null) return this;
+		if (this.val === null or this.err != null) return this;
 		
 		var res = null;
 		var err = null;
@@ -164,7 +164,11 @@ class Monad
 	 */
 	public var value()
 	{
-		if (this.val == null or this.err != null) return null;
+		if (this.err != null)
+		{
+			throw this.err;
+		}
+		if (this.val === null or this.err != null) return null;
 		return this.val;
 	}
 	

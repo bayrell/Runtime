@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.rs;
 use Runtime.rtl;
+use Runtime.lib;
 use Runtime.BusResult;
 use Runtime.Collection;
 use Runtime.CoreDriver;
@@ -91,13 +92,12 @@ struct Context extends CoreStruct
 	/**
 	 * Returns enviroment by eky
 	 */
-	pure fn env(string key, var def_value = "")
-	{
-		return string (Context c) use (key, def_value)
-		{
-			return (c.enviroments != null) ? c.enviroments.get(key, def_value) : def_value;
-		}
-	}
+	pure fn env(string key, var def_value = "") => 
+		string (Context c) use (key, def_value) =>
+			c
+				-> attr "enviroments"
+				-> lib::get(key, def_value)
+	;
 	
 	
 	
@@ -105,29 +105,25 @@ struct Context extends CoreStruct
 	 * Returns settings
 	 * @return Dict<string>
 	 */
-	pure fn config(Collection items, primitive d = null)
-	{
-		return var (Context c) use (items, d)
-		{
-			if (c.settings == null) return null;
-			Dict<var> config = c.settings.get("config", null);
-			return (config != null) ? rtl::attr(config, items, d) : null
-		}
-	}
+	pure fn config(Collection items, primitive d = null) =>
+		var (Context c) use (items, d) =>
+			c
+				-> attr "settings"
+				-> lib::get("config", null)
+				-> lib::attr(items, d)
+	;
 	
 	
 	
 	/**
 	 * Returns docker secret key
 	 */
-	pure fn secret(string key)
-	{
-		return string (Context c) use (key)
-		{
-			Dict<var> secrets = c.settings.get("secrets", null);
-			return (secrets != null) ? secrets.get("key", "") : "";
-		}
-	}
+	pure fn secret(string key) =>
+		string (Context c) use (key) =>
+			c
+				-> attr "settings"
+				-> lib::get(key, "")
+	;
 	
 	
 	
@@ -472,7 +468,7 @@ struct Context extends CoreStruct
 	{
 		return void (Context c) use (message, loglevel)
 		{
-			int time = c -> method utime();
+			int time = c -> method utime;
 			time = time - c.start_time;
 			string s = "[" ~ rtl::round(time * 1000) ~ "]ms " ~ message ~ "\n";
 			c.logs.push(s);
@@ -568,15 +564,12 @@ struct Context extends CoreStruct
 	/**
 	 * Returns unix timestamp
 	 */
-	static fn time ()
+	static int time()
 	{
-		return int (Context c)
-		{
-			#switch
-			#case ifcode PHP then
-			return time();
-			#endswitch
-		}
+		#switch
+		#case ifcode PHP then
+		return time();
+		#endswitch
 	}
 	
 	
@@ -584,15 +577,12 @@ struct Context extends CoreStruct
 	/**
 	 * Returns unix timestamp
 	 */
-	static fn utime ()
+	static int utime()
 	{
-		return int (Context c)
-		{
-			#switch
-			#case ifcode PHP then
-			return microtime(true);
-			#endswitch
-		}
+		#switch
+		#case ifcode PHP then
+		return microtime(true);
+		#endswitch
 	}
 	
 	
