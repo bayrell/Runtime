@@ -207,14 +207,14 @@ class _Map implements \ArrayAccess, \JsonSerializable
 	/**
 	 * Get and set methods
 	 */
-	function __isset($k){return $this->has($k);}
-	function __get($k){return $this->item($k);}
-	function __set($k,$v){throw new \Runtime\Exceptions\AssignStructValueError($k);}
-	function __unset($k){throw new \Runtime\Exceptions\AssignStructValueError($k);}
-	public function offsetExists($k){return $this->has($k);}
-	public function offsetGet($k){return $this->item($k);}
-	public function offsetSet($k,$v){throw new \Runtime\Exceptions\AssignStructValueError($k);}
-	public function offsetUnset($k){throw new \Runtime\Exceptions\AssignStructValueError($k);}
+	function __isset($k){return $this->has(null, $k);}
+	function __get($k){return $this->get(null, $k, null);}
+	function __set($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
+	function __unset($k){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
+	public function offsetExists($k){return $this->has(null, $k);}
+	public function offsetGet($k){return $this->get(null, $k, "");}
+	public function offsetSet($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
+	public function offsetUnset($k){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
 	
 	/* Class name */
 	public function getClassName(){return "Runtime._Map";}
@@ -261,16 +261,40 @@ class Dict<T> extends _Map
 	 * Returns copy of Dict
 	 * @param int pos - position
 	 */
-	public Dict<T> copy()
+	public Dict<T> copy(var obj = null)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
 		var new_obj = this.constructor.Instance(ctx);
 		new_obj._map = Object.assign({}, this._map);
+		if (obj != null)
+		{
+			var _Dict = use("Runtime.Dict");
+			if (obj instanceof _Dict) 
+			{
+				obj = obj._map;
+				for (var key in obj)
+				{
+					new_obj._map[key] = obj[key];
+				}
+			}
+			else
+			{
+				for (var key in obj)
+				{
+					new_obj._map["|" + key] = obj[key];
+				}
+			}
+		}
 		return new_obj;
 		#case ifcode PHP then
 		$new_obj = static::Instance($ctx);
 		$new_obj->_map = $this->_map;
+		if ($obj != null)
+		{
+			if ($obj instanceof \Runtime\Dict) $obj = $obj->_map;
+			$new_obj->_map = array_merge($new_obj->_map, $obj);
+		}
 		return $new_obj;
 		#endswitch
 	}

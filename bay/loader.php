@@ -27,15 +27,10 @@ use Runtime\Dict;
 class Loader
 {
 	public $ctx = null;
-	public $env = [];
+	public $cli_args = null;
 	public $base_path = "";
-	public $main_class = "";
-	public $main_module = "";
 	public $include_path = [];
 	public $return_code = 0;
-	public $start_time = 0;
-	public $main_module_class = "";
-	public $main_class_name = "";
 	
 	
 	/**
@@ -43,7 +38,7 @@ class Loader
 	 */
 	function __construct()
 	{
-		spl_autoload_register([ $this, 'load' ]);
+		spl_autoload_register([ $this, 'loadClass' ]);
 		register_shutdown_function([ $this, "shutdown" ]);
 		$this->start_time = microtime(true);
 	}
@@ -51,23 +46,14 @@ class Loader
 	
 	
 	/**
-	 * Set main class
+	 * Set cli args
 	 */
-	function main_class($value)
+	function set_args($cli_args)
 	{
-		$this->main_class = $value;
+		$this->cli_args = $cli_args;
 		return $this;
 	}
 	
-	
-	/**
-	 * Set main module
-	 */
-	function main_module($value)
-	{
-		$this->main_module = $value;
-		return $this;
-	}
 	
 	
 	/**
@@ -82,17 +68,6 @@ class Loader
 	
 	
 	/**
-	 * Set env
-	 */
-	function set_env($env)
-	{
-		$this->env = $env;
-		return $this;
-	}
-	
-	
-	
-	/**
 	 * Add include path
 	 */
 	function add_src($src_path)
@@ -100,221 +75,6 @@ class Loader
 		$this->include_path[] = $src_path;
 		return $this;
 	}
-	
-	
-	
-	/**
-	 * Init
-	 */
-	function init()
-	{
-		$main_module = $this->main_module;
-		$main_module_class = "";
-		if ($main_module != "")
-		{
-			$main_module_class = $main_module . ".ModuleDescription";
-			$main_module_class = \Runtime\rtl::find_class($main_module_class);
-			if ($main_module_class == "")
-			{
-				throw new \Exception("Module " . $main_module . " not found");
-			}
-		}
-		
-		$main_class = $this->main_class;
-		if ($main_class == "")
-		{
-			$main_class = "Runtime.Context";
-		}
-		
-		$class_name = \Runtime\rtl::find_class($main_class);
-		if ($class_name == "")
-		{
-			throw new \Exception("Context " . $main_class . " not found");
-		}
-		
-		$this->main_module_class = $main_module_class;
-		$this->main_class_name = $class_name;
-	}
-	
-	
-	
-	/**
-	 * Create context
-	 */
-	function create_context()
-	{
-		$main_module_class = $this->main_module_class;
-		$main_class_name = $this->main_class_name;
-		
-		$env = getenv();
-		$env = array_merge($env, $this->env);
-		$env['BASE_PATH'] = $this->base_path;
-		$env = Dict::from($env);
-		
-		$time = microtime(true) - $this->start_time;
-		$s = "[" . round($time * 1000) . "]ms " . "Start create context" . "\n";
-		/*var_dump($s);*/
-		
-		/* Set settings */
-		$settings = null;
-		if ($main_module_class != "")
-		{
-			$settings = $main_module_class::appSettings(null, $env);
-		}
-		
-		/* Set modules */
-		$modules = null;
-		if ($this->main_module != "")
-		{
-			$modules = Collection::from([ $this->main_module ]);
-		}
-		
-		/* Create app */
-		$ctx = $main_class_name::create( null, $env, $settings, $modules );
-		$ctx = $ctx->copy($ctx, Dict::from([ "start_time" => $this->start_time ]) );
-		
-		/* Set global context */
-		\Runtime\RuntimeUtils::setContext($ctx);
-		
-		$ctx::log_timer($ctx, "before init")($ctx, $ctx);
-		
-		/* Init app */
-		if ($main_module_class != "")
-		{
-			$ctx = $main_module_class::appInit($ctx, $ctx);
-		}
-		else
-		{
-			$ctx = $ctx->init($ctx, $ctx);
-		}
-		
-		$ctx::log_timer($ctx, "before start")($ctx, $ctx);
-		
-		/* Start app */
-		if ($main_module_class != "")
-		{
-			$ctx = $main_module_class::appStart($ctx, $ctx);
-		}
-		else
-		{
-			$ctx = $ctx->start($ctx, $ctx);
-		}
-		
-		$ctx::log_timer($ctx, "after start")($ctx, $ctx);
-		
-		return $ctx;
-	}
-	
-	
-	
-	/**
-	 * Output 404 Error
-	 */
-	function output_404($container)
-	{
-		http_response_code(404);
-		echo "404 Not found";
-	}
-	
-	
-	
-	/**
-	 * Output Web Resonse
-	 */
-	function output_web_response($ctx, $container)
-	{
-		if ($container != null && $container->response)
-		{
-			http_response_code($container->response->http_code);
-			if ($container->cookies != null)
-			{
-				$keys = $container->cookies->keys($ctx);
-				for ($i=0; $i<$keys->count($ctx); $i++)
-				{
-					$key = $keys->item($ctx, $i);
-					$cookie = $container->cookies->item($ctx, $key);
-					if ($cookie != null && $cookie->name)
-					{
-						setcookie(
-							$cookie->name,
-							$cookie->value,
-							$cookie->expire,
-							$cookie->path,
-							$cookie->domain,
-							$cookie->secure,
-							$cookie->httponly
-						);
-					}
-				}
-			}
-			if ($container->response->headers != null)
-			{
-				$keys = $container->response->headers->keys($ctx);
-				for ($i=0; $i<$keys->count($ctx); $i++)
-				{
-					$key = $keys->item($ctx, $i);
-					$value = $container->response->headers->item($ctx, $key);
-					header($key . ": " . $value);
-				}
-			}
-			echo $container->response->staticMethod("getContent")($ctx, $container->response);
-		}
-		else
-		{
-			$this->output_404($container);
-		}
-	}
-	
-	
-	
-	/**
-	 * Run Web Request
-	 */
-	function run_web_request()
-	{
-		/* Init */
-		$this->init();
-		$main_module_class = $this->main_module_class;
-		$main_class_name = $this->main_class_name;
-		
-		/* Create context */
-		$ctx = $this->create_context();
-		$env = $ctx->enviroments;
-		$this->ctx = $ctx;
-		
-		/* Run request */
-		$route_prefix = isset($_SERVER['HTTP_X_ROUTE_PREFIX']) ? $_SERVER['HTTP_X_ROUTE_PREFIX'] : null;
-		if ($route_prefix === null) $route_prefix = $env->get($ctx, 'ROUTE_PREFIX', null);
-		if ($route_prefix === null) $route_prefix = "";
-		$request = \Runtime\Web\Request::createPHPRequest($ctx);
-		$request = $request->copy($ctx, new Dict($ctx, [ "route_prefix" => $route_prefix ]) );
-		
-		try
-		{
-			if ($main_module_class)
-			{
-				$container = $main_module_class::appRequest($ctx, $ctx, $request);
-			}
-			else if ($main_class_name)
-			{
-				$container = $main_class_name::request($ctx, $ctx, $request);
-			}
-			else
-			{
-				throw new \Exception("Main class is not set");
-			}
-			
-			/* Output web response */
-			$this->output_web_response($ctx, $container);
-		}
-		catch (\Exception $ex)
-		{
-			$this->exception($ex);
-		}
-		
-		return $this;
-	}
-	
 	
 	
 	/**
@@ -333,9 +93,9 @@ class Loader
 	
 	
 	/**
-	 * Load module
+	 * Load file
 	 */
-	function loadModule($arr1, $arr2)
+	function loadFile($arr1, $arr2)
 	{
 		$module_name = implode(".", $arr1);
 		$file_name = array_pop($arr2);
@@ -359,7 +119,7 @@ class Loader
 	/**
 	 * Load class
 	 */
-	function load($name)
+	function loadClass($name)
 	{
 		$arr = explode("\\", $name);
 		$sz=count($arr);
@@ -370,7 +130,7 @@ class Loader
 			$arr1 = array_slice($arr, 0, $i);
 			$arr2 = array_slice($arr, $i);
 			
-			if (static::loadModule($arr1, $arr2))
+			if (static::loadFile($arr1, $arr2))
 			{
 				return true;
 			}
@@ -404,14 +164,82 @@ class Loader
 	
 	
 	/**
-	 * Excetion
+	 * Create context
 	 */
-	function exception($ex)
+	function create_context($class_name, $main_module, $env = null)
 	{
-		echo "<pre>";
-		echo "<b>Fatal Error</b>: " . $ex->getMessage();
-		echo "\n";
-		echo $ex->getTraceAsString();
-		echo "</pre>";
+		$context_class_name = \Runtime\rtl::find_class($class_name);
+		$main_module_class_name = \Runtime\rtl::find_class($main_module . ".ModuleDescription");
+		
+		/* Prepare env */
+		$context_env = getenv();
+		if ($env != null) $context_env = array_merge($context_env, $env);
+		$context_env['BASE_PATH'] = $this->base_path;
+		$context_env = Dict::from($env);
+		
+		/* Create context */
+		$ctx = $context_class_name::create( null, $main_module, $context_env );
+		
+		/* Set context params */
+		$ctx = $ctx->copy($ctx, Dict::from([
+			"start_time" => $this->start_time,
+			"cli_args" => Collection::from($this->cli_args),
+		]) );
+		
+		/* Set global context */
+		\Runtime\RuntimeUtils::setContext($ctx);
+		
+		$ctx::log_timer($ctx, "before init")($ctx, $ctx);
+		
+		/* Init app */
+		if ($main_module_class_name != "" && method_exists($main_module_class_name, "appInit"))
+		{
+			$ctx = $main_module_class_name::appInit($ctx, $ctx);
+		}
+		else
+		{
+			$ctx = $ctx->init($ctx, $ctx);
+		}
+		
+		$ctx::log_timer($ctx, "before start")($ctx, $ctx);
+		
+		/* Start app */
+		if ($main_module_class_name != "" && method_exists($main_module_class_name, "appStart"))
+		{
+			$ctx = $main_module_class_name::appStart($ctx, $ctx);
+		}
+		else
+		{
+			$ctx = $ctx->start($ctx, $ctx);
+		}
+		
+		$ctx::log_timer($ctx, "after start")($ctx, $ctx);
+		
+		/* Assign context */
+		$this->ctx = $ctx;
+		return $this;
 	}
+	
+	
+	
+	/**
+	 * Run application
+	 */
+	function run($f1, $f2 = null)
+	{
+		$ctx = $this->ctx;
+		
+		/* Run */
+		if ($f2 == null) call_user_func_array($f1, [$ctx]);
+		else
+		{
+			$f1 = \Runtime\rtl::find_class($f1);
+			call_user_func_array([$f1, $f2], [$ctx]);
+		}
+		
+		return $this;
+	}
+	
+	
+	
 }

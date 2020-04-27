@@ -52,6 +52,7 @@ struct Context extends CoreStruct
 	Dict<var> settings = null;
 	Collection<string> modules = null;
 	Collection<CoreStruct> entities = null;
+	Collection<string> cli_args = null;
 	Dict<CoreDriver> drivers = null;
 	Dict<CoreStruct> providers = null;
 	Dict<var> tags = null;
@@ -64,6 +65,8 @@ struct Context extends CoreStruct
 	/* Private data */
 	private Vector logs = new Vector();
 	
+	/* Main class */
+	string main_class = "";
 	
 	
 	/**
@@ -135,22 +138,31 @@ struct Context extends CoreStruct
 	 * @params Dict settings
 	 * @return Context
 	 */
-	static Context create(Dict env, Dict<var> settings = null, Collection<string> modules = null)
+	static Context create(string main_module, Dict env = null)
 	{
-		if (settings == null)
+		string main_module_class_name = "";
+		Dict settings = {};
+		
+		/* Get settings */
+		if (main_module)
 		{
-			settings = static::getSettings(env);
+			main_module_class_name = main_module ~ ".ModuleDescription";
+			fn f = rtl::method(main_module_class_name, "appSettings");
+			settings = f(env);
 		}
 		
 		/* Context data */
 		Dict obj = {
 			"enviroments": env,
 			"settings": settings,
+			"main_class": main_module_class_name,
+			"modules": [],
 		};
 		
-		if (modules != null)
+		/* Add main module */
+		if (main_module)
 		{
-			obj <= obj.setIm("modules", modules);
+			obj <= modules <= obj.item("modules").pushIm(main_module);
 		}
 		
 		/* Create context */
@@ -188,10 +200,10 @@ struct Context extends CoreStruct
 		entities = static::getRequiredEntities(entities);
 		
 		/* Get providers */
-		Dict<CoreStruct> providers = static::getProvidersFromEntities(entities);
+		Dict<CoreStruct> providers = static::getProvidersFromEntities(c, entities);
 		
 		/* Register drivers */
-		Dict<CoreDriver> drivers = static::getDriversFromEntities(entities);
+		Dict<CoreDriver> drivers = static::getDriversFromEntities(c, entities);
 		
 		return c.copy
 		{
@@ -416,12 +428,9 @@ struct Context extends CoreStruct
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
-	pure fn translate(string message, string space, Map params = null, string locale = "")
+	pure fn translate(Context c, string space, string message, Map params = null, string locale = "")
 	{
-		return string (Context c) use (message, space, params, locale)
-		{
-			return message;
-		}
+		return message;
 	}
 	
 	
@@ -694,7 +703,7 @@ struct Context extends CoreStruct
 	/**
 	 * Returns providers from entities
 	 */
-	pure Dict<CoreStruct> getProvidersFromEntities(Collection<CoreStruct> entities)
+	pure Dict<CoreStruct> getProvidersFromEntities(Context c, Collection<CoreStruct> entities)
 	{
 		Collection<CoreStruct> arr = entities.filter
 		(
@@ -714,7 +723,7 @@ struct Context extends CoreStruct
 	/**
 	 * Register drivers
 	 */
-	pure Dict<Driver> getDriversFromEntities(Collection<CoreStruct> entities)
+	pure Dict<Driver> getDriversFromEntities(Context c, Collection<CoreStruct> entities)
 	{
 		Collection<CoreStruct> arr = entities.filter
 		(
@@ -730,10 +739,10 @@ struct Context extends CoreStruct
 			if (class_name == "") class_name = item.name;
 			
 			CoreDriver driver = rtl::newInstance(class_name, []);
-			driver = static::chain(class_name, [driver]);
+			driver = c -> method chain(class_name, [driver]);
 			if (class_name != driver_name)
 			{
-				driver = static::chain(driver_name, [driver]);
+				driver = c -> method chain(driver_name, [driver]);
 			}
 			
 			drivers.set(item.name, driver);
