@@ -196,4 +196,13 @@ class lib
 			)
 	;
 	
+	
+	/**
+	 * Convert monad by type
+	 */
+	pure fn default(var def_value = null) =>
+		bool (var m) use (def_value) =>
+			(m.err != null or m.val === null) ? new Monad(def_value) : m
+	;
+	
 }
