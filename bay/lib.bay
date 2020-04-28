@@ -91,36 +91,6 @@ class lib
 	
 	
 	/**
-	 * Returns key value of obj
-	 */
-	pure fn get(string key, var def_value) =>
-		var (var obj) use (key, def_value) =>
-			rtl::attr(obj, [key], def_value)
-	;
-	
-	
-	
-	/**
-	 * Returns attr of item
-	 */
-	pure fn attr(Collection<string> path, var def_value = null) =>
-		var (var obj) use (path, def_value) =>
-			rtl::attr(obj, path, def_value)
-	;
-	
-	
-	
-	/**
-	 * Set dict attr
-	 */
-	pure fn setAttr(Collection<string> path, var value) =>
-		var (var obj) use (path, value) =>
-			rtl::setAttr(obj, path, value)
-	;
-	
-	
-	
-	/**
 	 * Equal two struct by key
 	 */
 	pure fn equalAttr(string key, var value)
@@ -150,6 +120,36 @@ class lib
 			fn f = rtl::@method(item1, method_name);
 			return f() == value;
 		}
+	;
+	
+	
+	
+	/**
+	 * Returns key value of obj
+	 */
+	pure fn get(string key, var def_value) =>
+		var (var obj) use (key, def_value) =>
+			rtl::attr(obj, [key], def_value)
+	;
+	
+	
+	
+	/**
+	 * Returns attr of item
+	 */
+	pure fn attr(Collection<string> path, var def_value = null) =>
+		var (var obj) use (path, def_value) =>
+			rtl::attr(obj, path, def_value)
+	;
+	
+	
+	
+	/**
+	 * Set dict attr
+	 */
+	pure fn setAttr(Collection<string> path, var value) =>
+		var (var obj) use (path, value) =>
+			rtl::setAttr(obj, path, value)
 	;
 	
 	

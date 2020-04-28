@@ -26,4 +26,6 @@ struct Entity extends CoreStruct
 {
 	string name = "";
 	string value = "";
+	
+	string className() => this.value != "" ? this.value : this.name;
 }
