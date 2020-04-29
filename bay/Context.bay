@@ -276,12 +276,11 @@ struct Context extends CoreStruct
 			if (c.providers.has(provider_name))
 			{
 				Provider info = c.providers.item(provider_name);
-				if (info.kind == "interface")
+				if (info.kind == Provider::KIND_INTERFACE)
 				{
 					throw new RuntimeException("Provider " ~ provider_name ~ " does not declared");
 				}
-				string class_name = info.value;
-				if (class_name == "") class_name = info.name;
+				string class_name = info.className();
 				
 				/* Set default params */
 				if (params == null)

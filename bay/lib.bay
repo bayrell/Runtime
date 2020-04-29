@@ -168,6 +168,15 @@ class lib
 	
 	
 	/**
+	 * Copy object
+	 */
+	pure fn copy(Dict d) =>
+		bool (var item) use (d) => item.copy(d)
+	;
+	
+	
+	
+	/**
 	 * Take dict
 	 */
 	pure fn takeDict(Collection<string> fields) =>

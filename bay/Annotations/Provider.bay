@@ -30,4 +30,6 @@ use Runtime.Annotations.Entity;
 
 struct Provider extends Entity
 {
+	static const string KIND_INTERFACE = "interface";
+	string kind = "";
 }
