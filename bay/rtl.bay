@@ -1130,6 +1130,19 @@ class rtl
 	
 	
 	/**
+	 * Sleep
+	 */
+	static async void usleep(int time)
+	{
+		#switch
+		#case ifcode PHP then
+		usleep($time);
+		#endswitch
+	}
+	
+	
+	
+	/**
 	 * Returns unique value
 	 * @param bool flag If true returns as text. Default true
 	 * @return string

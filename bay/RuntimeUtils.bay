@@ -224,14 +224,29 @@ static class RuntimeUtils
 	/**
 	 * Returns methods in class by annotation name
 	 */
-	pure memorize Collection<string> getMethodsIntrospection(string class_name, string annotation_name)
+	pure Collection<string> getMethodsIntrospection(string class_name, Collection<string> annotations)
 	{
 		IntrospectionClass class_info = RuntimeUtils::getClassIntrospection( class_name );
 		Dict d = class_info.methods.filter
 		(
-			void (Collection<Entity> arr, string method_name) use (annotation_name)
+			void (Collection<Entity> arr, string method_name) use (annotations, class_name)
 			{
-				arr = arr.filter( lib::isInstance(annotation_name) );
+				arr = arr.filter
+				(
+					bool (Entity item) use (annotations)
+					{
+						for (int i=0; i<annotations.count(); i++)
+						{
+							string annotation_name = annotations.item(i);
+							if (rtl::is_instanceof(item, annotation_name))
+							{
+								return true;
+							}
+						}
+						return false;
+					}
+				);
+				
 				return arr.count() > 0;
 			}
 		);
