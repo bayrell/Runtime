@@ -25,13 +25,15 @@ use Runtime.rs;
 use Runtime.rtl;
 use Runtime.Collection;
 use Runtime.Vector;
+use Runtime.Interfaces.EntityInterface;
 
 
-struct LambdaChain extends CoreStruct
+struct LambdaChain extends CoreStruct implements EntityInterface
 {	
 	string name = "";
 	string value = "";
 	string chain = "";
 	double pos = 0;
 	bool is_await = false;
+	string logName() => this.getClassName() ~ " -> " ~ this.name ~ " -> [" ~ this.pos ~ "] " ~ this.value;
 }

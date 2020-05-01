@@ -20,12 +20,15 @@ namespace Runtime.Annotations;
 
 use Runtime.rtl;
 use Runtime.CoreStruct;
+use Runtime.Interfaces.EntityInterface;
 
 
-struct Entity extends CoreStruct
+struct Entity extends CoreStruct implements EntityInterface
 {
 	string name = "";
 	string value = "";
-	
 	string className() => this.value != "" ? this.value : this.name;
+	string logName() =>
+		this.getClassName() ~ " -> " ~ ( this.value != "" ? (this.name ~ " -> " ~ this.value) : this.name )
+	;
 }

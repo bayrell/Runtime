@@ -732,7 +732,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		if ($value == null) return "";
+		if ($value === null) return "";
 		if ($value instanceof StringInterface) return $value->toString();
 		return (string)$value;
 		
@@ -742,7 +742,7 @@ class rtl
 		/*if (isBrowser()) _StringInterface = Runtime.Interfaces.StringInterface; 
 		else _StringInterface = StringInterface;*/
 		
-		if (value == null) return "";
+		if (value === null) return "";
 		if (typeof value == 'string') return value;
 		if (value instanceof String) return ""+value;
 		if (this.is_implements(null, value, _StringInterface)) return value.toString();

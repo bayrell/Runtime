@@ -93,6 +93,13 @@ class rs
 	
 	
 	/**
+	 * Is start
+	 */
+	pure bool start(string s, string search) => static::search(s, search) == 0;
+	
+	
+	
+	/**
 	 * Returns substring
 	 * @param string s The string
 	 * @param int start

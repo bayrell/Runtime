@@ -15,22 +15,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
-namespace Runtime.Annotations;
-
-use Runtime.CoreStruct;
-use Runtime.Dict;
-use Runtime.Map;
-use Runtime.rs;
-use Runtime.rtl;
-use Runtime.Collection;
-use Runtime.Vector;
-use Runtime.Interfaces.EntityInterface;
+ 
+namespace Runtime.Interfaces;
 
 
-struct LambdaChainDeclare extends CoreStruct implements EntityInterface
+interface EntityInterface
 {
-	string name = "";
-	bool is_await = false;
-	string logName() => this.getClassName() ~ " -> " ~ this.name;
+	
+	/**
+	 * Log name
+	 * @return string
+	 */
+	string logName();
+	
 }
