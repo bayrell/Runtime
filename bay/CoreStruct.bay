@@ -148,8 +148,8 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	
 	
 	/**
-	 * Copy this struct with new values
-	 * @param Map obj = null
+	 * Clone this struct with fields
+	 * @param Collection fields = null
 	 * @return CoreStruct
 	 */
 	public CoreStruct clone(Collection fields = null)

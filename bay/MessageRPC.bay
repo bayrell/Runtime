@@ -38,6 +38,7 @@ struct MessageRPC<primitive> extends Message
 	
 	/* Result */
 	int code = 0;
+	string success_message = "";
 	string error = "";
 	primitive response = null;
 	Collection<string> logs = null;	
@@ -57,9 +58,16 @@ struct MessageRPC<primitive> extends Message
 	 * @param primitive res
 	 * @return Message
 	 */
-	pure fn success(primitive response) =>
-		Message (Message msg) use (response) =>
-			msg.copy{ "code": RuntimeConstant::ERROR_OK, "error": "", "response": response, "have_result": true }
+	pure fn success(primitive response, string message = "", int code = 1) =>
+		Message (Message msg) use (response, message, code) =>
+			msg.copy
+			{
+				"code": code,
+				"error": "",
+				"success_message": message,
+				"response": response,
+				"have_result": true
+			}
 	;
 	
 	

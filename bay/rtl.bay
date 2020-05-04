@@ -500,7 +500,7 @@ class rtl
 		fn f = var (Collection attrs, var data, var new_value, var f)
 		{
 			if (attrs.count() == 0) return new_value;
-			if (data == null) return null;
+			if (data == null) data = {};
 			
 			var new_data = null;
 			var attr_name = attrs.first();
@@ -1130,13 +1130,52 @@ class rtl
 	
 	
 	/**
-	 * Sleep
+	 * Sleep in ms
+	 */
+	static async void sleep(int time)
+	{
+		#switch
+		#case ifcode PHP then
+		usleep( round($time / 1000) );
+		#case ifcode JAVASCRIPT then
+		setTimeout
+		(
+			(function (__async_t)
+			{
+				return function()
+				{
+					__async_t.resolve(ctx, null);
+				};
+			})(__async_t),
+			time
+		);
+		return;
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Sleep in microseconds
 	 */
 	static async void usleep(int time)
 	{
 		#switch
 		#case ifcode PHP then
 		usleep($time);
+		#case ifcode JAVASCRIPT then
+		setTimeout
+		(
+			(function (__async_t)
+			{
+				return function()
+				{
+					__async_t.resolve(ctx, null);
+				};
+			})(__async_t),
+			Math.round(time / 1000)
+		);
+		return;
 		#endswitch
 	}
 	

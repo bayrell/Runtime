@@ -258,11 +258,52 @@ class Dict<T> extends _Map
 	
 	
 	/**
+	 * Clone this struct with fields
+	 * @param Collection fields = null
+	 * @return Dict<T>
+	 */
+	public Dict<T> clone(Collection fields = null)
+	{
+		if (fields == null) return this;
+		
+		#switch
+		#case ifcode JAVASCRIPT then
+		var new_obj = this.constructor.Instance(ctx);
+		if (fields != null)
+		{
+			for (var key in fields)
+			{
+				if (typeof obj["|" + key] == undefined)
+					new_obj._map["|" + key] = this._map["|" + key];
+			}
+		}
+		return new_obj;
+		#case ifcode PHP then
+		$new_obj = static::Instance($ctx);
+		if ($fields != null)
+		{
+			foreach ($fields->_arr as $key)
+			{
+				if (isset($this->_map[$key]))
+				{
+					$new_obj->_map[$key] = $this->_map[$key];
+				}
+			}
+		}
+		return $new_obj;
+		#endswitch
+	}
+	
+	
+	
+	/**
 	 * Returns copy of Dict
 	 * @param int pos - position
 	 */
 	public Dict<T> copy(var obj = null)
 	{
+		if (obj == null) return this;
+		
 		#switch
 		#case ifcode JAVASCRIPT then
 		var new_obj = this.constructor.Instance(ctx);

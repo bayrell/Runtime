@@ -421,14 +421,23 @@ struct Context extends CoreStruct
 	
 	/**
 	 * Translate message
-	 * @params string message - message need to be translated
 	 * @params string space - message space
+	 * @params string message - message need to be translated
 	 * @params Map params - Messages params. Default null.
 	 * @params string locale - Different locale. Default "".
 	 * @return string - translated string
 	 */
 	pure fn translate(Context c, string space, string message, Map params = null, string locale = "")
 	{
+		message = (params == null) ? message :
+			params.reduce
+			(
+				string (string message, string value, string key) =>
+					rs::replace("%" ~ key ~ "%", value, message)
+				,
+				message
+			)
+		;
 		return message;
 	}
 	
