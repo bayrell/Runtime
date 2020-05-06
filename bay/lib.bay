@@ -198,7 +198,7 @@ class lib
 	 * Convert monad by type
 	 */
 	pure fn to(string type_value, var def_value = null) =>
-		bool (var m) use (type_value, def_value) =>
+		bool (Monad m) use (type_value, def_value) =>
 			new Monad
 			(
 				m.err == null ? rtl::@convert( m.value(), type_value, def_value ) : def_value
@@ -206,12 +206,30 @@ class lib
 	;
 	
 	
+	
 	/**
 	 * Convert monad by type
 	 */
 	pure fn default(var def_value = null) =>
-		bool (var m) use (def_value) =>
+		bool (Monad m) use (def_value) =>
 			(m.err != null or m.val === null) ? new Monad(def_value) : m
 	;
+	
+	
+	
+	/**
+	 * Set monad new value
+	 */
+	pure fn set(var value = null, bool clear_error = false) =>
+		bool (Monad m) use (value, clear_error) =>
+			clear_error == true ? new Monad(value) : m.err == null ? new Monad(value) : m
+	;
+	
+	
+	
+	/**
+	 * Returns monad
+	 */
+	pure Monad monad(Monad m) => m;
 	
 }

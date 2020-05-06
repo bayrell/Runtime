@@ -33,7 +33,7 @@ class Monad
 	public void constructor(var value, var err = null)
 	{
 		this.val = value;
-		this.err = null;
+		this.err = err;
 	}
 	
 	
