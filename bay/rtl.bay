@@ -432,6 +432,29 @@ class rtl
 	
 	
 	/**
+	 * Returns value
+	 */
+	static var get(var item, string key, var def_val = null)
+	{
+		if (item === null) return def_val;
+		
+		#switch
+		#case ifcode PHP then
+		return $item[$key];
+		#case ifcode JAVASCRIPT then
+		if (item instanceof Runtime.Dict || item instanceof Runtime.Collection)
+		{
+			return item.get(ctx, key, def_val);
+		}
+		return item[key];
+		#endswitch
+		
+		return def_val;
+	}
+	
+	
+	
+	/**
 	 * Returns callback
 	 * @return var
 	 */
@@ -441,6 +464,8 @@ class rtl
 		#case ifcode PHP then
 		
 		if ($item === null) return $def_val;
+		if (gettype($path) == "string") $path = \Runtime\Collection::from([$path]);
+		
 		if (count($path->_arr) == 0) 
 		{
 			return $item;
@@ -462,9 +487,10 @@ class rtl
 		}
 		return $val;
 		
-		#case ifcode JAVASCRIPT then		
+		#case ifcode JAVASCRIPT then
 		if (def_val == undefined) def_val = null;
 		if (item === null) return def_val;
+		if (typeof path == "string") path = Runtime.Collection.from([path]);
 		if (path.count() == 0)
 		{
 			return item;
