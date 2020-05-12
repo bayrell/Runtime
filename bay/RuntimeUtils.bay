@@ -884,33 +884,4 @@ static class RuntimeUtils
 	}
 	
 	
-	
-	/**
-	 * Retuns css hash 
-	 * @param string component class name
-	 * @return string hash
-	 */
-	static memorize string getCssHash(string s)
-	{
-		string r = "";
-		string a = "1234567890abcdef";
-		int sz = rs::strlen(s);
-		int h = 0;
-		for (int i=0; i<sz; i++)
-		{
-			int c = rs::ord( rs::substr(s, i, 1) );
-			h = ((h << 2) + (h >> 14) + c) & 65535;
-		}
-		int p = 0;
-		while (h != 0 or p < 4)
-		{
-			int c = h & 15;
-			h = h >> 4;
-			r ~= rs::substr(a, c, 1);
-			p = p + 1;
-		}
-		return r;
-	}
-	
-	
 }
