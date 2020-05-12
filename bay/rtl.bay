@@ -442,6 +442,7 @@ class rtl
 		#case ifcode PHP then
 		return $item[$key];
 		#case ifcode JAVASCRIPT then
+		if (item == undefined) return def_val;
 		if (item instanceof Runtime.Dict || item instanceof Runtime.Collection)
 		{
 			return item.get(ctx, key, def_val);
