@@ -214,6 +214,11 @@ Object.assign(Runtime.AsyncThread.prototype,
 		var item = this.tasks.last(ctx);
 		return item.vars.get(ctx, var_name);
 	},
+	getErr: function(ctx)
+	{
+		var item = this.tasks.last(ctx);
+		return item.err;
+	},
 	call: function(ctx, f, res_name)
 	{
 		var tasks = this.tasks.pushIm(ctx, new Runtime.AsyncTask(ctx, {"pos":"0","f":f,"res_name":res_name} ));
