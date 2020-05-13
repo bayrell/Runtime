@@ -241,6 +241,26 @@ class Dict<T> extends _Map
 	
 	
 	/**
+	 * Copy instance
+	 */
+	protected Dict<T> cp()
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		var new_obj = this.constructor.Instance(ctx);
+		new_obj._map = Object.assign({}, this._map);
+		return new_obj;
+		#case ifcode PHP then
+		$new_obj = static::Instance($ctx);
+		$new_obj->_map = $this->_map;
+		return $new_obj;
+		#endswitch
+	}
+	
+	
+	
+	
+	/**
 	 * Returns new Instance
 	 * @return Object
 	 */
@@ -481,12 +501,12 @@ class Dict<T> extends _Map
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var res = this.copy(ctx);
+		var res = this.cp(ctx);
 		key = this.toStr(key);
 		res._map["|" + key] = value;
 		return res;
 		#case ifcode PHP then
-		$res = $this->copy($ctx);
+		$res = $this->cp($ctx);
 		$key = $this->toStr($key);
 		$res->_map[$key] = $value;
 		return $res;
@@ -507,7 +527,7 @@ class Dict<T> extends _Map
 		key = this.toStr(key);
 		if (typeof this._map["|" + key] != "undefined")
 		{
-			var res = this.copy();
+			var res = this.cp();
 			delete res._map["|" + key];
 			return res;
 		}
@@ -516,7 +536,7 @@ class Dict<T> extends _Map
 		$key = $this->toStr($key);
 		if (isset($this->_map[$key]))
 		{
-			$res = $this->copy($ctx);
+			$res = $this->cp($ctx);
 			unset($res->_map[$key]);
 			return $res;
 		}
@@ -716,7 +736,7 @@ class Dict<T> extends _Map
 		#switch
 		#case ifcode JAVASCRIPT then
 		if (map == null) return this;
-		var res = this.copy(ctx);
+		var res = this.cp(ctx);
 		for (var key in map._map)
 		{
 			res._map[key] = map._map[key];
@@ -724,7 +744,7 @@ class Dict<T> extends _Map
 		return res;
 		#case ifcode PHP then
 		if ($map == null) return $this;
-		$res = $this->copy($ctx);
+		$res = $this->cp($ctx);
 		foreach ($this->_map as $key => $value)
 		{
 			$res->_map[$key] = $value;
