@@ -22,9 +22,11 @@ use Runtime.CoreStruct;
 use Runtime.Collection;
 use Runtime.Map;
 use Runtime.Message;
+use Runtime.Monad;
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
 use Runtime.Session;
+use Runtime.Exceptions.RuntimeException;
 
 
 struct MessageRPC<primitive> extends Message
@@ -40,6 +42,8 @@ struct MessageRPC<primitive> extends Message
 	int code = 0;
 	string success_message = "";
 	string error = "";
+	string error_name = "";
+	string error_trace = "";
 	primitive response = null;
 	Collection<string> logs = null;	
 	bool have_result = false;
@@ -66,7 +70,7 @@ struct MessageRPC<primitive> extends Message
 				"error": "",
 				"success_message": message,
 				"response": response,
-				"have_result": true
+				"have_result": true,
 			}
 	;
 	
@@ -77,8 +81,56 @@ struct MessageRPC<primitive> extends Message
 	 * @param primitive res
 	 * @return Message
 	 */
-	pure fn fail(primitive response, string error = "", int code = -1) =>
-		Message (Message msg) use (response, error, code) =>
-			msg.copy{ "code": code, "error": error, "response": response, "have_result": true }
+	pure fn fail(primitive response, string error = "", int code = -1, string error_name = "") =>
+		Message (Message msg) use (response, error, error_name, code) =>
+			msg.copy
+			{
+				"code": code,
+				"error": error,
+				"error_name": error_name,
+				"response": response,
+				"have_result": true,
+			}
 	;
+	
+	
+	
+	/**
+	 * Set exception
+	 * @param primitive res
+	 * @return Message
+	 */
+	pure fn exception(RuntimeException e) =>
+		Message (Message msg) use (e) =>
+			msg.copy
+			{
+				"code": e.getErrorCode(),
+				"error": e.getErrorMessage(),
+				"error_name": e.getClassName(),
+				"response": e,
+				"have_result": true,
+			}
+	;
+	
+	
+	
+	/**
+	 * End pipe
+	 */
+	pure MessageRPC end(Monad m)
+	{
+		if (m.err == null) return m;
+		return new Monad
+		(
+			new MessageRPC
+			{
+				"error": m.err.getErrorMessage(),
+				"error_name": m.err.getClassName(),
+				"code": m.err.getErrorCode(),
+				"response": m.err,
+				"have_result": false,
+			}
+		);
+	}
+	
 }
