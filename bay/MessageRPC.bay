@@ -26,6 +26,7 @@ use Runtime.Monad;
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
 use Runtime.Session;
+use Runtime.Exceptions.ApiException;
 use Runtime.Exceptions.RuntimeException;
 
 
@@ -46,14 +47,14 @@ struct MessageRPC<primitive> extends Message
 	string error_trace = "";
 	primitive response = null;
 	Collection<string> logs = null;	
-	bool have_result = false;
+	bool have_answer = false;
 	
-	
+		
 	/**
 	 * Returns true if success
 	 * @return bool
 	 */
-	pure bool isSuccess(Message msg) => msg.have_result and msg.code >= RuntimeConstant::ERROR_OK;
+	pure bool isSuccess(Message msg) => msg.have_answer and msg.code >= RuntimeConstant::ERROR_OK;
 	
 	
 	
@@ -70,7 +71,6 @@ struct MessageRPC<primitive> extends Message
 				"error": "",
 				"success_message": message,
 				"response": response,
-				"have_result": true,
 			}
 	;
 	
@@ -89,7 +89,6 @@ struct MessageRPC<primitive> extends Message
 				"error": error,
 				"error_name": error_name,
 				"response": response,
-				"have_result": true,
 			}
 	;
 	
@@ -101,15 +100,23 @@ struct MessageRPC<primitive> extends Message
 	 * @return Message
 	 */
 	pure fn exception(RuntimeException e) =>
-		Message (Message msg) use (e) =>
-			msg.copy
+		Message (Message msg) use (e)
+		{
+			msg = msg.copy
 			{
 				"code": e.getErrorCode(),
 				"error": e.getErrorMessage(),
 				"error_name": e.getClassName(),
-				"response": e,
-				"have_result": true,
+				"response": null,
+			};
+			
+			if (e instanceof ApiException)
+			{
+				msg <= response <= e.response;
 			}
+			
+			return msg;
+		}
 	;
 	
 	
@@ -128,7 +135,6 @@ struct MessageRPC<primitive> extends Message
 				"error_name": m.err.getClassName(),
 				"code": m.err.getErrorCode(),
 				"response": m.err,
-				"have_result": false,
 			}
 		);
 	}

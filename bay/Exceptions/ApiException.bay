@@ -27,18 +27,12 @@ use Runtime.BusResult;
 
 class ApiException extends RuntimeException
 {
-	void constructor
-	(
-		string message = "", int code = -1,
-		ContextInterface context = null, Object prev = null
-	)
+	var response = null;
+	
+	void constructor(string message = "", int code = -1, var response = null, Object prev = null)
 	{
-		parent(
-			message, 
-			code, 
-			context,
-			prev
-		);
+		parent(message, code, prev);
+		this.response = response;
 	}
 
 }

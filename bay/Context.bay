@@ -30,6 +30,7 @@ use Runtime.CoreProvider;
 use Runtime.Dict;
 use Runtime.Map;
 use Runtime.Message;
+use Runtime.MessageRPC;
 use Runtime.Vector;
 use Runtime.RuntimeConstant;
 use Runtime.RuntimeUtils;
@@ -445,17 +446,32 @@ struct Context extends CoreStruct
 	
 	/* ----------------------- Bus ---------------------- */
 	
+	
 	/**
 	 * Send message
 	 * @param Message msg
-	 * @param Context ctx
 	 * @return Message
 	 */ 
-	static fn sendMessage(Message msg) =>
-		async Message (Context c) use (msg) =>
+	static fn send(MessageRPC msg) =>
+		async MessageRPC (Context c) use (msg) =>
 			c
 				-> method getProvider(RuntimeConstant::BUS_INTERFACE, "default")
-				-> await method sendMessage(msg)
+				-> await method sendMessage( msg )
+				-> monad MessageRPC::end
+			;
+			
+	
+	/**
+	 * Send rpc message
+	 * @param Dict items
+	 * @return Message
+	 */ 
+	static fn sendMessage(Dict items) =>
+		async MessageRPC (Context c) use (items) =>
+			c
+				-> method getProvider(RuntimeConstant::BUS_INTERFACE, "default")
+				-> await method sendMessage( MessageRPC::create(items) )
+				-> monad MessageRPC::end
 			;
 	
 	

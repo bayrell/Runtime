@@ -22,15 +22,30 @@ use Runtime.rtl;
 use Runtime.CoreStruct;
 use Runtime.Collection;
 use Runtime.Map;
-use Runtime.MessageSession;
 use Runtime.RuntimeConstant;
 
 
 struct Message extends CoreStruct
 {
+	string message_id = "";
 	bool is_external = false;
-	MessageSession session = null;
 	
-	pure bool isExternal(MessageSession s) => s.is_external == true;
-	pure bool isInternal(MessageSession s) => s.is_external == false;
+	
+	/**
+	 * Set message id
+	 */
+	pure Message setMessageId(Message msg)
+	{
+		if (msg.message_id == "") msg <= message_id <= rtl::unique();
+		return msg;
+	}
+	
+	
+	/**
+	 * Create message
+	 */
+	pure Message create(Dict items) =>
+		static::newInstance(items)
+		-> Message::setMessageId
+	;
 }
