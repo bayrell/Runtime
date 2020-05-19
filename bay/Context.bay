@@ -49,6 +49,7 @@ struct Context extends CoreStruct
 {
 	/* Struct data */
 	string base_path = null;
+	string entrypoint = "";
 	Dict<string> enviroments = null;
 	Dict<var> settings = null;
 	Collection<string> modules = null;

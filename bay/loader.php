@@ -31,6 +31,8 @@ class Loader
 	public $base_path = "";
 	public $include_path = [];
 	public $return_code = 0;
+	public $class_name = "";
+	public $main_module = "";
 	
 	
 	/**
@@ -168,6 +170,9 @@ class Loader
 	 */
 	function create_context($class_name, $main_module, $env = null)
 	{
+		$this->class_name = $class_name;
+		$this->main_module = $main_module;
+		
 		$context_class_name = \Runtime\rtl::find_class($class_name);
 		$main_module_class_name = \Runtime\rtl::find_class($main_module . ".ModuleDescription");
 		
@@ -185,6 +190,32 @@ class Loader
 			"start_time" => $this->start_time,
 			"cli_args" => Collection::from($this->cli_args),
 		]) );
+		
+		/* Assign context */
+		$this->ctx = $ctx;
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Set entrypoint
+	 */
+	function entrypoint($class_name)
+	{
+		$this->ctx = $this->ctx->copy($this->ctx, Dict::from(["entrypoint"=>$class_name]));
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Run application
+	 */
+	function run()
+	{
+		$ctx = $this->ctx;
+		$main_module_class_name = \Runtime\rtl::find_class($this->main_module . ".ModuleDescription");
 		
 		/* Set global context */
 		\Runtime\RuntimeUtils::setContext($ctx);
@@ -215,31 +246,11 @@ class Loader
 		
 		$ctx::log_timer($ctx, "after start")($ctx, $ctx);
 		
-		/* Assign context */
-		$this->ctx = $ctx;
-		return $this;
-	}
-	
-	
-	
-	/**
-	 * Run application
-	 */
-	function run($f1, $f2 = null)
-	{
-		$ctx = $this->ctx;
-		
-		/* Run */
-		if ($f2 == null) call_user_func_array($f1, [$ctx]);
-		else
-		{
-			$f1 = \Runtime\rtl::find_class($f1);
-			call_user_func_array([$f1, $f2], [$ctx]);
-		}
+		/* Run  entrypoint */
+		$entrypoint = $ctx->entrypoint;
+		$obj = \Runtime\rtl::find_class($entrypoint);
+		call_user_func_array([$obj, "run"], [$ctx]);
 		
 		return $this;
 	}
-	
-	
-	
 }

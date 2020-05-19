@@ -1410,11 +1410,28 @@ class rtl
 	
 	
 	/**
+	 * Save local file
+	 */
+	static async string saveLocalFile(string path, string content = "", string ch = "utf8", string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		#switch
+		#case ifcode PHP then
+		if ($filepath == false) return "";
+		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
+		return file_put_contents($filepath, $content);
+		#endswitch
+		return "";
+	}
+	
+	
+	/**
 	 * Read local file
 	 */
 	static async string readLocalFile(string path, string ch = "utf8", string chroot = "")
 	{
-		if (rs::substr(chroot, -1) != "/") chroot ~= "/";
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
 		string filepath = chroot ~ path;
 		#switch
 		#case ifcode PHP then
@@ -1423,6 +1440,23 @@ class rtl
 		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
 		if (!file_exists($filepath)) return "";
 		return file_get_contents($filepath);
+		#endswitch
+		return "";
+	}
+	
+	
+	/**
+	 * Make dir
+	 */
+	static async bool mkdir(string path, string chroot = "", string mode = "0755")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		#switch
+		#case ifcode PHP then
+		if ($filepath == false) return false;
+		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return false;
+		return @mkdir($filepath, $mode, true);
 		#endswitch
 		return "";
 	}
