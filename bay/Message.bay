@@ -29,6 +29,7 @@ struct Message extends CoreStruct
 {
 	string message_id = "";
 	bool is_external = false;
+	Dict<primitive> dict = new Dict();
 	
 	
 	/**
