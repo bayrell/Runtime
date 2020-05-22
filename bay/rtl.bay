@@ -1396,6 +1396,19 @@ class rtl
 	
 	
 	
+	/**
+	 * Convert to timestamp
+	 */
+	static int timestamp(string s)
+	{
+		#switch
+		#case ifcode PHP then
+		return strtotime($s);
+		#endswitch
+	}
+	
+	
+	
 	#ifdef BACKEND then
 	
 	/**

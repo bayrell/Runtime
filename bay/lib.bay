@@ -196,6 +196,15 @@ class lib
 	
 	
 	/**
+	 * Map
+	 */
+	pure fn map(fn f) =>
+		var (var m) use (f) => m.map(f)
+	;
+	
+	
+	
+	/**
 	 * Filter
 	 */
 	pure fn filter(fn f) =>

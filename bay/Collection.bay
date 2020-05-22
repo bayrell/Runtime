@@ -968,7 +968,11 @@ class Collection<T> extends _Collection
 		#case ifcode JAVASCRIPT then
 		var arr = this.cp(ctx);
 		if (f == undefined) Array.prototype.sort.call(arr);
-		Array.prototype.sort.call(arr, f);
+		else
+		{
+			var f1 = (a, b) => { return f(ctx, a, b); };
+			Array.prototype.sort.call(arr, f1);
+		}
 		return arr;
 		#case ifcode PHP then
 		$res = $this->cp($ctx);
@@ -978,7 +982,8 @@ class Collection<T> extends _Collection
 		}
 		else
 		{
-			usort($res->_arr, $f);
+			$f1 = function($a, $b) use ($ctx, $f){ return $f($ctx, $a, $b); };
+			usort($res->_arr, $f1);
 		}
 		return $res;
 		#endswitch

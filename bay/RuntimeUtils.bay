@@ -651,20 +651,25 @@ static class RuntimeUtils
 	
 	
 	/**
+	 * Url encode
+	 * @param string s
+	 * @return string 
+	 */
+	static string url_encode(string s)
+	{
+		return rs::url_encode(s);
+	}
+	
+	
+	
+	/**
 	 * Base64 encode
 	 * @param string s
 	 * @return string 
 	 */
 	static string base64_encode(string s)
 	{
-		#switch
-		#case ifcode PHP then
-		return base64_encode($s);
-		#case ifcode ES6 then
-		return window.btoa(window.unescape(window.encodeURIComponent(s)));
-		#case ifcode NODEJS then
-		return Buffer.from(s).toString('base64');
-		#endswitch
+		return rs::base64_encode(s);
 	}
 	
 	
@@ -676,14 +681,7 @@ static class RuntimeUtils
 	 */
 	static string base64_decode(string s)
 	{
-		#switch
-		#case ifcode PHP then
-		return base64_decode($s);
-		#case ifcode ES6 then
-		return window.decodeURIComponent(window.escape(window.atob(s)));
-		#case ifcode NODEJS then
-		return Buffer.from(s, 'base64').toString('ascii');
-		#endswitch
+		return rs::base64_decode(s);
 	}
 	
 	
@@ -695,25 +693,7 @@ static class RuntimeUtils
 	 */
 	static string base64_encode_url(string s)
 	{
-		#switch
-		#case ifcode PHP then
-	
-		$s = base64_encode($s);
-		$s = str_replace('+', '-', $s);
-		$s = str_replace('/', '_', $s);
-		$s = str_replace('=', '', $s);
-		return $s;
-	
-		#case ifcode ES6 then
-		s = this.base64_encode(ctx, s)
-			.replace(new RegExp('\\+', 'g'), '-')
-			.replace(new RegExp('\\/', 'g'), '_')
-			.replace(new RegExp('=', 'g'), '')
-		;
-		return s;
-		#case ifcode NODEJS then
-		return Buffer.from(s).toString('base64');
-		#endswitch
+		return rs::base64_encode_url(s);
 	}
 	
 	
@@ -725,23 +705,7 @@ static class RuntimeUtils
 	 */
 	static string base64_decode_url(string s)
 	{
-		#switch
-		#case ifcode PHP then
-		$c = 4 - strlen($s) % 4;
-		if ($c < 4 && $c > 0) $s .= str_repeat('=', $c);
-		$s = str_replace('-', '+', $s);
-		$s = str_replace('_', '/', $s);
-		return base64_decode($s);
-		#case ifcode ES6 then
-		var c = 4 - s.length % 4;
-		if (c < 4 && c > 0) s = s + '='.repeat(c);
-		s = s.replace(new RegExp('-', 'g'), '+')
-			.replace(new RegExp('_', 'g'), '/')
-		;
-		return this.base64_decode(ctx, s);
-		#case ifcode NODEJS then
-		return Buffer.from(s, 'base64').toString('ascii');
-		#endswitch
+		return rs::base64_decode_url(s);
 	}
 	
 	
