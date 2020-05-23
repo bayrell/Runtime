@@ -214,6 +214,24 @@ class lib
 	
 	
 	/**
+	 * Sort
+	 */
+	pure fn sort(fn f) =>
+		bool (var m) use (f) => m.sortIm(f)
+	;
+	
+	
+	
+	/**
+	 * Transition
+	 */
+	pure fn transition(fn f) =>
+		var (var m) use (f) => m.transition(f)
+	;
+	
+	
+	
+	/**
 	 * Convert monad by type
 	 */
 	pure fn to(string type_value, var def_value = null) =>

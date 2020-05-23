@@ -795,7 +795,7 @@ class Collection<T> extends _Collection
 		#switch
 		#case ifcode JAVASCRIPT then
 		var Dict = use("Runtime.Dict");
-		var d = new Dict();
+		var d = new Dict(ctx);
 		for (var i=0; i<this.length; i++)
 		{
 			var value = this[i];
@@ -804,11 +804,11 @@ class Collection<T> extends _Collection
 		}
 		return d;
 		#case ifcode PHP then
-		$d = new \Runtime\Dict();
+		$d = new \Runtime\Dict($ctx);
 		foreach ($this->_arr as $key => $value)
 		{
-			$p = $f(ctx, $value, $key);
-			$d->map[$p[1]] = $p[0];
+			$p = $f($ctx, $value, $key);
+			$d->_map[$p[1]] = $p[0];
 		}
 		return $d;
 		#endswitch
