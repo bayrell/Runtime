@@ -19,20 +19,18 @@
 namespace Runtime.Exceptions;
 
 use Runtime.rtl;
-use Runtime.RuntimeConstant;
 use Runtime.Exceptions.RuntimeException;
-use Runtime.Interfaces.ContextInterface;
 
 
 class AssignStructValueError extends RuntimeException
 {
 	
-	void constructor(string name, ContextInterface context = null, Object prev = null)
+	void constructor(string name, Object prev = null)
 	{
-		parent(
-			rtl::translate("Can not set key '" ~ name ~ "' in immutable struct", null, "", context), 
-			RuntimeConstant::ERROR_INDEX_OUT_OF_RANGE, 
-			context,
+		parent
+		(
+			_("Runtime", "Can not set key '" ~ name ~ "' in immutable struct"), 
+			rtl::ERROR_INDEX_OUT_OF_RANGE, 
 			prev
 		);
 	}

@@ -26,13 +26,11 @@ use Runtime.Interfaces.ContextInterface;
 
 class KeyNotFound extends RuntimeException{
 	
-	void constructor(string key, ContextInterface context = null, Object prev = null){
-			
-		/* RuntimeUtils::translate("ERROR_KEY_NOT_FOUND", null, "", context),  */
+	void constructor(string key, Object prev = null)
+	{
 		parent(
-			"Key '" ~ key ~ "' not found",
-			RuntimeConstant::ERROR_KEY_NOT_FOUND, 
-			context,
+			_("Runtime", "Key '" ~ key ~ "' not found"),
+			rtl::ERROR_KEY_NOT_FOUND,
 			prev
 		);
 	}

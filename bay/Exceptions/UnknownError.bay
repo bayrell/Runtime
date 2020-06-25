@@ -24,14 +24,14 @@ use Runtime.Exceptions.RuntimeException;
 use Runtime.Interfaces.ContextInterface;
 
 
-class UnknownError extends RuntimeException{
+class UnknownError extends RuntimeException
+{
 	
-	void constructor(ContextInterface context = null, Object prev = null){
-		
+	void constructor(Object prev = null)
+	{
 		parent(
-			rtl::translate("Unknown error", null, "", context), 
-			RuntimeConstant::ERROR_UNKNOWN, 
-			context, 
+			_("Runtime", "Unknown error"),
+			rtl::ERROR_UNKNOWN, 
 			prev
 		);
 	}

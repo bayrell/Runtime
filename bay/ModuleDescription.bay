@@ -21,9 +21,6 @@ namespace Runtime;
 use Runtime.Map;
 use Runtime.rtl;
 use Runtime.Vector;
-use Runtime.Annotations.LambdaChain;
-use Runtime.Annotations.LambdaChainDeclare;
-use Runtime.Annotations.Provider;
 use Runtime.Interfaces.AssetsInterface;
 use Runtime.Interfaces.ModuleDescriptionInterface;
 
@@ -44,7 +41,7 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 * Returns module name
 	 * @return string
 	 */
-	pure string getModuleVersion() => "0.9.3";
+	pure string getModuleVersion() => "0.10.0";
 	
 	
 	
@@ -53,13 +50,6 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 * @return Map<string>
 	 */	
 	pure Map<string> requiredModules() => null;
-	
-	
-	
-	/**
-	 * Compatibility with older versions
-	 */
-	pure Map<string> getRequiredModules() => static::requiredModules();
 	
 	
 	
@@ -73,43 +63,19 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 		"Runtime/rs",
 		"Runtime/re",
 		"Runtime/lib",
+		"Runtime/AsyncAwait",
 		"Runtime/Collection",
-		"Runtime/CoreObject",
 		"Runtime/Dict",
-		"Runtime/RuntimeConstant",
-		"Runtime/RuntimeUtils",
+		"Runtime/Map",
+		"Runtime/Vector",
+		"Runtime/Monad",
+		"Runtime/CoreObject",
+		"Runtime/CoreStruct",
+		"Runtime/DateTime",
 		"Runtime/Exceptions/RuntimeException",
 		"Runtime/Interfaces/AssetsInterface",
-		"Runtime/Interfaces/BusInterface",
 		"Runtime/Interfaces/ModuleDescriptionInterface",
-		"Runtime/Interfaces/SerializeInterface",
-		"Runtime/Interfaces/StringInterface",
-		"Runtime/CoreStruct",
-		"Runtime/CoreProvider",
-		"Runtime/CoreEvent",
-		"Runtime/Map",
-		"Runtime/Message",
-		"Runtime/MessageRPC",
-		"Runtime/PathInfo",
 		"Runtime/ModuleDescription",
-		"Runtime/Monad",
-		"Runtime/Reference",
-		"Runtime/Vector",
-		"Runtime/Exceptions/ApiException",
-		"Runtime/Exceptions/IndexOutOfRange",
-		"Runtime/Exceptions/KeyNotFound",
-		"Runtime/Exceptions/UnknownError",
-		"Runtime/DateTime",
-		"Runtime/Annotations/Entity",
-		"Runtime/Annotations/IntrospectionClass",
-		"Runtime/Annotations/IntrospectionInfo",
-		"Runtime/Annotations/LambdaChain",
-		"Runtime/Annotations/LambdaChainDeclare",
-		"Runtime/Annotations/Driver",
-		"Runtime/Annotations/Provider",
-		"Runtime/UIStruct",
-		"Runtime/Context",
-		"Runtime/AsyncAwait",
 	];
 	
 	

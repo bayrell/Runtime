@@ -26,7 +26,6 @@ use Runtime.Map;
 use Runtime.Monad;
 use Runtime.rs;
 use Runtime.rtl;
-use Runtime.UIStruct;
 use Runtime.Vector;
 
 

@@ -26,6 +26,81 @@ use Runtime.Dict;
 
 class rtl
 {
+	/* Log level */
+	
+	/**
+	 * Fatal error. Application stoped
+	 */
+	static const int LOG_FATAL = 0;
+	
+	/**
+	 * Critical error. Application damaged, but works
+	 */	
+	static const int LOG_CRITICAL = 2;
+	
+	/**
+	 * Any Application error or exception
+	 */	
+	static const int LOG_ERROR = 4;
+	
+	/**
+	 * Log warning. Developer should attention to this
+	 */
+	static const int LOG_WARNING = 6;
+	
+	/**
+	 * Information about any event
+	 */
+	static const int LOG_INFO = 8;
+	
+	/**
+	 * Debug level 1
+	 */
+	static const int LOG_DEBUG = 10;
+	
+	/**
+	 * Debug level 2
+	 */	
+	static const int LOG_DEBUG2 = 12;
+	
+	/* Status codes */ 
+	static const int STATUS_PLAN = 0;
+	static const int STATUS_DONE = 1;
+	static const int STATUS_PROCESS = 100;
+	static const int STATUS_FAIL = -1;
+	
+	/* Errors */
+	static const int ERROR_NULL = 0;
+	static const int ERROR_OK = 1;
+	static const int ERROR_PROCCESS = 100;
+	static const int ERROR_FALSE = -100;
+	static const int ERROR_UNKNOWN = -1;
+	static const int ERROR_INDEX_OUT_OF_RANGE = -2;
+	static const int ERROR_KEY_NOT_FOUND = -3;
+	static const int ERROR_STOP_ITERATION = -4;
+	static const int ERROR_FILE_NOT_FOUND = -5;
+	static const int ERROR_ITEM_NOT_FOUND = -5;
+	static const int ERROR_OBJECT_DOES_NOT_EXISTS = -5;
+	static const int ERROR_OBJECT_ALLREADY_EXISTS = -6;
+	static const int ERROR_ASSERT = -7;
+	static const int ERROR_REQUEST = -8;
+	static const int ERROR_RESPONSE = -9;
+	static const int ERROR_CSRF_TOKEN = -10;
+	static const int ERROR_RUNTIME = -11;
+	static const int ERROR_VALIDATION = -12;
+	static const int ERROR_PARSE_SERIALIZATION_ERROR = -14;
+	static const int ERROR_ASSIGN_DATA_STRUCT_VALUE = -15;
+	static const int ERROR_AUTH = -16;
+	static const int ERROR_DUPLICATE = -17;
+	static const int ERROR_API_NOT_FOUND = -18;
+	static const int ERROR_FATAL = -99;
+	static const int ERROR_HTTP_CONTINUE = -100;
+	static const int ERROR_HTTP_SWITCH = -101;
+	static const int ERROR_HTTP_PROCESSING = -102;
+	static const int ERROR_HTTP_OK = -200;
+	static const int ERROR_HTTP_BAD_GATEWAY = -502;
+	
+	
 	
 	static bool @isBrowser()
 	{
@@ -1516,12 +1591,10 @@ class rtl
 	 */
 	public static string translate
 	(
-		string message, 
-		Dict params = null, 
-		string locale = "", 
-		Object context = null
+		string space, string message, Map params = null, string locale = ""
 	)
 	{
+		return message;
 		#switch
 		#case ifcode PHP then
 		return self::callStaticMethod("Runtime.RuntimeUtils", "translate", [$message, $params, $locale, $context]);
