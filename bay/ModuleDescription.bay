@@ -85,8 +85,6 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 */
 	pure Collection<Dict> entities() => 
 	[
-		/* Declare Lambda chains */
-		new LambdaChainDeclare{ "name": "Runtime.Entities" },
 	];
 	
 	
