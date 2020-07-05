@@ -90,6 +90,9 @@ class rtl
 		if (class_name instanceof Function)
 			return class_name;
 		
+		if (window[class_name] != undefined)
+			return window[class_name];
+			
 		return Runtime.rtl._classes[class_name];
 		
 		if (class_name instanceof Runtime.CoreObject) class_name = class_name.getClassName();
@@ -1651,6 +1654,6 @@ class rtl
 #case ifcode PHP then
 rtl::$_memorize_not_found = (object) ['s' => 'memorize_key_not_found'];
 #case ifcode JAVASCRIPT then
-if (typeof rtl != 'undefined') rtl._memorize_not_found = {'s':'memorize_key_not_found','id':Symbol()};
-if (typeof Runtime != 'undefined') Runtime.rtl._memorize_not_found = {'s':'memorize_key_not_found','id':Symbol()};
+if (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined')
+	Runtime.rtl._memorize_not_found = {'s':'memorize_key_not_found','id':Symbol()};
 #endswitch

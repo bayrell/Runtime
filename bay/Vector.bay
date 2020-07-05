@@ -23,12 +23,6 @@ use Runtime.Collection;
 use Runtime.Exceptions.IndexOutOfRange;
 
 
-#switch
-#case ifcode JAVASCRIPT then
-var isBrowser=function(){return typeof window !== "undefined" && this === window;}
-#endswitch
-
-
 class Vector<T> extends Collection
 {
 	

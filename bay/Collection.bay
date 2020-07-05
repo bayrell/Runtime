@@ -22,17 +22,6 @@ use Runtime.rtl;
 use Runtime.Exceptions.IndexOutOfRange;
 
 
-#switch
-#case ifcode NODEJS then
-var use = require('bayrell').use; use.platform = "nodejs";
-#case ifcode ES6 then
-var use = function(s){return Runtime.rtl.find_class(s);}
-#case ifcode JAVASCRIPT then
-var isBrowser=function(){return typeof window !== "undefined" && this === window;}
-#endswitch
-
-
-
 declare class _Collection{}
 
 #switch

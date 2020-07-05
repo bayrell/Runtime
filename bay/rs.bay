@@ -24,12 +24,6 @@ use Runtime.Collection;
 use Runtime.Vector;
 
 
-#switch
-#case ifcode JAVASCRIPT then
-var isBrowser=function(){return typeof window !== "undefined" && this === window;}
-#endswitch
-
-
 class rs
 {
 

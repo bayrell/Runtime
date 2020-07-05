@@ -17,11 +17,10 @@
  *  limitations under the License.
  */
 
-var isBrowser = function(){return typeof window !== "undefined" && this === window;}
-var use = null;
-if (isBrowser())
-use = (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined') ?Runtime.rtl.find_class : null;
-else use = require('bayrell').use;
+if (typeof use == "undefined")
+{
+	if (typeof window === "undefined" || this !== window) use = require('bayrell').use;
+}
 
 if (typeof Runtime == 'undefined') Runtime = {};
 if (!isBrowser())
