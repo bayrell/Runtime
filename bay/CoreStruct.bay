@@ -212,3 +212,7 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	#endswitch
 	
 }
+
+#ifcode JAVASCRIPT then
+Runtime.CoreStruct.prototype.get = function(ctx, k, v){ return this[k] != undefined ? this[k] : v; };
+#endif

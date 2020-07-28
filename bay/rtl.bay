@@ -18,7 +18,6 @@
 
 namespace Runtime;
 
-use Runtime.Interfaces.StringInterface;
 use Runtime.Collection;
 use Runtime.CoreStruct;
 use Runtime.Dict;
@@ -840,18 +839,18 @@ class rtl
 		#case ifcode PHP then
 		
 		if ($value === null) return "";
-		if ($value instanceof StringInterface) return $value->toString();
+		if ($value instanceof \Runtime\Interfaces\StringInterface) return $value->toString();
 		return (string)$value;
 		
 		#case ifcode JAVASCRIPT then
 		
 		var _StringInterface = use("Runtime.Interfaces.StringInterface");
-		/*if (isBrowser()) _StringInterface = Runtime.Interfaces.StringInterface; 
-		else _StringInterface = StringInterface;*/
+		if (isBrowser()) _StringInterface = Runtime.Interfaces.StringInterface; 
+		else _StringInterface = StringInterface;
 		
 		if (value === null) return "";
 		if (typeof value == 'string') return value;
-		if (value instanceof String) return ""+value;
+		if (value instanceof String) return "" + value;
 		if (this.is_implements(null, value, _StringInterface)) return value.toString();
 		return ""+value;
 		
@@ -1025,6 +1024,31 @@ class rtl
 		return Math.round(value);
 		
 		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Json encode data
+	 * @param var data
+	 * @return string
+	 */
+	public static string json_encode(var data)
+	{
+		fn f = static::method("Runtime.RuntimeUtils", "json_encode");
+		return f(data);
+	}
+	
+	
+	/**
+	 * Json decode to primitive values
+	 * @param string s Encoded string
+	 * @return var
+	 */
+	public static string json_decode(var obj)
+	{
+		fn f = static::method("Runtime.RuntimeUtils", "json_decode");
+		return f(obj);
 	}
 	
 	
@@ -1482,240 +1506,6 @@ class rtl
 		#endswitch
 	}
 	
-	
-	
-	#ifdef BACKEND then
-	
-	/**
-	 * Returns module path. For backend only
-	 */
-	static string getModulePath(string module_name)
-	{
-		#switch
-		#case ifcode PHP then
-		$class = "\\" . preg_replace("/\\./", "\\", $module_name . ".ModuleDescription");
-		$reflector = new \ReflectionClass($class);
-		$path = $reflector->getFileName();
-		return dirname( dirname($path) );
-		#endswitch
-		return "";
-	}
-	
-	
-	/**
-	 * Save local file
-	 */
-	static async string saveLocalFile(string path, string content = "", string ch = "utf8", string chroot = "")
-	{
-		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
-		string filepath = chroot ~ path;
-		#switch
-		#case ifcode PHP then
-		if ($filepath == false) return "";
-		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
-		return file_put_contents($filepath, $content);
-		#endswitch
-		return "";
-	}
-	
-	
-	/**
-	 * Read local file
-	 */
-	static async string readLocalFile(string path, string ch = "utf8", string chroot = "")
-	{
-		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
-		string filepath = chroot ~ path;
-		#switch
-		#case ifcode PHP then
-		$filepath = realpath($filepath);
-		if ($filepath == false) return "";
-		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
-		if (!file_exists($filepath)) return "";
-		return file_get_contents($filepath);
-		#endswitch
-		return "";
-	}
-	
-	
-	/**
-	 * Make dir
-	 */
-	static async bool mkdir(string path, string chroot = "", string mode = "0755")
-	{
-		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
-		string filepath = chroot ~ path;
-		#switch
-		#case ifcode PHP then
-		if ($filepath == false) return false;
-		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return false;
-		return @mkdir($filepath, $mode, true);
-		#endswitch
-		return "";
-	}
-	
-	
-	#endif
-	
-	
-	
-	/* =================== Deprecated =================== */
-	
-	
-	/**
-	 * Round down
-	 * @param double value
-	 * @return int
-	 */
-	static string dump(var value)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		var_dump($value);
-		
-		#case ifcode JAVASCRIPT then
-		
-		console.log(value);
-		
-		#endswitch
-	}
-	
-	
-	/**
-	 * Translate message
-	 * @params string message - message need to be translated
-	 * @params MapInterface params - Messages params. Default null.
-	 * @params string locale - Different locale. Default "".
-	 * @return string - translated string
-	 */
-	public static string translate
-	(
-		string space, string message, Map params = null, string locale = ""
-	)
-	{
-		return message;
-		#switch
-		#case ifcode PHP then
-		return self::callStaticMethod("Runtime.RuntimeUtils", "translate", [$message, $params, $locale, $context]);
-		#case ifcode JAVASCRIPT then
-		return this.callStaticMethod("Runtime.RuntimeUtils", "translate", [message, params, locale, context]);
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Json encode data
-	 * @param var data
-	 * @return string
-	 */
-	public static string json_encode(var data)
-	{
-		#switch
-		#case ifcode PHP then
-		return self::callStaticMethod("Runtime.RuntimeUtils", "json_encode", [$data]);
-		#case ifcode JAVASCRIPT then
-		return this.callStaticMethod("Runtime.RuntimeUtils", "json_encode", [data]);
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Call method
-	 * @return Object
-	 */
-	static var f(fn f)
-	{
-		return f;
-	}
-	
-	
-	
-	/**
-	 * Returns value if value instanceof type_value, else returns def_value
-	 * @param var value
-	 * @param string type_value
-	 * @param var def_value
-	 * @param var type_template
-	 * @return var
-	 */
-	static var correct(var value, var def_value = null, string type_value, string type_template = ""){
-		return static::convert(value, type_value, def_value, type_template);
-	}
-	
-	
-	
-	/**
-	 * Convert module name to node js package
-	 */
-	static string convertNodeJSModuleName(string name)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		$arr1 = "qazwsxedcrfvtgbyhnujmikolp";
-		$arr2 = "0123456789";
-		$res = "";
-		$sz = mb_strlen($name);
-		$previsbig = false;
-		for ($i = 0; $i < $sz; $i++){
-			$ch = mb_substr($name, $i, 1);
-			$ch2 = mb_strtoupper($ch);
-			$ch3 = mb_strtolower($ch);
-			$isAlpha = mb_strpos($arr1, $ch3) !== false;
-			$isNum = mb_strpos($arr2, $ch3) !== false;
-			if ($i > 0 && $ch == $ch2 && !$previsbig && $isAlpha){
-				$res .= "-";
-			}
-			$res .= $ch3;
-			if ($ch == $ch2){
-				$previsbig = true;
-			}
-			else {
-				$previsbig = false;
-			}
-			if (!$isAlpha && !$isNum){
-				$previsbig = true;
-			}
-		}
-		$res .= "-nodejs";
-		return $res;
-		
-		#case ifcode JAVASCRIPT then
-		
-		name = new String(name);
-		var arr1 = "qazwsxedcrfvtgbyhnujmikolp";
-		var arr2 = "01234567890";
-		var res = "";
-		var sz = name.length;
-		var previsbig = false;
-		for (var i = 0; i < sz; i++){
-			var ch = name[i];
-			var ch2 = ch.toUpperCase();
-			var ch3 = ch.toLowerCase();
-			var isAlpha = arr1.indexOf(ch3) != -1;
-			var isNum = arr2.indexOf(ch3) != -1;
-			if (i > 0 && ch == ch2 && !previsbig && isAlpha){
-				res += "-";
-			}
-			res += ch3;
-			if (ch == ch2 && isAlpha){
-				previsbig = true;
-			}
-			else {
-				previsbig = false;
-			}
-			if (!isAlpha && !isNum){
-				previsbig = true;
-			}
-		}
-		res += "-nodejs";
-		return res;
-		
-		#endswitch
-	}
 	
 }
 
