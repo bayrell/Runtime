@@ -845,8 +845,6 @@ class rtl
 		#case ifcode JAVASCRIPT then
 		
 		var _StringInterface = use("Runtime.Interfaces.StringInterface");
-		if (isBrowser()) _StringInterface = Runtime.Interfaces.StringInterface; 
-		else _StringInterface = StringInterface;
 		
 		if (value === null) return "";
 		if (typeof value == 'string') return value;
