@@ -568,9 +568,13 @@ class rtl
 		return $val;
 		
 		#case ifcode JAVASCRIPT then
+		var Collection = use("Runtime.Collection");
+		var Dict = use("Runtime.Dict");
+		var CoreStruct = use("Runtime.CoreStruct");
+		
 		if (def_val == undefined) def_val = null;
 		if (item === null) return def_val;
-		if (typeof path == "string") path = Runtime.Collection.from([path]);
+		if (typeof path == "string") path = Collection.from([path]);
 		if (path.count() == 0)
 		{
 			return item;
@@ -578,13 +582,13 @@ class rtl
 		var key = path.first(ctx);
 		var path = path.removeFirstIm(ctx);
 		var val = def_val;
-		if (item instanceof Runtime.Dict || item instanceof Runtime.Collection)
+		if (item instanceof Dict || item instanceof Collection)
 		{
 			item = item.get(ctx, key, def_val);
 			val = this.attr(ctx, item, path, def_val);
 			return val;
 		}
-		else if (item instanceof Runtime.CoreStruct)
+		else if (item instanceof CoreStruct)
 		{
 			item = item.takeValue(ctx, key, def_val);
 			val = this.attr(ctx, item, path, def_val);
