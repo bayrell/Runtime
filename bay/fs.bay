@@ -1,0 +1,91 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+
+class fs
+{
+	
+	#ifdef BACKEND then
+	
+	
+	/**
+	 * Save local file
+	 */
+	static async string saveFile(string path, string content = "", string ch = "utf8", string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		#switch
+		#case ifcode PHP then
+		if ($filepath == false) return "";
+		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
+		return file_put_contents($filepath, $content);
+		#endswitch
+		return "";
+	}
+	
+	
+	/**
+	 * Read local file
+	 */
+	static async string readFile(string path, string ch = "utf8", string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		#switch
+		#case ifcode NODEJS then
+		
+		var fs = require("fs");
+		var mpath = require("path");
+		return fs.readFileSync( mpath.resolve(filepath), { "encoding": ch } );
+		
+		#case ifcode PHP then
+		
+		$filepath = realpath($filepath);
+		if ($filepath == false) return "";
+		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
+		if (!file_exists($filepath)) return "";
+		return file_get_contents($filepath);
+		
+		#endswitch
+		return "";
+	}
+	
+	
+	/**
+	 * Make dir
+	 */
+	static async bool mkdir(string path, string chroot = "", string mode = "0755")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		#switch
+		#case ifcode PHP then
+		if ($filepath == false) return false;
+		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return false;
+		return @mkdir($filepath, $mode, true);
+		#endswitch
+		return "";
+	}
+	
+	
+	#endif
+	
+}
