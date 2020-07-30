@@ -21,6 +21,7 @@ namespace Runtime;
 use Runtime.Collection;
 use Runtime.CoreStruct;
 use Runtime.Dict;
+use Runtime.Monad;
 
 
 class rtl
@@ -661,6 +662,29 @@ class rtl
 		else if (rtl::is_instanceof(null, v, e)) return v;
 		return v;
 	}
+	
+	
+	
+	/**
+	 * Convert monad by type
+	 */
+	pure fn m_to(string type_value, var def_value = null) =>
+		bool (Monad m) use (type_value, def_value) =>
+			new Monad
+			(
+				m.err == null ? static::@convert( m.value(), type_value, def_value ) : def_value
+			)
+	;
+	
+	
+	
+	/**
+	 * Convert monad to default value
+	 */
+	pure fn m_def(var def_value = null) =>
+		bool (Monad m) use (def_value) =>
+			(m.err != null or m.val === null) ? new Monad(def_value) : m
+	;
 	
 	
 	
