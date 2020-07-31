@@ -86,6 +86,33 @@ class fs
 	}
 	
 	
+	
+	/**
+	 * Scan directory
+	 */
+	static async Collection<string> scanDir(string dirname, string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string dirpath = chroot ~ dirname;
+		
+		#switch
+		#case ifcode NODEJS then
+		
+		var Collection = use("Runtime.Collection");
+		var fs = require("fs");
+		var mpath = require("path");
+		var arr = fs.readdirSync(dirpath).sort();
+		return Collection.from(arr);
+		
+		#case ifcode PHP then
+		
+		return \Runtime\Collection::from( scandir($dirpath) );
+		
+		#endswitch
+		
+		return null;
+	}
+	
 	#endif
 	
 }
