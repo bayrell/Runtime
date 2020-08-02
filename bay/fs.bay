@@ -18,9 +18,36 @@
 
 namespace Runtime;
 
+use Runtime.re;
+
 
 class fs
 {
+	
+	/**
+	 * Concat
+	 */
+	pure string concat(string base_path, string file_name)
+	{
+		return re.replace("//", "/", base_path ~ "/" ~ file_name);
+	}
+	
+	
+	
+	/**
+	 * Concat array
+	 */
+	pure Collection<string> concatArr(Collection<string> arr)
+	{
+		string res = arr.reduce
+		(
+			string (string res, string item) => res ~ "/" ~ item,
+			""
+		);
+		return re.replace("//", "/", res);
+	}
+	
+	
 	
 	#ifdef BACKEND then
 	
@@ -88,9 +115,27 @@ class fs
 	
 	
 	/**
+	 * Return true if path is folder
+	 * @param string path
+	 * @param boolean
+	 */
+	static async bool isDir(string path)
+	{
+		#switch
+		#case ifcode PHP then
+		return is_dir($path);
+		#case ifcode NODEJS then
+		var fs = require("fs");
+		return fs.lstatSync(path).isDirectory();
+		#endswitch
+	}
+	
+	
+	
+	/**
 	 * Scan directory
 	 */
-	static async Collection<string> scanDir(string dirname, string chroot = "")
+	static async Collection<string> readDir(string dirname, string chroot = "")
 	{
 		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
 		string dirpath = chroot ~ dirname;
@@ -111,6 +156,41 @@ class fs
 		#endswitch
 		
 		return null;
+	}
+	
+	
+	
+	/**
+	 * Scan directory recursive
+	 */
+	static async Collection<string> readDirectoryRecursive(string dirname, string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string dirpath = chroot ~ dirname;
+		
+		Vector<string> res = new Vector();
+		Collection<string> items = await static::readDir(dirname, chroot);
+		
+		for (int i=0; i<items.count(); i++)
+		{
+			string item_name = items.item(i);
+			string item_path = static::concat(dirname, item_name);
+			
+			if (item_name == "." or item_name == "..") continue;
+			res.push(item_path);
+			
+			bool is_dir = await static::isDir( static::concat(dirpath, item_name) );
+			if (is_dir)
+			{
+				Collection<string> sub_items = await static::readDirectoryRecursive
+				(
+					item_path, chroot
+				);
+				res.appendVector(sub_items);
+			}
+		}
+		
+		return res.toCollection();
 	}
 	
 	#endif

@@ -507,21 +507,26 @@ class rs
 		Vector<string> arr1 = rs::explode(".", filepath).toVector();
 		Vector<string> arr2 = rs::explode("/", filepath).toVector();
 		
-		PathInfo ret = new PathInfo();
+		string filepath = filepath;
+		string extension = arr1.pop();
+		string basename = arr2.pop();
+		string dirname = rs::implode("/", arr2);
 		
-		ret.filepath = filepath;
-		ret.extension = arr1.pop();
-		ret.basename = arr2.pop();
-		ret.dirname = rs::implode("/", arr2);
-		
-		int ext_length = rs::strlen(ret.extension);
+		int ext_length = rs::strlen(extension);
 		if (ext_length > 0) ext_length++;
-		ret.filename = rs::substr(ret.basename, 0, -1*ext_length);
+		string filename = rs::substr(basename, 0, -1*ext_length);
 		
 		delete arr1;
 		delete arr2;
 		
-		return ret;
+		return new PathInfo
+		{
+			"filepath": filepath,
+			"extension": extension,
+			"basename": basename,
+			"dirname": dirname,
+			"filename": filename,
+		};
 	}
 	
 	

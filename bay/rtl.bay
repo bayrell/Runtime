@@ -454,10 +454,13 @@ class rtl
 		}
 		if (gettype($f) == "string") $f = static::find_class($f);
 		return call_user_func_array($f, $arr);
-	
+		
 		#case ifcode JAVASCRIPT then
 		
+		var res;
 		if (args == null) args = [];
+		else args = Array.prototype.slice.call(args);
+		
 		args.unshift(ctx);
 		if (this.isString(ctx, f))
 		{
@@ -465,9 +468,14 @@ class rtl
 			var c = a[0]; var m = a[1];
 			c = this.find_class(c);
 			f = c[m];
-			return f.apply(c, args);
+			res = f.apply(c, args);
 		}
-		return f.apply(null, args);
+		else
+		{
+			res = f.apply(null, args);
+		}
+		
+		return res;
 		#endswitch
 	}
 	

@@ -44,6 +44,39 @@ class Vector<T> extends Collection
 	
 	
 	/**
+	 * Returns new Collection
+	 * @param int offset
+	 * @param int lenght
+	 * @return Collection<T>
+	 */
+	Collection<T> slice(int offset, int length = null)
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		if (offset == undefined) offset = 0;
+		if (length == undefined)
+		{
+			var arr = Array.prototype.slice.call(this, offset);
+			Object.setPrototypeOf(arr, this.constructor.prototype);
+			return arr;
+		}
+		if (length >= 0)
+		{
+			length = offset + length;
+		}
+		var arr = Array.prototype.slice.call(this, offset, length);
+		Object.setPrototypeOf(arr, this.constructor.prototype);
+		return arr;
+		#case ifcode PHP then
+		$arr2 = static::Instance($ctx);
+		$arr2->_arr = array_slice($this->_arr, $offset, $length);
+		return $arr2;
+		#endswitch
+	}
+	
+	
+	
+	/**
 	 * Append value to the end of array
 	 * @param T value
 	 */
