@@ -49,7 +49,50 @@ class fs
 	
 	
 	
+	/**
+	 * Relative
+	 */
+	static async string relative(string path, string to)
+	{
+		#switch
+		
+		#case ifcode NODEJS then
+		var mpath = require("path");
+		return mpath.relative(path, to);
+		
+		#case ifcode PHP then
+		return "";
+		
+		#endswitch
+		return "";
+	}
+	
+	
+	
 	#ifdef BACKEND then
+	
+	
+	/**
+	 * Exists
+	 */
+	static async string exists(string path, string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		
+		#switch
+		
+		#case ifcode NODEJS then
+		var fs = require("fs");
+		return fs.existsSync(filepath);
+		
+		#case ifcode PHP then
+		return file_exists($filepath);
+		
+		#endswitch
+		return false;
+	}
+	
 	
 	
 	/**
@@ -60,10 +103,17 @@ class fs
 		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
 		string filepath = chroot ~ path;
 		#switch
+		
+		#case ifcode NODEJS then
+		var fs = require("fs");
+		var mpath = require("path");
+		return fs.writeFileSync( mpath.resolve(filepath), content, { "encoding": ch } );
+		
 		#case ifcode PHP then
 		if ($filepath == false) return "";
 		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
 		return file_put_contents($filepath, $content);
+		
 		#endswitch
 		return "";
 	}
@@ -96,6 +146,7 @@ class fs
 	}
 	
 	
+	
 	/**
 	 * Make dir
 	 */
@@ -103,11 +154,79 @@ class fs
 	{
 		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
 		string filepath = chroot ~ path;
+		
 		#switch
+		
+		#case ifcode NODEJS then
+		var fs = require("fs");
+		var mpath = require("path");
+		filepath = mpath.resolve(filepath);
+		if (!fs.existsSync(filepath))
+		{
+			fs.mkdirSync(filepath, { "mode": mode, "recursive": true });
+		}
+		
 		#case ifcode PHP then
 		if ($filepath == false) return false;
 		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return false;
 		return @mkdir($filepath, $mode, true);
+		
+		#endswitch
+		
+		return "";
+	}
+	
+	
+	
+	/**
+	 * Synlink
+	 */
+	static async bool symlink(string target, string link_name, string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string target_path = target;
+		string link_name_path = link_name;
+		
+		if (rs::substr(target_path, 0, 2) != "..") target_path = chroot ~ target;
+		if (rs::substr(link_name_path, 0, 2) != "..") link_name_path = chroot ~ link_name;
+		
+		#switch
+		
+		#case ifcode NODEJS then
+		var fs = require("fs");
+		var mpath = require("path");
+		if (target_path.substr(0, 2) != "..") target_path = mpath.resolve(target_path);
+		if (link_name_path.substr(0, 2) != "..") link_name_path = mpath.resolve(link_name_path);
+		fs.symlinkSync(target_path, link_name_path);
+		
+		#endswitch
+		
+		return "";
+		
+	}
+	
+	
+	
+	/**
+	 * Unlink
+	 */
+	static async bool unlink(string path, string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		
+		#switch
+		
+		#case ifcode NODEJS then
+		
+		var fs = require("fs");
+		var mpath = require("path");
+		filepath = mpath.resolve(filepath);
+		if (fs.existsSync(filepath))
+		{
+			fs.unlinkSync(filepath);
+		}
+		
 		#endswitch
 		return "";
 	}
