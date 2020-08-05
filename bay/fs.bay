@@ -285,8 +285,9 @@ class fs
 		
 		var Collection = use("Runtime.Collection");
 		var arr = await readdir(dirpath);
-		arr = Collection.from( arr.sort() );
-		return Promise.resolve( arr );
+		arr = arr.filter( (s) => s != "." && s != ".." ).sort();
+		arr = Collection.from(arr);
+		return Promise.resolve(arr);
 		
 		#case ifcode PHP then
 		

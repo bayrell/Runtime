@@ -1303,7 +1303,9 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		usleep( $time * 1000 );
-		#case ifcode JAVASCRIPT then
+		#case ifcode NODEJS then
+		await new Promise((f, e) => setTimeout(f, time));
+		#case ifcode ES6 then
 		setTimeout
 		(
 			(function (__async_t)
