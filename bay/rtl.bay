@@ -346,7 +346,7 @@ class rtl
 		return true;
 	
 		#case ifcode JAVASCRIPT then
-	
+		
 		var obj = this.find_class(class_name);
 		if (!this.exists(ctx, obj)) return false;
 		if (
@@ -428,6 +428,7 @@ class rtl
 			throw new Error("Method " + method_name + " not found in " + class_name);
 		}
 		
+		return obj[method_name].bind(obj);
 		return function(obj, method_name){ return function () {
 			return obj[method_name].apply(obj, arguments);
 		}}(obj, method_name);

@@ -21,6 +21,22 @@ namespace Runtime;
 use Runtime.re;
 
 
+#ifcode NODEJS then
+const fs = require('fs');
+const { promisify } = require('util');
+const { resolve } = require('path');
+
+const fileExists = promisify(fs.exists);
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+const symlink = promisify(fs.symlink);
+const unlink = promisify(fs.unlink);
+const lstat = promisify(fs.lstat);
+const mkdir = promisify(fs.mkdir);
+const readdir = promisify(fs.readdir);
+#endif
+
+
 class fs
 {
 	
@@ -52,15 +68,17 @@ class fs
 	/**
 	 * Relative
 	 */
-	static async string relative(string path, string to)
+	static string relative(string path, string to)
 	{
 		#switch
 		
 		#case ifcode NODEJS then
+		
 		var mpath = require("path");
 		return mpath.relative(path, to);
 		
 		#case ifcode PHP then
+		
 		return "";
 		
 		#endswitch
@@ -83,10 +101,12 @@ class fs
 		#switch
 		
 		#case ifcode NODEJS then
-		var fs = require("fs");
-		return fs.existsSync(filepath);
+		
+		var res = await fileExists(filepath);
+		return Promise.resolve( res );
 		
 		#case ifcode PHP then
+		
 		return file_exists($filepath);
 		
 		#endswitch
@@ -98,18 +118,18 @@ class fs
 	/**
 	 * Save local file
 	 */
-	static async string saveFile(string path, string content = "", string ch = "utf8", string chroot = "")
+	static async bool saveFile(string path, string content = "", string ch = "utf8", string chroot = "")
 	{
 		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
 		string filepath = chroot ~ path;
 		#switch
 		
 		#case ifcode NODEJS then
-		var fs = require("fs");
-		var mpath = require("path");
-		return fs.writeFileSync( mpath.resolve(filepath), content, { "encoding": ch } );
+		
+		await writeFile( resolve(filepath), content, { "encoding": ch } );
 		
 		#case ifcode PHP then
+		
 		if ($filepath == false) return "";
 		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
 		return file_put_contents($filepath, $content);
@@ -126,12 +146,13 @@ class fs
 	{
 		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
 		string filepath = chroot ~ path;
+		
 		#switch
+		
 		#case ifcode NODEJS then
 		
-		var fs = require("fs");
-		var mpath = require("path");
-		return fs.readFileSync( mpath.resolve(filepath), { "encoding": ch } );
+		var content = await readFile( resolve(filepath), { "encoding": ch } );
+		return Promise.resolve( content );
 		
 		#case ifcode PHP then
 		
@@ -142,6 +163,7 @@ class fs
 		return file_get_contents($filepath);
 		
 		#endswitch
+		
 		return "";
 	}
 	
@@ -158,15 +180,16 @@ class fs
 		#switch
 		
 		#case ifcode NODEJS then
-		var fs = require("fs");
-		var mpath = require("path");
-		filepath = mpath.resolve(filepath);
-		if (!fs.existsSync(filepath))
+		
+		filepath = resolve(filepath);
+		var exists = await fileExists(filepath);
+		if (!exists)
 		{
-			fs.mkdirSync(filepath, { "mode": mode, "recursive": true });
+			await mkdir(filepath, { "mode": mode, "recursive": true });
 		}
 		
 		#case ifcode PHP then
+		
 		if ($filepath == false) return false;
 		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return false;
 		return @mkdir($filepath, $mode, true);
@@ -193,11 +216,10 @@ class fs
 		#switch
 		
 		#case ifcode NODEJS then
-		var fs = require("fs");
-		var mpath = require("path");
-		if (target_path.substr(0, 2) != "..") target_path = mpath.resolve(target_path);
-		if (link_name_path.substr(0, 2) != "..") link_name_path = mpath.resolve(link_name_path);
-		fs.symlinkSync(target_path, link_name_path);
+		
+		if (target_path.substr(0, 2) != "..") target_path = resolve(target_path);
+		if (link_name_path.substr(0, 2) != "..") link_name_path = resolve(link_name_path);
+		await symlink(target_path, link_name_path);
 		
 		#endswitch
 		
@@ -219,12 +241,11 @@ class fs
 		
 		#case ifcode NODEJS then
 		
-		var fs = require("fs");
-		var mpath = require("path");
-		filepath = mpath.resolve(filepath);
-		if (fs.existsSync(filepath))
+		filepath = resolve(filepath);
+		var exists = await fileExists(filepath);
+		if (exists)
 		{
-			fs.unlinkSync(filepath);
+			await unlink(filepath);
 		}
 		
 		#endswitch
@@ -244,8 +265,8 @@ class fs
 		#case ifcode PHP then
 		return is_dir($path);
 		#case ifcode NODEJS then
-		var fs = require("fs");
-		return fs.lstatSync(path).isDirectory();
+		var stat = await lstat(path);
+		return Promise.resolve( stat.isDirectory() );
 		#endswitch
 	}
 	
@@ -263,10 +284,9 @@ class fs
 		#case ifcode NODEJS then
 		
 		var Collection = use("Runtime.Collection");
-		var fs = require("fs");
-		var mpath = require("path");
-		var arr = fs.readdirSync(dirpath).sort();
-		return Collection.from(arr);
+		var arr = await readdir(dirpath);
+		arr = Collection.from( arr.sort() );
+		return Promise.resolve( arr );
 		
 		#case ifcode PHP then
 		
