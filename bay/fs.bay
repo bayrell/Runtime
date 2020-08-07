@@ -259,13 +259,17 @@ class fs
 	 * @param string path
 	 * @param boolean
 	 */
-	static async bool isDir(string path)
+	static async bool isDir(string path, string chroot = "")
 	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string dirpath = chroot ~ path;
+		
 		#switch
 		#case ifcode PHP then
-		return is_dir($path);
+		return is_dir($dirpath);
 		#case ifcode NODEJS then
-		var stat = await lstat(path);
+		dirpath = resolve(dirpath);
+		var stat = await lstat(dirpath);
 		return Promise.resolve( stat.isDirectory() );
 		#endswitch
 	}
@@ -283,6 +287,7 @@ class fs
 		#switch
 		#case ifcode NODEJS then
 		
+		dirpath = resolve(dirpath);
 		var Collection = use("Runtime.Collection");
 		var arr = await readdir(dirpath);
 		arr = arr.filter( (s) => s != "." && s != ".." ).sort();
@@ -303,11 +308,8 @@ class fs
 	/**
 	 * Scan directory recursive
 	 */
-	static async Collection<string> readDirectoryRecursive(string dirname, string chroot = "")
+	static async Collection<string> readDirectoryRecursive(string dirname, string chroot = "", string parent_name = "")
 	{
-		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
-		string dirpath = chroot ~ dirname;
-		
 		Vector<string> res = new Vector();
 		Collection<string> items = await static::readDir(dirname, chroot);
 		
@@ -315,16 +317,17 @@ class fs
 		{
 			string item_name = items.item(i);
 			string item_path = static::concat(dirname, item_name);
+			string item_name2 = fs::concat(parent_name, item_name);
 			
 			if (item_name == "." or item_name == "..") continue;
-			res.push(item_path);
+			res.push( item_name2 );
 			
-			bool is_dir = await static::isDir( static::concat(dirpath, item_name) );
+			bool is_dir = await static::isDir(item_path, chroot);
 			if (is_dir)
 			{
 				Collection<string> sub_items = await static::readDirectoryRecursive
 				(
-					item_path, chroot
+					item_path, chroot, item_name2
 				);
 				res.appendVector(sub_items);
 			}
