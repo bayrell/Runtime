@@ -41,14 +41,14 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	 * Returns module name
 	 * @return string
 	 */
-	pure string getModuleVersion() => "0.10.0";
+	pure string getModuleVersion() => "0.10.1";
 	
 	
 	
 	/**
 	 * Returns required modules
 	 * @return Map<string>
-	 */	
+	 */
 	pure Map<string> requiredModules() => null;
 	
 	
