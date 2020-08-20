@@ -19,7 +19,7 @@
 namespace Runtime;
 
 use Runtime.Collection;
-use Runtime.CoreStruct;
+use Runtime.BaseStruct;
 use Runtime.Dict;
 use Runtime.Monad;
 
@@ -167,7 +167,7 @@ class rtl
 		
 		return Runtime.rtl._classes[class_name];
 		
-		if (class_name instanceof Runtime.CoreObject) class_name = class_name.getClassName();
+		if (class_name instanceof Runtime.BaseObject) class_name = class_name.getClassName();
 		else if (class_name instanceof Object) class_name = class_name.constructor.name;
 		
 		if (Runtime.rtl._classes==undefined) Runtime.rtl._classes = {};
@@ -516,6 +516,15 @@ class rtl
 	
 	
 	/**
+	 * Run thread
+	 */
+	static void runThread(fn f)
+	{
+	}
+	
+	
+	
+	/**
 	 * Returns value
 	 */
 	static var get(var item, string key, var def_val = null)
@@ -569,7 +578,7 @@ class rtl
 			$val = static::attr($ctx, $item, $path, $def_val);
 			return $val;
 		}
-		else if ($item instanceof \Runtime\CoreStruct)
+		else if ($item instanceof \Runtime\BaseStruct)
 		{
 			$item = $item->takeValue($ctx, $key, $def_val);
 			$val = static::attr($ctx, $item, $path, $def_val);
@@ -580,7 +589,7 @@ class rtl
 		#case ifcode JAVASCRIPT then
 		var Collection = use("Runtime.Collection");
 		var Dict = use("Runtime.Dict");
-		var CoreStruct = use("Runtime.CoreStruct");
+		var BaseStruct = use("Runtime.BaseStruct");
 		
 		if (def_val == undefined) def_val = null;
 		if (item === null) return def_val;
@@ -598,7 +607,7 @@ class rtl
 			val = this.attr(ctx, item, path, def_val);
 			return val;
 		}
-		else if (item instanceof CoreStruct)
+		else if (item instanceof BaseStruct)
 		{
 			item = item.takeValue(ctx, key, def_val);
 			val = this.attr(ctx, item, path, def_val);
@@ -625,7 +634,7 @@ class rtl
 			var new_data = null;
 			var attr_name = attrs.first();
 			
-			if (data instanceof CoreStruct)
+			if (data instanceof BaseStruct)
 			{
 				var attr_data = data.get(attr_name, null);
 				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);			
@@ -662,7 +671,7 @@ class rtl
 	 */
 	static var @to(var v, var o)
 	{
-		var e = o["e"];
+		var e = o.e;
 		if (e == "mixed" or e == "primitive" or e == "var" or e == "fn" or e == "callback") return v;
 		if (e == "bool") return static::toBool(null, v);
 		else if (e == "string") return static::toString(null, v);
@@ -1423,6 +1432,21 @@ class rtl
 	
 	
 	/**
+	 * Returns unix timestamp
+	 */
+	int utime()
+	{
+		#switch
+		#case ifcode PHP then
+		return microtime(true);
+		#case ifcode JAVASCRIPT then
+		return (new Date()).getTime() * 1000;
+		#endswitch
+	}
+	
+	
+	
+	/**
 	 * Clone var
 	 * @param {var} value - Variable
 	 * @return {var} result
@@ -1440,8 +1464,8 @@ class rtl
 		
 		var Collection = use("Runtime.Collection");
 		var Dict = use("Runtime.Dict");
-		var CoreObject = use("Runtime.CoreObject");
-		var CoreStruct = use("Runtime.CoreStruct");
+		var BaseObject = use("Runtime.BaseObject");
+		var BaseStruct = use("Runtime.BaseStruct");
 		var FakeStruct = use("Runtime.FakeStruct");
 		var Reference = use("Runtime.Reference");
 		
@@ -1500,7 +1524,7 @@ class rtl
 			}
 			return res;
 		}
-		else if (val instanceof CoreStruct)
+		else if (val instanceof BaseStruct)
 		{
 			return val;
 		}
@@ -1512,7 +1536,7 @@ class rtl
 		{
 			return new Reference(ctx, val.ref);
 		}
-		else if (val instanceof CoreObject || typeof val == 'object')
+		else if (val instanceof BaseObject || typeof val == 'object')
 		{
 			var proto = Object.getPrototypeOf(val);
 			var res = Object.create(proto);

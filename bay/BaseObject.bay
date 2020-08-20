@@ -16,22 +16,31 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Annotations;
+namespace Runtime;
 
-use Runtime.BaseStruct;
 use Runtime.rtl;
-use Runtime.lib;
-use Runtime.Collection;
-use Runtime.Dict;
-use Runtime.Annotations.IntrospectionInfo;
+use Runtime.Map;
+use Runtime.Vector;
 
 
-struct IntrospectionClass extends BaseStruct
+class BaseObject
 {
-	string class_name = "";
-	Collection<BaseStruct> class_info = null;
-	Dict<Collection> fields = null;
-	Dict<Collection> methods = null;
-	Collection<string> interfaces = null;
+	
+	/** 
+	 * Constructor
+	 */
+	public void constructor()
+	{		
+		/* Init object */
+		this._init();
+	}
+	
+	
+	/**
+	 * Init function
+	 */
+	protected void _init()
+	{
+	}
+	
 }
-

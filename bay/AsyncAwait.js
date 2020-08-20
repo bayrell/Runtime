@@ -32,9 +32,9 @@ if (!isBrowser())
 
 Runtime.AsyncTask = function()
 {
-	use('Runtime.CoreStruct').apply(this, arguments);
+	use('Runtime.BaseStruct').apply(this, arguments);
 };
-Runtime.AsyncTask.prototype = Object.create(use('Runtime.CoreStruct').prototype);
+Runtime.AsyncTask.prototype = Object.create(use('Runtime.BaseStruct').prototype);
 Runtime.AsyncTask.prototype.constructor = Runtime.AsyncTask;
 Object.assign(Runtime.AsyncTask.prototype,
 {
@@ -46,7 +46,7 @@ Object.assign(Runtime.AsyncTask.prototype,
 		this.res = null;
 		this.res_name = null;
 		this.f = null;
-		Runtime.CoreStruct.prototype._init.call(this,ctx);
+		Runtime.BaseStruct.prototype._init.call(this,ctx);
 	},
 	assignObject: function(ctx,o)
 	{
@@ -59,7 +59,7 @@ Object.assign(Runtime.AsyncTask.prototype,
 			this.__res_name = o.__res_name;
 			this.__f = o.__f;
 		}
-		use("Runtime.CoreStruct").prototype.assignObject.call(this,ctx,o);
+		use("Runtime.BaseStruct").prototype.assignObject.call(this,ctx,o);
 	},
 	assignValue: function(ctx,k,v)
 	{
@@ -69,7 +69,7 @@ Object.assign(Runtime.AsyncTask.prototype,
 		else if (k == "res") this.__res = v;
 		else if (k == "res_name") this.__res_name = v;
 		else if (k == "f") this.__f = v;
-		else use("Runtime.CoreStruct").prototype.assignValue.call(this,ctx,k,v);
+		else use("Runtime.BaseStruct").prototype.assignValue.call(this,ctx,k,v);
 	},
 	takeValue: function(ctx,k,d)
 	{
@@ -80,14 +80,14 @@ Object.assign(Runtime.AsyncTask.prototype,
 		else if (k == "res")return this.__res;
 		else if (k == "res_name")return this.__res_name;
 		else if (k == "f")return this.__f;
-		return use("Runtime.CoreStruct").prototype.takeValue.call(this,ctx,k,d);
+		return use("Runtime.BaseStruct").prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function()
 	{
 		return "Runtime.AsyncTask";
 	},
 });
-Object.assign(Runtime.AsyncTask, use("Runtime.CoreStruct"));
+Object.assign(Runtime.AsyncTask, use("Runtime.BaseStruct"));
 Object.assign(Runtime.AsyncTask,
 {
 	/* ======================= Class Init Functions ======================= */
@@ -101,7 +101,7 @@ Object.assign(Runtime.AsyncTask,
 	},
 	getParentClassName: function()
 	{
-		return "Runtime.CoreStruct";
+		return "Runtime.BaseStruct";
 	},
 	getClassInfo: function()
 	{
@@ -150,9 +150,9 @@ else{ use.add(Runtime.AsyncTask); module.exports.Runtime.AsyncTask = Runtime.Asy
 
 Runtime.AsyncThread = function()
 {
-	use('Runtime.CoreStruct').apply(this, arguments);
+	use('Runtime.BaseStruct').apply(this, arguments);
 };
-Runtime.AsyncThread.prototype = Object.create(use('Runtime.CoreStruct').prototype);
+Runtime.AsyncThread.prototype = Object.create(use('Runtime.BaseStruct').prototype);
 Runtime.AsyncThread.prototype.constructor = Runtime.AsyncThread;
 Object.assign(Runtime.AsyncThread.prototype,
 {
@@ -161,7 +161,7 @@ Object.assign(Runtime.AsyncThread.prototype,
 		var Collection = use("Runtime.Collection");
 		this.err = new Collection(ctx);
 		this.tasks = new Collection(ctx);
-		Runtime.CoreStruct.prototype._init.call(this,ctx);
+		Runtime.BaseStruct.prototype._init.call(this,ctx);
 	},
 	assignObject: function(ctx,o)
 	{
@@ -170,20 +170,20 @@ Object.assign(Runtime.AsyncThread.prototype,
 			this.__err = o.__err;
 			this.__tasks = o.__tasks;
 		}
-		use("Runtime.CoreStruct").prototype.assignObject.call(this,ctx,o);
+		use("Runtime.BaseStruct").prototype.assignObject.call(this,ctx,o);
 	},
 	assignValue: function(ctx,k,v)
 	{
 		if (k == "err") this.__err = v;
 		else if (k == "tasks") this.__tasks = v;
-		else use("Runtime.CoreStruct").prototype.assignValue.call(this,ctx,k,v);
+		else use("Runtime.BaseStruct").prototype.assignValue.call(this,ctx,k,v);
 	},
 	takeValue: function(ctx,k,d)
 	{
 		if (d == undefined) d = null;
 		if (k == "err")return this.__err;
 		if (k == "tasks")return this.__tasks;
-		return use("Runtime.CoreStruct").prototype.takeValue.call(this,ctx,k,d);
+		return use("Runtime.BaseStruct").prototype.takeValue.call(this,ctx,k,d);
 	},
 	getClassName: function(ctx)
 	{
@@ -254,7 +254,7 @@ Object.assign(Runtime.AsyncThread.prototype,
 		return null;
 	},
 });
-Object.assign(Runtime.AsyncThread, use("Runtime.CoreStruct"));
+Object.assign(Runtime.AsyncThread, use("Runtime.BaseStruct"));
 Object.assign(Runtime.AsyncThread,
 {
 	run: function(ctx, t)
@@ -305,7 +305,7 @@ Object.assign(Runtime.AsyncThread,
 	},
 	getParentClassName: function()
 	{
-		return "Runtime.CoreStruct";
+		return "Runtime.BaseStruct";
 	},
 	getClassInfo: function()
 	{

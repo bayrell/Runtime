@@ -18,11 +18,11 @@
 
 namespace Runtime;
 
-use Runtime.CoreStruct;
+use Runtime.BaseStruct;
 use Runtime.Interfaces.StringInterface;
 
 
-struct PathInfo extends CoreStruct implements StringInterface
+struct PathInfo extends BaseStruct implements StringInterface
 {
 	
 	string filepath = "";

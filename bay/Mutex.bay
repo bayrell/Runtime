@@ -15,31 +15,30 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
+ 
 namespace Runtime;
 
-use Runtime.rtl;
-use Runtime.Map;
-use Runtime.Vector;
 
-
-class CoreObject
+class Mutex
 {
 	
-	/** 
-	 * Constructor
-	 */
-	public void constructor()
-	{		
-		/* Init object */
-		this._init();
+	void lock()
+	{
 	}
 	
+	void unLock()
+	{
+	}
 	
-	/**
-	 * Init function
-	 */
-	protected void _init()
+	void isLocked()
+	{
+	}
+	
+	async void wait()
+	{
+	}
+	
+	async void waitAndLock()
 	{
 	}
 	

@@ -19,11 +19,11 @@
 namespace Runtime;
 
 use Runtime.rtl;
-use Runtime.CoreStruct;
+use Runtime.BaseStruct;
 use Runtime.Dict;
 
 
-struct DateTime extends CoreStruct
+struct DateTime extends BaseStruct
 {
 	
 	public int y = 0;
