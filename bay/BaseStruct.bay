@@ -24,10 +24,9 @@ use Runtime.Map;
 use Runtime.rtl;
 use Runtime.RuntimeUtils;
 use Runtime.Vector;
-use Runtime.Interfaces.SerializeInterface;
 
 
-class BaseStruct extends BaseObject implements ArrayInterface, SerializeInterface
+class BaseStruct extends BaseObject
 {
 	
 	

@@ -385,8 +385,8 @@ class rtl
 		if (!(obj instanceof Function)) return null;
 		if (args == undefined || args == null) args = [];
 		args = args.slice(); 
-		args.unshift(null);
 		args.unshift(ctx);
+		args.unshift(null);
 		var f = Function.prototype.bind.apply(obj, args);
 		return new f;
 	
@@ -1312,9 +1312,9 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		usleep( $time * 1000 );
-		#case ifcode NODEJS then
+		#case ifcode JAVASCRIPT then
 		await new Promise((f, e) => setTimeout(f, time));
-		#case ifcode ES6 then
+		#case ifcode ES5 then
 		setTimeout
 		(
 			(function (__async_t)

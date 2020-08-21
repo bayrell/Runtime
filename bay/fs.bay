@@ -39,6 +39,29 @@ const readdir = promisify(fs.readdir);
 
 class fs
 {
+	static const string DIRECTORY_SEPARATOR = "/";
+	
+	
+	
+	/**
+	 * Add first slash
+	 */
+	pure string addFirstSlash(string s)
+	{
+		return re.replace("//", "/", static::DIRECTORY_SEPARATOR ~ s);
+	}
+	
+	
+	
+	/**
+	 * Add last slash
+	 */
+	pure string addLastSlash(string s)
+	{
+		return re.replace("//", "/", s ~ static::DIRECTORY_SEPARATOR);
+	}
+	
+	
 	
 	/**
 	 * Concat
@@ -57,7 +80,7 @@ class fs
 	{
 		string res = arr.reduce
 		(
-			string (string res, string item) => res ~ "/" ~ item,
+			string (string res, string item) => res ~ static::DIRECTORY_SEPARATOR ~ item,
 			""
 		);
 		return re.replace("//", "/", res);
