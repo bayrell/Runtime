@@ -594,6 +594,7 @@ class rtl
 		if (def_val == undefined) def_val = null;
 		if (item === null) return def_val;
 		if (typeof path == "string") path = Collection.from([path]);
+		else if (Array.isArray(path) && path.count == undefined) path = Collection.from(path);
 		if (path.count() == 0)
 		{
 			return item;
@@ -626,6 +627,12 @@ class rtl
 	 */
 	static var setAttr(var item, Collection attrs, var new_value)
 	{
+		#ifcode JAVASCRIPT then
+		var Collection = use("Runtime.Collection");
+		if (typeof attrs == "string") attrs = Collection.from([attrs]);
+		else if (Array.isArray(attrs) && attrs.count == undefined) attrs = Collection.from(attrs);
+		#endif
+		
 		fn f = var (Collection attrs, var data, var new_value, var f)
 		{
 			if (attrs.count() == 0) return new_value;

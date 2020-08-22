@@ -44,7 +44,7 @@ class Reference<T> extends BaseObject
 	 * Assign and clone data from other object
 	 * @param BaseObject obj
 	 */
-	void assignObject(BaseObject obj)
+	void assignObject1(BaseObject obj)
 	{
 		if (obj instanceof Reference)
 		{
