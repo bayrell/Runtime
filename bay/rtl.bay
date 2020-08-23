@@ -347,6 +347,12 @@ class rtl
 	
 		#case ifcode JAVASCRIPT then
 		
+		if (typeof(class_name) == "object")
+		{
+			if (class_name[method_name] != undefined) return true;
+			return false;
+		}
+		
 		var obj = this.find_class(class_name);
 		if (!this.exists(ctx, obj)) return false;
 		if (
