@@ -356,11 +356,11 @@ class rtl
 		var obj = this.find_class(class_name);
 		if (!this.exists(ctx, obj)) return false;
 		if (
-			!this.exists(ctx, obj[method_name]) && 
-			!this.exists(ctx, obj.prototype) && 
-			!this.exists(ctx, obj.prototype[method_name])
-		) return false;
-		return true;
+			this.exists(ctx, obj[method_name]) ||
+			this.exists(ctx, obj.prototype) &&
+			this.exists(ctx, obj.prototype[method_name])
+		) return true;
+		return false;
 	
 		#endswitch
 	}
