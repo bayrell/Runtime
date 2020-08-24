@@ -206,7 +206,18 @@ class BaseStruct extends BaseObject
 	 * @param var value
 	 * @return BaseStruct
 	 */
-	pure BaseStruct update(BaseStruct item, Collection<string> path, var value) => rtl::setAttr(item, path, value);
+	pure BaseStruct update(BaseStruct item, Dict items) => item.copy(items);
+	
+	
+	
+	/**
+	 * Update struct
+	 * @param Collection<string> path
+	 * @param var value
+	 * @return BaseStruct
+	 */
+	pure BaseStruct setAttr(BaseStruct item, Collection<string> path, var value) => rtl::setAttr(item, path, value);
+	
 	
 	
 	
