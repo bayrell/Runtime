@@ -492,7 +492,7 @@ class rtl
 	 * Call await method
 	 * @return fn
 	 */
-	static var applyAwait(fn f, Collection args)
+	static async var applyAsync(fn f, Collection args)
 	{
 		#switch
 		#case ifcode PHP then
@@ -506,16 +506,7 @@ class rtl
 		return call_user_func_array($f, $arr);
 		
 		#case ifcode JAVASCRIPT then
-		args.unshift(ctx);
-		var t = new Runtime.AsyncThread(ctx, {
-			"tasks": Runtime.Collection.from([
-				new Runtime.AsyncTask(ctx, {
-					"pos": "0",
-					"f": f.apply(null, args),
-				})
-			])
-		});
-		Runtime.AsyncThread.run(ctx, t);
+		await f.apply(null, args);
 		#endswitch
 	}
 	
@@ -526,6 +517,20 @@ class rtl
 	 */
 	static void runThread(fn f)
 	{
+		#ifcode JAVASCRIPT then
+		/*
+		args.unshift(ctx);
+		var t = new Runtime.AsyncThread(ctx, {
+			"tasks": Runtime.Collection.from([
+				new Runtime.AsyncTask(ctx, {
+					"pos": "0",
+					"f": f.apply(null, args),
+				})
+			])
+		});
+		Runtime.AsyncThread.run(ctx, t);
+		*/
+		#endif
 	}
 	
 	
