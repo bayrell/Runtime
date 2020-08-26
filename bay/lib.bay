@@ -231,6 +231,20 @@ class lib
 	
 	
 	/**
+	 * Sort asc
+	 */
+	pure int sortAsc(var a, var b) => (a > b) ? 1 : (a < b) ? -1 : 0;
+	
+	
+	
+	/**
+	 * Sort desc
+	 */
+	pure int sortDesc(var a, var b) => (a > b) ? -1 : (a < b) ? 1 : 0;
+	
+	
+	
+	/**
 	 * Convert monad by type
 	 */
 	pure fn to(string type_value, var def_value = null) =>
