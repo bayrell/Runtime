@@ -18,11 +18,11 @@
 
 namespace Runtime;
 
-use Runtime.CoreObject;
+use Runtime.BaseObject;
 use Runtime.rtl;
 
 
-class Reference<T> extends CoreObject
+class Reference<T> extends BaseObject
 {
 	
 	string uq = rtl::unique();
@@ -42,9 +42,9 @@ class Reference<T> extends CoreObject
 	
 	/**
 	 * Assign and clone data from other object
-	 * @param CoreObject obj
+	 * @param BaseObject obj
 	 */
-	void assignObject(CoreObject obj)
+	void assignObject1(BaseObject obj)
 	{
 		if (obj instanceof Reference)
 		{

@@ -1,0 +1,364 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.re;
+
+
+#ifcode NODEJS then
+const fs = require('fs');
+const { promisify } = require('util');
+const { resolve } = require('path');
+
+const fileExists = promisify(fs.exists);
+const readFile = promisify(fs.readFile);
+const writeFile = promisify(fs.writeFile);
+const symlink = promisify(fs.symlink);
+const unlink = promisify(fs.unlink);
+const lstat = promisify(fs.lstat);
+const mkdir = promisify(fs.mkdir);
+const readdir = promisify(fs.readdir);
+#endif
+
+
+class fs
+{
+	static const string DIRECTORY_SEPARATOR = "/";
+	
+	
+	
+	/**
+	 * Add first slash
+	 */
+	pure string addFirstSlash(string s)
+	{
+		return re.replace("//", "/", static::DIRECTORY_SEPARATOR ~ s);
+	}
+	
+	
+	
+	/**
+	 * Add last slash
+	 */
+	pure string addLastSlash(string s)
+	{
+		return re.replace("//", "/", s ~ static::DIRECTORY_SEPARATOR);
+	}
+	
+	
+	
+	/**
+	 * Concat
+	 */
+	pure string concat(string base_path, string file_name)
+	{
+		return re.replace("//", "/", base_path ~ "/" ~ file_name);
+	}
+	
+	
+	
+	/**
+	 * Concat array
+	 */
+	pure Collection<string> concatArr(Collection<string> arr)
+	{
+		string res = arr.reduce
+		(
+			string (string res, string item) => res ~ static::DIRECTORY_SEPARATOR ~ item,
+			""
+		);
+		return re.replace("//", "/", res);
+	}
+	
+	
+	
+	/**
+	 * Relative
+	 */
+	static string relative(string path, string to)
+	{
+		#switch
+		
+		#case ifcode NODEJS then
+		
+		var mpath = require("path");
+		return mpath.relative(path, to);
+		
+		#case ifcode PHP then
+		
+		return "";
+		
+		#endswitch
+		return "";
+	}
+	
+	
+	
+	#ifdef BACKEND then
+	
+	
+	/**
+	 * Exists
+	 */
+	static async string exists(string path, string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		
+		#switch
+		
+		#case ifcode NODEJS then
+		
+		var res = await fileExists(filepath);
+		return Promise.resolve( res );
+		
+		#case ifcode PHP then
+		
+		return file_exists($filepath);
+		
+		#endswitch
+		return false;
+	}
+	
+	
+	
+	/**
+	 * Save local file
+	 */
+	static async bool saveFile(string path, string content = "", string ch = "utf8", string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		#switch
+		
+		#case ifcode NODEJS then
+		
+		await writeFile( resolve(filepath), content, { "encoding": ch } );
+		
+		#case ifcode PHP then
+		
+		if ($filepath == false) return "";
+		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
+		return file_put_contents($filepath, $content);
+		
+		#endswitch
+		return "";
+	}
+	
+	
+	/**
+	 * Read local file
+	 */
+	static async string readFile(string path, string ch = "utf8", string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		
+		#switch
+		
+		#case ifcode NODEJS then
+		
+		var content = await readFile( resolve(filepath), { "encoding": ch } );
+		return Promise.resolve( content );
+		
+		#case ifcode PHP then
+		
+		$filepath = realpath($filepath);
+		if ($filepath == false) return "";
+		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return "";
+		if (!file_exists($filepath)) return "";
+		return file_get_contents($filepath);
+		
+		#endswitch
+		
+		return "";
+	}
+	
+	
+	
+	/**
+	 * Make dir
+	 */
+	static async bool mkdir(string path, string chroot = "", string mode = "0755")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		
+		#switch
+		
+		#case ifcode NODEJS then
+		
+		filepath = resolve(filepath);
+		var exists = await fileExists(filepath);
+		if (!exists)
+		{
+			await mkdir(filepath, { "mode": mode, "recursive": true });
+		}
+		
+		#case ifcode PHP then
+		
+		if ($filepath == false) return false;
+		if ($chroot != "" && strpos($filepath, $chroot) !== 0) return false;
+		return @mkdir($filepath, $mode, true);
+		
+		#endswitch
+		
+		return "";
+	}
+	
+	
+	
+	/**
+	 * Synlink
+	 */
+	static async bool symlink(string target, string link_name, string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string target_path = target;
+		string link_name_path = link_name;
+		
+		if (rs::substr(target_path, 0, 2) != "..") target_path = chroot ~ target;
+		if (rs::substr(link_name_path, 0, 2) != "..") link_name_path = chroot ~ link_name;
+		
+		#switch
+		
+		#case ifcode NODEJS then
+		
+		if (target_path.substr(0, 2) != "..") target_path = resolve(target_path);
+		if (link_name_path.substr(0, 2) != "..") link_name_path = resolve(link_name_path);
+		await symlink(target_path, link_name_path);
+		
+		#endswitch
+		
+		return "";
+		
+	}
+	
+	
+	
+	/**
+	 * Unlink
+	 */
+	static async bool unlink(string path, string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string filepath = chroot ~ path;
+		
+		#switch
+		
+		#case ifcode NODEJS then
+		
+		filepath = resolve(filepath);
+		var exists = await fileExists(filepath);
+		if (exists)
+		{
+			await unlink(filepath);
+		}
+		
+		#endswitch
+		return "";
+	}
+	
+	
+	
+	/**
+	 * Return true if path is folder
+	 * @param string path
+	 * @param boolean
+	 */
+	static async bool isDir(string path, string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string dirpath = chroot ~ path;
+		
+		#switch
+		#case ifcode PHP then
+		return is_dir($dirpath);
+		#case ifcode NODEJS then
+		dirpath = resolve(dirpath);
+		var stat = await lstat(dirpath);
+		return Promise.resolve( stat.isDirectory() );
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Scan directory
+	 */
+	static async Collection<string> readDir(string dirname, string chroot = "")
+	{
+		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
+		string dirpath = chroot ~ dirname;
+		
+		#switch
+		#case ifcode NODEJS then
+		
+		dirpath = resolve(dirpath);
+		var Collection = use("Runtime.Collection");
+		var arr = await readdir(dirpath);
+		arr = arr.filter( (s) => s != "." && s != ".." ).sort();
+		arr = Collection.from(arr);
+		return Promise.resolve(arr);
+		
+		#case ifcode PHP then
+		
+		return \Runtime\Collection::from( scandir($dirpath) );
+		
+		#endswitch
+		
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Scan directory recursive
+	 */
+	static async Collection<string> readDirectoryRecursive(string dirname, string chroot = "", string parent_name = "")
+	{
+		Vector<string> res = new Vector();
+		Collection<string> items = await static::readDir(dirname, chroot);
+		
+		for (int i=0; i<items.count(); i++)
+		{
+			string item_name = items.item(i);
+			string item_path = static::concat(dirname, item_name);
+			string item_name2 = fs::concat(parent_name, item_name);
+			
+			if (item_name == "." or item_name == "..") continue;
+			res.push( item_name2 );
+			
+			bool is_dir = await static::isDir(item_path, chroot);
+			if (is_dir)
+			{
+				Collection<string> sub_items = await static::readDirectoryRecursive
+				(
+					item_path, chroot, item_name2
+				);
+				res.appendVector(sub_items);
+			}
+		}
+		
+		return res.toCollection();
+	}
+	
+	#endif
+	
+}

@@ -16,21 +16,31 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Annotations;
+namespace Runtime;
 
-use Runtime.CoreStruct;
-use Runtime.Dict;
-use Runtime.Map;
-use Runtime.rs;
 use Runtime.rtl;
-use Runtime.Collection;
+use Runtime.Map;
 use Runtime.Vector;
-use Runtime.Interfaces.EntityInterface;
 
 
-struct LambdaChainDeclare extends CoreStruct implements EntityInterface
+class BaseObject
 {
-	string name = "";
-	bool is_await = false;
-	string logName() => this.getClassName() ~ " -> " ~ this.name;
+	
+	/** 
+	 * Constructor
+	 */
+	public void constructor()
+	{		
+		/* Init object */
+		this._init();
+	}
+	
+	
+	/**
+	 * Init function
+	 */
+	protected void _init()
+	{
+	}
+	
 }

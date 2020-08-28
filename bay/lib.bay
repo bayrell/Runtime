@@ -20,13 +20,12 @@ namespace Runtime;
 
 use Runtime.Collection;
 use Runtime.Context;
-use Runtime.CoreStruct;
+use Runtime.BaseStruct;
 use Runtime.Dict;
 use Runtime.Map;
 use Runtime.Monad;
 use Runtime.rs;
 use Runtime.rtl;
-use Runtime.UIStruct;
 use Runtime.Vector;
 
 
@@ -65,7 +64,7 @@ class lib
 	 * Create struct
 	 */
 	pure fn createStruct(string class_name) =>
-		CoreStruct(Dict data) use (class_name) => rtl::newInstance(class_name, [data])
+		BaseStruct(Dict data) use (class_name) => rtl::newInstance(class_name, [data])
 	;
 	
 	
@@ -94,7 +93,7 @@ class lib
 	 * Equal two struct by key
 	 */
 	pure fn equalAttr(string key, var value)
-		=> bool (CoreStruct item1) use (key, value)
+		=> bool (BaseStruct item1) use (key, value)
 			=> (item1 != null) ? item1.takeValue(key) == value : false
 	;
 	
@@ -104,7 +103,7 @@ class lib
 	 * Equal two struct by key
 	 */
 	pure fn equalNotAttr(string key, var value)
-		=> bool (CoreStruct item1) use (key, value)
+		=> bool (BaseStruct item1) use (key, value)
 			=> (item1 != null) ? item1.takeValue(key) != value : false
 	;
 	
@@ -114,7 +113,7 @@ class lib
 	 * Equal two struct by key
 	 */
 	pure fn equalMethod(string method_name, var value)
-		=> bool (CoreStruct item1) use (method_name, value)
+		=> bool (BaseStruct item1) use (method_name, value)
 		{
 			if (item1 == null) return false;
 			fn f = rtl::@method(item1, method_name);
@@ -167,10 +166,10 @@ class lib
 	/**
 	 * Returns max id from items
 	 */
-	pure int getMaxIdFromItems(Collection<CoreStruct> items, int start = 0) =>
+	pure int getMaxIdFromItems(Collection<BaseStruct> items, int start = 0) =>
 		items.reduce
 		(
-			int (int value, CoreStruct item) => item.id > value ? item.id : value,
+			int (int value, BaseStruct item) => item.id > value ? item.id : value,
 			start
 		)
 	;
@@ -228,6 +227,20 @@ class lib
 	pure fn transition(fn f) =>
 		var (var m) use (f) => m.transition(f)
 	;
+	
+	
+	
+	/**
+	 * Sort asc
+	 */
+	pure int sortAsc(var a, var b) => (a > b) ? 1 : (a < b) ? -1 : 0;
+	
+	
+	
+	/**
+	 * Sort desc
+	 */
+	pure int sortDesc(var a, var b) => (a > b) ? -1 : (a < b) ? 1 : 0;
 	
 	
 	

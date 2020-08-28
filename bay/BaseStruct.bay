@@ -18,23 +18,22 @@
 
 namespace Runtime;
 
-use Runtime.CoreObject;
+use Runtime.BaseObject;
 use Runtime.Dict;
 use Runtime.Map;
 use Runtime.rtl;
 use Runtime.RuntimeUtils;
 use Runtime.Vector;
-use Runtime.Interfaces.SerializeInterface;
 
 
-class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterface
+class BaseStruct extends BaseObject
 {
 	
 	
 	/**
 	 * Assign
 	 */
-	protected static void _assign(CoreStruct item, CoreStruct old_item, Map obj)
+	protected static void _assign(BaseStruct item, BaseStruct old_item, Map obj)
 	{
 		if (obj == null)
 		{
@@ -106,7 +105,7 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Init struct data
 	 */
-	protected void initData(CoreStruct old, Dict changed = null)
+	protected void initData(BaseStruct old, Dict changed = null)
 	{
 	}
 	
@@ -115,9 +114,9 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Copy this struct with new values
 	 * @param Map obj = null
-	 * @return CoreStruct
+	 * @return BaseStruct
 	 */
-	public CoreStruct copy(Dict obj = null)
+	public BaseStruct copy(Dict obj = null)
 	{
 		if (obj == null) return this;
 		
@@ -150,9 +149,9 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Clone this struct with fields
 	 * @param Collection fields = null
-	 * @return CoreStruct
+	 * @return BaseStruct
 	 */
-	public CoreStruct clone(Collection fields = null)
+	public BaseStruct clone(Collection fields = null)
 	{
 		if (fields == null) return this;
 		
@@ -166,7 +165,7 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 		);
 		
 		/* Return object */
-		CoreStruct res = rtl::newInstance( this.getClassName(), [ obj.toDict() ] );
+		BaseStruct res = rtl::newInstance( this.getClassName(), [ obj.toDict() ] );
 		return res;
 	}
 	
@@ -176,9 +175,9 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	 * Create new struct with new value
 	 * @param string field_name
 	 * @param fn f
-	 * @return CoreStruct
+	 * @return BaseStruct
 	 */
-	public CoreStruct map(string field_name, fn f)
+	public BaseStruct map(string field_name, fn f)
 	{
 		return this.copy( (new Map()).set( field_name, f(this.takeValue(field_name)) ).toDict() );
 	}
@@ -188,7 +187,7 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	/**
 	 * Returns new instance
 	 */
-	pure CoreStruct newInstance(Dict items)
+	pure BaseStruct newInstance(Dict items)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -198,6 +197,27 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 		return new $class_name($ctx, $items);
 		#endswitch
 	}
+	
+	
+	
+	/**
+	 * Update struct
+	 * @param Collection<string> path
+	 * @param var value
+	 * @return BaseStruct
+	 */
+	pure BaseStruct update(BaseStruct item, Dict items) => item.copy(items);
+	
+	
+	
+	/**
+	 * Update struct
+	 * @param Collection<string> path
+	 * @param var value
+	 * @return BaseStruct
+	 */
+	pure BaseStruct setAttr(BaseStruct item, Collection<string> path, var value) => rtl::setAttr(item, path, value);
+	
 	
 	
 	
@@ -212,3 +232,7 @@ class CoreStruct extends CoreObject implements ArrayInterface, SerializeInterfac
 	#endswitch
 	
 }
+
+#ifcode JAVASCRIPT then
+Runtime.BaseStruct.prototype.get = function(ctx, k, v){ return this[k] != undefined ? this[k] : v; };
+#endif

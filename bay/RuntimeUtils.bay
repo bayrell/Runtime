@@ -20,7 +20,7 @@ namespace Runtime;
 
 use Runtime.Collection;
 use Runtime.Context;
-use Runtime.CoreStruct;
+use Runtime.BaseStruct;
 use Runtime.Dict;
 use Runtime.lib;
 use Runtime.Map;
@@ -28,7 +28,6 @@ use Runtime.rs;
 use Runtime.rtl;
 use Runtime.UIStruct;
 use Runtime.Vector;
-use Runtime.Annotations.Entity;
 use Runtime.Annotations.IntrospectionClass;
 use Runtime.Annotations.IntrospectionInfo;
 use Runtime.Interfaces.SerializeInterface;
@@ -154,7 +153,7 @@ static class RuntimeUtils
 	 */
 	pure memorize IntrospectionClass getClassIntrospection(string class_name)
 	{
-		Collection<CoreStruct> class_info = null;
+		Collection<BaseStruct> class_info = null;
 		Map<Collection> fields = new Map();
 		Map<Collection> methods = new Map();
 		IntrospectionInfo info = null;
@@ -229,11 +228,11 @@ static class RuntimeUtils
 		IntrospectionClass class_info = RuntimeUtils::getClassIntrospection( class_name );
 		Dict d = class_info.methods.filter
 		(
-			void (Collection<Entity> arr, string method_name) use (annotations, class_name)
+			void (Collection<var> arr, string method_name) use (annotations, class_name)
 			{
 				arr = arr.filter
 				(
-					bool (Entity item) use (annotations)
+					bool (var item) use (annotations)
 					{
 						for (int i=0; i<annotations.count(); i++)
 						{
@@ -647,205 +646,5 @@ static class RuntimeUtils
 		return null;
 		#endswitch
 	}
-	
-	
-	
-	/**
-	 * Url encode
-	 * @param string s
-	 * @return string 
-	 */
-	static string url_encode(string s)
-	{
-		return rs::url_encode(s);
-	}
-	
-	
-	
-	/**
-	 * Base64 encode
-	 * @param string s
-	 * @return string 
-	 */
-	static string base64_encode(string s)
-	{
-		return rs::base64_encode(s);
-	}
-	
-	
-	
-	/**
-	 * Base64 decode
-	 * @param string s
-	 * @return string 
-	 */
-	static string base64_decode(string s)
-	{
-		return rs::base64_decode(s);
-	}
-	
-	
-	
-	/**
-	 * Base64 encode
-	 * @param string s
-	 * @return string 
-	 */
-	static string base64_encode_url(string s)
-	{
-		return rs::base64_encode_url(s);
-	}
-	
-	
-	
-	/**
-	 * Base64 decode
-	 * @param string s
-	 * @return string 
-	 */
-	static string base64_decode_url(string s)
-	{
-		return rs::base64_decode_url(s);
-	}
-	
-	
-
-	/* ================================= Other Functions ================================= */
-	
-	
-	
-	/*
-	 * Generate password
-	 *
-	 * @param int length The lenght of the password
-	 * @param string options What kinds of the char can be in password
-	 *   a - lower case chars
-	 *   b - upper case chars
-	 *   c - numbers
-	 *   d - special chars !@#$%^&?*_-+=~(){}[]<>|/,.:;\\
-	 *   e - quotes `"'
-	 */	
-	public static string randomString(int length=16, string options="abc")
-	{
-		string s = "";
-		if (rs::strpos(options, "a") >= 0) s ~= "abcdefghjkmnpqrstuvwxyz";
-		if (rs::strpos(options, "b") >= 0) s ~= "ABCDEFGHJKMNPQRSTUVWXYZ";
-		if (rs::strpos(options, "c") >= 0) s ~= "1234567890";
-		if (rs::strpos(options, "d") >= 0) s ~= "!@#$%^&?*_-+=~(){}[]<>|/,.:;\\";
-		if (rs::strpos(options, "e") >= 0) s ~= "`\"\'";
-		string res = "";
-		int c = rs::strlen(s);
-		for (int i=0; i<length; i++){
-			int k = rtl::random(0, c-1);
-			res ~= s[k];
-		}
-		return res;
-	}
-	
-	
-	/**
-	 * Returns true if value is primitive value
-	 * @return boolean 
-	 */
-	public static bool isPrimitiveValue(var value)
-	{
-		if (rtl::isScalarValue(value)) return true;
-		if (value instanceof Vector) return true;
-		if (value instanceof Map) return true;
-		return false;
-	}
-	
-	
-	
-	/**
-	 * Convert bytes to string
-	 * @param Vector<byte> arr - vector of the bytes
-	 * @string charset - charset of the bytes vector. Default utf8
-	 * @return string
-	 */
-	public static string bytesToString(Collection<byte> arr, string charset="utf8")
-	{
-		#switch
-		#case ifcode PHP then
-		$arr = array_map( function($byte){ return chr($byte); }, $arr->_getArr() );
-		$s = implode("", $arr);
-		return $s;
-		#case ifcode ES6 then
-		var decoder = new TextDecoder(charset);
-		var bytes = new Uint8Array(arr);
-		return decoder.decode(bytes);
-		#case ifcode NODEJS then
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Convert string to bytes
-	 * @param string s - incoming string
-	 * @param charset - Result bytes charset. Default utf8
-	 * @return Collection<byte> output collection
-	 */
-	pure Collection<byte> toString(Collection<byte> arr, string charset="utf8")
-	{
-		return static::bytesToString(arr, charset);
-	}
-	
-	
-	
-	/**
-	 * Convert string to bytes
-	 * @param string s - incoming string
-	 * @param Vector<byte> arr - output vector
-	 * @param charset - Result bytes charset. Default utf8
-	 */
-	pure Collection<byte> stringToBytes(string s, Vector<byte> arr, string charset="utf8")
-	{
-		#switch
-		#case ifcode PHP then
-		#case ifcode ES6 then
-		var encoder = new TextEncoder(charset);
-		var bytes = encoder.encode(s);
-		return Runtime.Collection.from(bytes);
-		#case ifcode NODEJS then
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Convert string to bytes
-	 * @param string s - incoming string
-	 * @param charset - Result bytes charset. Default utf8
-	 * @return Collection<byte> output collection
-	 */
-	pure Collection<byte> toBytes(string s, string charset="utf8")
-	{
-		return static::stringToBytes(s, charset);
-	}
-	
-	
-	
-	/**
-	 * Translate message
-	 * @params string message - message need to be translated
-	 * @params Dict params - Messages params. Default null.
-	 * @params string locale - Different locale. Default "".
-	 * @return string - translated string
-	 */
-	public static string translate
-	(
-		string message, Dict params = null, string locale = "", 
-		Object context = null
-	)
-	{
-		if (context == null) context = self::getContext();
-		if (context != null)
-		{
-			context.translate(message, params, locale);
-		}	
-		return message;
-	}
-	
 	
 }

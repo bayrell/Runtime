@@ -27,9 +27,9 @@ use Runtime.Interfaces.ContextInterface;
 class IndexOutOfRange extends RuntimeException
 {
 	
-	void constructor()
+	void constructor(Object prev = null)
 	{
-		parent(_("Index out of range", null), RuntimeConstant::ERROR_INDEX_OUT_OF_RANGE);
+		parent( _("Runtime", "Index out of range"), rtl::ERROR_INDEX_OUT_OF_RANGE, prev );
 	}
 
 }

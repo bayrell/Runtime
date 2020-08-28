@@ -498,24 +498,29 @@ class rs
 	 */
 	static PathInfo pathinfo(string filepath)
 	{
-		Vector<string> arr1 = rs::explode(".", filepath).toVector();
-		Vector<string> arr2 = rs::explode("/", filepath).toVector();
+		Vector<string> arr1 = static::explode(".", filepath).toVector();
+		Vector<string> arr2 = static::explode("/", filepath).toVector();
 		
-		PathInfo ret = new PathInfo();
+		string filepath = filepath;
+		string extension = arr1.pop();
+		string basename = arr2.pop();
+		string dirname = static::join("/", arr2);
 		
-		ret.filepath = filepath;
-		ret.extension = arr1.pop();
-		ret.basename = arr2.pop();
-		ret.dirname = rs::implode("/", arr2);
-		
-		int ext_length = rs::strlen(ret.extension);
+		int ext_length = static::strlen(extension);
 		if (ext_length > 0) ext_length++;
-		ret.filename = rs::substr(ret.basename, 0, -1*ext_length);
+		string filename = static::substr(basename, 0, -1*ext_length);
 		
 		delete arr1;
 		delete arr2;
 		
-		return ret;
+		return new PathInfo
+		{
+			"filepath": filepath,
+			"extension": extension,
+			"basename": basename,
+			"dirname": dirname,
+			"filename": filename,
+		};
 	}
 	
 	
@@ -700,7 +705,7 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		return arr.join(ch);
+		return arr.join(ctx, ch);
 		
 		#endswitch
 	}

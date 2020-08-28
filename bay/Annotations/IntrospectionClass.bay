@@ -18,7 +18,7 @@
 
 namespace Runtime.Annotations;
 
-use Runtime.CoreStruct;
+use Runtime.BaseStruct;
 use Runtime.rtl;
 use Runtime.lib;
 use Runtime.Collection;
@@ -26,10 +26,10 @@ use Runtime.Dict;
 use Runtime.Annotations.IntrospectionInfo;
 
 
-struct IntrospectionClass extends CoreStruct
+struct IntrospectionClass extends BaseStruct
 {
 	string class_name = "";
-	Collection<CoreStruct> class_info = null;
+	Collection<BaseStruct> class_info = null;
 	Dict<Collection> fields = null;
 	Dict<Collection> methods = null;
 	Collection<string> interfaces = null;

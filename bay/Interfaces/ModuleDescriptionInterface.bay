@@ -18,7 +18,7 @@
  
 namespace Runtime.Interfaces;
 
-use Runtime.CoreStruct;
+use Runtime.BaseStruct;
 use Runtime.Map;
 use Runtime.Vector;
 use Runtime.Interfaces.ContextInterface;
@@ -55,7 +55,7 @@ interface ModuleDescriptionInterface
 	/**
 	 * Returns enities
 	 */
-	pure Collection<CoreStruct> entities();
+	pure Collection<BaseStruct> entities();
 	
 	
 }

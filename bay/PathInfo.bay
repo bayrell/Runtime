@@ -18,31 +18,27 @@
 
 namespace Runtime;
 
-use Runtime.Context;
-use Runtime.CoreObject;
-use Runtime.rtl;
-use Runtime.RuntimeUtils;
-use Runtime.Vector;
+use Runtime.BaseStruct;
+use Runtime.Interfaces.StringInterface;
 
 
-class CoreDriver extends CoreObject
+struct PathInfo extends BaseStruct implements StringInterface
 {
 	
-	/**
-	 * Constructor
-	 */
-	public void constructor()
-	{
-		parent();
-	}
-	
+	string filepath = "";
+	string dirname = "";
+	string basename = "";
+	string extension = "";
+	string filename = "";
 	
 	
 	/**
-	 * Start driver
+	 * Returns string
 	 */
-	public async void startDriver()
+	public string toString()
 	{
+		return this.filepath;
 	}
+	
 	
 }

@@ -16,18 +16,30 @@
  *  limitations under the License.
  */
  
-namespace Runtime.Interfaces;
-
-use Runtime.Message;
-use Runtime.Context;
+namespace Runtime;
 
 
-interface BusInterface
+class Mutex
 {
 	
-	/**
-	 * Send message
-	 */
-	static fn sendMessage(Message msg);
+	void lock()
+	{
+	}
+	
+	void unLock()
+	{
+	}
+	
+	void isLocked()
+	{
+	}
+	
+	async void wait()
+	{
+	}
+	
+	async void waitAndLock()
+	{
+	}
 	
 }
