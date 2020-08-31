@@ -1591,6 +1591,8 @@ class rtl
 #switch
 #case ifcode PHP then
 rtl::$_memorize_not_found = (object) ['s' => 'memorize_key_not_found'];
+#case ifcode ES6 then
+var use = function(s){return Runtime.rtl.find_class(s);}
 #case ifcode JAVASCRIPT then
 if (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined')
 	Runtime.rtl._memorize_not_found = {'s':'memorize_key_not_found','id':Symbol()};
