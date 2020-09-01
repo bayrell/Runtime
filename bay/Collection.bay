@@ -594,10 +594,7 @@ class Collection<T> extends _Collection
 	 * Append value to the end of the vector
 	 * @param T value
 	 */
-	public Collection<T> appendIm(T value)
-	{
-		return this.pushIm(value);
-	}
+	public Collection<T> appendIm(T value) => this.pushIm(value);
 	
 	
 	
@@ -605,10 +602,15 @@ class Collection<T> extends _Collection
 	 * Insert first value to begin of the vector
 	 * @return T value
 	 */
-	public Collection<T> prependIm(T value)
-	{
-		return this.unshiftIm(value);
-	}
+	public Collection<T> prependIm(T value) => this.unshiftIm(value);
+	
+	
+	
+	/**
+	 * Append vector to the end of the vector
+	 * @param Collection<T> arr
+	 */
+	public Collection<T> concatIm(Collection<T> arr) => this.appendCollectionIm(arr);
 	
 	
 	

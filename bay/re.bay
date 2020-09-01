@@ -59,7 +59,7 @@ class re
 	 * @param string s string
 	 * @return Vector result
 	 */
-	static Map<string, string> matchAll(string r, string s)
+	static Collection<string> matchAll(string r, string s)
 	{
 		#switch
 		
@@ -68,16 +68,16 @@ class re
 		$matches = [];
 		if (preg_match_all("/" . $r . "/i", $s, $matches))
 		{
-			$res = new Vector();
-			array_shift($matches);
-			foreach ($matches as $arr)
-			{
-				$res->push($ctx, Vector::from($arr) );
-			}
-			return $res;
+			return Collection::from($matches[1]);
 		}
 		
 		return null;
+		
+		#case ifcode JAVASCRIPT then
+		var arr = [...s.matchAll( new RegExp(r, "g") )];
+		if (arr.length == 0) return null;
+		return Runtime.Collection.from( arr.map( (s) => s[1] ).filter( (s) => s != undefined ) );
+		
 		#endswitch
 		
 		return null;

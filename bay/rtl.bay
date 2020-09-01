@@ -1119,7 +1119,7 @@ class rtl
 	/**
 	 * Apply async chain
 	 */
-	static async Collection<var> chainAwait(Collection<string> chain, Collection<var> args)
+	static async Collection<var> chainAsync(Collection<string> chain, Collection<var> args)
 	{
 		for (int i=0; i<chain.count(); i++)
 		{
