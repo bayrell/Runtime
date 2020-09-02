@@ -21,13 +21,10 @@ namespace Runtime;
 use Runtime.Map;
 use Runtime.rtl;
 use Runtime.Vector;
-use Runtime.Interfaces.AssetsInterface;
-use Runtime.Interfaces.ModuleDescriptionInterface;
 
 
-class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
+static class ModuleDescription
 {
-
 	
 	/**
 	 * Returns module name
@@ -54,45 +51,10 @@ class ModuleDescription implements ModuleDescriptionInterface, AssetsInterface
 	
 	
 	/**
-	 * Returns module files load order
-	 * @return Collection<string>
-	 */
-	pure Collection<string> assets() => 
-	[
-		"Runtime/rtl",
-		"Runtime/rs",
-		"Runtime/re",
-		"Runtime/lib",
-		"Runtime/AsyncAwait",
-		"Runtime/Collection",
-		"Runtime/Dict",
-		"Runtime/Map",
-		"Runtime/Vector",
-		"Runtime/Monad",
-		"Runtime/BaseObject",
-		"Runtime/BaseStruct",
-		"Runtime/DateTime",
-		"Runtime/Exceptions/RuntimeException",
-		"Runtime/Interfaces/AssetsInterface",
-		"Runtime/Interfaces/ModuleDescriptionInterface",
-		"Runtime/ModuleDescription",
-	];
-	
-	
-	
-	/**
 	 * Returns enities
 	 */
 	pure Collection<Dict> entities() => 
 	[
 	];
-	
-	
-	
-	/**
-	 * Returns enities
-	 */
-	pure Collection<Dict> resources() => null;
-	
 	
 }

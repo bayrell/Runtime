@@ -18,6 +18,7 @@
 
 namespace Runtime;
 
+use Runtime.re;
 use Runtime.rtl;
 use Runtime.PathInfo;
 use Runtime.Collection;
@@ -645,6 +646,18 @@ class rs
 		return static::replace("\n", "<br/>", s);
 	}
 	
+	
+	
+	/**
+	 * Remove spaces
+	 */
+	static string spaceless(string s)
+	{
+		s = re::replace("\s+", " ", s);
+		s = re::replace("\t", "", s);
+		s = re::replace("\n", "", s);
+		return s;
+	}
 	
 	
 	

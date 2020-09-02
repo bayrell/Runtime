@@ -43,4 +43,9 @@ class BaseObject
 	{
 	}
 	
+	
+	/* Old functions */
+	var assignValue(string k, var v){}
+	var takeValue(string k, var v = null){}
+	
 }

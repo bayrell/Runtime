@@ -68,7 +68,7 @@ class re
 		$matches = [];
 		if (preg_match_all("/" . $r . "/i", $s, $matches))
 		{
-			return Collection::from($matches[1]);
+			return Collection::from(isset($matches[1]) ? $matches[1] : []);
 		}
 		
 		return null;

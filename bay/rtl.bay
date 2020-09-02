@@ -408,8 +408,8 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
-	
-		return new \Runtime\Callback(static::find_class($obj), $method_name);
+		
+		return new \Runtime\Callback($obj, $method_name);
 		
 		#case ifcode JAVASCRIPT then
 		
@@ -574,6 +574,7 @@ class rtl
 		
 		if ($item === null) return $def_val;
 		if (gettype($path) == "string") $path = \Runtime\Collection::from([$path]);
+		else if (gettype($path) == "array") $path = \Runtime\Collection::from($path);
 		
 		if (count($path->_arr) == 0) 
 		{
@@ -637,11 +638,15 @@ class rtl
 	 */
 	static var setAttr(var item, Collection attrs, var new_value)
 	{
-		#ifcode JAVASCRIPT then
+		#switch
+		#case ifcode PHP then
+		if (gettype($attrs) == "string") $attrs = \Runtime\Collection::from([$attrs]);
+		else if (gettype($attrs) == "array") $attrs = \Runtime\Collection::from($attrs);
+		#case ifcode JAVASCRIPT then
 		var Collection = use("Runtime.Collection");
 		if (typeof attrs == "string") attrs = Collection.from([attrs]);
 		else if (Array.isArray(attrs) && attrs.count == undefined) attrs = Collection.from(attrs);
-		#endif
+		#endswitch
 		
 		fn f = var (Collection attrs, var data, var new_value, var f)
 		{
@@ -1584,6 +1589,27 @@ class rtl
 		#endswitch
 	}
 	
+	
+	
+	/**
+	 * Debug
+	 */
+	void @trace()
+	{
+		#switch
+		#case ifcode PHP then
+		
+		$trace = debug_backtrace();
+		foreach ($trace as $index => $arr)
+		{
+			$file = isset($arr['file']) ? $arr['file'] : "";
+			$line = isset($arr['line']) ? $arr['line'] : "";
+			$function = isset($arr['function']) ? $arr['function'] : "";
+			echo "${index}) ${file}:${line} ${function}\n";
+		}
+		
+		#endswitch
+	}
 	
 }
 

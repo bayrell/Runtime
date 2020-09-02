@@ -30,7 +30,7 @@ use Runtime.UIStruct;
 use Runtime.Vector;
 use Runtime.IntrospectionClass;
 use Runtime.IntrospectionInfo;
-use Runtime.Interfaces.SerializeInterface;
+use Runtime.SerializeInterface;
 
 
 #switch
@@ -335,7 +335,7 @@ static class RuntimeUtils
 		}
 		
 		
-		if (obj implements SerializeInterface)
+		if (obj instanceof BaseStruct)
 		{
 			Map<var> values = new Map();
 			Collection<string> names = static::getVariablesNames(obj.getClassName(), 1);
@@ -409,7 +409,7 @@ static class RuntimeUtils
 			{
 				return null;
 			}
-			if (not rtl::class_implements(class_name, "Runtime.Interfaces.SerializeInterface"))
+			if (not rtl::class_implements(class_name, "Runtime.SerializeInterface"))
 			{
 				return null;
 			}
@@ -428,7 +428,7 @@ static class RuntimeUtils
 			}
 			
 			/* New instance */
-			SerializeInterface instance = rtl::newInstance(class_name, [obj]);
+			var instance = rtl::newInstance(class_name, [obj]);
 			
 			delete res;
 			delete obj;

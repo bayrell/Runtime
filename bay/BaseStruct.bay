@@ -24,9 +24,10 @@ use Runtime.Map;
 use Runtime.rtl;
 use Runtime.RuntimeUtils;
 use Runtime.Vector;
+use Runtime.SerializeInterface;
 
 
-class BaseStruct extends BaseObject
+class BaseStruct extends BaseObject implements SerializeInterface
 {
 	
 	
@@ -223,6 +224,7 @@ class BaseStruct extends BaseObject
 	
 	#switch
 	#case ifcode PHP then
+	function get($ctx,$k,$v){$k="__".$k;return isset($this->$k)?$this->$k:$v;}
 	function __get($k){$k="__".$k;return isset($this->$k)?$this->$k:null;}
 	function __set($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
 	function offsetExists($k){$k="__".$k;return isset($this->$k);}

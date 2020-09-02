@@ -15,39 +15,17 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
- 
-namespace Runtime.Interfaces;
+
+namespace Runtime;
 
 
-interface AssetsInterface
+interface StringInterface
 {
 	
 	/**
-	 * Returns module name
-	 * @return string
+	 * Returns string
 	 */
-	pure string getModuleName();
-	
-	
-	/**
-	 * Returns required modules
-	 * @return Dict<string>
-	 */
-	pure Dict<string> requiredModules();
-	
-	
-	
-	/**
-	 * Returns module files load order
-	 * @return Collection<string>
-	 */
-	pure Collection<string> assets();
-	
-	
-	
-	/**
-	 * Returns sync loaded files
-	 */		
-	pure Collection<string> resources();
+	public string toString();
 	
 }
+

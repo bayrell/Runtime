@@ -19,7 +19,7 @@
 namespace Runtime;
 
 use Runtime.BaseStruct;
-use Runtime.Interfaces.StringInterface;
+use Runtime.StringInterface;
 
 
 struct PathInfo extends BaseStruct implements StringInterface

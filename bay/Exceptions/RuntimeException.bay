@@ -19,7 +19,6 @@
 namespace Runtime.Exceptions;
 
 use Runtime.rtl;
-use Runtime.Interfaces.ContextInterface;
 
 
 declare class ClassException{}
@@ -62,7 +61,6 @@ class ClassException extends \Exception
 
 class RuntimeException extends ClassException
 {
-	protected ContextInterface context = null;
 	protected Object prev = null;
 	public string error_message = "";
 	public string error_str = "";

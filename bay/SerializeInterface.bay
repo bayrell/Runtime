@@ -16,9 +16,22 @@
  *  limitations under the License.
  */
  
-namespace Runtime.Interfaces;
+namespace Runtime;
+
+use Runtime.CoreObject;
+use Runtime.Map;
+use Runtime.Vector;
 
 
-interface ContextInterface
+interface SerializeInterface
 {
+	
+	/**
+	 * Returns instance of the value by variable name
+	 * @param string variable_name
+	 * @return var
+	 */
+	public var takeValue(string variable_name, var default_value = null);
+	
+	
 }

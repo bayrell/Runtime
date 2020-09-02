@@ -28,7 +28,7 @@ class Callback
 	{
 		if (gettype($obj) == "string")
 		{
-			//$obj = \Runtime\rtl::find_class($obj);
+			$obj = \Runtime\rtl::find_class($obj);
 			if (!class_exists($obj))
 			{
 				throw new \Exception("Class " . $obj . " not found ");
