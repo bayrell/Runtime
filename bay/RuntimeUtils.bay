@@ -28,8 +28,8 @@ use Runtime.rs;
 use Runtime.rtl;
 use Runtime.UIStruct;
 use Runtime.Vector;
-use Runtime.Annotations.IntrospectionClass;
-use Runtime.Annotations.IntrospectionInfo;
+use Runtime.IntrospectionClass;
+use Runtime.IntrospectionInfo;
 use Runtime.Interfaces.SerializeInterface;
 
 

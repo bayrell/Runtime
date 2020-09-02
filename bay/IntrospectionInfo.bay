@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Annotations;
+namespace Runtime;
 
 use Runtime.BaseStruct;
 use Runtime.rtl;

@@ -1,6 +1,6 @@
 {
 	"name": "Runtime",
-	"files":
+	"assets":
 	[
 		"rtl",
 		"lib",
@@ -28,9 +28,9 @@
 		"DateTime",
 		"PathInfo",
 		"Reference",
+		"IntrospectionClass",
+		"IntrospectionInfo",
 		"RuntimeUtils",
-		"Annotations/IntrospectionClass",
-		"Annotations/IntrospectionInfo",
 		"ModuleDescription"
 	]
 }
