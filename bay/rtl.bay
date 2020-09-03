@@ -93,6 +93,8 @@ class rtl
 	static const int ERROR_AUTH = -16;
 	static const int ERROR_DUPLICATE = -17;
 	static const int ERROR_API_NOT_FOUND = -18;
+	static const int ERROR_API_WRONG_FORMAT = -19;
+	static const int ERROR_API_WRONG_APP_NAME = -20;
 	static const int ERROR_FATAL = -99;
 	static const int ERROR_HTTP_CONTINUE = -100;
 	static const int ERROR_HTTP_SWITCH = -101;
@@ -514,21 +516,15 @@ class rtl
 	/**
 	 * Run thread
 	 */
-	static void runThread(fn f)
+	static void runThread(fn f, Collection<var> args = null)
 	{
+		if (args == null) args = [];
+		
 		#ifcode JAVASCRIPT then
-		/*
-		args.unshift(ctx);
-		var t = new Runtime.AsyncThread(ctx, {
-			"tasks": Runtime.Collection.from([
-				new Runtime.AsyncTask(ctx, {
-					"pos": "0",
-					"f": f.apply(null, args),
-				})
-			])
-		});
-		Runtime.AsyncThread.run(ctx, t);
-		*/
+		(async () => {
+			try { args = args.prependIm(ctx); await f.apply(args); }
+			catch (e) { console.log(e.stack); }
+		})();
 		#endif
 	}
 	
@@ -1456,7 +1452,7 @@ class rtl
 	/**
 	 * Returns unix timestamp
 	 */
-	int utime()
+	static int utime()
 	{
 		#switch
 		#case ifcode PHP then

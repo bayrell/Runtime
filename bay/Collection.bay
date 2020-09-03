@@ -291,13 +291,13 @@ class Collection<T> extends _Collection
 		if (pos < 0 || pos >= this.length)
 		{
 			var _IndexOutOfRange = use("Runtime.Exceptions.IndexOutOfRange");
-			throw new _IndexOutOfRange(ctx);
+			throw new _IndexOutOfRange(ctx, pos);
 		}
 		return this[pos];
 		#case ifcode PHP then
 		if (!array_key_exists($pos, $this->_arr))
 		{
-			throw new \Runtime\Exceptions\IndexOutOfRange($ctx);
+			throw new \Runtime\Exceptions\IndexOutOfRange($ctx, $pos);
 		}
 		return $this->_arr[$pos];
 		#endswitch

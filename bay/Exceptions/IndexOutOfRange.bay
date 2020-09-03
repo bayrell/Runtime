@@ -26,9 +26,9 @@ use Runtime.Exceptions.RuntimeException;
 class IndexOutOfRange extends RuntimeException
 {
 	
-	void constructor(Object prev = null)
+	void constructor(int pos, Object prev = null)
 	{
-		parent( _("Runtime", "Index out of range"), rtl::ERROR_INDEX_OUT_OF_RANGE, prev );
+		parent( _("Runtime", "Index out of range. Pos: %pos%", {"pos":pos}), rtl::ERROR_INDEX_OUT_OF_RANGE, prev );
 	}
 
 }

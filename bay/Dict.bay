@@ -464,7 +464,7 @@ class Dict<T> extends _Map
 		if (typeof this._map["|" + key] == "undefined")
 		{
 			var _KeyNotFound = use("Runtime.Exceptions.KeyNotFound");
-			throw new _KeyNotFound(key);
+			throw new _KeyNotFound(ctx, key);
 		}
 		var val = this._map["|" + key];
 		if (val === null || typeof val == "undefined") return null;
@@ -473,7 +473,7 @@ class Dict<T> extends _Map
 		$key = $this->toStr($key);
 		if (!array_key_exists($key, $this->_map))
 		{
-			throw new KeyNotFound($key);
+			throw new \Runtime\Exceptions\KeyNotFound($ctx, $key);
 		}
 		return $this->_map[$key];
 		#endswitch

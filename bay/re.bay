@@ -68,7 +68,21 @@ class re
 		$matches = [];
 		if (preg_match_all("/" . $r . "/i", $s, $matches))
 		{
-			return Collection::from(isset($matches[1]) ? $matches[1] : []);
+			$res = [];
+			foreach ($matches as $index1 => $obj1)
+			{
+				foreach ($obj1 as $index2 => $val)
+				{
+					if (!isset($res[$index2])) $res[$index2] = [];
+					$res[$index2][$index1] = $val;
+				}
+			}
+			$res = array_map
+			(
+				function ($item) { return Collection::from($item); },
+				$res
+			);
+			return Collection::from($res);
 		}
 		
 		return null;
@@ -76,7 +90,7 @@ class re
 		#case ifcode JAVASCRIPT then
 		var arr = [...s.matchAll( new RegExp(r, "g") )];
 		if (arr.length == 0) return null;
-		return Runtime.Collection.from( arr.map( (s) => s[1] ).filter( (s) => s != undefined ) );
+		return Runtime.Collection.from( arr.map( (v) => Runtime.Collection.from(v) ) );
 		
 		#endswitch
 		
