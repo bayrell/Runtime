@@ -25,11 +25,34 @@ class RawString
 	protected $s;
 	function __construct($s)
 	{
+		$s = static::normalize($s);
 		$this->s = $s;
 	}
-	function __toString(){ return $this->s; }
+	function __toString(){ return $this->toString(); }
 	function toString()
 	{
-		return $this->s;
+		return gettype($this->s) == "array" ? implode("", $this->s) : $this->s;
+	}
+	static function normalize($s)
+	{
+		if (gettype($s) == "array")
+		{
+			$arr1 = [];
+			foreach ($s as $v)
+			{
+				if ($v instanceof RawString && gettype($v->s) == "array") $v = $v->s;
+				if (gettype($v) == "array")
+				{
+					$v = static::normalize($v);
+					foreach ($v as $v2)
+					{
+						$arr1[] = $v2;
+					}
+				}
+				else $arr1[] = $v;
+			}
+			return $arr1;
+		}
+		return $s;
 	}
 }

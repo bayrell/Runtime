@@ -540,14 +540,20 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		if ($item === null) return $def_val;
-		if ($item instanceof \Runtime\Dict || $item instanceof \Runtime\Collection)
+		if ($item instanceof \Runtime\Dict ||
+			$item instanceof \Runtime\Collection ||
+			$item instanceof \Runtime\BaseStruct
+		)
 		{
 			return $item->get($ctx, $key, $def_val);
 		}
 		return $item[$key];
 		#case ifcode JAVASCRIPT then
 		if (item == undefined) return def_val;
-		if (item instanceof Runtime.Dict || item instanceof Runtime.Collection)
+		if (item instanceof Runtime.Dict ||
+			item instanceof Runtime.Collection ||
+			item instanceof Runtime.BaseStruct
+		)
 		{
 			return item.get(ctx, key, def_val);
 		}

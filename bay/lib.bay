@@ -94,7 +94,7 @@ class lib
 	 */
 	pure fn equalAttr(string key, var value)
 		=> bool (BaseStruct item1) use (key, value)
-			=> (item1 != null) ? item1.takeValue(key) == value : false
+			=> (item1 != null) ? item1.get(key, null) == value : false
 	;
 	
 	
@@ -104,7 +104,7 @@ class lib
 	 */
 	pure fn equalNotAttr(string key, var value)
 		=> bool (BaseStruct item1) use (key, value)
-			=> (item1 != null) ? item1.takeValue(key) != value : false
+			=> (item1 != null) ? item1.get(key, null) != value : false
 	;
 	
 	
