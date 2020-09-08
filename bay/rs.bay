@@ -464,13 +464,11 @@ class rs
 		#case ifcode PHP then
 		
 		if ($s instanceof \Runtime\Collection) return $s;
-		if ($s instanceof \Runtime\UIStruct) return $s;
 		return htmlspecialchars($s, ENT_QUOTES | ENT_HTML401);
 		
 		#case ifcode JAVASCRIPT then
 		
 		if (s instanceof Runtime.Collection) return s;
-		if (s instanceof Runtime.UIStruct) return s;
 		var obj = {
 			"<":"&lt;",
 			">": "&gt;", 
@@ -870,5 +868,50 @@ class rs
 		#case ifcode NODEJS then
 		return Buffer.from(s, 'base64').toString('ascii');
 		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Returns string lenght
+	 * @param string s The string
+	 * @return int
+	 */
+	static string url_get_add(string s, string key, string value)
+	{
+		int pos = static::strpos(s, "?");
+		string s1 = static::substr(s, 0, pos);
+		string s2 = (pos >= 0) ? static::substr(s, pos + 1) : "";
+		bool find = false;
+		
+		Collection arr = static::explode("&", s2);
+		arr = arr
+			.map
+			(
+				string (string s) use (key, value, find)
+				{
+					Collection arr = static::explode("=", s);
+					if (value == "") return "";
+					if (arr[0] == key)
+					{
+						find = true;
+						return key ~ "=" ~ static::htmlEscape(value);
+					}
+					return s;
+				}
+			)
+			.filter( bool (string s) => s != "" )
+		;
+		
+		if (not find and value != "")
+		{
+			arr = arr.appendIm(key ~ "=" ~ static::htmlEscape(value));
+		}
+		
+		s = s1;
+		s2 = static::join("&", arr);
+		if (s2 != "") s = s ~ "?" ~ s2;
+		
+		return s;
 	}
 }
