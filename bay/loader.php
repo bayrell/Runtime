@@ -30,6 +30,7 @@ class Loader
 {
 	public $exit_code = 0;
 	public $start_time = 0;
+	public $args = null;
 	public $env = null;
 	public $main_module = "";
 	public $entry_point = "";
@@ -163,6 +164,17 @@ class Loader
 	
 	
 	/**
+	 * Set args
+	 */
+	function setArgs($value)
+	{
+		$this->args = $value;
+		return $this;
+	}
+	
+	
+	
+	/**
 	 * Set enviroment
 	 */
 	function setEnv($value)
@@ -202,7 +214,14 @@ class Loader
 	{
 		/* Create context */
 		$context = Context::create(null, Dict::from($this->env));
-
+		
+		/* Set context params */
+		$context = $context->copy($context, Dict::from([
+			"start_time" => time(),
+			"cli_args" => Collection::from($this->args),
+			"base_path" => getcwd(),
+		]));
+		
 		/* Set main module */
 		if ($this->main_module) $context = $context::setMainModule($context, $context, $this->main_module);
 		
