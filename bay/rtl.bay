@@ -922,6 +922,25 @@ class rtl
 	
 	
 	/**
+	 * Return true if value is function
+	 * @param var value
+	 * @return bool
+	 */
+	static bool isFn(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		return is_callable($value);
+		#case ifcode JAVASCRIPT then
+		if (typeof(value) == 'function') return true;
+		#endswitch
+		
+		return false;
+	}
+	
+	
+	
+	/**
 	 * Convert value to string
 	 * @param var value
 	 * @return string
