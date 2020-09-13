@@ -48,7 +48,7 @@ class fs
 	 */
 	pure string addFirstSlash(string s)
 	{
-		return re.replace("//", "/", static::DIRECTORY_SEPARATOR ~ s);
+		return re::replace("//", "/", static::DIRECTORY_SEPARATOR ~ s);
 	}
 	
 	
@@ -58,7 +58,7 @@ class fs
 	 */
 	pure string addLastSlash(string s)
 	{
-		return re.replace("//", "/", s ~ static::DIRECTORY_SEPARATOR);
+		return re::replace("//", "/", s ~ static::DIRECTORY_SEPARATOR);
 	}
 	
 	
@@ -68,7 +68,7 @@ class fs
 	 */
 	pure string concat(string base_path, string file_name)
 	{
-		return re.replace("//", "/", base_path ~ "/" ~ file_name);
+		return re::replace("//", "/", base_path ~ "/" ~ file_name);
 	}
 	
 	
@@ -83,7 +83,7 @@ class fs
 			string (string res, string item) => res ~ static::DIRECTORY_SEPARATOR ~ item,
 			""
 		);
-		return re.replace("//", "/", res);
+		return re::replace("//", "/", res);
 	}
 	
 	
