@@ -1455,6 +1455,50 @@ class rtl
 	
 	
 	/**
+	 * Generate uuid
+	 */
+	static string uid()
+	{
+		#switch
+		#case ifcode PHP then
+		
+		$bytes = bin2hex(random_bytes(16));
+		return substr($bytes, 0, 8) . "-" .
+			substr($bytes, 8, 4) . "-" .
+			substr($bytes, 12, 4) . "-" .
+			substr($bytes, 16, 4) . "-" .
+			substr($bytes, 20);
+		
+		#case ifcode JAVASCRIPT then
+		
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Generate timestamp based uuid
+	 */
+	static string time_uid()
+	{
+		#switch
+		#case ifcode PHP then
+		
+		$bytes = dechex(time()) . bin2hex(random_bytes(12));
+		return substr($bytes, 0, 8) . "-" .
+			substr($bytes, 8, 4) . "-" .
+			substr($bytes, 12, 4) . "-" .
+			substr($bytes, 16, 4) . "-" .
+			substr($bytes, 20);
+		
+		#case ifcode JAVASCRIPT then
+		
+		#endswitch
+	}
+	
+	
+	
+	/**
 	 * Returns random value x, where a <= x <= b
 	 * @param int a
 	 * @param int b

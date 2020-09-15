@@ -524,7 +524,7 @@ class Dict<T> extends _Map
 		return this;
 		#case ifcode PHP then
 		$key = $this->toStr($key);
-		if (isset($this->_map[$key]))
+		if (array_key_exists($key, $this->_map))
 		{
 			$res = $this->cp($ctx);
 			unset($res->_map[$key]);
