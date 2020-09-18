@@ -735,7 +735,7 @@ class Dict<T> extends _Map
 		#case ifcode PHP then
 		if ($map == null) return $this;
 		$res = $this->cp($ctx);
-		foreach ($this->_map as $key => $value)
+		foreach ($map->_map as $key => $value)
 		{
 			$res->_map[$key] = $value;
 		}

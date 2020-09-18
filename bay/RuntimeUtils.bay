@@ -512,8 +512,41 @@ static class RuntimeUtils
 	
 	static var PrimitiveToNative(var value)
 	{
-		
 		#switch
+		
+		#case ifcode PHP then
+		
+		if ($value === null)
+			return null;
+		
+		if ($value instanceof \Runtime\Collection)
+		{
+			$arr = [];
+			$value->each
+			(
+				$ctx,
+				function ($ctx, $v) use (&$arr)
+				{
+					$arr[] = static::PrimitiveToNative($ctx, $v);
+				}
+			);
+			return $arr;
+		}
+		
+		if ($value instanceof \Runtime\Dict)
+		{
+			$arr = [];
+			$value->each
+			(
+				$ctx,
+				function ($ctx, $v, $k) use (&$arr)
+				{
+					$arr[$k] = static::PrimitiveToNative($ctx, $v);
+				}
+			);
+			return $arr;
+		}
+		
 		#case ifcode JAVASCRIPT then
 		
 		/*var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
@@ -540,15 +573,15 @@ static class RuntimeUtils
 		if (value instanceof _Dict)
 		{
 			var obj = {};
-			value.each((k, v)=>{
+			value.each((v, k)=>{
 				obj[k] = _Utils.PrimitiveToNative(v);
 			});
 			return obj;
 		}
 		
-		return value;
-		
 		#endswitch
+		
+		return value;
 	}
 	
 	

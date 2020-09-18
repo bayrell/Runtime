@@ -577,7 +577,7 @@ class rtl
 		if ($item === null) return $def_val;
 		if (gettype($path) == "string") $path = \Runtime\Collection::from([$path]);
 		else if (gettype($path) == "array") $path = \Runtime\Collection::from($path);
-		
+		if (!($path instanceof \Runtime\Collection)) return $def_val;
 		if (count($path->_arr) == 0) 
 		{
 			return $item;
@@ -608,6 +608,7 @@ class rtl
 		if (item === null) return def_val;
 		if (typeof path == "string") path = Collection.from([path]);
 		else if (Array.isArray(path) && path.count == undefined) path = Collection.from(path);
+		if (!(path instanceof Collection)) return def_val;
 		if (path.count() == 0)
 		{
 			return item;
