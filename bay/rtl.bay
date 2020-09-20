@@ -454,7 +454,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$arr = ($args != null) ? $args->_getArr() : [];
+		$arr = ($args != null) ? (($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : [];
 		array_unshift($arr, $ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
