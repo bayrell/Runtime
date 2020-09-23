@@ -110,6 +110,24 @@ class lib
 	
 	
 	/**
+	 * Equal attrs
+	 */
+	pure fn equalAttrs(Dict search) =>
+		bool (Dict item) use (search)
+		{
+			Collection fields = search.keys();
+			for (int i=0; i<fields.count(); i++)
+			{
+				string field_name = fields[i];
+				if (search[field_name] != item[field_name]) return false;
+			}
+			return true;
+		}
+	;
+	
+	
+	
+	/**
 	 * Equal two struct by key
 	 */
 	pure fn equalMethod(string method_name, var value)
@@ -289,5 +307,87 @@ class lib
 	 * Returns monad
 	 */
 	pure Monad monad(Monad m) => m;
+	
+	
+	
+	/**
+	 * Get method from class
+	 * @return fn
+	 */
+	pure fn method(string method_name) =>
+		fn (string class_name) use (method_name) =>
+			rtl::method(class_name, method_name)
+	;
+	
+	
+	
+	/**
+	 * Apply function
+	 * @return fn
+	 */
+	pure fn applyMethod(string method_name, Collection args = null) =>
+		var (string class_name) use (method_name, args)
+		{
+			fn f = rtl::method(class_name, method_name);
+			return rtl::apply(f, args);
+		}
+	;
+	
+	
+	
+	/**
+	 * Apply async function
+	 * @return fn
+	 */
+	pure fn applyMethodAsync(string method_name, Collection args = null) =>
+		async var (string class_name) use (method_name, args)
+		{
+			fn f = rtl::method(class_name, method_name);
+			return rtl::apply(f, args);
+		}
+	;
+	
+	
+	
+	/**
+	 * Apply function
+	 * @return fn
+	 */
+	pure fn apply(Collection args = null) =>
+		var (fn f) use (args) =>
+			rtl::apply(f, args)
+	;
+	
+	
+	
+	/**
+	 * Apply async function
+	 * @return fn
+	 */
+	pure fn applyAsync(Collection args = null) =>
+		async var (fn f) use (args) =>
+			await rtl::applyAsync(f, args)
+	;
+	
+	
+	
+	/**
+	 * Log message
+	 * @return fn
+	 */
+	pure fn log(string message = "") =>
+		var (var value) use (message)
+		{
+			if (message == "")
+			{
+				log(value);
+			}
+			else
+			{
+				log(message);
+			}
+			return value;
+		}
+	;
 	
 }

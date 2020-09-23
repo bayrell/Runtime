@@ -537,6 +537,21 @@ class Dict<T> extends _Map
 	
 	
 	/**
+	 * Remove value from position
+	 * @param string key
+	 * @return self
+	 */
+	public Dict<T> removeKeys(Collection<string> keys) =>
+		(keys != null) ? keys.reduce
+		(
+			Dict (Dict item, string key) => item.removeIm(key),
+			this
+		) : this
+	;
+	
+	
+	
+	/**
 	 * Returns vector of the keys
 	 * @return Collection<string>
 	 */
@@ -744,4 +759,25 @@ class Dict<T> extends _Map
 	}
 	
 	
+	
+	/**
+	 * Clone this struct with fields
+	 * @param Collection fields = null
+	 * @return BaseStruct
+	 */
+	public Dict intersect(Collection fields = null)
+	{
+		if (fields == null) return {};
+		
+		Map obj = new Map();
+		fields.each
+		(
+			void (string field_name) use (obj)
+			{
+				obj.set(field_name, this.get(field_name, null));
+			}
+		);
+		
+		return obj.toDict();
+	}
 }

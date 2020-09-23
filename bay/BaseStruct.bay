@@ -148,13 +148,25 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	
 	
 	/**
+	 * Copy this struct with new values
+	 * @param Map obj = null
+	 * @return BaseStruct
+	 */
+	public BaseStruct clone(Dict obj = null)
+	{
+		return this.copy(obj);
+	}
+	
+	
+	
+	/**
 	 * Clone this struct with fields
 	 * @param Collection fields = null
 	 * @return BaseStruct
 	 */
-	public BaseStruct clone(Collection fields = null)
+	public BaseStruct intersect(Collection fields = null)
 	{
-		if (fields == null) return this;
+		if (fields == null) return {};
 		
 		Map obj = new Map();
 		fields.each
