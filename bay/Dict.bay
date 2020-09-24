@@ -397,7 +397,7 @@ class Dict<T> extends _Map
 		return typeof this._map["|" + key] != "undefined";
 		#case ifcode PHP then
 		$key = $this->toStr($key);
-		return isset($this->_map[$key]);
+		return array_key_exists($key, $this->_map);
 		#endswitch
 	}
 	

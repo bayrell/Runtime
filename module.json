@@ -16,6 +16,7 @@
 		"Exceptions/RuntimeException",
 		"Exceptions/ApiException",
 		"Exceptions/AssignStructValueError",
+		"Exceptions/FileNotFound",
 		"Exceptions/IndexOutOfRange",
 		"Exceptions/KeyNotFound",
 		"Exceptions/UnknownError",
