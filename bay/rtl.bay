@@ -836,6 +836,15 @@ class rtl
 	
 	
 	/**
+	 * Return true if value is boolean
+	 * @param var value
+	 * @return bool
+	 */
+	static bool isBool(var value) => static::isBoolean(value);
+	
+	
+	
+	/**
 	 * Return true if value is number
 	 * @param var value
 	 * @return bool

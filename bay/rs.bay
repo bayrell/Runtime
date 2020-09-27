@@ -433,7 +433,7 @@ class rs
 	 * @param {int} flags - Флаги
 	 * @return {string} json строка
 	 */
-	static string json_encode(var s, int flags)
+	static string json_encode_primitive(var s, int flags)
 	{
 
 		#switch
@@ -449,6 +449,31 @@ class rs
 		return JSON.stringify(obj);
 		
 		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Json encode data
+	 * @param var data
+	 * @return string
+	 */
+	public static string json_encode(var data)
+	{
+		fn f = rtl::method("Runtime.RuntimeUtils", "json_encode");
+		return f(data);
+	}
+	
+	
+	/**
+	 * Json decode to primitive values
+	 * @param string s Encoded string
+	 * @return var
+	 */
+	public static string json_decode(var obj)
+	{
+		fn f = rtl::method("Runtime.RuntimeUtils", "json_decode");
+		return f(obj);
 	}
 	
 	
