@@ -106,6 +106,7 @@ class lib
 		=> bool (BaseStruct item1) use (key, value)
 			=> (item1 != null) ? rtl::attr(item1, key) != value : false
 	;
+	pure fn equalAttrNot(string key, var value) => static::equalNotAttr;
 	
 	
 	
@@ -226,6 +227,15 @@ class lib
 	 */
 	pure fn filter(fn f) =>
 		bool (var m) use (f) => m.filter(f)
+	;
+	
+	
+	
+	/**
+	 * Intersect
+	 */
+	pure fn intersect(Collection arr) =>
+		bool (var m) use (arr) => m.intersect(arr)
 	;
 	
 	
