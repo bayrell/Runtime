@@ -547,7 +547,15 @@ class rtl
 		{
 			return $item->get($ctx, $key, $def_val);
 		}
-		return $item[$key];
+		if (gettype($item) == "array" or method_exists($item, "__get"))
+		{
+			if (is_int($key) or is_float($key) or is_string($key) or is_bool($key)) return $item[$key];
+		}
+		if (gettype($item) == "string")
+		{
+			if (is_int($key)) return mb_substr($item, $key, 1);
+		}
+		return $def_val;
 		#case ifcode JAVASCRIPT then
 		if (item == undefined) return def_val;
 		if (item instanceof Runtime.Dict ||

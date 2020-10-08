@@ -42,7 +42,6 @@ class fs
 	static const string DIRECTORY_SEPARATOR = "/";
 	
 	
-	
 	/**
 	 * Add first slash
 	 */
@@ -66,9 +65,18 @@ class fs
 	/**
 	 * Concat
 	 */
-	pure string concat(string base_path, string file_name)
+	pure string concat()
 	{
-		return re::replace("//", "/", base_path ~ "/" ~ file_name);
+		Collection arr = [];
+		#switch
+		#case ifcode JAVASCRIPT then
+		var Collection = use("Runtime.Collection");
+		for (var i=1; i<arguments.length; i++) arr.push( arguments[i] );
+		arr = Collection.from(arr);
+		#case ifcode PHP then
+		arr = \Runtime\Collection::from( array_slice(func_get_args(), 1) );
+		#endswitch
+		return static::concatArr(arr);
 	}
 	
 	
