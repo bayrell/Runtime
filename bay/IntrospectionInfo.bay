@@ -33,6 +33,7 @@ struct IntrospectionInfo extends BaseStruct
 	public string class_name = "";
 	public string kind = "";
 	public string name = "";
+	public string t = "";
 	public Collection<BaseStruct> annotations = null;
 	
 	
