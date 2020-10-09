@@ -18,10 +18,12 @@
 
 namespace Runtime;
 
-use Runtime.Collection;
 use Runtime.BaseStruct;
+use Runtime.Collection;
 use Runtime.Dict;
+use Runtime.Map;
 use Runtime.Monad;
+use Runtime.Vector;
 
 
 class rtl
@@ -723,7 +725,7 @@ class rtl
 		bool (Monad m) use (type_value, def_value) =>
 			new Monad
 			(
-				m.err == null ? static::@convert( m.val, type_value, def_value ) : def_value
+				m.err == null ? static::convert( m.val, type_value, def_value ) : def_value
 			)
 	;
 	
@@ -747,16 +749,15 @@ class rtl
 	 * @param var type_template
 	 * @return var
 	 */
-	static var @convert(var v, string t, var d = null)
+	static var convert(var v, string t, var d = null)
 	{
 		if (v == null) v = d;
 		if (t == "mixed" or t == "primitive" or t == "var" or t == "fn" or t == "callback") return v;
-		if (t == "bool" or t == "boolean") return static::toBool(null, v);
-		else if (t == "string") return static::toString(null, v);
-		else if (t == "int") return static::toInt(null, v);
-		else if (t == "float" or t == "double") return static::toFloat(null, v);
-		else if (rtl::is_instanceof(null, v, t)) return v;
-		return d;
+		if (t == "bool" or t == "boolean") return static::toBool(v);
+		else if (t == "string") return static::toString(v);
+		else if (t == "int") return static::toInt(v);
+		else if (t == "float" or t == "double") return static::toFloat(v);
+		return static::toObject(v, t, d);
 	}
 	
 	
@@ -1095,6 +1096,27 @@ class rtl
 		
 		#endswitch
 		return 0;
+	}
+	
+	
+	
+	/**
+	 * Convert to object
+	 */
+	static var toObject(var v, string t, var d = null)
+	{
+		if (static::is_instanceof(v, t)) return v;
+		if (t == "Runtime.Collection") return Collection::@from(v);
+		if (t == "Runtime.Vector") return Vector::@from(v);
+		if (t == "Runtime.Dict") return Dict::@from(v);
+		if (t == "Runtime.Map") return Map::@from(v);
+		try
+		{
+			fn newInstance = static::method(t, "newInstance");
+			return newInstance(v);
+		}
+		catch (var e){}
+		return d;
 	}
 	
 	

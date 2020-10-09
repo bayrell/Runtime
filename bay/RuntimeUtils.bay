@@ -95,7 +95,7 @@ static class RuntimeUtils
 	 * Returns parents class names
 	 * @return Vector<string>
 	 */
-	static Collection<string> getParents(string class_name)
+	pure memorize Collection<string> getParents(string class_name)
 	{
 		Vector<string> res = new Vector();
 		res.push(class_name);
@@ -231,6 +231,7 @@ static class RuntimeUtils
 	}
 	
 	
+	
 	/**
 	 * Returns methods in class by annotation name
 	 */
@@ -261,6 +262,24 @@ static class RuntimeUtils
 			}
 		);
 		return d.keys();
+	}
+	
+	
+	
+	/**
+	 * Returns IntrospectionInfo of field
+	 */
+	pure memorize IntrospectionInfo getFieldInfo(string class_name, string field_name)
+	{
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			fn getFieldInfoByName = rtl::method(parent_class_name, "getFieldInfoByName");
+			IntrospectionInfo res = getFieldInfoByName(field_name);
+			if (res != null) return res;
+		}
+		return null;
 	}
 	
 	

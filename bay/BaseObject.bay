@@ -44,6 +44,14 @@ class BaseObject
 	}
 	
 	
+	
+	/**
+	 * Returns new instance
+	 */
+	pure BaseObject newInstance(Dict items) => null;
+	pure BaseObject createInstance(Dict items) => static::newInstance(items);
+	
+	
 	/* Old functions */
 	var assignValue(string k, var v){}
 	var takeValue(string k, var v = null){}

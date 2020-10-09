@@ -32,15 +32,42 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	
 	
 	/**
+	 * Returns field value
+	 */
+	protected static Dict _initDataGet(BaseStruct old, Dict changed, string field_name) =>
+		(changed != null and changed.has(field_name)) ? changed[field_name] : old[field_name]
+	;
+	
+	
+	
+	/**
+	 * Init struct data
+	 */
+	protected static Dict _initData(BaseStruct old, Dict changed) => changed;
+	
+	
+	
+	/**
 	 * Assign
 	 */
-	protected static void _assign(BaseStruct item, BaseStruct old_item, Map obj)
+	protected static void _assign(BaseStruct new_item, BaseStruct old_item, Dict obj)
 	{
+		obj = rtl::convert(obj, classof Dict);
+		obj = new_item::_initData(old_item, obj);
 		if (obj == null)
 		{
-			item.initData(old_item, obj);
 			return;
 		}
+		
+		
+		bool check_types = false;
+		#ifdef ENABLE_CHECK_TYPES then
+		
+		/* Enable check types */
+		check_types = true;
+		
+		#endif
+		
 		
 		#switch
 		#case ifcode PHP then
@@ -50,8 +77,18 @@ class BaseStruct extends BaseObject implements SerializeInterface
 			foreach ($obj->_map as $key => $value)
 			{
 				$k = "__".$key;
-				if (property_exists($item, $k))
-					$item->$k = $value;
+				if (property_exists($new_item, $k))
+				{
+					if ($check_types)
+					{
+						$info = \Runtime\RuntimeUtils::getFieldInfo($ctx, $new_item->getClassName(), $k);
+						if ($info)
+						{
+							$value = \Runtime\rtl::convert($ctx, $value, $info->t, null);
+						}
+					}
+					$new_item->$k = $value;
+				}
 			}
 		}
 		else if (gettype($obj) == "array")
@@ -59,26 +96,57 @@ class BaseStruct extends BaseObject implements SerializeInterface
 			foreach ($obj as $key => $value)
 			{
 				$k = "__".$key;
-				if (property_exists($item, $k))
-					$item->$k = $value;
+				if (property_exists($new_item, $k))
+				{
+					if ($check_types)
+					{
+						$info = \Runtime\RuntimeUtils::getFieldInfo($ctx, $new_item->getClassName(), $k);
+						if ($info)
+						{
+							$value = \Runtime\rtl::convert($ctx, $value, $info->t, null);
+						}
+					}
+					$new_item->$k = $value;
+				}
 			}
 		}
-		
-		$item->initData($old_item, $obj);
 		
 		#case ifcode JAVASCRIPT then
 		
 		var _Dict = use("Runtime.Dict");
+		var RuntimeUtils = use("Runtime.RuntimeUtils");
 		if (obj instanceof _Dict)
 		{
-			for (var key in obj._map) item[key.substring(1)] = obj._map[key];
+			for (var key in obj._map)
+			{
+				var value = obj._map[key];
+				if (check_types)
+				{
+					info = RuntimeUtils.getFieldInfo(ctx, new_item.getClassName(), key);
+					if (info)
+					{
+						value = rtl.convert(ctx, value, info.t, null);
+					}
+				}
+				new_item[key.substring(1)] = value;
+			}
 		}
 		else
 		{
-			for (var key in obj) item[key] = obj[key];
+			for (var key in obj)
+			{
+				var value = obj[key];
+				if (check_types)
+				{
+					info = RuntimeUtils.getFieldInfo(ctx, new_item.getClassName(), key);
+					if (info)
+					{
+						value = rtl.convert(ctx, value, info.t, null);
+					}
+				}
+				new_item[key] = value;
+			}
 		}
-		
-		item.initData(ctx, old_item, obj);
 		
 		#endswitch
 	}
@@ -88,7 +156,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	/** 
 	 * Constructor
 	 */
-	public void constructor(Map obj = null)
+	public void constructor(Dict obj = null)
 	{
 		parent();
 		
@@ -99,15 +167,6 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		if (this.__uq__ == undefined || this.__uq__ == null) this.__uq__ = Symbol();
 		Object.freeze(this);
 		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Init struct data
-	 */
-	protected void initData(BaseStruct old, Dict changed = null)
-	{
 	}
 	
 	
