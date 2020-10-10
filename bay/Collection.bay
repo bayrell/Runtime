@@ -574,14 +574,14 @@ class Collection<T> extends _Collection
 		if (pos < 0 || pos >= this.length)
 		{
 			var _IndexOutOfRange = use("Runtime.Exceptions.IndexOutOfRange");
-			throw new _IndexOutOfRange(ctx);
+			throw new _IndexOutOfRange(ctx, pos);
 		}
 		var arr = this.cp(ctx);
 		arr[pos] = value;
 		return arr;
 		#case ifcode PHP then
 		if (!array_key_exists($pos, $this->_arr))
-			throw new \Runtime\Exceptions\IndexOutOfRange($ctx);
+			throw new \Runtime\Exceptions\IndexOutOfRange($ctx, $pos);
 		$res = $this->cp($ctx);
 		$res->_arr[$pos] = $value;
 		return $res;

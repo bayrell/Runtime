@@ -19,6 +19,7 @@
 namespace Runtime;
 
 use Runtime.Collection;
+use Runtime.DateTime;
 use Runtime.Context;
 use Runtime.BaseStruct;
 use Runtime.Dict;
@@ -321,17 +322,6 @@ static class RuntimeUtils
 					return static::ObjectToPrimitive( value, force_class_name );
 				}
 			);
-			
-			/*
-			Vector<var> res = new Vector();
-			for (int i=0; i<obj.count(); i++)
-			{
-				var value = obj.item(i);
-				value = self::ObjectToPrimitive( value, force_class_name );
-				res.push(value);
-			}
-			return res.toCollection();
-			*/
 		}
 		
 		if (obj instanceof Dict)
@@ -344,26 +334,6 @@ static class RuntimeUtils
 				}
 			);
 			
-			/*
-			Map<var> res = new Map();
-			Vector<string> keys = obj.keys();
-			
-			for (int i=0; i<keys.count(); i++)
-			{
-				string key = keys.item(i);
-				var value = obj.item(key);
-				value = self::ObjectToPrimitive( value, force_class_name );
-				res.set(key, value);
-			}
-			
-			delete keys;
-			*/
-			/*
-			if (force_class_name)
-			{
-				obj = obj.setIm("__class_name__", classof Dict);
-			}
-			*/
 			return obj.toDict();
 		}
 		
@@ -381,7 +351,7 @@ static class RuntimeUtils
 				values.set(variable_name, value);
 			}
 			
-			if (force_class_name)
+			if (force_class_name or obj instanceof DateTime)
 			{
 				values.set("__class_name__", obj.getClassName());
 			}

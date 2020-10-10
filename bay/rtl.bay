@@ -751,12 +751,13 @@ class rtl
 	 */
 	static var convert(var v, string t, var d = null)
 	{
-		if (v == null) v = d;
+		if (v === null) return d;
 		if (t == "mixed" or t == "primitive" or t == "var" or t == "fn" or t == "callback") return v;
 		if (t == "bool" or t == "boolean") return static::toBool(v);
 		else if (t == "string") return static::toString(v);
 		else if (t == "int") return static::toInt(v);
 		else if (t == "float" or t == "double") return static::toFloat(v);
+		else if (static::is_instanceof(v, t)) return v;
 		return static::toObject(v, t, d);
 	}
 	

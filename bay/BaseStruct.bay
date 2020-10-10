@@ -59,12 +59,15 @@ class BaseStruct extends BaseObject implements SerializeInterface
 			return;
 		}
 		
-		
 		bool check_types = false;
+		string class_name = static::getCurrentClassName();
+		
 		#ifdef ENABLE_CHECK_TYPES then
 		
 		/* Enable check types */
 		check_types = true;
+		if (class_name == "Runtime.IntrospectionClass") check_types = false;
+		if (class_name == "Runtime.IntrospectionInfo") check_types = false;
 		
 		#endif
 		
@@ -72,26 +75,8 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		#switch
 		#case ifcode PHP then
 		
-		if ($obj instanceof \Runtime\Dict)
-		{
-			foreach ($obj->_map as $key => $value)
-			{
-				$k = "__".$key;
-				if (property_exists($new_item, $k))
-				{
-					if ($check_types)
-					{
-						$info = \Runtime\RuntimeUtils::getFieldInfo($ctx, $new_item->getClassName(), $k);
-						if ($info)
-						{
-							$value = \Runtime\rtl::convert($ctx, $value, $info->t, null);
-						}
-					}
-					$new_item->$k = $value;
-				}
-			}
-		}
-		else if (gettype($obj) == "array")
+		if ($obj instanceof \Runtime\Dict) $obj = $obj->_map;
+		if (gettype($obj) == "array")
 		{
 			foreach ($obj as $key => $value)
 			{
@@ -100,7 +85,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 				{
 					if ($check_types)
 					{
-						$info = \Runtime\RuntimeUtils::getFieldInfo($ctx, $new_item->getClassName(), $k);
+						$info = \Runtime\RuntimeUtils::getFieldInfo($ctx, $class_name, $key);
 						if ($info)
 						{
 							$value = \Runtime\rtl::convert($ctx, $value, $info->t, null);
