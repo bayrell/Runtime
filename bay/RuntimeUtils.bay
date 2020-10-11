@@ -337,6 +337,10 @@ static class RuntimeUtils
 			return obj.toDict();
 		}
 		
+		if (obj instanceof DateTime)
+		{
+			return obj;
+		}
 		
 		if (obj instanceof BaseStruct)
 		{
@@ -351,7 +355,7 @@ static class RuntimeUtils
 				values.set(variable_name, value);
 			}
 			
-			if (force_class_name or obj instanceof DateTime)
+			if (force_class_name)
 			{
 				values.set("__class_name__", obj.getClassName());
 			}
@@ -456,21 +460,38 @@ static class RuntimeUtils
 			
 		if (is_object($value))
 		{
-			$res = \Runtime\Dict::from($value);
-			$res = $res->map($ctx, function ($ctx, $val, $key){
-				return self::NativeToPrimitive($ctx, $val);
-			});
-			return $res;
-		}
-		
-		if (is_array($value))
-		{
-			if ( isset($value['__class_name__']) ){
+			if (isset($value->__class_name__) && $value['__class_name__'] == "Runtime.DateTime")
+			{
+				$res = \Runtime\DateTime::from($value);
+				return $res;
+			}
+			else
+			{
 				$res = \Runtime\Dict::from($value);
 				$res = $res->map($ctx, function ($ctx, $val, $key){
 					return self::NativeToPrimitive($ctx, $val);
 				});
 				return $res;
+			}
+		}
+		
+		if (is_array($value))
+		{
+			if ( isset($value['__class_name__']) )
+			{
+				if ($value['__class_name__'] == "Runtime.DateTime")
+				{
+					$res = \Runtime\DateTime::from($value);
+					return $res;
+				}
+				else
+				{
+					$res = \Runtime\Dict::from($value);
+					$res = $res->map($ctx, function ($ctx, $val, $key){
+						return self::NativeToPrimitive($ctx, $val);
+					});
+					return $res;
+				}
 			}
 			$arr = array_values($value);
 			$res = \Runtime\Collection::from($arr);
@@ -492,19 +513,27 @@ static class RuntimeUtils
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
+		var _DateTime = use("Runtime.DateTime");
 		var _Dict = use("Runtime.Dict");
 		
 		if (value === null)
 			return null;
 		
-		if (Array.isArray(value)){
+		if (Array.isArray(value))
+		{
 			var new_value = _Collection.from(value);
 			new_value = new_value.map(ctx, (ctx, val)=>{
 				return _Utils.NativeToPrimitive(ctx, val);
 			});
 			return new_value;
 		}
-		if (typeof value == 'object'){
+		if (typeof value == 'object')
+		{
+			if (value["__class_name__"] == "Runtime.DateTime")
+			{
+				var new_value = _DateTime.from(value);
+				return new_value;
+			}
 			var new_value = _Dict.from(value);
 			new_value = new_value.map(ctx, (ctx, val, key)=>{
 				return _Utils.NativeToPrimitive(ctx, val);
@@ -524,6 +553,11 @@ static class RuntimeUtils
 		
 		if ($value === null)
 			return null;
+		
+		if ($value instanceof \Runtime\DateTime)
+		{
+			$value = $value->toDict($ctx)->setIm($ctx, "__class_name__", "Runtime.DateTime");
+		}
 		
 		if ($value instanceof \Runtime\Collection)
 		{
@@ -563,10 +597,16 @@ static class RuntimeUtils
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
+		var _DateTime = use("Runtime.DateTime");
 		var _Dict = use("Runtime.Dict");
 		
 		if (value === null)
 			return null;
+		
+		if (value instanceof _DateTime)
+		{
+			value = value.toDict(ctx).setIm(ctx, "__class_name__", "Runtime.DateTime");
+		}
 		
 		if (value instanceof _Collection)
 		{
@@ -606,7 +646,7 @@ static class RuntimeUtils
 		#switch
 		#case ifcode PHP then
 		if ($convert){
-			$value = self::ObjectToPrimitive($ctx, $value);
+			$value = self::ObjectToNative($ctx, $value);
 		}
 		$json_flags = JSON_UNESCAPED_UNICODE;
 		if ( ($flags & 1) == 1 ) $json_flags = $json_flags | JSON_PRETTY_PRINT;

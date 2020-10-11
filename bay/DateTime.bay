@@ -72,11 +72,11 @@ struct DateTime extends BaseStruct
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->getObjectData();
+		$dt = $this->getObjectData($ctx);
 		return $dt->getTimestamp();
 		
 		#case ifcode JAVASCRIPT then
-		var dt = this.getObjectData();
+		var dt = this.getObjectData(ctx);
 		return dt.getTime();
 		
 		#endswitch
@@ -95,11 +95,11 @@ struct DateTime extends BaseStruct
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->getObjectData();
+		$dt = $this->getObjectData($ctx);
 		return $dt->format("w");
 		
 		#case ifcode JAVASCRIPT then
-		var dt = this.getObjectData();
+		var dt = this.getObjectData(ctx);
 		return dt.getDay();
 		
 		#endswitch
@@ -116,7 +116,7 @@ struct DateTime extends BaseStruct
 	{
 		#switch
 		#case ifcode PHP then
-		if (time == -1) $time = time();
+		if ($time == -1) $time = time();
 		$dt = new \DateTime();
 		$dt->setTimezone(new \DateTimeZone($tz));
 		$dt->setTimestamp($time);
@@ -147,25 +147,51 @@ struct DateTime extends BaseStruct
 	 * Return db datetime
 	 * @return string
 	 */
-	string getDBTime()
+	string getDBTime(string tz = "UTC")
 	{
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->getObjectData();
+		$dt = $this->getObjectData($ctx);
+		$dt->setTimezone( new \DateTimeZone($tz) );
 		return $dt->format("Y-m-d H:i:s");
 		
 		#case ifcode JAVASCRIPT then
-		var m = (this.m < 10) ? "0" + this.m : "" + this.m;
-		var d = (this.d < 10) ? "0" + this.d : "" + this.d;
-		var h = (this.h < 10) ? "0" + this.h : "" + this.h;
-		var i = (this.i < 10) ? "0" + this.i : "" + this.i;
-		var s = (this.s < 10) ? "0" + this.s : "" + this.s;
-		return this.y + "-" + m + "-" + d + " " + h + ":" + i + ":" + s;
+		
+		var dt = this.getObjectData(ctx);
+		var offset = this.constructor.getTimezoneOffset(ctx, tz);
+		var offset = offset - dt.getTimezoneOffset();
+		dt = this.constructor.shiftOffset(ctx, dt, -offset);
+		
+		var y = Number(dt.getFullYear());
+		var m = Number(dt.getMonth()) + 1;
+		var d = Number(dt.getDate());
+		var h = Number(dt.getHours());
+		var i = Number(dt.getMinutes());
+		var s = Number(dt.getSeconds());
+		
+		var m = (m < 10) ? "0" + m : "" + m;
+		var d = (d < 10) ? "0" + d : "" + d;
+		var h = (h < 10) ? "0" + h : "" + h;
+		var i = (i < 10) ? "0" + i : "" + i;
+		var s = (s < 10) ? "0" + s : "" + s;
+		return y + "-" + m + "-" + d + " " + h + ":" + i + ":" + s;
 		
 		#endswitch
 		
 		return "";
+	}
+	
+	
+	
+	/**
+	 * Return date
+	 * @return string
+	 */
+	string getDate(string tz = "UTC")
+	{
+		string value = this.getDBTime(tz);
+		return rs::substr(value, 0, 10);
 	}
 	
 	
@@ -176,32 +202,7 @@ struct DateTime extends BaseStruct
 	 */
 	string getDBTimeUTC()
 	{
-		#switch
-		
-		#case ifcode PHP then
-		$dt = $this->getObjectData();
-		$dt->setTimezone( new \DateTimeZone("UTC") );
-		return $dt->format("Y-m-d H:i:s");
-		
-		#case ifcode JAVASCRIPT then
-		var dt = this.getObjectData();
-		var y = Number(dt.getUTCFullYear());
-		var m = Number(dt.getUTCMonth()) + 1;
-		var d = Number(dt.getUTCDate());
-		var h = Number(dt.getUTCHours());
-		var i = Number(dt.getUTCMinutes());
-		var s = Number(dt.getUTCSeconds());
-		m = (m < 10) ? "0" + m : "" + m;
-		d = (d < 10) ? "0" + d : "" + d;
-		h = (h < 10) ? "0" + h : "" + h;
-		i = (i < 10) ? "0" + i : "" + i;
-		s = (s < 10) ? "0" + s : "" + s;
-		return y + "-" + m + "-" + d + " " +
-			h + ":" + i + ":" + s;
-		
-		#endswitch
-		
-		return "";
+		return static::getDBTime("UTC");
 	}
 	
 	
@@ -215,7 +216,7 @@ struct DateTime extends BaseStruct
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->getObjectData();
+		$dt = $this->getObjectData($ctx);
 		return $dt->format(\DateTime::RFC822);
 		
 		#case ifcode JAVASCRIPT then
@@ -271,7 +272,7 @@ struct DateTime extends BaseStruct
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->getObjectData();
+		$dt = $this->getObjectData($ctx);
 		return $dt->format(\DateTime::ISO8601);
 		
 		#case ifcode JAVASCRIPT then

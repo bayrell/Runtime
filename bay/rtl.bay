@@ -581,6 +581,7 @@ class rtl
 	 */
 	static var attr(var item, Collection path, var def_val = null)
 	{
+		if (attrs == null) return def_val;
 		#switch
 		#case ifcode PHP then
 		
@@ -651,6 +652,7 @@ class rtl
 	 */
 	static var setAttr(var item, Collection attrs, var new_value)
 	{
+		if (attrs == null) return item;
 		#switch
 		#case ifcode PHP then
 		if (gettype($attrs) == "string") $attrs = \Runtime\Collection::from([$attrs]);
