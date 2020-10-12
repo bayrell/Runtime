@@ -581,7 +581,7 @@ class rtl
 	 */
 	static var attr(var item, Collection path, var def_val = null)
 	{
-		if (attrs == null) return def_val;
+		if (path == null) return def_val;
 		#switch
 		#case ifcode PHP then
 		
