@@ -765,15 +765,16 @@ class Dict<T> extends _Map
 	 * @param Collection fields = null
 	 * @return BaseStruct
 	 */
-	public Dict intersect(Collection fields = null)
+	public Dict intersect(Collection fields = null, bool skip_empty = true)
 	{
 		if (fields == null) return {};
 		
 		Map obj = new Map();
 		fields.each
 		(
-			void (string field_name) use (obj)
+			void (string field_name) use (skip_empty, obj)
 			{
+				if (skip_empty and not this.has(field_name)) return;
 				obj.set(field_name, this.get(field_name, null));
 			}
 		);
