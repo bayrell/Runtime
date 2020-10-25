@@ -19,6 +19,7 @@
 namespace Runtime;
 
 use Runtime.Collection;
+use Runtime.Date;
 use Runtime.DateTime;
 use Runtime.Context;
 use Runtime.BaseStruct;
@@ -337,6 +338,10 @@ static class RuntimeUtils
 			return obj.toDict();
 		}
 		
+		if (obj instanceof Date)
+		{
+			return obj;
+		}
 		if (obj instanceof DateTime)
 		{
 			return obj;
@@ -460,7 +465,12 @@ static class RuntimeUtils
 			
 		if (is_object($value))
 		{
-			if (isset($value->__class_name__) && $value['__class_name__'] == "Runtime.DateTime")
+			if (isset($value->__class_name__) && $value['__class_name__'] == "Runtime.Date")
+			{
+				$res = \Runtime\Date::from($value);
+				return $res;
+			}
+			else if (isset($value->__class_name__) && $value['__class_name__'] == "Runtime.DateTime")
 			{
 				$res = \Runtime\DateTime::from($value);
 				return $res;
@@ -479,7 +489,12 @@ static class RuntimeUtils
 		{
 			if ( isset($value['__class_name__']) )
 			{
-				if ($value['__class_name__'] == "Runtime.DateTime")
+				if ($value['__class_name__'] == "Runtime.Date")
+				{
+					$res = \Runtime\Date::from($value);
+					return $res;
+				}
+				else if ($value['__class_name__'] == "Runtime.DateTime")
 				{
 					$res = \Runtime\DateTime::from($value);
 					return $res;
@@ -513,6 +528,7 @@ static class RuntimeUtils
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
+		var _Date = use("Runtime.Date");
 		var _DateTime = use("Runtime.DateTime");
 		var _Dict = use("Runtime.Dict");
 		
@@ -529,6 +545,11 @@ static class RuntimeUtils
 		}
 		if (typeof value == 'object')
 		{
+			if (value["__class_name__"] == "Runtime.Date")
+			{
+				var new_value = _Date.from(value);
+				return new_value;
+			}
 			if (value["__class_name__"] == "Runtime.DateTime")
 			{
 				var new_value = _DateTime.from(value);
@@ -554,7 +575,11 @@ static class RuntimeUtils
 		if ($value === null)
 			return null;
 		
-		if ($value instanceof \Runtime\DateTime)
+		if ($value instanceof \Runtime\Date)
+		{
+			$value = $value->toDict($ctx)->setIm($ctx, "__class_name__", "Runtime.Date");
+		}
+		else if ($value instanceof \Runtime\DateTime)
 		{
 			$value = $value->toDict($ctx)->setIm($ctx, "__class_name__", "Runtime.DateTime");
 		}
@@ -598,12 +623,17 @@ static class RuntimeUtils
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
 		var _DateTime = use("Runtime.DateTime");
+		var _Date = use("Runtime.Date");
 		var _Dict = use("Runtime.Dict");
 		
 		if (value === null)
 			return null;
 		
-		if (value instanceof _DateTime)
+		if (value instanceof _Date)
+		{
+			value = value.toDict(ctx).setIm(ctx, "__class_name__", "Runtime.Date");
+		}
+		else if (value instanceof _DateTime)
 		{
 			value = value.toDict(ctx).setIm(ctx, "__class_name__", "Runtime.DateTime");
 		}
@@ -611,16 +641,16 @@ static class RuntimeUtils
 		if (value instanceof _Collection)
 		{
 			var arr = [];
-			value.each((v)=>{
-				arr.push( _Utils.PrimitiveToNative(v) );
+			value.each(ctx, (ctx, v)=>{
+				arr.push( _Utils.PrimitiveToNative(ctx, v) );
 			});
 			return arr;
 		}
 		if (value instanceof _Dict)
 		{
 			var obj = {};
-			value.each((v, k)=>{
-				obj[k] = _Utils.PrimitiveToNative(v);
+			value.each(ctx, (ctx, v, k)=>{
+				obj[k] = _Utils.PrimitiveToNative(ctx, v);
 			});
 			return obj;
 		}

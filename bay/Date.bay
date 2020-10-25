@@ -1,0 +1,59 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+ 
+namespace Runtime;
+
+use Runtime.rtl;
+use Runtime.BaseStruct;
+use Runtime.Dict;
+
+
+struct Date extends BaseStruct
+{
+	public int y = 0;
+	public int m = 0;
+	public int d = 0;
+	
+	
+	/**
+	 * Return date
+	 * @return string
+	 */
+	string getDate()
+	{
+		return this.y ~ "-" ~ this.m ~ "-" ~ this.d;
+	}
+}
+
+
+#ifcode JAVASCRIPT then
+Runtime.Date.prototype.toObject = function(ctx)
+{
+	var dt = new Date(this.y, this.m - 1, this.d);
+	return dt;
+}
+Runtime.Date.fromObject = function(ctx, dt)
+{
+	var Dict = use("Runtime.Dict");
+	var y = Number(dt.getFullYear());
+	var m = Number(dt.getMonth()) + 1;
+	var d = Number(dt.getDate());
+	var dt = new Runtime.Date( ctx, Dict.from({"y":y,"m":m,"d":d}) );
+	return dt;
+}
+#endif
