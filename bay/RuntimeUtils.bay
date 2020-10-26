@@ -153,7 +153,7 @@ static class RuntimeUtils
 	 * @param string class_name
 	 * @return Vector<IntrospectionInfo>
 	 */
-	pure memorize IntrospectionClass getClassIntrospection(string class_name)
+	pure memorize IntrospectionClass getClassIntrospection(string class_name, bool include_parents = false)
 	{
 		Collection<BaseStruct> class_info = null;
 		Map<Collection> fields = new Map();
@@ -180,7 +180,9 @@ static class RuntimeUtils
 		catch (var e){}
 		
 		/* Get parents names */
-		Collection<string> class_names = self::getParents(class_name);
+		Collection<string> class_names = [];
+		if (include_parents) class_names = self::getParents(class_name);
+		else class_names = [ class_name ];
 		for (int i=0; i<class_names.count(); i++)
 		{
 			string item_class_name = class_names.item(i);
@@ -229,7 +231,7 @@ static class RuntimeUtils
 	 */
 	pure memorize IntrospectionClass getClassIntrospectionWithParents(string class_name)
 	{
-		return static::getClassIntrospection(class_name);
+		return static::getClassIntrospection(class_name, true);
 	}
 	
 	
