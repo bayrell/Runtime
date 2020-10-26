@@ -905,7 +905,7 @@ class rs
 	static string url_get_add(string s, string key, string value)
 	{
 		int pos = static::strpos(s, "?");
-		string s1 = static::substr(s, 0, pos);
+		string s1 = (pos >= 0) ? static::substr(s, 0, pos) : s;
 		string s2 = (pos >= 0) ? static::substr(s, pos + 1) : "";
 		bool find = false;
 		
@@ -916,7 +916,6 @@ class rs
 				string (string s) use (key, value, find)
 				{
 					Collection arr = static::explode("=", s);
-					if (value == "") return "";
 					if (arr[0] == key)
 					{
 						find = true;
