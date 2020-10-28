@@ -37,6 +37,10 @@ Runtime._Collection.prototype = Object.create(Array.prototype);
 Runtime._Collection.prototype.constructor = Runtime._Collection;
 Object.assign(Runtime._Collection.prototype,
 {
+	toArray: function()
+	{
+		return Array.prototype.slice.call(this);
+	},
 	toStr: function(value)
 	{
 		return use("Runtime.rtl").toStr(value);

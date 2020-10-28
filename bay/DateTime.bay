@@ -38,7 +38,7 @@ struct DateTime extends BaseStruct
 	
 	#ifcode PHP then
 	
-	private function getObjectData($ctx)
+	private function toObject($ctx)
 	{
 		$dt = new \DateTime();
 		$dt->setTimezone( new \DateTimeZone($this->tz) );
@@ -72,17 +72,18 @@ struct DateTime extends BaseStruct
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->getObjectData($ctx);
+		$dt = $this->toObject($ctx);
 		return $dt->getTimestamp();
 		
 		#case ifcode JAVASCRIPT then
-		var dt = this.getObjectData(ctx);
+		var dt = this.toObject(ctx);
 		return dt.getTime();
 		
 		#endswitch
 		
 		return null;
 	}
+	int timestamp() => this.getTimestamp();
 	
 	
 	
@@ -95,11 +96,11 @@ struct DateTime extends BaseStruct
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->getObjectData($ctx);
+		$dt = $this->toObject($ctx);
 		return $dt->format("w");
 		
 		#case ifcode JAVASCRIPT then
-		var dt = this.getObjectData(ctx);
+		var dt = this.toObject(ctx);
 		return dt.getDay();
 		
 		#endswitch
@@ -147,18 +148,18 @@ struct DateTime extends BaseStruct
 	 * Return db datetime
 	 * @return string
 	 */
-	string getDBTime(string tz = "UTC")
+	string getDateTime(string tz = "UTC")
 	{
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->getObjectData($ctx);
+		$dt = $this->toObject($ctx);
 		$dt->setTimezone( new \DateTimeZone($tz) );
 		return $dt->format("Y-m-d H:i:s");
 		
 		#case ifcode JAVASCRIPT then
 		
-		var dt = this.getObjectData(ctx);
+		var dt = this.toObject(ctx);
 		var offset = this.constructor.getTimezoneOffset(ctx, tz);
 		var offset = offset - dt.getTimezoneOffset();
 		dt = this.constructor.shiftOffset(ctx, dt, -offset);
@@ -190,19 +191,8 @@ struct DateTime extends BaseStruct
 	 */
 	string getDate(string tz = "UTC")
 	{
-		string value = this.getDBTime(tz);
+		string value = this.getDateTime(tz);
 		return rs::substr(value, 0, 10);
-	}
-	
-	
-	
-	/**
-	 * Return datetime by UTC
-	 * @return string
-	 */
-	string getDBTimeUTC()
-	{
-		return static::getDBTime("UTC");
 	}
 	
 	
@@ -216,7 +206,7 @@ struct DateTime extends BaseStruct
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->getObjectData($ctx);
+		$dt = $this->toObject($ctx);
 		return $dt->format(\DateTime::RFC822);
 		
 		#case ifcode JAVASCRIPT then
@@ -272,7 +262,7 @@ struct DateTime extends BaseStruct
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->getObjectData($ctx);
+		$dt = $this->toObject($ctx);
 		return $dt->format(\DateTime::ISO8601);
 		
 		#case ifcode JAVASCRIPT then
@@ -338,7 +328,7 @@ Runtime.DateTime.shiftOffset = function(ctx, dt, offset)
 	return dt;
 }
 
-Runtime.DateTime.prototype.getObjectData = function(ctx)
+Runtime.DateTime.prototype.toObject = function(ctx)
 {
 	var dt = new Date(this.y, this.m - 1, this.d, this.h, this.i, this.s);
 	var offset = this.constructor.getTimezoneOffset(ctx, this.tz);
