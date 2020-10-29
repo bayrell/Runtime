@@ -452,4 +452,10 @@ class lib
 		}
 	;
 	
+	
+	
+	/**
+	 * Join
+	 */
+	pure fn join(string ch) => string (Collection items) use (ch) => rs::join(ch, items);
 }
