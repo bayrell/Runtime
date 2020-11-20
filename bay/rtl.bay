@@ -675,7 +675,7 @@ class rtl
 			{
 				var attr_data = data.get(attr_name, null);
 				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);			
-				new_data = data.copy( (new Map()).set(attr_name, res) );
+				new_data = data.copy( (new Map()).setValue(attr_name, res) );
 			}
 			else if (data instanceof Dict)
 			{
