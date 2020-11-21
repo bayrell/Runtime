@@ -374,7 +374,7 @@ class rtl
 	 * Create object by class_name. If class name does not exists return null
 	 * @return Object
 	 */
-	static Object newInstance(string class_name, Vector<var> args = null)
+	static Object newInstance(string class_name, Collection<var> args = null)
 	{
 		#switch
 		#case ifcode PHP then
@@ -392,7 +392,7 @@ class rtl
 		var obj = this.find_class(class_name);
 		if (!this.exists(ctx, obj)) return null;
 		if (!(obj instanceof Function)) return null;
-		if (args == undefined || args == null) args = [];
+		if (args == undefined || args == null){ args = []; } else { args = args.toArray(); }
 		args = args.slice(); 
 		args.unshift(ctx);
 		args.unshift(null);

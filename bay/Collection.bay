@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.rtl;
 use Runtime.Exceptions.IndexOutOfRange;
+use Runtime.Exceptions.RuntimeException;
 
 
 declare class _Collection{}
@@ -439,8 +440,9 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> push(T value){ throw new RuntimeException("Deprecated Collection push"); }
 	public Collection<T> push1(T value) => this.pushIm(value);
-	public Collection<T> append(T value) => this.push(value);
+	public Collection<T> append1(T value) => this.push(value);
 	public Collection<T> appendIm(T value) => this.pushIm(value);
 	
 	
@@ -462,8 +464,9 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
-	public Collection<T> unshift(T value) => this.unshiftIm(value);
-	public Collection<T> prepend(T value) => this.unshift(value);
+	public Collection<T> unshift(T value){ throw new RuntimeException("Deprecated Collection unshift"); }
+	public Collection<T> unshift1(T value) => this.unshiftIm(value);
+	public Collection<T> prepend1(T value) => this.unshift(value);
 	public Collection<T> prependIm(T value) => this.unshiftIm(value);
 	
 	
@@ -602,6 +605,7 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> set(T value){ throw new RuntimeException("Deprecated Collection set"); }
 	public Collection<T> set1(T value) => this.setIm(value);
 	
 	
@@ -634,7 +638,7 @@ class Collection<T> extends _Collection
 		#endswitch
 	}
 	public Collection<T> appendCollection1(Collection<T> arr) => this.concatIm(arr);
-	public Collection<T> concat1(Collection<T> arr) => this.concatIm(arr);
+	public Collection<T> concat(Collection<T> arr) => this.concatIm(arr);
 	
 	
 	
@@ -678,11 +682,8 @@ class Collection<T> extends _Collection
 		if (index != -1) return this.remove(index);
 		return this;
 	}
-	/*
-	public Collection<T> removeValue1(T value) => this.removeValueIm(value);
-	public Collection<T> removeItem1(T value) => this.removeValue(value);
-	public Collection<T> removeItemIm(T value) => this.removeItem(value);
-	*/
+	public Collection<T> removeItem(T value) => this.removeItemIm(value);
+	
 	
 	
 	/**

@@ -163,7 +163,7 @@ class Vector<T> extends Collection
 	 * @param int pos - position
 	 * @param int count - count remove items
 	 */
-	public Vector<T> vectorRemove(int pos, int count = 1)
+	public Vector<T> removePosition(int pos, int count = 1)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -180,24 +180,23 @@ class Vector<T> extends Collection
 	/**
 	 * Remove value
 	 */
-	public Vector<T> vectorRemoveValue(T value)
+	public Vector<T> removeValue(T value)
 	{
 		var index = this.indexOf(value);
-		if (index != -1) this.remove(index, 1);
+		if (index != -1) this.removePosition(index, 1);
 		return this;
 	}
-	public Vector<T> vectorRemoveItem(T value) => this.vectorRemoveValue(value);
 	
 	
 	
 	/**
 	 * Remove value
 	 */
-	public Vector<T> vectorRemoveItems(Vector<T> values)
+	public Vector<T> removeValues(Vector<T> values)
 	{
 		for (var i=0; i<values.count(); i++)
 		{
-			this.vectorRemoveValue( values.item(i) );
+			this.removeValue( values.item(i) );
 		}
 		return this;
 	}
@@ -209,7 +208,7 @@ class Vector<T> extends Collection
 	 * @param int pos_begin - start position
 	 * @param int pos_end - end position
 	 */
-	public Vector<T> vectorRemoveRange(int pos_begin, int pos_end)
+	public Vector<T> removeRangeValues(int pos_begin, int pos_end)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
