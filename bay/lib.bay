@@ -106,7 +106,7 @@ class lib
 		=> bool (BaseStruct item1) use (key, value)
 			=> (item1 != null) ? rtl::attr(item1, key) != value : false
 	;
-	pure fn equalAttrNot(string key, var value) => static::equalNotAttr;
+	pure fn equalAttrNot(string key, var value) => static::equalNotAttr(key, value);
 	
 	
 	
@@ -446,9 +446,9 @@ class lib
 			{
 				fn f = arr[i];
 				bool res = f(item);
-				if (res) return true;
+				if (not res) return false;
 			}
-			return false;
+			return true;
 		}
 	;
 	
