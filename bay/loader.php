@@ -32,6 +32,7 @@ class Loader
 	public $start_time = 0;
 	public $args = null;
 	public $env = null;
+	public $app_name = "";
 	public $main_module = "";
 	public $entry_point = "";
 	public $include_path = [];
@@ -186,6 +187,17 @@ class Loader
 	
 	
 	/**
+	 * Set app name
+	 */
+	function setAppName($value)
+	{
+		$this->app_name = $value;
+		return $this;
+	}
+	
+	
+	
+	/**
 	 * Set main module
 	 */
 	function setMainModule($value)
@@ -208,9 +220,9 @@ class Loader
 	
 	
 	/**
-	 * Run application
+	 * Create context
 	 */
-	function run()
+	function createContext()
 	{
 		/* Create context */
 		$context = Context::create(null, Dict::from($this->env));
@@ -222,6 +234,9 @@ class Loader
 			"base_path" => getcwd(),
 		]));
 		
+		/* Set app name */
+		if ($this->app_name) $context = $context::setAppName($context, $context, $this->app_name);
+		
 		/* Set main module */
 		if ($this->main_module) $context = $context::setMainModule($context, $context, $this->main_module);
 		
@@ -230,23 +245,46 @@ class Loader
 
 		/* Set global context */
 		RuntimeUtils::setContext($context);
-
-		/* Run entry */
-		$context = $context::run
-		(
-			$context, $context,
-			
-			/* Before start */
-			function ($ctx, $c){ return $c; },
-			
-			/* Before run */
-			function ($ctx, $c)
-			{
-				/* Set global context */
-				RuntimeUtils::setContext($c);
-				return $c;
-			},
-		);
+		
+		/* Return context */
+		return $context;
+	}
+	
+	
+	
+	/**
+	 * Start context
+	 */
+	function startContext()
+	{
+		/* Create context */
+		$context = $this->createContext();
+		
+		/* Init context */
+		$context = $context::appInit($context, $context);
+		
+		/* Start context */
+		$context = $context::appStart($context, $context);
+		
+		/* Set global context */
+		RuntimeUtils::setContext($context);
+		
+		/* Return context */
+		return $context;
+	}
+	
+	
+	
+	/**
+	 * Run application
+	 */
+	function run()
+	{
+		/* Start context */
+		$context = $this->startContext();
+		
+		/* Run app */
+		$context = $context::appRun($context, $context);
 		
 		return $this;
 	}
