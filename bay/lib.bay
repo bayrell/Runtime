@@ -379,20 +379,20 @@ class lib
 	 * Apply function
 	 * @return fn
 	 */
-	pure fn apply(Collection args = null) =>
-		var (fn f) use (args) =>
-			rtl::apply(f, args)
+	pure fn apply(fn f) =>
+		var (var value) use (f) =>
+			f(value)
 	;
 	
 	
 	
 	/**
-	 * Apply async function
+	 * Apply function
 	 * @return fn
 	 */
-	pure fn applyAsync(Collection args = null) =>
-		async var (fn f) use (args) =>
-			await rtl::applyAsync(f, args)
+	pure fn applyAsync(fn f) =>
+		async var (var value) use (f) =>
+			await f(value)
 	;
 	
 	

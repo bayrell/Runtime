@@ -526,8 +526,8 @@ class rs
 		Vector<string> arr2 = static::explode("/", filepath).toVector();
 		
 		string filepath = filepath;
-		string extension = arr1.pop();
-		string basename = arr2.pop();
+		string extension = arr1.popValue();
+		string basename = arr2.popValue();
 		string dirname = static::join("/", arr2);
 		
 		int ext_length = static::strlen(extension);

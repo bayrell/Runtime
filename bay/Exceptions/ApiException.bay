@@ -18,7 +18,6 @@
 
 namespace Runtime.Exceptions;
 
-use Runtime.rtl;
 use Runtime.Exceptions.RuntimeException;
 
 
