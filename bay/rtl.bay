@@ -516,6 +516,30 @@ class rtl
 	
 	
 	/**
+	 * Apply method
+	 * @return var
+	 */
+	static var applyMethod(string class_name, string method_name, Collection args = null)
+	{
+		fn f = rtl::method(class_name, method_name);
+		return rtl::apply(f, args);
+	}
+	
+	
+	
+	/**
+	 * Apply method async
+	 * @return var
+	 */
+	static async var applyMethodAsync(string class_name, string method_name, Collection args = null)
+	{
+		fn f = rtl::method(class_name, method_name);
+		return await rtl::applyAsync(f, args);
+	}
+	
+	
+	
+	/**
 	 * Run thread
 	 */
 	static void runThread(fn f, Collection<var> args = null)

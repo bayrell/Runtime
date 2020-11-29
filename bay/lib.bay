@@ -369,7 +369,7 @@ class lib
 		async var (string class_name) use (method_name, args)
 		{
 			fn f = rtl::method(class_name, method_name);
-			return rtl::apply(f, args);
+			return await rtl::applyAsync(f, args);
 		}
 	;
 	
