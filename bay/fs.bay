@@ -149,7 +149,7 @@ class fs
 	/**
 	 * Save local file
 	 */
-	static async bool saveFile(string path, string content = "", string ch = "utf8", string chroot = "")
+	static async bool saveFile(string path, string content = "", string chroot = "", string ch = "utf8")
 	{
 		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
 		string filepath = chroot ~ path;
@@ -174,7 +174,7 @@ class fs
 	/**
 	 * Read local file
 	 */
-	static async string readFile(string path, string ch = "utf8", string chroot = "")
+	static async string readFile(string path, string chroot = "", string ch = "utf8")
 	{
 		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
 		string filepath = chroot ~ path;
