@@ -287,9 +287,9 @@ class fs
 	
 	
 	/**
-	 * Unlink
+	 * Remove
 	 */
-	static async bool unlink(string path, string chroot = "")
+	static async bool remove(string path, string chroot = "")
 	{
 		if (chroot != "" and rs::substr(chroot, -1) != "/") chroot ~= "/";
 		string filepath = chroot ~ path;
@@ -307,11 +307,13 @@ class fs
 		
 		#case ifcode PHP then
 		
-		unlink($filepath);
+		if (is_dir($filepath)) rmdir($filepath);
+		else unlink($filepath);
 		
 		#endswitch
 		return "";
 	}
+	static async bool unlink(string path, string chroot = "") => static::remove(path, chroot);
 	
 	
 	
