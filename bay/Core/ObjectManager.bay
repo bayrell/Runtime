@@ -1,0 +1,484 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime.Core;
+
+use Runtime.lib;
+use Runtime.Mutex;
+use Runtime.BaseObject;
+use Runtime.BaseStruct;
+use Runtime.Core.CoreDriver;
+use Runtime.Core.CoreEvent;
+use Runtime.Core.CoreObject;
+use Runtime.Core.Driver;
+use Runtime.Core.Entity;
+use Runtime.Core.Message;
+use Runtime.Core.RemoteCallEvent;
+use Runtime.Core.RemoteCallResponse;
+use Runtime.Exceptions.RuntimeException;
+
+
+class ObjectManager extends CoreDriver
+{
+	protected Map<CoreObject> objects = null;
+	protected Map<CoreObject> drivers = null;
+	protected Vector<Message> messages = null;
+	protected Mutex mutex_messages = null;
+	protected Mutex mutex_objects = null;
+	protected Mutex mutex_process = null;
+	protected Vector<Dict> listeners = null;
+	
+	
+	/**
+	 * Constructor
+	 */
+	void constructor(string object_name = "", Entity entity = null)
+	{
+		parent(object_name, entity);
+		
+		/* Create object */
+		this.objects = new Map<CoreObject>();
+		this.drivers = new Map<CoreObject>();
+		this.messages = new Vector<Message>();
+		this.mutex_messages = new Mutex();
+		this.mutex_objects = new Mutex();
+		this.mutex_process = new Mutex();
+		
+		/* Register self */
+		this.objects.setValue(this.getClassName(), this);
+		this.drivers.setValue(this.getClassName(), this);
+		this.objects.setValue("default:object_manager", this);
+		this.drivers.setValue("default:object_manager", this);
+		this.listeners = new Vector<Dict>();
+		this.manager = this;
+	}
+	
+	
+	
+	/**
+	 * Add object
+	 */
+	void addObject(CoreObject obj, string object_name = "")
+	{
+		safe (this.mutex_objects)
+		{
+			if (obj instanceof CoreObject)
+			{
+				if (object_name == "") object_name = obj.getObjectName();
+				if (not this.drivers.has(object_name))
+				{
+					this.objects.setValue(object_name, obj);
+					obj.manager = this;
+				}
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Get object
+	 */
+	CoreObject getObject(string object_name)
+	{
+		CoreObject obj = null;
+		safe (this.mutex_objects)
+		{
+			obj = this.objects.get(object_name, null);
+		}
+		return obj;
+	}
+	
+	
+	
+	/**
+	 * Get objects
+	 */
+	Collection<CoreDriver> getObjects(string class_name)
+	{
+		Vector<CoreDriver> objects = new Vector();
+		safe (this.mutex_objects)
+		{
+			this.objects.each
+			(
+				void (CoreDriver obj) use (objects, class_name)
+				{
+					if (rtl::is_instanceof(obj, class_name)) objects.pushValue(obj);
+				}
+			);
+		}
+		return objects.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Get driver
+	 */
+	CoreDriver getDriver(string driver_name)
+	{
+		CoreObject obj = null;
+		safe (this.mutex_objects)
+		{
+			obj = this.drivers.get(driver_name, null);
+		}
+		return obj;
+	}
+	
+	
+	
+	/**
+	 * Get drivers
+	 */
+	Collection<CoreDriver> getDrivers(string class_name)
+	{
+		Vector<CoreDriver> drivers = new Vector();
+		safe (this.mutex_objects)
+		{
+			this.drivers.each
+			(
+				void (CoreDriver obj) use (drivers, class_name)
+				{
+					if (rtl::is_instanceof(obj, class_name)) drivers.pushValue(obj);
+				}
+			);
+		}
+		return drivers.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Remove object
+	 */
+	void removeObject(string object_name)
+	{
+		safe (this.mutex_objects)
+		{
+			if (not this.drivers.has(object_name))
+			{
+				CoreObject obj = this.objects.get(object_name, null);
+				if (obj != null and obj.parent != null)
+				{
+					obj.parent.childs.removeValue(obj);
+					obj.parent = null;
+				}
+				this.objects.removeValue(object_name);
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Remove object
+	 */
+	void removeObjectRecursive(string object_name)
+	{
+		Collection<string> keys = null;
+		safe (this.mutex_objects)
+		{
+			keys = this.objects.keys();
+		}
+		
+		keys = keys
+			.filter
+			(
+				bool (string item_name) use (object_name) => rs::strpos(item_name, object_name) == 0
+			)
+			.sortIm( lib::sortDesc )
+		;
+		
+		for (int i=0; i<keys.count(); i++)
+		{
+			string name = keys[i];
+			this.removeObject(name);
+		}
+		
+		/* Remove listeners */
+		for (int i=this.listeners.count() - 1; i>=0; i--)
+		{
+			Dict item = this.listeners[i];
+			if
+			(
+				rs::strpos(item["from"], object_name) == 0 or
+				rs::strpos(item["object_name"], object_name) == 0
+			)
+			{
+				this.listeners.removeValue(i);
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Register listener
+	 */
+	public void registerListener(string from, string event_class_name, string object_name, string method_name = "")
+	{
+		for (int i=0; i<this.listeners.count(); i++)
+		{
+			Dict item = this.listeners[i];
+			if (
+				item["from"] == from and
+				item["object_name"] == object_name and
+				item["method_name"] == method_name and
+				item["event_class_name"] == event_class_name
+			)
+			{
+				return;
+			}
+		}
+		this.listeners.pushValue
+		{
+			"from": from,
+			"object_name": object_name,
+			"event_class_name": event_class_name,
+			"method_name": method_name,
+		};
+	}
+	
+	
+	
+	/**
+	 * Find callback
+	 */
+	public void findListeners(string from, string event_class_name = "")
+	{
+		Vector<Dict> items = new Vector();
+		for (int i=0; i<this.listeners.count(); i++)
+		{
+			Dict item = this.listeners[i];
+			if
+			(
+				item["from"] == from and
+				(event_class_name == "" or item["event_class_name"] == event_class_name)
+			)
+			{
+				items.pushValue(item);
+			}
+		}
+		return items.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Start object manager
+	 */
+	async void startManager(Collection<BaseStruct> entities)
+	{
+		Vector<CoreObject> drivers_created = new Vector();
+		
+		Collection<BaseStruct> drivers = entities.filter
+		(
+			bool (BaseStruct item) => item instanceof Driver
+		);
+		
+		for (int i=0; i<drivers.count(); i++)
+		{
+			Driver driver_entity = drivers.item(i);
+			
+			string driver_name = driver_entity.name;
+			string class_name = driver_entity.value;
+			if (class_name == "") class_name = driver_entity.name;
+			
+			CoreDriver driver = rtl::newInstance(class_name, [driver_name, driver_entity]);
+			driver = @.chain(class_name, [driver]) |> attr 0;
+			if (class_name != driver_name)
+			{
+				driver = @.chain(driver_name, [driver]) |> attr 0;
+			}
+			
+			if (driver == null)
+			{
+				throw new RuntimeException("Driver '" ~ class_name ~ "' not found");
+			}
+			
+			safe (this.mutex_objects)
+			{
+				this.objects.setValue(driver_name, driver);
+				this.drivers.setValue(driver_name, driver);
+				driver.manager = this;
+			}
+			
+			drivers_created.pushValue(driver);
+		}
+		
+		/* Start drivers */
+		for (int i=0; i<drivers_created.count(); i++)
+		{
+			CoreDriver driver = drivers_created.item(i);
+			await driver.startDriver();
+		}
+		
+		/*rtl::runThread( method this.processMessages );*/
+	}
+	
+	
+	
+	/**
+	 * Send message
+	 * @param Message msg
+	 * @return Message
+	 */ 
+	async void sendMessage(Message msg)
+	{
+		safe (this.mutex_messages)
+		{
+			this.messages.pushValue(msg);
+		}
+		this.mutex_process.unLock();
+		
+		/* Handle messages */
+		await this.handleMessages();
+	}
+	
+	
+	
+	/**
+	 * Send message
+	 * @param Message msg
+	 * @return Message
+	 */ 
+	async RemoteCallResponse remoteCall(Dict items)
+	{
+		/* Create message */
+		RemoteCallEvent event = RemoteCallEvent::create(items);
+		Message msg = new Message(event, event.object_name);
+		
+		/* Send message */
+		await this.sendMessage(msg);
+		
+		/* Wait message */
+		RemoteCallResponse response = await this.waitResponse(msg);
+		
+		/* Return response */
+		return response;
+	}
+	
+	
+	
+	/**
+	 * Process messages
+	 */
+	async void processMessages()
+	{
+		bool is_run = @.getRun();
+		while (is_run)
+		{
+			if (this.message.count() == 0)
+			{
+				await this.mutex_process.waitAsync();
+			}
+			await this.handleMessages();
+			this.mutex_process.lock();
+		}
+	}
+	
+	
+	
+	/**
+	 * Handle messages
+	 */
+	async void handleMessages()
+	{
+		while (this.messages.count() > 0)
+		{
+			Message msg = null;
+			safe (this.mutex_messages)
+			{
+				msg = this.messages.pop();
+			}
+			if (msg == null)
+			{
+				return;
+			}
+			
+			await this.handleMessage(msg);
+		}
+	}
+	
+	
+	
+	/**
+	 * Handle messages
+	 */
+	async void handleMessage(Message msg)
+	{
+		if (msg.data == null) return;
+		
+		Map<bool> hash = new Map();
+		Collection<Dict> items = this.findListeners(msg.from, msg.data.getClassName());
+		for (int i=0; i<items.count(); i++)
+		{
+			Dict item = items[i];
+			
+			string object_name = item["object_name"];
+			string method_name = item["method_name"];
+			
+			CoreObject obj = this.getObject(object_name);
+			if (obj != null)
+			{
+				if (rtl::method_exists(obj, method_name))
+				{
+					fn f = rtl::method(obj, method_name);
+					await f(msg);
+				}
+			}
+			
+			if (not hash.has(object_name))
+			{
+				while (obj != null)
+				{
+					await obj.handleMessage(msg);
+					obj = obj.parent;
+				}
+				hash.setValue(object_name, true);
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Set parent
+	 */
+	void changeParent(CoreObject child_obj, CoreObject parent_obj)
+	{
+		safe (this.mutex_objects)
+		{
+			if (child_obj.parent != null)
+			{
+				child_obj.parent.childs.removeValue(child_obj);
+			}
+			
+			child_obj.parent = parent_obj;
+			
+			if (parent_obj != null)
+			{
+				if (parent_obj.childs.indexOf(child_obj) == -1)
+				{
+					parent_obj.childs.pushValue(child_obj);
+				}
+			}
+		}
+	}
+	
+}

@@ -31,6 +31,17 @@
 		"IntrospectionClass",
 		"IntrospectionInfo",
 		"RuntimeUtils",
+		"Core/BusDriverInterface",
+		"Core/Context",
+		"Core/CoreObject",
+		"Core/CoreDriver",
+		"Core/CoreEvent",
+		"Core/Entity",
+		"Core/Driver",
+		"Core/LambdaChain",
+		"Core/LambdaChainDeclare",
+		"Core/Message",
+		"Core/ObjectManager",
 		"ModuleDescription"
 	]
 }
