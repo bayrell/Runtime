@@ -63,7 +63,7 @@ struct Context extends BaseStruct
 	string main_class = "";
 	
 	/* Object manager */
-	protected ObjectManager object_manager = null;
+	protected ObjectManager manager = null;
 	
 	
 	/**
@@ -142,7 +142,7 @@ struct Context extends BaseStruct
 			"enviroments": env,
 			"settings": settings,
 			"modules": [],
-			"object_manager": new ObjectManager(classof ObjectManager),
+			"manager": new ObjectManager(classof ObjectManager),
 		};
 		
 		/* Create context */
@@ -258,7 +258,7 @@ struct Context extends BaseStruct
 		if (c.started) return c;
 		
 		/* Start Object Manager */
-		await c.object_manager.startManager(c.entities);
+		await c.manager.startManager(c.entities);
 		
 		return c.copy{"started": true};
 	}
@@ -354,7 +354,7 @@ struct Context extends BaseStruct
 	 */
 	Context addObject(CoreObject obj, string object_name = "")
 	{
-		this.object_manager.addObject(obj, object_name);
+		this.manager.addObject(obj, object_name);
 		return this;
 	}
 	
@@ -364,7 +364,7 @@ struct Context extends BaseStruct
 	 * Register listener
 	 */
 	void registerListener(string from, string event_class_name, string object_name, string method_name = "") =>
-		this.object_manager.registerListener(from, event_class_name, object_name, method_name);
+		this.manager.registerListener(from, event_class_name, object_name, method_name);
 	
 	
 	
@@ -372,35 +372,35 @@ struct Context extends BaseStruct
 	 * Find listeners
 	 */
 	Collection<Dict> findListeners(string from, string event_class_name = "") =>
-		this.object_manager.findListeners(from, event_class_name);
+		this.manager.findListeners(from, event_class_name);
 		
 	
 	
 	/**
 	 * Get object
 	 */
-	CoreObject getObject(string object_name) => this.object_manager.getObject(object_name);
+	CoreObject getObject(string object_name) => this.manager.getObject(object_name);
 	
 	
 	
 	/**
 	 * Get objects
 	 */
-	CoreObject getObjects(string object_name) => this.object_manager.getObjects(object_name);
+	CoreObject getObjects(string object_name) => this.manager.getObjects(object_name);
 	
 	
 	
 	/**
 	 * Get driver
 	 */
-	CoreObject getDriver(string driver_name) => this.object_manager.getDriver(driver_name);
+	CoreObject getDriver(string driver_name) => this.manager.getDriver(driver_name);
 	
 	
 	
 	/**
 	 * Get drivers
 	 */
-	CoreObject getDrivers(string class_name) => this.object_manager.getDrivers(class_name);
+	CoreObject getDrivers(string class_name) => this.manager.getDrivers(class_name);
 	
 	
 	
@@ -409,7 +409,7 @@ struct Context extends BaseStruct
 	 */
 	CoreObject removeObject(string object_name)
 	{
-		this.object_manager.removeObject(object_name);
+		this.manager.removeObject(object_name);
 		return this;
 	}
 	
@@ -420,7 +420,7 @@ struct Context extends BaseStruct
 	 * @param Message msg
 	 * @return Message
 	 */
-	async void sendLocalMessage(Message msg){ await this.object_manager.sendMessage(msg); }
+	async void sendLocalMessage(Message msg){ await this.manager.sendMessage(msg); }
 	
 	
 	
@@ -429,7 +429,7 @@ struct Context extends BaseStruct
 	 * @param Dict items
 	 * @return RemoteCallAnswer
 	 */
-	async RemoteCallAnswer remoteLocalCall(Dict items) => await this.object_manager.remoteCall(items);
+	async RemoteCallAnswer remoteLocalCall(Dict items) => await this.manager.remoteCall(items);
 	
 	
 	

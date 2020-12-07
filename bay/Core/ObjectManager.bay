@@ -62,8 +62,8 @@ class ObjectManager extends CoreDriver
 		/* Register self */
 		this.objects.setValue(this.getClassName(), this);
 		this.drivers.setValue(this.getClassName(), this);
-		this.objects.setValue("default:object_manager", this);
-		this.drivers.setValue("default:object_manager", this);
+		this.objects.setValue("default:manager", this);
+		this.drivers.setValue("default:manager", this);
 		this.listeners = new Vector<Dict>();
 		this.manager = this;
 	}
