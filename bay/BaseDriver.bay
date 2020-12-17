@@ -24,7 +24,15 @@ use Runtime.Entity;
 
 class BaseDriver extends BaseObject
 {
-	Entity entity = null;
+	protected string object_name = "";
+	protected Entity entity = null;
+	
+	
+	/**
+	 * Returns object name
+	 */
+	public string getObjectName() => this.object_name;
+	
 	
 	
 	/**
@@ -38,7 +46,8 @@ class BaseDriver extends BaseObject
 	 */
 	public void constructor(string object_name = "", Entity entity = null)
 	{
-		parent(object_name);
+		parent();
+		this.object_name = object_name;
 		this.entity = entity;
 	}
 	

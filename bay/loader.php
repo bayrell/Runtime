@@ -261,10 +261,10 @@ class Loader
 		$context = $this->createContext();
 		
 		/* Init context */
-		$context = $context::appInit($context, $context);
+		$context = $context::init($context, $context);
 		
 		/* Start context */
-		$context = $context::appStart($context, $context);
+		$context = $context::start($context, $context);
 		
 		/* Set global context */
 		\Runtime\rtl::setContext($context);
@@ -284,7 +284,7 @@ class Loader
 		$context = $this->startContext();
 		
 		/* Run app */
-		$context = $context::appRun($context, $context);
+		$context = $context::run($context, $context);
 		
 		return $this;
 	}

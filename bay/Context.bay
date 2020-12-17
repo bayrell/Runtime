@@ -22,12 +22,15 @@ use Runtime.rs;
 use Runtime.rtl;
 use Runtime.lib;
 use Runtime.Collection;
+use Runtime.BaseDriver;
 use Runtime.BaseStruct;
 use Runtime.Entity;
 use Runtime.IntrospectionClass;
 use Runtime.IntrospectionInfo;
 use Runtime.LambdaChain;
 use Runtime.Dict;
+use Runtime.Driver;
+use Runtime.Entity;
 use Runtime.Map;
 use Runtime.Vector;
 use Runtime.RuntimeUtils;
@@ -44,6 +47,9 @@ struct Context extends BaseStruct
 	Collection<string> modules = null;
 	Collection<BaseStruct> entities = null;
 	Collection<string> cli_args = null;
+	
+	/* Drivers */
+	Map<BaseDriver> drivers = new Map<BaseDriver>();
 	
 	/* Variable data */
 	bool initialized = false;
@@ -205,7 +211,7 @@ struct Context extends BaseStruct
 	/**
 	 * Init context
 	 */
-	static Context init(Context c)
+	static Context appInit(Context c)
 	{
 		@ = c;
 		if (c.initialized) return c;
@@ -243,10 +249,49 @@ struct Context extends BaseStruct
 	/**
 	 * Start context
 	 */
-	static async Context start(Context c)
+	static async Context appStart(Context c)
 	{
 		@ = c;
 		if (c.started) return c;
+		
+		/* Get drivers from entity */
+		Collection<BaseStruct> drivers = c.entities.filter
+		(
+			bool (BaseStruct item) => item instanceof Driver
+		);
+		
+		/* Create drivers */
+		for (int i=0; i<drivers.count(); i++)
+		{
+			Driver driver_entity = drivers.item(i);
+			
+			string driver_name = driver_entity.name;
+			string class_name = driver_entity.value;
+			if (class_name == "") class_name = driver_entity.name;
+			
+			BaseDriver driver = rtl::newInstance(class_name, [driver_name, driver_entity]);
+			driver = @.chain(class_name, [driver]) |> attr 0;
+			if (class_name != driver_name)
+			{
+				driver = @.chain(driver_name, [driver]) |> attr 0;
+			}
+			
+			if (driver == null)
+			{
+				throw new RuntimeException("Driver '" ~ class_name ~ "' not found");
+			}
+			
+			c.drivers.setValue(driver_name, driver);
+		}
+		
+		/* Start drivers */
+		Collection keys = c.drivers.keys()
+		for (int i=0; i<keys.count(); i++)
+		{
+			string driver_name = keys[i];
+			BaseDriver driver = c.drivers[driver_name];
+			await driver.startDriver();
+		}
 		
 		return c.copy{"started": true};
 	}
@@ -256,19 +301,19 @@ struct Context extends BaseStruct
 	/**
 	 * Init
 	 */
-	static async Context appInit(Context c)
+	static async Context init(Context c)
 	{
 		string main_class = c.main_class;
 		
 		/* Init app */
 		if (main_class != "" and rtl::method_exists(main_class, "appInit"))
 		{
-			fn init = rtl::method(main_class, "appInit");
-			c = init(c);
+			fn appInit = rtl::method(main_class, "appInit");
+			c = appInit(c);
 		}
 		else
 		{
-			c = c::init(c);
+			c = c::appInit(c);
 		}
 		
 		return c;
@@ -279,19 +324,19 @@ struct Context extends BaseStruct
 	/**
 	 * Start
 	 */
-	static async Context appStart(Context c)
+	static async Context start(Context c)
 	{
 		string main_class = c.main_class;
 		
 		/* Start app */
 		if (main_class != "" and rtl::method_exists(main_class, "appStart"))
 		{
-			fn start = rtl::method(main_class, "appStart");
-			c = await start(c);
+			fn appStart = rtl::method(main_class, "appStart");
+			c = await appStart(c);
 		}
 		else
 		{
-			c = await c::start(c);
+			c = await c::appStart(c);
 		}
 		
 		return c;
@@ -302,7 +347,7 @@ struct Context extends BaseStruct
 	/**
 	 * Run entry point
 	 */
-	static async Context appRun(Context c)
+	static async Context run(Context c)
 	{
 		@ = c;
 		string entry_point = c.entry_point;
@@ -310,8 +355,8 @@ struct Context extends BaseStruct
 		/* Run entrypoint */
 		if (entry_point != "")
 		{
-			fn run = rtl::method(entry_point, "appRun");
-			await @run(c);
+			fn appRun = rtl::method(entry_point, "appRun");
+			await @appRun(c);
 		}
 		
 		return c;
@@ -320,18 +365,13 @@ struct Context extends BaseStruct
 	
 	
 	/**
-	 * Run application
+	 * Add driver
 	 */
-	static async Context run(Context c, fn f1 = null, fn f2 = null)
+	Context addDriver(BaseDriver obj)
 	{
-		c = await static::appInit(c);
-		if (f1 != null) c = await f1(c);
-		c = await static::appStart(c);
-		if (f2 != null) c = await f2(c);
-		c = await static::appRun(c);
-		return c;
+		this.drivers.setValue(obj.getObjectName(), obj);
+		return this;
 	}
-	
 	
 	
 	/* ---------------------- Chain --------------------- */
