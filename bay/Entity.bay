@@ -16,15 +16,21 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Core;
+namespace Runtime;
 
+use Runtime.rtl;
 use Runtime.BaseStruct;
-use Runtime.rs;
 
 
-struct LambdaChainDeclare extends BaseStruct
+struct Entity extends BaseStruct
 {
 	string name = "";
-	bool is_await = false;
-	string logName() => this.getClassName() ~ " -> " ~ this.name;
+	string value = "";
+	Dict params = {};
+	
+	/* Functions */
+	string className() => this.name != "" ? (this.value != "" ? this.value : this.name) : "";
+	string logName() =>
+		this.getClassName() ~ " -> " ~ ( this.value != "" ? (this.name ~ " -> " ~ this.value) : this.name )
+	;
 }

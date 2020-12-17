@@ -18,9 +18,9 @@
  */
 
 use Runtime\Collection;
+use Runtime\Context;
 use Runtime\Dict;
 use Runtime\RuntimeUtils;
-use Runtime\Core\Context;
 
 
 /**
@@ -244,7 +244,7 @@ class Loader
 		if ($this->entry_point) $context = $context::setEntryPoint($context, $context, $this->entry_point);
 
 		/* Set global context */
-		RuntimeUtils::setContext($context);
+		\Runtime\rtl::setContext($context);
 		
 		/* Return context */
 		return $context;
@@ -267,7 +267,7 @@ class Loader
 		$context = $context::appStart($context, $context);
 		
 		/* Set global context */
-		RuntimeUtils::setContext($context);
+		\Runtime\rtl::setContext($context);
 		
 		/* Return context */
 		return $context;

@@ -35,59 +35,9 @@ use Runtime.IntrospectionInfo;
 use Runtime.SerializeInterface;
 
 
-#switch
-#case ifcode JAVASCRIPT then
-var isBrowser=function(){return typeof window !== "undefined" && this === window;}
-#endswitch
-
-
 static class RuntimeUtils
 {
-	
-	
-	
-	/* ================================ Context Functions ================================ */
-	
-	
-	protected static var _global_context = null;
 	protected static Map _variables_names = null;
-	
-	
-	/**
-	 * Returns global context
-	 * @return Context
-	 */
-	public static Context @getContext()
-	{
-		#switch
-		#case ifcode PHP then
-		return self::$_global_context;
-		#case ifcode NODEJS then
-		return RuntimeUtils._global_context;
-		#case ifcode ES6 then
-		return Runtime.RuntimeUtils._global_context;
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Set global context
-	 * @param Context context
-	 */
-	public static Context @setContext(Context context)
-	{
-		#switch
-		#case ifcode PHP then
-		self::$_global_context = $context;
-		#case ifcode JAVASCRIPT then
-		/*if (isBrowser()) Runtime.RuntimeUtils._global_context = context;
-		else RuntimeUtils._global_context = context;*/
-		use("Runtime.RuntimeUtils")._global_context = context;
-		#endswitch
-		return context;
-	}
-	
 	
 	
 	/* ========================== Class Introspection Functions ========================== */
@@ -522,11 +472,6 @@ static class RuntimeUtils
 	
 		#case ifcode JAVASCRIPT then
 		
-		/*var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
-		var _Utils = null; if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
-		var _Vector=null; if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
-		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;*/
-		
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
@@ -616,11 +561,6 @@ static class RuntimeUtils
 		
 		#case ifcode JAVASCRIPT then
 		
-		/*var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
-		var _Utils = null; if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=Utils;
-		var _Collection=null; if (isBrowser()) _Collection=Runtime.Collection; else _Collection=Collection;
-		var _Dict=null; if (isBrowser()) _Dict=Runtime.Dict; else _Dict=Dict;*/
-		
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
@@ -687,12 +627,6 @@ static class RuntimeUtils
 		#case ifcode JAVASCRIPT then
 		if (flags == undefined) flags = 0;
 		if (convert == undefined) convert = true;
-		/*
-		var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
-		var _Collection=null;if (isBrowser()) _Collection=Runtime.Collection; else _Collection=Collection;
-		var _Dict=null;if (isBrowser()) _Dict=Runtime.Dict; else _Dict=Dict;
-		var _rtl=null;if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
-		*/
 		
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
@@ -728,11 +662,6 @@ static class RuntimeUtils
 	
 		#case ifcode JAVASCRIPT then
 		try{
-			/*
-			var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
-			var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
-			var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;	
-			*/
 			
 			var _rtl = use("Runtime.rtl");
 			var _Utils = use("Runtime.RuntimeUtils");

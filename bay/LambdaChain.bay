@@ -16,23 +16,18 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Core;
+namespace Runtime;
 
 use Runtime.BaseStruct;
+use Runtime.rs;
 
 
-struct CoreEvent extends BaseStruct
-{
-	
-	/**
-	 * Check if event is cancel
-	 */
-	bool isCancel() => false;
-	
-	
-	/**
-	 * Cancel event
-	 */
-	pure CoreEvent cancel(CoreEvent event) => event;
-	
+struct LambdaChain extends BaseStruct
+{	
+	string name = "";
+	string value = "";
+	string chain = "";
+	double pos = 0;
+	bool is_async = false;
+	string logName() => this.getClassName() ~ " -> " ~ this.name ~ " -> [" ~ this.pos ~ "] " ~ this.value;
 }

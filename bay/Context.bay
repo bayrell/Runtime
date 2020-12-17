@@ -16,28 +16,23 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Core;
+namespace Runtime;
 
 use Runtime.rs;
 use Runtime.rtl;
 use Runtime.lib;
 use Runtime.Collection;
 use Runtime.BaseStruct;
+use Runtime.Entity;
 use Runtime.IntrospectionClass;
 use Runtime.IntrospectionInfo;
+use Runtime.LambdaChain;
 use Runtime.Dict;
 use Runtime.Map;
 use Runtime.Vector;
 use Runtime.RuntimeUtils;
 use Runtime.Exceptions.FileNotFound;
 use Runtime.Exceptions.RuntimeException;
-use Runtime.Core.BusDriverInterface;
-use Runtime.Core.CoreObject;
-use Runtime.Core.Entity;
-use Runtime.Core.LambdaChain;
-use Runtime.Core.Message;
-use Runtime.Core.ObjectManager;
-use Runtime.Core.RemoteCallAnswer;
 
 
 struct Context extends BaseStruct
@@ -61,9 +56,6 @@ struct Context extends BaseStruct
 	string entry_point = "";
 	string main_module = "";
 	string main_class = "";
-	
-	/* Object manager */
-	protected ObjectManager manager = null;
 	
 	
 	/**
@@ -142,7 +134,6 @@ struct Context extends BaseStruct
 			"enviroments": env,
 			"settings": settings,
 			"modules": [],
-			"manager": new ObjectManager(classof ObjectManager),
 		};
 		
 		/* Create context */
@@ -257,9 +248,6 @@ struct Context extends BaseStruct
 		@ = c;
 		if (c.started) return c;
 		
-		/* Start Object Manager */
-		await c.manager.startManager(c.entities);
-		
 		return c.copy{"started": true};
 	}
 	
@@ -343,164 +331,6 @@ struct Context extends BaseStruct
 		c = await static::appRun(c);
 		return c;
 	}
-	
-	
-	
-	/* ------------------ Object Manager ---------------- */
-	
-	
-	/**
-	 * Add object
-	 */
-	Context addObject(CoreObject obj, string object_name = "")
-	{
-		this.manager.addObject(obj, object_name);
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Register listener
-	 */
-	void registerListener(string from, string event_class_name, string object_name, string method_name = "") =>
-		this.manager.registerListener(from, event_class_name, object_name, method_name);
-	
-	
-	
-	/**
-	 * Find listeners
-	 */
-	Collection<Dict> findListeners(string from, string event_class_name = "") =>
-		this.manager.findListeners(from, event_class_name);
-		
-	
-	
-	/**
-	 * Get object
-	 */
-	CoreObject getObject(string object_name) => this.manager.getObject(object_name);
-	
-	
-	
-	/**
-	 * Get objects
-	 */
-	CoreObject getObjects(string object_name) => this.manager.getObjects(object_name);
-	
-	
-	
-	/**
-	 * Get driver
-	 */
-	CoreObject getDriver(string driver_name) => this.manager.getDriver(driver_name);
-	
-	
-	
-	/**
-	 * Get drivers
-	 */
-	CoreObject getDrivers(string class_name) => this.manager.getDrivers(class_name);
-	
-	
-	
-	/**
-	 * Remove object
-	 */
-	CoreObject removeObject(string object_name)
-	{
-		this.manager.removeObject(object_name);
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Send message
-	 * @param Message msg
-	 * @return Message
-	 */
-	async void sendLocalMessage(Message msg){ await this.manager.sendMessage(msg); }
-	
-	
-	
-	/**
-	 * Remote call
-	 * @param Dict items
-	 * @return RemoteCallAnswer
-	 */
-	async RemoteCallAnswer remoteLocalCall(Dict items) => await this.manager.remoteCall(items);
-	
-	
-	
-	/**
-	 * Send message
-	 * @param Message msg
-	 * @return Message
-	 */
-	async void sendBusMessage(Message msg)
-	{
-		BusDriverInterface driver = this.getDriver("default:external_bus");
-		await driver.sendMessage(msg);
-	}
-	
-	
-	
-	/**
-	 * Remote call
-	 * @param Dict items
-	 * @return RemoteCallAnswer
-	 */
-	async RemoteCallAnswer remoteBusCall(Dict items)
-	{
-		BusDriverInterface driver = this.getDriver("default:external_bus");
-		return await driver.remoteCall(items);
-	}
-	
-	
-	
-	
-	#ifdef BACKEND then
-	
-	
-	/**
-	 * Push message to frontend client
-	 * @param Message msg
-	 * @return Message
-	 */
-	async void pushExternalMessage(Message msg)
-	{
-		BusDriverInterface driver = this.getDriver("default:external_bus");
-		await driver.pushMessage(msg);
-	}
-	
-	
-	
-	/**
-	 * Send message
-	 * @param Message msg
-	 * @return Message
-	 */
-	async void sendSystemMessage(Message msg)
-	{
-		BusDriverInterface driver = this.getDriver("default:system_bus");
-		await driver.sendMessage(msg);
-	}
-	
-	
-	
-	/**
-	 * Remote call
-	 * @param Dict items
-	 * @return RemoteCallAnswer
-	 */
-	async RemoteCallAnswer remoteSystemCall(Dict items)
-	{
-		BusDriverInterface driver = this.getDriver("default:system_bus");
-		await driver.remoteCall(items);
-	}
-	
-	#endif
 	
 	
 	

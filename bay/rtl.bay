@@ -106,41 +106,6 @@ class rtl
 	
 	
 	
-	static bool @isBrowser()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		return typeof window !== "undefined";
-		#endswitch
-		return false;
-	}
-	
-	
-	
-	/**
-	 * Define props
-	 */
-	static bool @defProp(var obj, var name)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		Object.defineProperty
-		(
-			obj,
-			name,
-			{
-				get:() => { return obj["__" + name] },
-				set:(value) => {
-					var AssignStructValueError = use("Runtime.Exceptions.AssignStructValueError");
-					throw new AssignStructValueError(null, name); 
-				}
-			}
-		);
-		#endswitch
-	}
-	
-	
-	
 	/**
 	 * Define class
 	 */
@@ -540,61 +505,11 @@ class rtl
 	
 	
 	/**
-	 * Run thread
-	 */
-	static void runThread(fn f, Collection<var> args = null)
-	{
-		if (args == null) args = [];
-		
-		#ifcode JAVASCRIPT then
-		(async () => {
-			try { args = args.prependIm(ctx); await f.apply(args); }
-			catch (e) { console.log(e.stack); }
-		})();
-		#endif
-	}
-	
-	
-	
-	/**
 	 * Returns value
 	 */
 	static var get(var item, string key, var def_val = null)
 	{
-		if (item === null) return def_val;
-		
-		#switch
-		#case ifcode PHP then
-		if ($item === null) return $def_val;
-		if ($item instanceof \Runtime\Dict ||
-			$item instanceof \Runtime\Collection ||
-			$item instanceof \Runtime\BaseStruct
-		)
-		{
-			return $item->get($ctx, $key, $def_val);
-		}
-		if (gettype($item) == "array" or method_exists($item, "__get"))
-		{
-			if (is_int($key) or is_float($key) or is_string($key) or is_bool($key)) return $item[$key];
-		}
-		if (gettype($item) == "string")
-		{
-			if (is_int($key)) return mb_substr($item, $key, 1);
-		}
-		return $def_val;
-		#case ifcode JAVASCRIPT then
-		if (item == undefined) return def_val;
-		if (item instanceof Runtime.Dict ||
-			item instanceof Runtime.Collection ||
-			item instanceof Runtime.BaseStruct
-		)
-		{
-			return item.get(ctx, key, def_val);
-		}
-		return item[key];
-		#endswitch
-		
-		return def_val;
+		return static::attr(item, key, def_val)
 	}
 	
 	
@@ -605,13 +520,13 @@ class rtl
 	 */
 	static var attr(var item, Collection path, var def_val = null)
 	{
-		if (path == null) return def_val;
+		if (path === null) return def_val;
 		#switch
 		#case ifcode PHP then
 		
 		if ($item === null) return $def_val;
-		if (gettype($path) == "string") $path = \Runtime\Collection::from([$path]);
-		else if (gettype($path) == "array") $path = \Runtime\Collection::from($path);
+		if (gettype($path) == "array") $path = \Runtime\Collection::from($path);
+		else if (static::isScalarValue($ctx, $path)) $path = \Runtime\Collection::from([$path]);
 		if (!($path instanceof \Runtime\Collection)) return $def_val;
 		if (count($path->_arr) == 0) 
 		{
@@ -641,8 +556,8 @@ class rtl
 		
 		if (def_val == undefined) def_val = null;
 		if (item === null) return def_val;
-		if (typeof path == "string") path = Collection.from([path]);
-		else if (Array.isArray(path) && path.count == undefined) path = Collection.from(path);
+		if (Array.isArray(path) && path.count == undefined) path = Collection.from(path);
+		if (this.isScalarValue(ctx, path)) path = Collection.from([path]);
 		if (!(path instanceof Collection)) return def_val;
 		if (path.count() == 0)
 		{
@@ -1211,63 +1126,6 @@ class rtl
 	
 	
 	
-	/**
-	 * Json encode data
-	 * @param var data
-	 * @return string
-	 */
-	public static string json_encode(var data)
-	{
-		fn f = static::method("Runtime.RuntimeUtils", "json_encode");
-		return f(data);
-	}
-	
-	
-	/**
-	 * Json decode to primitive values
-	 * @param string s Encoded string
-	 * @return var
-	 */
-	public static string json_decode(var obj)
-	{
-		fn f = static::method("Runtime.RuntimeUtils", "json_decode");
-		return f(obj);
-	}
-	
-	
-	
-	/* ====================== Chains ====================== */
-	
-	/**
-	 * Apply async chain
-	 */
-	static async Collection<var> chainAsync(Collection<string> chain, Collection<var> args)
-	{
-		for (int i=0; i<chain.count(); i++)
-		{
-			string chain_name = chain.item(i);
-			args = await rtl::apply(chain_name, args);
-		}
-		return args;
-	}
-	
-	
-	
-	/**
-	 * Apply chain
-	 */
-	static Collection<var> chain(Collection<string> chain, Collection<var> args)
-	{
-		for (int i=0; i<chain.count(); i++)
-		{
-			string chain_name = chain.item(i);
-			args = rtl::apply(chain_name, args);
-		}
-		return args;
-	}
-	
-	
-	
 	/* ================ Memorize functions ================ */
 	
 	
@@ -1630,129 +1488,6 @@ class rtl
 	
 	
 	/**
-	 * Clone var
-	 * @param {var} value - Variable
-	 * @return {var} result
-	 */
-	static var clone(var val)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		if ($val == null) return null;
-		if (self::isScalarValue($val)) return $val;
-		return clone $val;
-		
-		#case ifcode JAVASCRIPT then
-		
-		var Collection = use("Runtime.Collection");
-		var Dict = use("Runtime.Dict");
-		var BaseObject = use("Runtime.BaseObject");
-		var BaseStruct = use("Runtime.BaseStruct");
-		var FakeStruct = use("Runtime.FakeStruct");
-		var Reference = use("Runtime.Reference");
-		
-		if (val == null)
-			return null;
-		
-		else if (val instanceof Number || typeof val == "number")
-		{
-			return val;
-		}
-		else if (val instanceof String || typeof val == "string")
-		{
-			return (new String(val)).toString();
-		}
-		else if (val instanceof Boolean || typeof val == "boolean")
-		{
-			return val;
-		}
-		else if (typeof val == "symbol")
-		{
-			return Symbol();
-		}
-		else if (val instanceof Date)
-		{
-			return new Date(val);
-		}
-		else if (typeof val == 'object' && val.nodeType && typeof val.cloneNode == "function")
-		{
-			return val.cloneNode(true);
-		}
-		else if (val instanceof Collection)
-		{
-			var res = val.constructor.Instance();
-			for (var i=0;i<val.length;i++)
-			{
-				res.push(ctx, this.clone(ctx, val[i]));
-			}
-			return res;
-		}
-		else if (val instanceof Dict)
-		{
-			var res = val.constructor.Instance();
-			for (var key in val._map)
-			{
-				res._map[key] = this.clone(ctx, val._map[key]);
-			}
-			return res;
-		}
-		else if (Array.isArray(val))
-		{	
-			var proto = Object.getPrototypeOf(val);
-			var res = Object.create(proto);
-			for (var i=0;i<val.length;i++)
-			{
-				res.push(ctx, this.clone(ctx, val[i]));
-			}
-			return res;
-		}
-		else if (val instanceof BaseStruct)
-		{
-			return val;
-		}
-		else if (val instanceof FakeStruct)
-		{
-			return val.clone(ctx);
-		}
-		else if (val instanceof Reference)
-		{
-			return new Reference(ctx, val.ref);
-		}
-		else if (val instanceof BaseObject || typeof val == 'object')
-		{
-			var proto = Object.getPrototypeOf(val);
-			var res = Object.create(proto);
-			var a = Object.getOwnPropertyNames(val);
-			for (var i=0;i<a.length;i++)
-			{
-				var key = a[i];
-				res[key] = this.clone(ctx, val[key]);
-			}
-			return res;
-		}
-		
-		return null;
-		
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Convert to timestamp
-	 */
-	static int timestamp(string s)
-	{
-		#switch
-		#case ifcode PHP then
-		return strtotime($s);
-		#endswitch
-	}
-	
-	
-	
-	/**
 	 * Debug
 	 */
 	void @trace()
@@ -1792,6 +1527,76 @@ class rtl
 	}
 	
 	#endif
+	
+	
+	
+	/* ================================ Context Functions ================================ */
+	
+	protected static var _global_context = null;
+	
+	
+	/**
+	 * Returns global context
+	 * @return Context
+	 */
+	public static var @getContext()
+	{
+		#switch
+		#case ifcode PHP then
+		return self::$_global_context;
+		#case ifcode NODEJS then
+		return rtl._global_context;
+		#case ifcode ES6 then
+		return Runtime.rtl._global_context;
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Set global context
+	 * @param Context context
+	 */
+	public static var @setContext(var context)
+	{
+		#switch
+		#case ifcode PHP then
+		self::$_global_context = $context;
+		#case ifcode JAVASCRIPT then
+		use("Runtime.rtl")._global_context = context;
+		#endswitch
+		return context;
+	}
+	
+	
+	
+	/* ============================= Runtime Utils Functions ============================= */
+	
+	
+	/**
+	 * Json encode data
+	 * @param var data
+	 * @return string
+	 */
+	public static string json_encode(var data)
+	{
+		fn f = static::method("Runtime.RuntimeUtils", "json_encode");
+		return f(data);
+	}
+	
+	
+	
+	/**
+	 * Json decode to primitive values
+	 * @param string s Encoded string
+	 * @return var
+	 */
+	public static string json_decode(var obj)
+	{
+		fn f = static::method("Runtime.RuntimeUtils", "json_decode");
+		return f(obj);
+	}
+	
 }
 
 

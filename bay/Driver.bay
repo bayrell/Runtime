@@ -16,16 +16,16 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Core;
+namespace Runtime;
 
 use Runtime.BaseStruct;
+use Runtime.Collection;
 use Runtime.Dict;
+use Runtime.Entity;
 use Runtime.Map;
 use Runtime.rs;
 use Runtime.rtl;
-use Runtime.Collection;
 use Runtime.Vector;
-use Runtime.Core.Entity;
 
 
 struct Driver extends Entity
