@@ -35,6 +35,7 @@
 		"Entity",
 		"Driver",
 		"LambdaChain",
+		"LambdaChainClass",
 		"LambdaChainDeclare",
 		"RuntimeUtils",
 		"ModuleDescription"

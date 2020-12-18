@@ -19,19 +19,11 @@
 namespace Runtime;
 
 use Runtime.BaseStruct;
-use Runtime.Entity;
 use Runtime.rs;
 
 
-struct LambdaChain extends BaseStruct
-{
+struct LambdaChainClass extends BaseStruct
+{	
 	string name = "";
-	string value = "";
-	string chain = "";
-	double pos = 0;
-	bool is_async = false;
-	string logName() => this.getClassName() ~ " -> " ~ this.name ~ " -> [" ~ this.pos ~ "] " ~ this.value;
-	LambdaChain addClassItem(string class_name, string class_method_name, Entity class_item) =>
-		this.copy{ "value": class_name ~ "::" ~ class_method_name }
-	;
 }
+ 
