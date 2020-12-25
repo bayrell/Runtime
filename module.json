@@ -24,6 +24,7 @@
 		"StringInterface",
 		"BaseObject",
 		"BaseStruct",
+		"Date",
 		"DateTime",
 		"PathInfo",
 		"Reference",

@@ -416,4 +416,46 @@ class lib
 		}
 	;
 	
+	
+	
+	/**
+	 * Function or
+	 */
+	pure fn or(Collection<fn> arr) =>
+		bool (var item) use (arr)
+		{
+			for (int i=0; i<arr.count(); i++)
+			{
+				fn f = arr[i];
+				bool res = f(item);
+				if (res) return true;
+			}
+			return false;
+		}
+	;
+	
+	
+	
+	/**
+	 * Function and
+	 */
+	pure fn and(Collection<fn> arr) =>
+		bool (var item) use (arr)
+		{
+			for (int i=0; i<arr.count(); i++)
+			{
+				fn f = arr[i];
+				bool res = f(item);
+				if (res) return true;
+			}
+			return false;
+		}
+	;
+	
+	
+	
+	/**
+	 * Join
+	 */
+	pure fn join(string ch) => string (Collection items) use (ch) => rs::join(ch, items);
 }

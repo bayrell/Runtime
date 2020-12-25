@@ -37,6 +37,10 @@ Runtime._Collection.prototype = Object.create(Array.prototype);
 Runtime._Collection.prototype.constructor = Runtime._Collection;
 Object.assign(Runtime._Collection.prototype,
 {
+	toArray: function()
+	{
+		return Array.prototype.slice.call(this);
+	},
 	toStr: function(value)
 	{
 		return use("Runtime.rtl").toStr(value);
@@ -942,7 +946,7 @@ class Collection<T> extends _Collection
 		return arr;
 		#case ifcode PHP then
 		$arr2 = $this->cp($ctx);
-		array_reverse($arr2->_arr);
+		$arr2->_arr = array_reverse($arr2->_arr);
 		return $arr2;
 		#endswitch
 	}
