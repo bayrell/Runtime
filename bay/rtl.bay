@@ -578,6 +578,12 @@ class rtl
 			val = this.attr(ctx, item, path, def_val);
 			return val;
 		}
+		else
+		{
+			item = item[key] || def_val;
+			val = this.attr(ctx, item, path, def_val);
+			return val;
+		}
 		return val;
 		
 		#endswitch
@@ -943,7 +949,10 @@ class rtl
 	 */
 	static string @toStr(var value)
 	{
+		#ifdef ENABLE_CONTEXT then
 		return static::toString(null, value);
+		#endif
+		return static::toString(value);
 	}
 	
 	
@@ -1597,6 +1606,24 @@ class rtl
 		return f(obj);
 	}
 	
+	
+	
+	/**
+	 * Returns parents class names
+	 * @return Vector<string>
+	 */
+	pure memorize Collection<string> getParents(string class_name)
+	{
+		Vector<string> res = new Vector();
+		while (class_name != "")
+		{
+			res.pushValue(class_name);
+			var f = static::method(class_name, "getParentClassName");
+			class_name = f();
+		}
+		
+		return res.toCollection();
+	}
 }
 
 

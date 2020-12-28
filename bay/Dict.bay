@@ -742,17 +742,25 @@ class Dict<T> extends _Map
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
+		var _map = {};
+		var f = false;
+		var Dict = use("Runtime.Dict");
 		if (map == null) return this;
+		if (map instanceof Dict) _map = map._map;
+		else if (typeof map == "object") { _map = map; f = true; }
 		var res = this.cp(ctx);
-		for (var key in map._map)
+		for (var key in _map)
 		{
-			res._map[key] = map._map[key];
+			res._map[(f ? "|" : "") + key] = _map[key];
 		}
 		return res;
 		#case ifcode PHP then
+		$_map = [];
 		if ($map == null) return $this;
+		if ($map instanceof \Runtime\Dict) $_map = $map->_map;
+		else if (gettype($map) == "array") $_map = $map;
 		$res = $this->cp($ctx);
-		foreach ($map->_map as $key => $value)
+		foreach ($_map as $key => $value)
 		{
 			$res->_map[$key] = $value;
 		}

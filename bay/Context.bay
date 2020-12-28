@@ -201,6 +201,15 @@ struct Context extends BaseStruct
 	
 	
 	/**
+	 * Set main class
+	 */
+	pure Context setMainClass(Context c, string main_class) =>
+		c.copy{ "main_class": main_class }
+	;
+	
+	
+	
+	/**
 	 * Set entry point
 	 */
 	pure Context setEntryPoint(Context c, string entry_point) =>
@@ -303,6 +312,13 @@ struct Context extends BaseStruct
 			string driver_name = keys[i];
 			BaseDriver driver = c.drivers[driver_name];
 			await driver.startDriver();
+			
+			#ifcode JAVASCRIPT then
+			if (driver.entity.global)
+			{
+				window[driver_name] = driver;
+			}
+			#endif
 		}
 		
 		return c.copy{"started": true};
@@ -675,5 +691,51 @@ struct Context extends BaseStruct
 	 * Extends entities
 	 */
 	pure Collection<BaseStruct> extendEntities(Context c, Collection<BaseStruct> entities) => entities;
+	
+	
+	
+	/**
+	 * Start App
+	 */
+	static async void startApp(Dict env, string module_name, string app_name)
+	{
+		Context context = static::create(env);
+		
+		/* Set global context */
+		@ = context;
+		
+		#ifcode JAVASCRIPT then
+		window["globalContext"] = context;
+		#endif
+		
+		context = context::setMainModule(context, module_name);
+		context = context::setMainClass(context, app_name);
+		context = context::setEntryPoint(context, app_name);
+		
+		/* Init context */
+		context = await context::init(context);
+		
+		/* Start context */
+		context = await context::start(context);
+		
+		/* Set global context */
+		@ = context;
+		
+		#ifcode JAVASCRIPT then
+		window["globalContext"] = context;
+		#endif
+		
+		try
+		{
+			/* Run app */
+			await context::run(context);
+		}
+		catch (var e)
+		{
+			#ifcode JAVASCRIPT then
+			console.log( e.stack );
+			#endif
+		}
+	}
 	
 }

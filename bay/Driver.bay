@@ -30,4 +30,5 @@ use Runtime.Vector;
 
 struct Driver extends Entity
 {
+	bool global = false;
 }

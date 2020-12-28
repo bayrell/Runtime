@@ -21,7 +21,7 @@ namespace Runtime;
 use Runtime.re;
 
 
-#ifcode NODEJS then
+#ifcode JAVASCRIPT then
 const fs = require('fs');
 const { promisify } = require('util');
 const { resolve } = require('path');
@@ -103,7 +103,7 @@ class fs
 	{
 		#switch
 		
-		#case ifcode NODEJS then
+		#case ifcode JAVASCRIPT then
 		
 		var mpath = require("path");
 		return mpath.relative(path, to);
@@ -118,9 +118,6 @@ class fs
 	
 	
 	
-	#ifdef BACKEND then
-	
-	
 	/**
 	 * Exists
 	 */
@@ -131,7 +128,7 @@ class fs
 		
 		#switch
 		
-		#case ifcode NODEJS then
+		#case ifcode JAVASCRIPT then
 		
 		var res = await fileExists(filepath);
 		return Promise.resolve( res );
@@ -155,7 +152,7 @@ class fs
 		string filepath = chroot ~ path;
 		#switch
 		
-		#case ifcode NODEJS then
+		#case ifcode JAVASCRIPT then
 		
 		await writeFile( resolve(filepath), content, { "encoding": ch } );
 		
@@ -181,7 +178,7 @@ class fs
 		
 		#switch
 		
-		#case ifcode NODEJS then
+		#case ifcode JAVASCRIPT then
 		
 		var content = await readFile( resolve(filepath), { "encoding": ch } );
 		return Promise.resolve( content );
@@ -211,7 +208,7 @@ class fs
 		
 		#switch
 		
-		#case ifcode NODEJS then
+		#case ifcode JAVASCRIPT then
 		
 		#case ifcode PHP then
 		
@@ -236,7 +233,7 @@ class fs
 		
 		#switch
 		
-		#case ifcode NODEJS then
+		#case ifcode JAVASCRIPT then
 		
 		filepath = resolve(filepath);
 		var exists = await fileExists(filepath);
@@ -272,7 +269,7 @@ class fs
 		
 		#switch
 		
-		#case ifcode NODEJS then
+		#case ifcode JAVASCRIPT then
 		
 		if (target_path.substr(0, 2) != "..") target_path = resolve(target_path);
 		if (link_name_path.substr(0, 2) != "..") link_name_path = resolve(link_name_path);
@@ -296,7 +293,7 @@ class fs
 		
 		#switch
 		
-		#case ifcode NODEJS then
+		#case ifcode JAVASCRIPT then
 		
 		filepath = resolve(filepath);
 		var exists = await fileExists(filepath);
@@ -330,10 +327,12 @@ class fs
 		#switch
 		#case ifcode PHP then
 		return is_dir($dirpath);
-		#case ifcode NODEJS then
+		
+		#case ifcode JAVASCRIPT then
 		dirpath = resolve(dirpath);
 		var stat = await lstat(dirpath);
 		return Promise.resolve( stat.isDirectory() );
+
 		#endswitch
 	}
 	
@@ -348,7 +347,7 @@ class fs
 		string dirpath = chroot ~ dirname;
 		
 		#switch
-		#case ifcode NODEJS then
+		#case ifcode JAVASCRIPT then
 		
 		dirpath = resolve(dirpath);
 		var Collection = use("Runtime.Collection");
@@ -398,7 +397,5 @@ class fs
 		
 		return res.toCollection();
 	}
-	
-	#endif
 	
 }

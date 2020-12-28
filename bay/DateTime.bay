@@ -56,7 +56,7 @@ struct DateTime extends BaseStruct
 		$i = (int)$dt->format("i");
 		$s = (int)$dt->format("s");
 		$tz = $dt->getTimezone()->getName();
-		return new \Runtime\DateTime( $ctx, Dict::from(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"tz"=>$tz]) );
+		return new \Runtime\DateTime($ctx, Dict::from(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"tz"=>$tz]));
 	}
 	
 	#endif
@@ -349,7 +349,7 @@ Runtime.DateTime.fromObject = function(ctx, dt, tz)
 	var h = Number(dt.getHours());
 	var i = Number(dt.getMinutes());
 	var s = Number(dt.getSeconds());
-	var dt = new Runtime.DateTime( ctx, Dict.from({"y":y,"m":m,"d":d,"h":h,"i":i,"s":s,"tz":tz}) );
+	var dt = new Runtime.DateTime(ctx, Dict.from({"y":y,"m":m,"d":d,"h":h,"i":i,"s":s,"tz":tz}));
 	return dt;
 }
 

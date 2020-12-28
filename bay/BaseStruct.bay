@@ -248,7 +248,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		return new (Function.prototype.bind.apply(this, [null, ctx, items]));
+		return new (Function.prototype.bind.apply(this, (typeof ctx != "undefined") ? [null, ctx, items] : [null, items]));
 		#case ifcode PHP then
 		$class_name = static::class;
 		return new $class_name($ctx, $items);
