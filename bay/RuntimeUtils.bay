@@ -307,7 +307,7 @@ static class RuntimeUtils
 			for (int i=0; i<names.count(); i++)
 			{
 				string variable_name = names.item(i);
-				var value = obj.takeValue(variable_name, null);
+				var value = obj.get(variable_name, null);
 				var value = self::ObjectToPrimitive( value, force_class_name );
 				values.setValue(variable_name, value);
 			}

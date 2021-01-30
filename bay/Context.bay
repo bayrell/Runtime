@@ -692,6 +692,7 @@ struct Context extends BaseStruct
 		Context context = static::create(env);
 		
 		/* Set global context */
+		rtl::@setContext(context);
 		@ = context;
 		
 		#ifcode JAVASCRIPT then
@@ -710,6 +711,7 @@ struct Context extends BaseStruct
 		context = await context::start(context);
 		
 		/* Set global context */
+		rtl::@setContext(context);
 		@ = context;
 		
 		#ifcode JAVASCRIPT then
