@@ -18,11 +18,6 @@
 
 namespace Runtime;
 
-use Runtime.LambdaChainClass;
-use Runtime.Map;
-use Runtime.rtl;
-use Runtime.Vector;
-
 
 static class ModuleDescription
 {
@@ -56,7 +51,6 @@ static class ModuleDescription
 	 */
 	pure Collection<Dict> entities() => 
 	[
-		new LambdaChainClass{ "name": "Faydell.App" },
 	];
 	
 }

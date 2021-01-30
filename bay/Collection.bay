@@ -153,20 +153,20 @@ class _Collection implements \ArrayAccess, \JsonSerializable
 	 * Get and set methods
 	 */
 	function __isset($k){return isset($this->_arr[$k]);}
-	function __get($k){return $this->item(\Runtime\RuntimeUtils::getContext(), $k);}
+	function __get($k){return $this->item(\Runtime\rtl::getContext(), $k);}
 	function __set($k,$v){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\RuntimeUtils::getContext(), $k);
+		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
 	}
 	function __unset($k){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\RuntimeUtils::getContext(), $k);
+		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
 	}
 	public function offsetExists($k){return isset($this->_arr[$k]);}
-	public function offsetGet($k){return $this->item(\Runtime\RuntimeUtils::getContext(), $k);}
+	public function offsetGet($k){return $this->item(\Runtime\rtl::getContext(), $k);}
 	public function offsetSet($k,$v){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\RuntimeUtils::getContext(), $k);
+		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
 	}
 	public function offsetUnset($k){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\RuntimeUtils::getContext(), $k);
+		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
 	}
 	
 	
@@ -616,9 +616,9 @@ class Collection<T> extends _Collection
 	 */
 	public Collection<T> concatIm(Collection<T> arr)
 	{
+		if (arr == null) return this;
 		#switch
 		#case ifcode JAVASCRIPT then
-		if (arr == null) return this;
 		if (arr.length == 0) return this;
 		var res = this.cp(ctx);
 		for (var i=0; i<arr.length; i++)

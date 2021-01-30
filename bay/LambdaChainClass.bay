@@ -19,11 +19,11 @@
 namespace Runtime;
 
 use Runtime.BaseStruct;
+use Runtime.Entity;
 use Runtime.rs;
 
 
-struct LambdaChainClass extends BaseStruct
-{	
-	string name = "";
+struct LambdaChainClass extends Entity
+{
 }
  

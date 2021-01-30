@@ -740,6 +740,7 @@ class Dict<T> extends _Map
 	 */
 	public Dict<T> concat(Dict<T> map = null)
 	{
+		if (map == null) return this;
 		#switch
 		#case ifcode JAVASCRIPT then
 		var _map = {};

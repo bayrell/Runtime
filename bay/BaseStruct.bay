@@ -85,7 +85,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 				{
 					if ($check_types)
 					{
-						$info = \Runtime\RuntimeUtils::getFieldInfo($ctx, $class_name, $key);
+						$info = \Runtime\rtl::getFieldInfo($ctx, $class_name, $key);
 						if ($info)
 						{
 							$value = \Runtime\rtl::convert($ctx, $value, $info->t, null);
@@ -99,7 +99,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		#case ifcode JAVASCRIPT then
 		
 		var _Dict = use("Runtime.Dict");
-		var RuntimeUtils = use("Runtime.RuntimeUtils");
+		var rtl = use("Runtime.rtl");
 		if (obj instanceof _Dict)
 		{
 			for (var key in obj._map)
@@ -107,7 +107,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 				var value = obj._map[key];
 				if (check_types)
 				{
-					info = RuntimeUtils.getFieldInfo(ctx, new_item.getClassName(), key);
+					info = rtl.getFieldInfo(ctx, new_item.getClassName(), key);
 					if (info)
 					{
 						value = rtl.convert(ctx, value, info.t, null);
@@ -123,7 +123,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 				var value = obj[key];
 				if (check_types)
 				{
-					info = RuntimeUtils.getFieldInfo(ctx, new_item.getClassName(), key);
+					info = rtl.getFieldInfo(ctx, new_item.getClassName(), key);
 					if (info)
 					{
 						value = rtl.convert(ctx, value, info.t, null);

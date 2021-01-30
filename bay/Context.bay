@@ -204,7 +204,7 @@ struct Context extends BaseStruct
 	 * Set main class
 	 */
 	pure Context setMainClass(Context c, string main_class) =>
-		c.copy{ "main_class": main_class }
+		c.copy{ "main_class": main_class, "entry_point": main_class }
 	;
 	
 	
@@ -607,26 +607,19 @@ struct Context extends BaseStruct
 		{
 			BaseStruct item1 = entities.item(i);
 			string item1_class_name = item1.getClassName();
-			if (item1_class_name == "Runtime.Core.Entity")
+			if (item1_class_name == "Runtime.Entity")
 			{
 				string class_name = (item1.value != "") ? item1.value : item1.name;
-				IntrospectionClass info = RuntimeUtils::getClassIntrospection(class_name);
-				if (info != null and info.class_info)
+				Collection annotations = rtl::getClassAnnotations(class_name);
+				for (int j=0; j<annotations.count(); j++)
 				{
-					for (int j=0; j<info.class_info.count(); j++)
+					BaseStruct item2 = annotations.item(j);
+					string item2_class_name = item2.getClassName();
+					if (item2 instanceof Entity and item2_class_name != "Runtime.Entity")
 					{
-						BaseStruct item2 = info.class_info.item(j);
-						string item2_class_name = item2.getClassName();
-						if (item2 instanceof Entity and item2_class_name != "Runtime.Core.Entity")
-						{
-							item2 = item2.copy({ "name": class_name });
-							e.pushValue(item2);
-						}
+						item2 = item2.copy({ "name": class_name });
+						e.pushValue(item2);
 					}
-				}
-				else
-				{
-					throw new FileNotFound(class_name, "Entity");
 				}
 			}	
 		}
@@ -656,8 +649,8 @@ struct Context extends BaseStruct
 			string class_name = class_item.name;
 			if (class_name == "") continue;
 			
-			IntrospectionClass class_info = RuntimeUtils::getClassIntrospection(class_name);
-			class_info.methods.each
+			Dict annotations = rtl::getMethodsAnnotations(class_name);
+			annotations.each
 			(
 				void (Collection annotations, string class_method_name) use
 				(methods, class_item, class_name, entity_class_name, entity_class_method)
@@ -669,11 +662,8 @@ struct Context extends BaseStruct
 						{
 							if (rtl::is_instanceof(annotation, entity_class_method))
 							{
-								methods.pushValue
-								(
-									annotation
-										.addClassItem(class_name, class_method_name, class_item)
-								);
+								annotation = annotation.addClassItem(class_name, class_method_name, class_item);
+								methods.pushValue(annotation);
 							}
 						}
 					}
@@ -697,7 +687,7 @@ struct Context extends BaseStruct
 	/**
 	 * Start App
 	 */
-	static async void startApp(Dict env, string module_name, string app_name)
+	static async void startApp(Dict env, string module_name, string main_class)
 	{
 		Context context = static::create(env);
 		
@@ -708,9 +698,10 @@ struct Context extends BaseStruct
 		window["globalContext"] = context;
 		#endif
 		
+		context = context::setAppName(context, module_name);
 		context = context::setMainModule(context, module_name);
-		context = context::setMainClass(context, app_name);
-		context = context::setEntryPoint(context, app_name);
+		context = context::setMainClass(context, main_class);
+		context = context::setEntryPoint(context, main_class);
 		
 		/* Init context */
 		context = await context::init(context);

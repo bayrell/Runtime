@@ -6,7 +6,6 @@
 		"lib",
 		"re",
 		"rs",
-		"fs",
 		"Collection",
 		"Dict",
 		"Map",

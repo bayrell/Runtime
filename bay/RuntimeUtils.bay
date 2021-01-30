@@ -47,7 +47,7 @@ static class RuntimeUtils
 	 * Returns parents class names
 	 * @return Vector<string>
 	 */
-	pure memorize Collection<string> getParents(string class_name)
+	pure memorize Collection<string> getParentsOld(string class_name)
 	{
 		Vector<string> res = new Vector();
 		res.pushValue(class_name);
@@ -72,7 +72,7 @@ static class RuntimeUtils
 	 * @param string class_name
 	 * @return Vector<IntrospectionInfo>
 	 */
-	pure memorize Collection<string> getVariablesNames(string class_name, int flag = 2)
+	pure memorize Collection<string> getVariablesNamesOld(string class_name, int flag = 2)
 	{
 		/* Get parents names */
 		Collection<string> class_names = self::getParents(class_name);
@@ -103,7 +103,7 @@ static class RuntimeUtils
 	 * @param string class_name
 	 * @return Vector<IntrospectionInfo>
 	 */
-	pure memorize IntrospectionClass getClassIntrospection(string class_name, bool include_parents = false)
+	pure memorize IntrospectionClass getClassIntrospectionOld(string class_name, bool include_parents = false)
 	{
 		Collection<BaseStruct> class_info = null;
 		Map<Collection> fields = new Map();
@@ -179,7 +179,7 @@ static class RuntimeUtils
 	 * @param string class_name
 	 * @return Vector<IntrospectionInfo>
 	 */
-	pure memorize IntrospectionClass getClassIntrospectionWithParents(string class_name)
+	pure memorize IntrospectionClass getClassIntrospectionWithParentsOld(string class_name)
 	{
 		return static::getClassIntrospection(class_name, true);
 	}
@@ -189,7 +189,7 @@ static class RuntimeUtils
 	/**
 	 * Returns methods in class by annotation name
 	 */
-	pure Collection<string> getMethodsIntrospection(string class_name, Collection<string> annotations)
+	pure Collection<string> getMethodsIntrospectionOld(string class_name, Collection<string> annotations)
 	{
 		IntrospectionClass class_info = RuntimeUtils::getClassIntrospection( class_name );
 		Dict d = class_info.methods.filter
@@ -223,7 +223,7 @@ static class RuntimeUtils
 	/**
 	 * Returns IntrospectionInfo of field
 	 */
-	pure memorize IntrospectionInfo getFieldInfo(string class_name, string field_name)
+	pure memorize IntrospectionInfo getFieldInfoOld(string class_name, string field_name)
 	{
 		Collection<string> parents = static::getParents(class_name);
 		for (int i=0; i<parents.count(); i++)
@@ -302,7 +302,7 @@ static class RuntimeUtils
 		if (obj instanceof BaseStruct)
 		{
 			Map<var> values = new Map();
-			Collection<string> names = static::getVariablesNames(obj.getClassName(), 1);
+			Collection<string> names = rtl::getFields(obj.getClassName());
 			
 			for (int i=0; i<names.count(); i++)
 			{
@@ -383,7 +383,7 @@ static class RuntimeUtils
 			
 			/* Assign values */
 			Map<var> obj = new Map();
-			Collection<string> names = static::getVariablesNames(class_name, 1);
+			Collection<string> names = rtl::getFields(class_name);
 			for (int i=0; i<names.count(); i++)
 			{
 				string variable_name = names.item(i);

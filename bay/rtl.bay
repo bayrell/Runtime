@@ -484,11 +484,13 @@ class rtl
 	 * Apply method
 	 * @return var
 	 */
-	static var applyMethod(string class_name, string method_name, Collection args = null)
+	static var methodApply(string class_name, string method_name, Collection args = null)
 	{
 		fn f = rtl::method(class_name, method_name);
 		return rtl::apply(f, args);
 	}
+	static var applyMethod(string class_name, string method_name, Collection args = null) =>
+		static::methodApply(class_name, method_name, args);
 	
 	
 	
@@ -496,12 +498,14 @@ class rtl
 	 * Apply method async
 	 * @return var
 	 */
-	static async var applyMethodAsync(string class_name, string method_name, Collection args = null)
+	static async var methodApplyAsync(string class_name, string method_name, Collection args = null)
 	{
 		fn f = rtl::method(class_name, method_name);
 		return await rtl::applyAsync(f, args);
 	}
-	
+	static async var applyMethodAsync(string class_name, string method_name, Collection args = null) =>
+		await static::methodApplyAsync(class_name, method_name, args);
+		
 	
 	
 	/**
@@ -543,7 +547,7 @@ class rtl
 		}
 		else if ($item instanceof \Runtime\BaseStruct)
 		{
-			$item = $item->takeValue($ctx, $key, $def_val);
+			$item = $item->get($ctx, $key, $def_val);
 			$val = static::attr($ctx, $item, $path, $def_val);
 			return $val;
 		}
@@ -574,7 +578,7 @@ class rtl
 		}
 		else if (item instanceof BaseStruct)
 		{
-			item = item.takeValue(ctx, key, def_val);
+			item = item.get(ctx, key, def_val);
 			val = this.attr(ctx, item, path, def_val);
 			return val;
 		}
@@ -1618,11 +1622,166 @@ class rtl
 		while (class_name != "")
 		{
 			res.pushValue(class_name);
-			var f = static::method(class_name, "getParentClassName");
-			class_name = f();
+			class_name = static::methodApply(class_name, "getParentClassName");
 		}
 		
 		return res.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Returns class annotations
+	 */
+	pure memorize Collection getClassAnnotations(string class_name, Collection res = null)
+	{
+		if (res == null) res = [];
+		Dict info = static::methodApply(class_name, "getClassInfo");
+		Collection arr = info["annotations"] |> default Collection [];
+		return res.concat(arr);
+	}
+	
+	
+	
+	/**
+	 * Returns class annotations with parents
+	 */
+	pure memorize Collection getClassAnnotationsWithParents(string class_name)
+	{
+		Collection res = {};
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			res = static::getClassAnnotations(parent_class_name, res);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns field info
+	 */
+	pure memorize Dict getFieldInfo(string class_name, string field_name)
+	{
+		Dict res = static::methodApply(class_name, "getFieldInfoByName", [field_name]);
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns field info
+	 */
+	pure memorize Dict getFieldInfoWithParents(string class_name, string field_name)
+	{
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			Dict res = static::methodApply(parent_class_name, "getFieldInfoByName", [field_name]);
+			if (res != null) return res;
+		}
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns fields of class
+	 */
+	pure memorize Dict getFields(string class_name, int flag = 255)
+	{
+		Vector<string> names = new Vector();
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			Collection<string> item_fields = static::methodApply
+			(
+				parent_class_name, "getFieldsList", [flag]
+			);
+			if (item_fields != null)
+			{
+				names.appendVector(item_fields);
+			}
+		}
+		return names.toCollection().removeDuplicatesIm();
+	}
+	
+	
+	
+	/**
+	 * Returns fields annotations
+	 */
+	pure memorize Dict getFieldsAnnotations(string class_name, Dict res = null)
+	{
+		if (res == null) res = {};
+		Collection<string> methods = static::methodApply(class_name, "getFieldsList", [255]);
+		for (int i=0; i<methods.count(); i++)
+		{
+			string method_name = methods[i];
+			Dict info = static::methodApply(class_name, "getFieldInfoByName", [method_name]);
+			Collection annotations = info["annotations"];
+			Collection arr = res[method_name] |> default Collection [];
+			res <= { method_name } <= arr.concat(annotations);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns fields annotations with parents
+	 */
+	pure memorize Dict getFieldsAnnotationsWithParents(string class_name)
+	{
+		Dict res = {};
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			res = static::getFieldsAnnotations(parent_class_name, res);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns methods annotations
+	 */
+	pure memorize Dict getMethodsAnnotations(string class_name, Dict res = null)
+	{
+		if (res == null) res = {};
+		Collection<string> methods = static::methodApply(class_name, "getMethodsList", [255]);
+		for (int i=0; i<methods.count(); i++)
+		{
+			string method_name = methods[i];
+			Dict info = static::methodApply(class_name, "getMethodInfoByName", [method_name]);
+			Collection annotations = info["annotations"];
+			Collection arr = res[method_name] |> default Collection [];
+			res <= { method_name } <= arr.concat(annotations);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns methods annotations with parents
+	 */
+	pure memorize Dict getMethodsAnnotationsWithParents(string class_name)
+	{
+		Dict res = {};
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			res = static::getMethodsAnnotations(parent_class_name, res);
+		}
+		return res;
 	}
 }
 

@@ -1,4 +1,4 @@
-"use strict";
+"use strict;"
 /*!
  *  Bayrell Runtime Library
  *
@@ -17,59 +17,17 @@
  *  limitations under the License.
  */
 
-function runWebApp(env, module_name, app_name)
+/* Run web app */
+function runWebApp(env, module_name, class_name)
 {
-	/* Use */
-	var rtl = use("Runtime.rtl");
-	var Collection = use("Runtime.Collection");
-	var Dict = use("Runtime.Dict");
-	var Context = use("Runtime.Context");
-
-	/* Get enviroment */
-	if (env == undefined) env = {};
-	env = Dict.from(env);
-
-	/* Create context */
-	var context = Context.create(null, Dict.from(env));
-	var ctx = context;
-	
-	/* Set context params */
-	context = context.copy
+	window.addEventListener
 	(
-		context,
-		{
-			"start_time": Date.now(),
-		}
+		"load",
+		(function(obj){ return function() {
+			(async () => {
+				var ctx = null;
+				Runtime.Context.startApp(ctx,Runtime.Dict.from(obj.env),obj.module_name,obj.class_name);
+			})();
+		}})({ "env": env, "module_name": module_name, "class_name": class_name })
 	);
-	
-	/* Set entry point */
-	context = context.constructor.setMainModule(ctx, context, module_name);
-	context = context.constructor.setMainClass(ctx, context, app_name);
-	context = context.constructor.setEntryPoint(ctx, context, app_name);
-
-	/* Set global context */
-	rtl.setContext(context);
-
-	/* Run app */
-	(async () => {
-		try
-		{
-			/* Init context */
-			context = await context.constructor.init(ctx, context);
-			
-			/* Start context */
-			context = await context.constructor.start(ctx, context);
-			
-			/* Set global context */
-			window["globalContext"] = context;
-			rtl.setContext(context);
-			
-			/* Run app */
-			await context.constructor.run(ctx, context);
-		}
-		catch (e)
-		{
-			console.log( e.stack );
-		}
-	})();
 }

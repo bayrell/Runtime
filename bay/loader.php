@@ -32,8 +32,8 @@ class Loader
 	public $start_time = 0;
 	public $args = null;
 	public $env = null;
-	public $app_name = "";
 	public $main_module = "";
+	public $main_class = "";
 	public $entry_point = "";
 	public $include_path = [];
 	
@@ -122,7 +122,7 @@ class Loader
 	 */
 	function shutdown()
 	{
-		$ctx = RuntimeUtils::getContext();
+		$ctx = \Runtime\rtl::getContext();
 		$error = error_get_last();
 		if ($ctx != null)
 		{
@@ -187,22 +187,22 @@ class Loader
 	
 	
 	/**
-	 * Set app name
+	 * Set main module
 	 */
-	function setAppName($value)
+	function setMainModule($value)
 	{
-		$this->app_name = $value;
+		$this->main_module = $value;
 		return $this;
 	}
 	
 	
 	
 	/**
-	 * Set main module
+	 * Set main class
 	 */
-	function setMainModule($value)
+	function setMainClass($value)
 	{
-		$this->main_module = $value;
+		$this->main_class = $value;
 		return $this;
 	}
 	
@@ -235,10 +235,13 @@ class Loader
 		]));
 		
 		/* Set app name */
-		if ($this->app_name) $context = $context::setAppName($context, $context, $this->app_name);
+		if ($this->main_module) $context = $context::setAppName($context, $context, $this->main_module);
 		
 		/* Set main module */
 		if ($this->main_module) $context = $context::setMainModule($context, $context, $this->main_module);
+		
+		/* Set main class */
+		if ($this->main_class) $context = $context::setMainClass($context, $context, $this->main_class);
 		
 		/* Set entry point */
 		if ($this->entry_point) $context = $context::setEntryPoint($context, $context, $this->entry_point);
