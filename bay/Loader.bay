@@ -1,4 +1,3 @@
-<?php
 /*!
  *  Bayrell Runtime Library
  *
@@ -16,6 +15,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
+
+namespace Runtime;
+
+
+#switch
+#case ifcode PHP then
+
 
 use Runtime\Collection;
 use Runtime\Context;
@@ -293,3 +299,24 @@ class Loader
 	}
 	
 }
+
+
+
+#case ifcode ES6 then
+
+/* Run web app */
+function runWebApp(env, module_name, class_name)
+{
+	window.addEventListener
+	(
+		"load",
+		(function(obj){ return function() {
+			(async () => {
+				var ctx = null;
+				Runtime.Context.startApp(ctx,Runtime.Dict.from(obj.env),obj.module_name,obj.class_name);
+			})();
+		}})({ "env": env, "module_name": module_name, "class_name": class_name })
+	);
+}
+
+#endswitch

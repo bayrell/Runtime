@@ -422,7 +422,7 @@ class rtl
 		#case ifcode PHP then
 		
 		$arr = ($args != null) ? (($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : [];
-		array_unshift($arr, $ctx);
+		if (isset($ctx)) array_unshift($arr, $ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
 			return $f->invokeArgs($arr);
@@ -436,7 +436,7 @@ class rtl
 		if (args == null) args = [];
 		else args = Array.prototype.slice.call(args);
 		
-		args.unshift(ctx);
+		if (typeof ctx != "undefined") args.unshift(ctx);
 		if (this.isString(ctx, f))
 		{
 			var a = f.split("::");
@@ -465,16 +465,37 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$arr = $args->_getArr();
-		array_unshift($arr, $ctx);
+		$arr = ($args != null) ? (($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : [];
+		if (isset($ctx)) array_unshift($arr, $ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
 			return $f->invokeArgs($arr);
 		}
+		if (gettype($f) == "string") $f = static::find_class($f);
 		return call_user_func_array($f, $arr);
 		
 		#case ifcode JAVASCRIPT then
-		await f.apply(null, args);
+		
+		var res;
+		if (args == null) args = [];
+		else args = Array.prototype.slice.call(args);
+		
+		if (typeof ctx != "undefined") args.unshift(ctx);
+		if (this.isString(ctx, f))
+		{
+			var a = f.split("::");
+			var c = a[0]; var m = a[1];
+			c = this.find_class(c);
+			f = c[m];
+			res = await f.apply(c, args);
+		}
+		else
+		{
+			res = await f.apply(null, args);
+		}
+		
+		return res;
+		
 		#endswitch
 	}
 	

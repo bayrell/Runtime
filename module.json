@@ -38,6 +38,6 @@
 		"LambdaChainDeclare",
 		"RuntimeUtils",
 		"ModuleDescription",
-		"loader"
+		"Loader"
 	]
 }
