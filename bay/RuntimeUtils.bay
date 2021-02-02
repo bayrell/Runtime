@@ -189,7 +189,7 @@ static class RuntimeUtils
 			
 			/* Get fields introspection */
 			Collection<string> item_fields = null;
-			try { item_fields = rtl::method(item_class_name, "getFieldsList")(3); } catch (var e) {}
+			try { item_fields = rtl::method(item_class_name, "getFieldsList")(255); } catch (var e) {}
 			for (int j=0; j<item_fields.count(); j++)
 			{
 				string field_name = item_fields.item(j);
@@ -199,7 +199,7 @@ static class RuntimeUtils
 			
 			/* Get methods introspection */
 			Collection<string> item_methods = null;
-			try { item_methods = rtl::method(item_class_name, "getMethodsList")(); } catch (var e) {}
+			try { item_methods = rtl::method(item_class_name, "getMethodsList")(255); } catch (var e) {}
 			for (int j=0; j<item_methods.count(); j++)
 			{
 				string method_name = item_methods.item(j);
