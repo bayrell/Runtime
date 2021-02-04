@@ -30,9 +30,9 @@ class Map<T> extends Dict<T>
 	 * Returns new Instance
 	 * @return Object
 	 */
-	static Collection<T> Instance()
+	static Collection<T> Instance(var val = null)
 	{
-		return new Map();
+		return new Map(val);
 	}
 	
 	

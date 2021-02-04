@@ -39,6 +39,10 @@ class Callback
 				throw new \Exception("Method '" . $name . "' not found in " . $obj);
 			}
 		}
+		else if (is_object($obj_name))
+		{
+			$obj = $obj_name;
+		}
 		else
 		{
 			throw new \Exception("Wrong object name");

@@ -104,16 +104,17 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		{
 			for (var key in obj._map)
 			{
+				var real_key = key.substring(1);
 				var value = obj._map[key];
 				if (check_types)
 				{
-					info = rtl.getFieldInfo(ctx, new_item.getClassName(), key);
+					info = rtl.getFieldInfo(ctx, new_item.getClassName(), real_key);
 					if (info)
 					{
-						value = rtl.convert(ctx, value, info.t, null);
+						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
 					}
 				}
-				new_item[key.substring(1)] = value;
+				new_item[real_key] = value;
 			}
 		}
 		else
@@ -126,7 +127,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 					info = rtl.getFieldInfo(ctx, new_item.getClassName(), key);
 					if (info)
 					{
-						value = rtl.convert(ctx, value, info.t, null);
+						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
 					}
 				}
 				new_item[key] = value;
@@ -284,7 +285,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	Dict takeDict()
 	{
 		Map<var> values = new Map();
-		Collection<string> names = RuntimeUtils::getVariablesNames(this.getClassName(), 1);
+		Collection<string> names = rtl::getFields(this.getClassName());
 		
 		for (int i=0; i<names.count(); i++)
 		{

@@ -418,11 +418,17 @@ class rtl
 	 */
 	static var apply(fn f, Collection args)
 	{
+		bool is_ctx = false;
+		
+		#ifdef ENABLE_CONTEXT then
+		is_ctx = true;
+		#endif
+		
 		#switch
 		#case ifcode PHP then
 		
 		$arr = ($args != null) ? (($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : [];
-		if (isset($ctx)) array_unshift($arr, $ctx);
+		if ($is_ctx) array_unshift($arr, $ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
 			return $f->invokeArgs($arr);
@@ -581,6 +587,7 @@ class rtl
 		
 		if (def_val == undefined) def_val = null;
 		if (item === null) return def_val;
+		if (item === undefined) return def_val;
 		if (Array.isArray(path) && path.count == undefined) path = Collection.from(path);
 		if (this.isScalarValue(ctx, path)) path = Collection.from([path]);
 		if (!(path instanceof Collection)) return def_val;
@@ -593,20 +600,20 @@ class rtl
 		var val = def_val;
 		if (item instanceof Dict || item instanceof Collection)
 		{
-			item = item.get(ctx, key, def_val);
-			val = this.attr(ctx, item, path, def_val);
+			var new_item = item.get(ctx, key, def_val);
+			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
 		else if (item instanceof BaseStruct)
 		{
-			item = item.get(ctx, key, def_val);
-			val = this.attr(ctx, item, path, def_val);
+			var new_item = item.get(ctx, key, def_val);
+			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
 		else
 		{
-			item = item[key] || def_val;
-			val = this.attr(ctx, item, path, def_val);
+			var new_item = item[key] || def_val;
+			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
 		return val;
@@ -1712,7 +1719,7 @@ class rtl
 	/**
 	 * Returns fields of class
 	 */
-	pure memorize Dict getFields(string class_name, int flag = 255)
+	pure memorize Collection getFields(string class_name, int flag = 255)
 	{
 		Vector<string> names = new Vector();
 		Collection<string> parents = static::getParents(class_name);

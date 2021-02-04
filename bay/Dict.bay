@@ -42,7 +42,7 @@ Runtime._Map = function(ctx, map)
 				this._map[i] = map._map[i];
 			}
 		}
-		else
+		else if (typeof map == "object" && !(map instanceof Runtime._Collection))
 		{
 			for (var i in map)
 			{
@@ -76,11 +76,8 @@ Object.assign(Runtime._Map,
 {
 	from: function(map)
 	{
-		var res = this.Instance(null);
-		for (var i in map)
-		{
-			res._map["|" + i] = map[i];
-		}
+		var ctx = null;
+		var res = this.Instance(ctx, map);
 		return res;
 	},
 	getCurrentNamespace: function(){ return "Runtime"; },
@@ -223,9 +220,9 @@ class Dict<T> extends _Map
 	 * Returns new Instance
 	 * @return Object
 	 */
-	static Dict<T> Instance()
+	static Dict<T> Instance(var val = null)
 	{
-		return new Dict();
+		return new Dict(val);
 	}
 	
 	
