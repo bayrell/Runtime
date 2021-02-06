@@ -789,4 +789,25 @@ class Dict<T> extends _Map
 		
 		return obj.toDict();
 	}
+	
+	
+	
+	/**
+	 * Check equal
+	 */
+	public bool equal(Dict item)
+	{
+		if (item == null) return false;
+		
+		Collection keys = (new Collection).concat(this.keys()).concat(item.keys()).removeDuplicatesIm();
+		for (int i=0; i<keys.count(); i++)
+		{
+			string key = keys[i];
+			if (not this.has(key)) return false;
+			if (not item.has(key)) return false;
+			if (this.get(key) != item.get(key)) return false;
+		}
+		
+		return true;
+	}
 }

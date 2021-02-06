@@ -20,7 +20,6 @@ namespace Runtime;
 
 use Runtime.re;
 use Runtime.rtl;
-use Runtime.PathInfo;
 use Runtime.Collection;
 use Runtime.Vector;
 
@@ -476,7 +475,7 @@ class rs
 	 *         extension  - расширение файла
 	 *         filename   - имя файла без расширения
 	 */
-	static PathInfo pathinfo(string filepath)
+	static Dict pathinfo(string filepath)
 	{
 		Vector<string> arr1 = static::explode(".", filepath).toVector();
 		Vector<string> arr2 = static::explode("/", filepath).toVector();
@@ -493,7 +492,7 @@ class rs
 		delete arr1;
 		delete arr2;
 		
-		return new PathInfo
+		return
 		{
 			"filepath": filepath,
 			"extension": extension,
@@ -512,9 +511,9 @@ class rs
 	 */
 	static string filename(string filepath)
 	{
-		PathInfo ret = self::pathinfo(filepath);
-		string res = ret.basename;
-		string ext = ret.extension;
+		Dict ret = self::pathinfo(filepath);
+		string res = ret["basename"];
+		string ext = ret["extension"];
 		if (ext != "")
 		{
 			int sz = 0 - rs::strlen(ext) - 1;
@@ -533,8 +532,8 @@ class rs
 	 */
 	static string basename(string filepath)
 	{
-		PathInfo ret = self::pathinfo(filepath);
-		string res = ret.basename;
+		Dict ret = self::pathinfo(filepath);
+		string res = ret["basename"];
 		delete ret;
 		return res;
 	}
@@ -548,8 +547,8 @@ class rs
 	 */
 	static string extname(string filepath)
 	{
-		PathInfo ret = self::pathinfo(filepath);
-		string res = ret.extension;
+		Dict ret = self::pathinfo(filepath);
+		string res = ret["extension"];
 		delete ret;
 		return res;
 	}
@@ -563,8 +562,8 @@ class rs
 	 */
 	static string dirname(string filepath)
 	{
-		PathInfo ret = self::pathinfo(filepath);
-		string res = ret.dirname;
+		Dict ret = self::pathinfo(filepath);
+		string res = ret["dirname"];
 		delete ret;
 		return res;
 	}
