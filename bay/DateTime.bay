@@ -64,6 +64,65 @@ struct DateTime extends BaseStruct
 	
 	
 	/**
+	 * Create date time from timestamp
+	 */
+	pure DateTime create(int time = -1, string tz = "UTC")
+	{
+		#switch
+		#case ifcode PHP then
+		if ($time == -1) $time = time();
+		$dt = new \DateTime();
+		$dt->setTimezone(new \DateTimeZone($tz));
+		$dt->setTimestamp($time);
+		return static::fromObject($ctx, $dt);
+		
+		#case ifcode JAVASCRIPT then
+		var dt = null;
+		if (time == -1) dt = new Date();
+		else dt = new Date(time*1000);
+		return this.fromObject(ctx, dt, tz);
+		#endswitch
+		
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Convert to timestamp
+	 */
+	static int strtotime(string s, string tz = "UTC")
+	{
+		#switch
+		#case ifcode PHP then
+		$date = new \DateTime($dateStr, new \DateTimeZone($tz));
+		$timestamp = $date->format('U');
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Create date from string
+	 */
+	pure DateTime fromString(string s, string tz = "UTC")
+	{
+		int time = static::strtotime(s);
+		return static::create(time, tz);
+	}
+	
+	
+	
+	/**
+	 * Returns datetime
+	 * @param string tz
+	 * @return DateTime
+	 */
+	pure DateTime now (string tz = "UTC") => static::create(-1, tz);
+	
+	
+	
+	/**
 	 * Returns timestamp
 	 * @return int
 	 */
@@ -107,40 +166,6 @@ struct DateTime extends BaseStruct
 		
 		return null;
 	}
-	
-	
-	
-	/**
-	 * Create date time from timestamp
-	 */
-	pure DateTime createDateTime(int time = -1, string tz = "UTC")
-	{
-		#switch
-		#case ifcode PHP then
-		if ($time == -1) $time = time();
-		$dt = new \DateTime();
-		$dt->setTimezone(new \DateTimeZone($tz));
-		$dt->setTimestamp($time);
-		return static::fromObject($ctx, $dt);
-		
-		#case ifcode JAVASCRIPT then
-		var dt = null;
-		if (time == -1) dt = new Date();
-		else dt = new Date(time*1000);
-		return this.fromObject(ctx, dt, tz);
-		#endswitch
-		
-		return null;
-	}
-	
-	
-	
-	/**
-	 * Returns datetime
-	 * @param string tz
-	 * @return DateTime
-	 */
-	pure DateTime now (string tz = "UTC") => static::createDateTime(-1, tz);
 	
 	
 	
