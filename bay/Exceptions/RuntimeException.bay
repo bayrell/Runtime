@@ -21,7 +21,7 @@ namespace Runtime.Exceptions;
 use Runtime.rtl;
 
 
-declare class ClassException{}
+abstract class ClassException{}
 
 #switch
 #case ifcode JAVASCRIPT then
