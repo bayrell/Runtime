@@ -241,8 +241,6 @@ struct Context extends BaseStruct
 		c <= entities <= entities;
 		
 		/* Extend entities */
-		entities = c.chain("Runtime.Entities", [c, entities]) |> attr 1;
-		entities = static::extendEntities(c, entities);
 		entities = static::getRequiredEntities(entities);
 		
 		/* Add lambda chains */
@@ -255,6 +253,9 @@ struct Context extends BaseStruct
 				classof LambdaChain
 			)
 		);
+		
+		/* Add Entities */
+		entities = c.chain("addEntities", [c, entities]) |> attr 1;
 		
 		return c.copy
 		{
@@ -617,8 +618,9 @@ struct Context extends BaseStruct
 					string item2_class_name = item2.getClassName();
 					if (item2 instanceof Entity and item2_class_name != "Runtime.Entity")
 					{
-						item2 = item2.copy({ "name": class_name });
+						item2 = item2.addClassInfo(class_name);
 						e.pushValue(item2);
+						e = item2.extendEntities(e).toVector();
 					}
 				}
 			}	
@@ -668,7 +670,7 @@ struct Context extends BaseStruct
 						{
 							if (rtl::is_instanceof(annotation, entity_class_method))
 							{
-								annotation = annotation.addClassItem
+								annotation = annotation.addMethodInfo
 								(
 									class_name,
 									class_method_name,
@@ -690,16 +692,9 @@ struct Context extends BaseStruct
 	
 	
 	/**
-	 * Extends entities
-	 */
-	pure Collection<BaseStruct> extendEntities(Context c, Collection<BaseStruct> entities) => entities;
-	
-	
-	
-	/**
 	 * Start App
 	 */
-	static async void startApp(Dict env, string module_name, string main_class)
+	static async void startApp(Dict env, string app_name, string main_class, string entry_point = "")
 	{
 		Context context = static::create(env);
 		
@@ -711,10 +706,11 @@ struct Context extends BaseStruct
 		window["globalContext"] = context;
 		#endif
 		
-		context = context::setAppName(context, module_name);
-		context = context::setMainModule(context, module_name);
+		context = context::setAppName(context, app_name);
+		context = context::setMainModule(context, app_name);
 		context = context::setMainClass(context, main_class);
-		context = context::setEntryPoint(context, main_class);
+		if (entry_point == "") context = context::setEntryPoint(context, main_class);
+		else context = context::setEntryPoint(context, entry_point);
 		
 		/* Init context */
 		context = await context::init(context);

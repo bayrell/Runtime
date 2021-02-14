@@ -25,5 +25,7 @@ use Runtime.rs;
 
 struct LambdaChainClass extends Entity
 {
+	/* Add class info in Context::getRequiredEntities */
+	Entity addClassInfo(string class_name) => this.copy{ "name": class_name };
 }
  

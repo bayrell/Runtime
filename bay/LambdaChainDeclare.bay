@@ -25,6 +25,8 @@ use Runtime.rs;
 struct LambdaChainDeclare extends BaseStruct
 {
 	string name = "";
-	bool is_await = false;
-	string logName() => this.getClassName() ~ " -> " ~ this.name;
+	bool is_async = false;
+	
+	/* Entity name for task output */
+	string entityName() => this.getClassName() ~ " -> " ~ this.name;
 }

@@ -24,13 +24,24 @@ use Runtime.BaseStruct;
 
 struct Entity extends BaseStruct
 {
+	/* Entity name */
 	string name = "";
+	
+	/* Entity value */
 	string value = "";
+	
+	/* Entity params */
 	Dict params = {};
 	
-	/* Functions */
-	string className() => this.name != "" ? (this.value != "" ? this.value : this.name) : "";
-	string logName() =>
-		this.getClassName() ~ " -> " ~ ( this.value != "" ? (this.name ~ " -> " ~ this.value) : this.name )
-	;
+	/* Entity name for task output */
+	string entityName() => this.getClassName() ~ " -> " ~ this.name ~ " -> " ~ this.value;
+	
+	/* Add class info in Context::getRequiredEntities */
+	Entity addClassInfo(string class_name) => this;
+	
+	/* Add class info in Context::getSubEntities */
+	Entity addMethodInfo(string class_name, string class_method_name, Entity class_entity, Dict method_info) => this;
+	
+	/* Extend entities */
+	Collection<BaseStruct> extendEntities(Collection<BaseStruct> entities) => entities;
 }
