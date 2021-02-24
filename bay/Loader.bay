@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -240,9 +240,6 @@ class Loader
 			"base_path" => getcwd(),
 		]));
 		
-		/* Set app name */
-		if ($this->main_module) $context = $context::setAppName($context, $context, $this->main_module);
-		
 		/* Set main module */
 		if ($this->main_module) $context = $context::setMainModule($context, $context, $this->main_module);
 		
@@ -305,17 +302,18 @@ class Loader
 #case ifcode ES6 then
 
 /* Run web app */
-function runWebApp(env, module_name, class_name)
+function runWebApp(env, module_name, class_name, entry_point)
 {
+	if (entry_point == undefined) entry_point = class_name;
 	window.addEventListener
 	(
 		"load",
 		(function(obj){ return function() {
 			(async () => {
 				var ctx = null;
-				Runtime.Context.startApp(ctx,Runtime.Dict.from(obj.env),obj.module_name,obj.class_name);
+				Runtime.Context.startApp(ctx,Runtime.Dict.from(obj.env),obj.module_name,obj.class_name,obj.entry_point);
 			})();
-		}})({ "env": env, "module_name": module_name, "class_name": class_name })
+		}})({ "env": env, "module_name": module_name, "class_name": class_name, "entry_point": entry_point })
 	);
 }
 
