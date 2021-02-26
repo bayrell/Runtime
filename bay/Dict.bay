@@ -23,7 +23,7 @@ use Runtime.Collection;
 use Runtime.Exceptions.KeyNotFound;
 
 
-declare class _Map{}
+abstract class _Map{}
 
 #switch
 #case ifcode JAVASCRIPT then

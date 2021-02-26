@@ -38,6 +38,13 @@ struct Date extends BaseStruct
 	{
 		return this.y ~ "-" ~ this.m ~ "-" ~ this.d;
 	}
+	
+	
+	
+	/**
+	 * Normalize date time
+	 */
+	DateTime normalize() => this;
 }
 
 

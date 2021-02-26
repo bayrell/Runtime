@@ -23,7 +23,7 @@ use Runtime.Exceptions.IndexOutOfRange;
 use Runtime.Exceptions.RuntimeException;
 
 
-declare class _Collection{}
+abstract class _Collection{}
 
 #switch
 #case ifcode JAVASCRIPT then

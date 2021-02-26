@@ -205,6 +205,15 @@ static class RuntimeUtils
 			return instance;
 		}
 		
+		if (obj instanceof Date)
+		{
+			return obj;
+		}
+		if (obj instanceof DateTime)
+		{
+			return obj;
+		}
+		
 		return null;
 	}
 	
@@ -219,14 +228,16 @@ static class RuntimeUtils
 			
 		if (is_object($value))
 		{
-			if (isset($value->__class_name__) && $value['__class_name__'] == "Runtime.Date")
+			if (isset($value->__class_name__) && $value->__class_name__ == "Runtime.Date")
 			{
-				$res = \Runtime\Date::from($value);
+				$value = \Runtime\Dict::from($value);
+				$res = new \Runtime\Date($ctx, $value);
 				return $res;
 			}
-			else if (isset($value->__class_name__) && $value['__class_name__'] == "Runtime.DateTime")
+			else if (isset($value->__class_name__) && $value->__class_name__ == "Runtime.DateTime")
 			{
-				$res = \Runtime\DateTime::from($value);
+				$value = \Runtime\Dict::from($value);
+				$res = new \Runtime\DateTime($ctx, $value);
 				return $res;
 			}
 			else
@@ -434,9 +445,13 @@ static class RuntimeUtils
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
 		var _Dict = use("Runtime.Dict");
+		var _Date = use("Runtime.Date");
+		var _DateTime = use("Runtime.DateTime");
 		
 		if (convert) value = _Utils.ObjectToPrimitive(ctx, value);
 		return JSON.stringify(value, (key, value) => {
+			if (value instanceof _Date) value = value.toDict().setIm("__class_name__", "Runtime.Date");
+			if (value instanceof _DateTime) value = value.toDict().setIm("__class_name__", "Runtime.DateTime");
 			if (value instanceof _Collection) return value;
 			if (value instanceof _Dict) return value.toObject();
 			if (_rtl.isScalarValue(value)) return value;

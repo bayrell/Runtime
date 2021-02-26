@@ -25,10 +25,9 @@ use Runtime.Dict;
 
 struct DateTime extends BaseStruct
 {
-	
-	public int y = 0;
-	public int m = 0;
-	public int d = 0;
+	public int y = 1970;
+	public int m = 1;
+	public int d = 1;
 	public int h = 0;
 	public int i = 0;
 	public int s = 0;
@@ -89,36 +88,66 @@ struct DateTime extends BaseStruct
 	
 	
 	/**
-	 * Convert to timestamp
-	 */
-	static int strtotime(string s, string tz = "UTC")
-	{
-		#switch
-		#case ifcode PHP then
-		$date = new \DateTime($dateStr, new \DateTimeZone($tz));
-		$timestamp = $date->format('U');
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Create date from string
-	 */
-	pure DateTime fromString(string s, string tz = "UTC")
-	{
-		int time = static::strtotime(s);
-		return static::create(time, tz);
-	}
-	
-	
-	
-	/**
 	 * Returns datetime
 	 * @param string tz
 	 * @return DateTime
 	 */
 	pure DateTime now (string tz = "UTC") => static::create(-1, tz);
+	
+	
+	
+	/**
+	 * Shift time
+	 */
+	DateTime shiftTime(int shift)
+	{
+		int timestamp = this.getTimestamp() + shift;
+		DateTime dt = static::create(timestamp, this.tz);
+		return dt;
+	}
+	
+	
+	
+	/**
+	 * Shift tz
+	 */
+	DateTime shift(string tz)
+	{
+		int timestamp = this.getTimestamp();
+		DateTime dt = static::create(timestamp, tz);
+		return dt;
+	}
+	
+	
+	
+	/**
+	 * Set week number
+	 */
+	DateTime setWeekNumber(int week)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		$dt = new \DateTime();
+		$dt->setTimezone(new \DateTimeZone($this->tz));
+		$dt->setISODate($this->y, $week);
+		$dt->setTime(0, 0, 0);
+		return static::fromObject($ctx, $dt);
+		
+		#case ifcode JAVASCRIPT then
+		
+		var dt = new Date(this.y, 0, 1, 0, 0, 0);
+		var year_begin = Math.round(dt.getTime() / 1000) - dt.getTimezoneOffset() * 60;
+		var day_begin = dt.getDay();
+		var shift = (day_begin - 1) * 86400;
+		var week_begin = year_begin - shift;
+		week_begin = week_begin + week * 604800 + dt.getTimezoneOffset() * 60;
+		return this.constructor.fromObject(ctx, new Date(week_begin*1000), this.tz, false);
+		
+		#endswitch
+		
+		return this;
+	}
 	
 	
 	
@@ -136,7 +165,7 @@ struct DateTime extends BaseStruct
 		
 		#case ifcode JAVASCRIPT then
 		var dt = this.toObject(ctx);
-		return dt.getTime();
+		return Math.round(dt.getTime() / 1000);
 		
 		#endswitch
 		
@@ -173,20 +202,23 @@ struct DateTime extends BaseStruct
 	 * Return db datetime
 	 * @return string
 	 */
-	string getDateTime(string tz = "UTC")
+	string getDateTime(string tz = "")
 	{
 		#switch
 		
 		#case ifcode PHP then
 		$dt = $this->toObject($ctx);
-		$dt->setTimezone( new \DateTimeZone($tz) );
+		if ($tz != "") $dt->setTimezone( new \DateTimeZone($tz) );
 		return $dt->format("Y-m-d H:i:s");
 		
 		#case ifcode JAVASCRIPT then
 		
+		var offset = 0;
 		var dt = this.toObject(ctx);
-		var offset = this.constructor.getTimezoneOffset(ctx, tz);
-		var offset = offset - dt.getTimezoneOffset();
+		if (tz == "") tz = this.tz;
+		
+		offset = this.constructor.getTimezoneOffset(ctx, tz);
+		offset = offset - dt.getTimezoneOffset();
 		dt = this.constructor.shiftOffset(ctx, dt, -offset);
 		
 		var y = Number(dt.getFullYear());
@@ -214,7 +246,7 @@ struct DateTime extends BaseStruct
 	 * Return date
 	 * @return string
 	 */
-	string getDate(string tz = "UTC")
+	string getDate(string tz = "")
 	{
 		string value = this.getDateTime(tz);
 		return rs::substr(value, 0, 10);
@@ -300,12 +332,19 @@ struct DateTime extends BaseStruct
 		var tz = Math.ceil(-this.constructor.getTimezoneOffset(ctx, this.tz) / 60);
 		if (tz < 10 && tz >= 0) tz = "0" + tz;
 		if (tz >= 0) tz = "+" + tz;
-		return this.y + "-" + m + "-" + d + "T" + h + ":" + i + ":" + s + tz;
+		return this.y + "-" + m + "-" + d + "T" + h + ":" + i + ":" + s + tz + "00";
 		
 		#endswitch
 		
 		return "";
 	}
+	
+	
+	
+	/**
+	 * Normalize date time
+	 */
+	DateTime normalize() => this;
 	
 }
 
@@ -362,12 +401,16 @@ Runtime.DateTime.prototype.toObject = function(ctx)
 	return dt;
 }
 
-Runtime.DateTime.fromObject = function(ctx, dt, tz)
+Runtime.DateTime.fromObject = function(ctx, dt, tz, is_shift)
 {
+	if (is_shift == undefined) is_shift = true;
 	var Dict = use("Runtime.Dict");
-	var offset = this.getTimezoneOffset(ctx, tz);
-	var offset = offset - dt.getTimezoneOffset();
-	dt = this.shiftOffset(ctx, dt, -offset);
+	if (is_shift)
+	{
+		var offset = this.getTimezoneOffset(ctx, tz);
+		var offset = offset - dt.getTimezoneOffset();
+		dt = this.shiftOffset(ctx, dt, -offset);
+	}
 	var y = Number(dt.getFullYear());
 	var m = Number(dt.getMonth()) + 1;
 	var d = Number(dt.getDate());
