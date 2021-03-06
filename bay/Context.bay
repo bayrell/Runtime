@@ -59,10 +59,9 @@ struct Context extends BaseStruct
 	string tz = "UTC";
 	
 	/* Entrypoint and main class */
-	string app_name = "";
-	string entry_point = "";
 	string main_module = "";
 	string main_class = "";
+	string entry_point = "";
 	
 	
 	/**
@@ -78,13 +77,6 @@ struct Context extends BaseStruct
 	 * @return Dict<string>
 	 */
 	pure Dict<string> getSettings(Dict env) => null;
-	
-	
-	
-	/**
-	 * Extends entities
-	 */
-	pure Collection<BaseStruct> getEntities(Collection<BaseStruct> entities) => null;
 	
 	
 	
@@ -176,9 +168,6 @@ struct Context extends BaseStruct
 			c <= modules <= c.modules.pushIm(main_module);
 		}
 		
-		/* Set app name */
-		c <= app_name <= main_module;
-		
 		/* Set main module */
 		c <= main_module <= main_module;
 		c <= main_class <= main_module_class_name;
@@ -189,17 +178,12 @@ struct Context extends BaseStruct
 		/* Set new settings */
 		c <= settings <= settings;
 		
+		/* Extends modules */
+		Collection<string> modules = static::getRequiredModules(c.modules);
+		c <= modules <= modules;
+		
 		return c;
-	}
-	
-	
-	
-	/**
-	 * Set app name
-	 */
-	pure Context setAppName(Context c, string app_name) =>
-		c.copy{ "app_name": app_name }
-	;
+	}	
 	
 	
 	
@@ -229,18 +213,11 @@ struct Context extends BaseStruct
 		@ = c;
 		if (c.initialized) return c;
 		
-		/* Extends modules */
-		Collection<string> modules = static::getRequiredModules(c.modules);
-		
-		/* Get modules entities */
-		Collection<BaseStruct> entities = static::getEntitiesFromModules(modules);
-		entities = entities.prependCollectionIm( static::getEntities(c.env) );
-		
 		/* Base path */
 		string base_path = (c.base_path != "") ? c.base_path : rtl::attr(c.env, ["BASE_PATH"], "", "string");
 		
-		/* Add entities */
-		if (c.entities != null) entities = entities.appendCollectionIm(c.entities);
+		/* Get modules entities */
+		Collection<BaseStruct> entities = static::getEntitiesFromModules(c.modules);
 		c <= entities <= entities;
 		
 		/* Extend entities */
@@ -262,7 +239,6 @@ struct Context extends BaseStruct
 		
 		return c.copy
 		{
-			"modules": modules,
 			"entities": entities,
 			"base_path": base_path,
 			"initialized": true,
@@ -697,8 +673,10 @@ struct Context extends BaseStruct
 	/**
 	 * Start App
 	 */
-	static async void startApp(Dict env, string app_name, string main_class, string entry_point = "")
+	static async void startApp(Dict env, string main_module, string main_class, Dict options = null)
 	{
+		string entry_point = options["entry_point"] |> default string "";
+		
 		Context context = static::create(env);
 		
 		/* Set global context */
@@ -709,14 +687,30 @@ struct Context extends BaseStruct
 		window["globalContext"] = context;
 		#endif
 		
-		context = context::setAppName(context, app_name);
-		context = context::setMainModule(context, app_name);
+		context = context::setMainModule(context, main_module);
 		context = context::setMainClass(context, main_class);
 		if (entry_point == "") context = context::setEntryPoint(context, main_class);
 		else context = context::setEntryPoint(context, entry_point);
 		
+		/* Call create */
+		if (options != null and options.has("create"))
+		{
+			fn f = options.has("init");
+			context = await f(context);
+		}
+		
 		/* Init context */
 		context = await context::init(context);
+		
+		/* Call init chain */
+		context = await context.chainAsync("init", [context]) |> attr 0;
+		
+		/* Call init */
+		if (options != null and options.has("init"))
+		{
+			fn f = options.has("init");
+			context = await f(context);
+		}
 		
 		/* Start context */
 		context = await context::start(context);
@@ -724,6 +718,16 @@ struct Context extends BaseStruct
 		/* Set global context */
 		rtl::@setContext(context);
 		@ = context;
+		
+		/* Call start chain */
+		context = await context.chainAsync("start", [context]) |> attr 0;
+		
+		/* Call start */
+		if (options != null and options.has("start"))
+		{
+			fn f = options.has("start");
+			context = await f(context);
+		}
 		
 		#ifcode JAVASCRIPT then
 		window["globalContext"] = context;
@@ -740,6 +744,8 @@ struct Context extends BaseStruct
 			console.log( e.stack );
 			#endif
 		}
+		
+		return context;
 	}
 	
 }
