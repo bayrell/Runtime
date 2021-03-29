@@ -74,7 +74,7 @@ class Vector<T> extends Collection
 	 * Append value to the end of array
 	 * @param T value
 	 */
-	public Vector<T> pushValue(T value)
+	public Vector<T> appendValue(T value)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -85,6 +85,7 @@ class Vector<T> extends Collection
 		return $this;
 		#endswitch
 	}
+	public Collection<T> pushValue(T value) => this.appendValue(value);
 	
 	
 	
@@ -92,7 +93,7 @@ class Vector<T> extends Collection
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	public Vector<T> unshiftValue(T value)
+	public Vector<T> prependValue(T value)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -103,6 +104,7 @@ class Vector<T> extends Collection
 		return $this;
 		#endswitch
 	}
+	public Collection<T> unshiftValue(T value) => this.prependValue(value);
 	
 	
 	
@@ -263,30 +265,6 @@ class Vector<T> extends Collection
 		$this->_arr = [];
 		return $this;
 		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Append value to the end of the vector
-	 * @param T value
-	 */
-	public Vector<T> appendValue(T value)
-	{
-		this.push(value);
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Insert first value to begin of the vector
-	 * @return T value
-	 */
-	public Vector<T> prependValue(T value)
-	{
-		this.unshift(value);
-		return this;
 	}
 	
 	

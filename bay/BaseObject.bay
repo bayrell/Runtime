@@ -99,7 +99,7 @@ class BaseObject
 				{
 					if ($check_types)
 					{
-						$info = \Runtime\rtl::getFieldInfo($ctx, $class_name, $key);
+						$info = \Runtime\rtl::getFieldInfoWithParents($ctx, $class_name, $key);
 						if ($info)
 						{
 							$value = \Runtime\rtl::convert($ctx, $value, $info->t, null);
@@ -122,7 +122,7 @@ class BaseObject
 				var value = obj._map[key];
 				if (check_types)
 				{
-					info = rtl.getFieldInfo(ctx, class_name, real_key);
+					info = rtl.getFieldInfoWithParents(ctx, class_name, real_key);
 					if (info)
 					{
 						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
@@ -138,7 +138,7 @@ class BaseObject
 				var value = obj[key];
 				if (check_types)
 				{
-					info = rtl.getFieldInfo(ctx, new_item.getClassName(), key);
+					info = rtl.getFieldInfoWithParents(ctx, new_item.getClassName(), key);
 					if (info)
 					{
 						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);

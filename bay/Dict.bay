@@ -578,9 +578,9 @@ class Dict<T> extends _Map
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var res = new Runtime.Collection(ctx);
-		for (var key in this._map) res.push( this._map[key] );
-		return res;
+		var res = new Runtime.Vector(ctx);
+		for (var key in this._map) res.pushValue( this._map[key] );
+		return res.toCollection();
 		#case ifcode PHP then
 		$values = array_values($this->_map);
 		$res = \Runtime\Collection::from($values);

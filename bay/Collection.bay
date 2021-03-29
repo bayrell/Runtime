@@ -468,6 +468,7 @@ class Collection<T> extends _Collection
 	public Collection<T> unshift1(T value) => this.unshiftIm(value);
 	public Collection<T> prepend1(T value) => this.unshift(value);
 	public Collection<T> prependIm(T value) => this.unshiftIm(value);
+	public Collection<T> prepend(T value) => this.unshiftIm(value);
 	
 	
 	
