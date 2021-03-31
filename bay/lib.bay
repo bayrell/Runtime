@@ -259,6 +259,15 @@ class lib
 	
 	
 	/**
+	 * Concat
+	 */
+	pure fn concat(Collection arr) =>
+		var (var m) use (farr) => m.concat(arr)
+	;
+	
+	
+	
+	/**
 	 * Sort asc
 	 */
 	pure int sortAsc(var a, var b) => (a > b) ? 1 : (a < b) ? -1 : 0;
