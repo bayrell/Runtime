@@ -262,7 +262,7 @@ class lib
 	 * Concat
 	 */
 	pure fn concat(Collection arr) =>
-		var (var m) use (farr) => m.concat(arr)
+		var (var m) use (arr) => m.concat(arr)
 	;
 	
 	
