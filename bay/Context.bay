@@ -206,9 +206,9 @@ struct Context extends BaseStruct
 	
 	
 	/**
-	 * Init context
+	 * Init
 	 */
-	static Context appInit(Context c)
+	static async Context init(Context c)
 	{
 		@ = c;
 		if (c.initialized) return c;
@@ -237,20 +237,31 @@ struct Context extends BaseStruct
 		/* Add Entities */
 		entities = c.chain("addEntities", [c, entities]) |> attr 1;
 		
-		return c.copy
+		/* Setup context */
+		c = c.copy
 		{
 			"entities": entities,
 			"base_path": base_path,
 			"initialized": true,
 		};
+		
+		/* Context init */
+		string main_class = c.main_class;
+		if (main_class != "" and rtl::method_exists(main_class, "contextInit"))
+		{
+			fn contextInit = rtl::method(main_class, "contextInit");
+			c = await contextInit(c);
+		}
+		
+		return c;
 	}
 	
 	
 	
 	/**
-	 * Start context
+	 * Start
 	 */
-	static async Context appStart(Context c)
+	static async Context start(Context c)
 	{
 		@ = c;
 		if (c.started) return c;
@@ -301,50 +312,15 @@ struct Context extends BaseStruct
 			#endif
 		}
 		
-		return c.copy{"started": true};
-	}
-	
-	
-	
-	/**
-	 * Init
-	 */
-	static async Context init(Context c)
-	{
-		string main_class = c.main_class;
-		
-		/* Init app */
-		if (main_class != "" and rtl::method_exists(main_class, "appInit"))
-		{
-			fn appInit = rtl::method(main_class, "appInit");
-			c = appInit(c);
-		}
-		else
-		{
-			c = c::appInit(c);
-		}
-		
-		return c;
-	}
-	
-	
-	
-	/**
-	 * Start
-	 */
-	static async Context start(Context c)
-	{
-		string main_class = c.main_class;
+		/* Setup started */
+		c = c.copy{"started": true};
 		
 		/* Start app */
-		if (main_class != "" and rtl::method_exists(main_class, "appStart"))
+		string main_class = c.main_class;
+		if (main_class != "" and rtl::method_exists(main_class, "contextStart"))
 		{
-			fn appStart = rtl::method(main_class, "appStart");
-			c = await appStart(c);
-		}
-		else
-		{
-			c = await c::appStart(c);
+			fn contextStart = rtl::method(main_class, "contextStart");
+			c = await contextStart(c);
 		}
 		
 		return c;
