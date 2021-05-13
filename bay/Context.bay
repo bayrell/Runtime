@@ -59,16 +59,10 @@ struct Context extends BaseStruct
 	string tz = "UTC";
 	
 	/* Entrypoint and main class */
+	string app_name = "self";
 	string main_module = "";
 	string main_class = "";
 	string entry_point = "";
-	
-	
-	/**
-	 * Returns app name
-	 * @return string
-	 */
-	pure string appName() => "";
 	
 	
 	
@@ -160,6 +154,12 @@ struct Context extends BaseStruct
 				fn f = rtl::method(main_module_class_name, "appSettings");
 				settings = f(c.enviroments);
 			}
+		}
+		
+		/* Setup app name */
+		if (rtl::method_exists(main_module_class_name, "appName"))
+		{
+			c <= app_name <= rtl::methodApply(main_module_class_name, "appName");
 		}
 		
 		/* Add main module */
