@@ -819,6 +819,24 @@ class rtl
 	
 	
 	/**
+	 * Returns true if value is scalar array
+	 * @return bool
+	 */
+	static bool isArray(var value)
+	{
+		if (value instanceof Collection) return true;
+		#switch
+		#case ifcode JAVASCRIPT then
+		if (value instanceof Array) return true;
+		#case ifcode PHP then
+		if (is_array($value)) return true;
+		#endswitch
+		return false;
+	}
+	
+	
+	
+	/**
 	 * Return true if value is boolean
 	 * @param var value
 	 * @return bool

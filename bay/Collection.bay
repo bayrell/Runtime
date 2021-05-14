@@ -618,6 +618,7 @@ class Collection<T> extends _Collection
 	public Collection<T> concatIm(Collection<T> arr)
 	{
 		if (arr == null) return this;
+		if (not (rtl::isArray(arr))) arr = [ arr ];
 		#switch
 		#case ifcode JAVASCRIPT then
 		if (arr.length == 0) return this;
