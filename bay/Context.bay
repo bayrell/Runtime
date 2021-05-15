@@ -47,7 +47,7 @@ struct Context extends BaseStruct
 	Dict<var> settings = null;
 	Collection<string> modules = null;
 	Collection<BaseStruct> entities = null;
-	Collection<string> cli_args = null;
+	Collection<string> cli_args = [];
 	
 	/* Drivers */
 	Map<BaseDriver> drivers = new Map<BaseDriver>();
@@ -652,8 +652,12 @@ struct Context extends BaseStruct
 	static async void startApp(Dict env, string main_module, string main_class, Dict options = null)
 	{
 		string entry_point = options["entry_point"] |> default string "";
+		Collection cli_args = options["cli_args"] |> default Collection [];
 		
 		Context context = static::create(env);
+		
+		/* Set cli args */
+		context <= cli_args <= cli_args;
 		
 		/* Set global context */
 		rtl::@setContext(context);

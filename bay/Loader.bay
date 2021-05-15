@@ -238,6 +238,7 @@ class Loader
 			$this->main_class,
 			Dict::from([
 				"entry_point" => $this->entry_point,
+				"cli_args" => \Runtime\Collection::from($_SERVER['argv']),
 			])
 		);
 		return $this;
