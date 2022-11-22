@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,21 +18,27 @@
 
 namespace Runtime;
 
-use Runtime.BaseStruct;
 use Runtime.Entity;
 use Runtime.rs;
 
 
-struct LambdaChain extends BaseStruct
+struct LambdaChain extends Entity
 {
 	string name = "";
 	string value = "";
 	string chain = "";
 	double pos = 0;
 	bool is_async = false;
-	string logName() => this.getClassName() ~ " -> " ~ this.name ~ " -> [" ~ this.pos ~ "] " ~ this.value;
 	
-	LambdaChain addClassItem(string class_name, string class_method_name, Entity class_item, Dict info) =>
-		this.copy{ "value": class_name ~ "::" ~ class_method_name }
+	/* Entity name for task output */
+	string entityName() => this.getClassName() ~ " -> " ~ this.name ~ " -> [" ~ this.pos ~ "] " ~ this.value;
+	
+	/* Add class info in Context::getSubEntities */
+	LambdaChain addMethodInfo(string class_name, string class_method_name, Entity class_entity, Dict method_info) =>
+		this.copy
+		{
+			"is_async": (method_info["async"] |> default bool false),
+			"value": class_name ~ "::" ~ class_method_name
+		}
 	;
 }

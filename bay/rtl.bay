@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -311,7 +311,13 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
-	
+		
+		if (gettype($class_name) == "object")
+		{
+			if (method_exists($class_name, $method_name)) return true;
+			return false;
+		}
+		
 		$class_name = static::find_class($class_name);
 		if (!class_exists($class_name)) return false;
 		if (!method_exists($class_name, $method_name)) return false;
@@ -685,13 +691,14 @@ class rtl
 	 */
 	static var @to(var v, var o)
 	{
+		var ctx = null;
 		var e = o.e;
 		if (e == "mixed" or e == "primitive" or e == "var" or e == "fn" or e == "callback") return v;
-		if (e == "bool") return static::toBool(null, v);
-		else if (e == "string") return static::toString(null, v);
-		else if (e == "int") return static::toInt(null, v);
-		else if (e == "float") return static::toFloat(null, v);
-		else if (rtl::is_instanceof(null, v, e)) return v;
+		if (e == "bool") return static::toBool(ctx, v);
+		else if (e == "string") return static::toString(ctx, v);
+		else if (e == "int") return static::toInt(ctx, v);
+		else if (e == "float") return static::toFloat(ctx, v);
+		else if (rtl::is_instanceof(ctx, v, e)) return v;
 		return v;
 	}
 	
@@ -806,6 +813,24 @@ class rtl
 		if (rtl::isString(value)) return true;
 		if (rtl::isNumber(value)) return true;
 		if (rtl::isBoolean(value)) return true;
+		return false;
+	}
+	
+	
+	
+	/**
+	 * Returns true if value is scalar array
+	 * @return bool
+	 */
+	static bool isArray(var value)
+	{
+		if (value instanceof Collection) return true;
+		#switch
+		#case ifcode JAVASCRIPT then
+		if (value instanceof Array) return true;
+		#case ifcode PHP then
+		if (is_array($value)) return true;
+		#endswitch
 		return false;
 	}
 	

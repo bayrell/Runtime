@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ struct Context extends BaseStruct
 	Dict<var> settings = null;
 	Collection<string> modules = null;
 	Collection<BaseStruct> entities = null;
-	Collection<string> cli_args = null;
+	Collection<string> cli_args = [];
 	
 	/* Drivers */
 	Map<BaseDriver> drivers = new Map<BaseDriver>();
@@ -59,17 +59,10 @@ struct Context extends BaseStruct
 	string tz = "UTC";
 	
 	/* Entrypoint and main class */
-	string app_name = "";
-	string entry_point = "";
+	string app_name = "self";
 	string main_module = "";
 	string main_class = "";
-	
-	
-	/**
-	 * Returns app name
-	 * @return string
-	 */
-	pure string appName() => "";
+	string entry_point = "";
 	
 	
 	
@@ -78,13 +71,6 @@ struct Context extends BaseStruct
 	 * @return Dict<string>
 	 */
 	pure Dict<string> getSettings(Dict env) => null;
-	
-	
-	
-	/**
-	 * Extends entities
-	 */
-	pure Collection<BaseStruct> getEntities(Collection<BaseStruct> entities) => null;
 	
 	
 	
@@ -170,6 +156,12 @@ struct Context extends BaseStruct
 			}
 		}
 		
+		/* Setup app name */
+		if (rtl::method_exists(main_module_class_name, "appName"))
+		{
+			c <= app_name <= rtl::methodApply(main_module_class_name, "appName");
+		}
+		
 		/* Add main module */
 		if (main_module)
 		{
@@ -186,17 +178,12 @@ struct Context extends BaseStruct
 		/* Set new settings */
 		c <= settings <= settings;
 		
+		/* Extends modules */
+		Collection<string> modules = static::getRequiredModules(c.modules);
+		c <= modules <= modules;
+		
 		return c;
-	}
-	
-	
-	
-	/**
-	 * Set app name
-	 */
-	pure Context setAppName(Context c, string app_name) =>
-		c.copy{ "app_name": app_name }
-	;
+	}	
 	
 	
 	
@@ -219,30 +206,21 @@ struct Context extends BaseStruct
 	
 	
 	/**
-	 * Init context
+	 * Init
 	 */
-	static Context appInit(Context c)
+	static async Context init(Context c)
 	{
 		@ = c;
 		if (c.initialized) return c;
 		
-		/* Extends modules */
-		Collection<string> modules = static::getRequiredModules(c.modules);
-		
-		/* Get modules entities */
-		Collection<BaseStruct> entities = static::getEntitiesFromModules(modules);
-		entities = entities.prependCollectionIm( static::getEntities(c.env) );
-		
 		/* Base path */
 		string base_path = (c.base_path != "") ? c.base_path : rtl::attr(c.env, ["BASE_PATH"], "", "string");
 		
-		/* Add entities */
-		if (c.entities != null) entities = entities.appendCollectionIm(c.entities);
+		/* Get modules entities */
+		Collection<BaseStruct> entities = static::getEntitiesFromModules(c.modules);
 		c <= entities <= entities;
 		
 		/* Extend entities */
-		entities = c.chain("Runtime.Entities", [c, entities]) |> attr 1;
-		entities = static::extendEntities(c, entities);
 		entities = static::getRequiredEntities(entities);
 		
 		/* Add lambda chains */
@@ -256,21 +234,34 @@ struct Context extends BaseStruct
 			)
 		);
 		
-		return c.copy
+		/* Add Entities */
+		entities = c.chain("addEntities", [c, entities]) |> attr 1;
+		
+		/* Setup context */
+		c = c.copy
 		{
-			"modules": modules,
 			"entities": entities,
 			"base_path": base_path,
 			"initialized": true,
 		};
+		
+		/* Context init */
+		string main_class = c.main_class;
+		if (main_class != "" and rtl::method_exists(main_class, "contextInit"))
+		{
+			fn contextInit = rtl::method(main_class, "contextInit");
+			c = await contextInit(c);
+		}
+		
+		return c;
 	}
 	
 	
 	
 	/**
-	 * Start context
+	 * Start
 	 */
-	static async Context appStart(Context c)
+	static async Context start(Context c)
 	{
 		@ = c;
 		if (c.started) return c;
@@ -321,50 +312,15 @@ struct Context extends BaseStruct
 			#endif
 		}
 		
-		return c.copy{"started": true};
-	}
-	
-	
-	
-	/**
-	 * Init
-	 */
-	static async Context init(Context c)
-	{
-		string main_class = c.main_class;
-		
-		/* Init app */
-		if (main_class != "" and rtl::method_exists(main_class, "appInit"))
-		{
-			fn appInit = rtl::method(main_class, "appInit");
-			c = appInit(c);
-		}
-		else
-		{
-			c = c::appInit(c);
-		}
-		
-		return c;
-	}
-	
-	
-	
-	/**
-	 * Start
-	 */
-	static async Context start(Context c)
-	{
-		string main_class = c.main_class;
+		/* Setup started */
+		c = c.copy{"started": true};
 		
 		/* Start app */
-		if (main_class != "" and rtl::method_exists(main_class, "appStart"))
+		string main_class = c.main_class;
+		if (main_class != "" and rtl::method_exists(main_class, "contextStart"))
 		{
-			fn appStart = rtl::method(main_class, "appStart");
-			c = await appStart(c);
-		}
-		else
-		{
-			c = await c::appStart(c);
+			fn contextStart = rtl::method(main_class, "contextStart");
+			c = await contextStart(c);
 		}
 		
 		return c;
@@ -617,8 +573,9 @@ struct Context extends BaseStruct
 					string item2_class_name = item2.getClassName();
 					if (item2 instanceof Entity and item2_class_name != "Runtime.Entity")
 					{
-						item2 = item2.copy({ "name": class_name });
+						item2 = item2.addClassInfo(class_name);
 						e.pushValue(item2);
+						e = item2.extendEntities(e).toVector();
 					}
 				}
 			}	
@@ -668,7 +625,7 @@ struct Context extends BaseStruct
 						{
 							if (rtl::is_instanceof(annotation, entity_class_method))
 							{
-								annotation = annotation.addClassItem
+								annotation = annotation.addMethodInfo
 								(
 									class_name,
 									class_method_name,
@@ -690,18 +647,17 @@ struct Context extends BaseStruct
 	
 	
 	/**
-	 * Extends entities
-	 */
-	pure Collection<BaseStruct> extendEntities(Context c, Collection<BaseStruct> entities) => entities;
-	
-	
-	
-	/**
 	 * Start App
 	 */
-	static async void startApp(Dict env, string module_name, string main_class)
+	static async void startApp(Dict env, string main_module, string main_class, Dict options = null)
 	{
+		string entry_point = options["entry_point"] |> default string "";
+		Collection cli_args = options["cli_args"] |> default Collection [];
+		
 		Context context = static::create(env);
+		
+		/* Set cli args */
+		context <= cli_args <= cli_args;
 		
 		/* Set global context */
 		rtl::@setContext(context);
@@ -711,13 +667,30 @@ struct Context extends BaseStruct
 		window["globalContext"] = context;
 		#endif
 		
-		context = context::setAppName(context, module_name);
-		context = context::setMainModule(context, module_name);
+		context = context::setMainModule(context, main_module);
 		context = context::setMainClass(context, main_class);
-		context = context::setEntryPoint(context, main_class);
+		if (entry_point == "") context = context::setEntryPoint(context, main_class);
+		else context = context::setEntryPoint(context, entry_point);
+		
+		/* Call create */
+		if (options != null and options.has("create"))
+		{
+			fn f = options.has("init");
+			context = await f(context);
+		}
 		
 		/* Init context */
 		context = await context::init(context);
+		
+		/* Call init chain */
+		context = await context.chainAsync("init", [context]) |> attr 0;
+		
+		/* Call init */
+		if (options != null and options.has("init"))
+		{
+			fn f = options.has("init");
+			context = await f(context);
+		}
 		
 		/* Start context */
 		context = await context::start(context);
@@ -725,6 +698,16 @@ struct Context extends BaseStruct
 		/* Set global context */
 		rtl::@setContext(context);
 		@ = context;
+		
+		/* Call start chain */
+		context = await context.chainAsync("start", [context]) |> attr 0;
+		
+		/* Call start */
+		if (options != null and options.has("start"))
+		{
+			fn f = options.has("start");
+			context = await f(context);
+		}
 		
 		#ifcode JAVASCRIPT then
 		window["globalContext"] = context;
@@ -741,6 +724,8 @@ struct Context extends BaseStruct
 			console.log( e.stack );
 			#endif
 		}
+		
+		return context;
 	}
 	
 }

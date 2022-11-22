@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -226,75 +226,21 @@ class Loader
 	
 	
 	/**
-	 * Create context
-	 */
-	function createContext()
-	{
-		/* Create context */
-		$context = Context::create(null, Dict::from($this->env));
-		
-		/* Set context params */
-		$context = $context->copy($context, Dict::from([
-			"start_time" => time(),
-			"cli_args" => Collection::from($this->args),
-			"base_path" => getcwd(),
-		]));
-		
-		/* Set app name */
-		if ($this->main_module) $context = $context::setAppName($context, $context, $this->main_module);
-		
-		/* Set main module */
-		if ($this->main_module) $context = $context::setMainModule($context, $context, $this->main_module);
-		
-		/* Set main class */
-		if ($this->main_class) $context = $context::setMainClass($context, $context, $this->main_class);
-		
-		/* Set entry point */
-		if ($this->entry_point) $context = $context::setEntryPoint($context, $context, $this->entry_point);
-
-		/* Set global context */
-		\Runtime\rtl::setContext($context);
-		
-		/* Return context */
-		return $context;
-	}
-	
-	
-	
-	/**
-	 * Start context
-	 */
-	function startContext()
-	{
-		/* Create context */
-		$context = $this->createContext();
-		
-		/* Init context */
-		$context = $context::init($context, $context);
-		
-		/* Start context */
-		$context = $context::start($context, $context);
-		
-		/* Set global context */
-		\Runtime\rtl::setContext($context);
-		
-		/* Return context */
-		return $context;
-	}
-	
-	
-	
-	/**
 	 * Run application
 	 */
 	function run()
 	{
-		/* Start context */
-		$context = $this->startContext();
-		
-		/* Run app */
-		$context = $context::run($context, $context);
-		
+		Context::startApp
+		(
+			null,
+			Dict::from($this->env),
+			$this->main_module,
+			$this->main_class,
+			Dict::from([
+				"entry_point" => $this->entry_point,
+				"cli_args" => \Runtime\Collection::from($_SERVER['argv']),
+			])
+		);
 		return $this;
 	}
 	
@@ -305,17 +251,18 @@ class Loader
 #case ifcode ES6 then
 
 /* Run web app */
-function runWebApp(env, module_name, class_name)
+function runWebApp(env, module_name, class_name, options)
 {
+	if (options == undefined) options = null;
 	window.addEventListener
 	(
 		"load",
 		(function(obj){ return function() {
 			(async () => {
 				var ctx = null;
-				Runtime.Context.startApp(ctx,Runtime.Dict.from(obj.env),obj.module_name,obj.class_name);
+				Runtime.Context.startApp(ctx,Runtime.Dict.from(obj.env),obj.module_name,obj.class_name,options);
 			})();
-		}})({ "env": env, "module_name": module_name, "class_name": class_name })
+		}})({ "env": env, "module_name": module_name, "class_name": class_name, "options": options })
 	);
 }
 

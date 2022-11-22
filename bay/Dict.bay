@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ use Runtime.Collection;
 use Runtime.Exceptions.KeyNotFound;
 
 
-declare class _Map{}
+abstract class _Map{}
 
 #switch
 #case ifcode JAVASCRIPT then
@@ -578,9 +578,9 @@ class Dict<T> extends _Map
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var res = new Runtime.Collection(ctx);
-		for (var key in this._map) res.push( this._map[key] );
-		return res;
+		var res = new Runtime.Vector(ctx);
+		for (var key in this._map) res.pushValue( this._map[key] );
+		return res.toCollection();
 		#case ifcode PHP then
 		$values = array_values($this->_map);
 		$res = \Runtime\Collection::from($values);

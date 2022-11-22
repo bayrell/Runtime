@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2021 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -50,6 +50,106 @@ class BaseObject
 	 */
 	pure BaseObject newInstance(Dict items) => null;
 	pure BaseObject createInstance(Dict items) => static::newInstance(items);
+	
+	
+	
+	/**
+	 * Init struct data
+	 */
+	static Dict _initData(BaseObject old, Dict changed) => changed;
+	
+	
+	
+	/**
+	 * Assign
+	 */
+	static void _assign(BaseObject new_item, BaseObject old_item, Dict obj)
+	{
+		obj = rtl::convert(obj, classof Dict);
+		obj = new_item::_initData(old_item, obj);
+		
+		if (obj == null)
+		{
+			return;
+		}
+		
+		bool check_types = false;
+		string class_name = new_item.getClassName();
+		
+		#ifdef ENABLE_CHECK_TYPES then
+		
+		/* Enable check types */
+		check_types = true;
+		if (class_name == "Runtime.IntrospectionClass") check_types = false;
+		if (class_name == "Runtime.IntrospectionInfo") check_types = false;
+		
+		#endif
+		
+		
+		#switch
+		#case ifcode PHP then
+		
+		if ($obj instanceof \Runtime\Dict) $obj = $obj->_map;
+		if (gettype($obj) == "array")
+		{
+			foreach ($obj as $key => $value)
+			{
+				$k = $new_item->__getKey($key);
+				if (property_exists($new_item, $k))
+				{
+					if ($check_types)
+					{
+						$info = \Runtime\rtl::getFieldInfoWithParents($ctx, $class_name, $key);
+						if ($info)
+						{
+							$value = \Runtime\rtl::convert($ctx, $value, $info->t, null);
+						}
+					}
+					$new_item->$k = $value;
+				}
+			}
+		}
+		
+		#case ifcode JAVASCRIPT then
+		
+		var _Dict = use("Runtime.Dict");
+		var rtl = use("Runtime.rtl");
+		if (obj instanceof _Dict)
+		{
+			for (var key in obj._map)
+			{
+				var real_key = key.substring(1);
+				var value = obj._map[key];
+				if (check_types)
+				{
+					info = rtl.getFieldInfoWithParents(ctx, class_name, real_key);
+					if (info)
+					{
+						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
+					}
+				}
+				new_item[real_key] = value;
+			}
+		}
+		else
+		{
+			for (var key in obj)
+			{
+				var value = obj[key];
+				if (check_types)
+				{
+					info = rtl.getFieldInfoWithParents(ctx, new_item.getClassName(), key);
+					if (info)
+					{
+						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
+					}
+				}
+				new_item[key] = value;
+			}
+		}
+		
+		#endswitch
+	}
 	
 	
 	#switch
