@@ -30,9 +30,9 @@ class Map<T> extends Dict<T>
 	 * Returns new Instance
 	 * @return Object
 	 */
-	static Collection<T> Instance()
+	static Collection<T> Instance(var val = null)
 	{
-		return new Map();
+		return new Map(val);
 	}
 	
 	
@@ -43,7 +43,7 @@ class Map<T> extends Dict<T>
 	 * @param T value 
 	 * @return self
 	 */
-	public Map<T> set(string key, T value)
+	public Map<T> setValue(string key, T value)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -64,7 +64,7 @@ class Map<T> extends Dict<T>
 	 * @param string key
 	 * @return self
 	 */
-	public Map<T> remove(string key)
+	public Map<T> removeValue(string key)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then

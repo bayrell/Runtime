@@ -38,12 +38,12 @@ class Vector<T> extends Collection
 	
 	
 	/**
-	 * Returns new Collection
+	 * Returns new Vector
 	 * @param int offset
 	 * @param int lenght
 	 * @return Collection<T>
 	 */
-	Collection<T> slice(int offset, int length = null)
+	Collection<T> vectorSlice(int offset, int length = null)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -74,7 +74,7 @@ class Vector<T> extends Collection
 	 * Append value to the end of array
 	 * @param T value
 	 */
-	public Vector<T> push(T value)
+	public Vector<T> pushValue(T value)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -92,7 +92,7 @@ class Vector<T> extends Collection
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	public Vector<T> unshift(T value)
+	public Vector<T> unshiftValue(T value)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -110,7 +110,7 @@ class Vector<T> extends Collection
 	 * Extract last value from array
 	 * @return T value
 	 */
-	public T pop()
+	public T popValue()
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -126,13 +126,14 @@ class Vector<T> extends Collection
 	 * Extract first value from array
 	 * @return T value
 	 */
-	public T shift()
+	public T shiftValue()
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
 		return Array.prototype.shift.call(this);
 		#case ifcode PHP then
-		return array_shift($this->_arr);
+		array_shift($this->_arr);
+		return $this;
 		#endswitch
 	}
 	
@@ -143,7 +144,7 @@ class Vector<T> extends Collection
 	 * @param T value
 	 * @param int pos - position
 	 */
-	public Vector<T> insert(int pos, T value)
+	public Vector<T> insertValue(int pos, T value)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -162,7 +163,7 @@ class Vector<T> extends Collection
 	 * @param int pos - position
 	 * @param int count - count remove items
 	 */
-	public Vector<T> remove(int pos, int count = 1)
+	public Vector<T> removePosition(int pos, int count = 1)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -177,11 +178,37 @@ class Vector<T> extends Collection
 	
 	
 	/**
+	 * Remove value
+	 */
+	public Vector<T> removeValue(T value)
+	{
+		var index = this.indexOf(value);
+		if (index != -1) this.removePosition(index, 1);
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Remove value
+	 */
+	public Vector<T> removeValues(Vector<T> values)
+	{
+		for (var i=0; i<values.count(); i++)
+		{
+			this.removeValue( values.item(i) );
+		}
+		return this;
+	}
+	
+	
+	
+	/**
 	 * Remove range
 	 * @param int pos_begin - start position
 	 * @param int pos_end - end position
 	 */
-	public Vector<T> removeRange(int pos_begin, int pos_end)
+	public Vector<T> removeRangeValues(int pos_begin, int pos_end)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -200,7 +227,7 @@ class Vector<T> extends Collection
 	 * @param int pos - position
 	 * @param T value 
 	 */
-	public T set(int pos, T value)
+	public T setValue(int pos, T value)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -244,7 +271,7 @@ class Vector<T> extends Collection
 	 * Append value to the end of the vector
 	 * @param T value
 	 */
-	public Vector<T> append(T value)
+	public Vector<T> appendValue(T value)
 	{
 		this.push(value);
 		return this;
@@ -256,7 +283,7 @@ class Vector<T> extends Collection
 	 * Insert first value to begin of the vector
 	 * @return T value
 	 */
-	public Vector<T> prepend(T value)
+	public Vector<T> prependValue(T value)
 	{
 		this.unshift(value);
 		return this;
@@ -306,41 +333,4 @@ class Vector<T> extends Collection
 		return $this;
 		#endswitch
 	}
-	
-	
-	
-	/**
-	 * Remove value
-	 */
-	public Vector<T> removeValue(T value)
-	{
-		var index = this.indexOf(value);
-		if (index != -1) this.remove(index, 1);
-		return this;
-	}
-	
-	
-	
-	/**
-	 * Remove value
-	 */
-	public Vector<T> removeItem(T value)
-	{
-		return this.removeValue(value);
-	}
-	
-	
-	
-	/**
-	 * Remove value
-	 */
-	public Vector<T> removeItems(Vector<T> values)
-	{
-		for (var i=0; i<values.count(); i++)
-		{
-			this.removeValue( values.item(i) );
-		}
-		return this;
-	}
-	
 }

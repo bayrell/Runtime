@@ -6,7 +6,6 @@
 		"lib",
 		"re",
 		"rs",
-		"fs",
 		"Collection",
 		"Dict",
 		"Map",
@@ -24,13 +23,21 @@
 		"StringInterface",
 		"BaseObject",
 		"BaseStruct",
+		"BaseDriver",
 		"Date",
 		"DateTime",
 		"PathInfo",
 		"Reference",
 		"IntrospectionClass",
 		"IntrospectionInfo",
+		"Context",
+		"Entity",
+		"Driver",
+		"LambdaChain",
+		"LambdaChainClass",
+		"LambdaChainDeclare",
 		"RuntimeUtils",
-		"ModuleDescription"
+		"ModuleDescription",
+		"Loader"
 	]
 }

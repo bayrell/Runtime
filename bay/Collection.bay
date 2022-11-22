@@ -20,9 +20,10 @@ namespace Runtime;
 
 use Runtime.rtl;
 use Runtime.Exceptions.IndexOutOfRange;
+use Runtime.Exceptions.RuntimeException;
 
 
-abstract class _Collection{}
+declare class _Collection{}
 
 #switch
 #case ifcode JAVASCRIPT then
@@ -152,20 +153,20 @@ class _Collection implements \ArrayAccess, \JsonSerializable
 	 * Get and set methods
 	 */
 	function __isset($k){return isset($this->_arr[$k]);}
-	function __get($k){return $this->item(\Runtime\RuntimeUtils::getContext(), $k);}
+	function __get($k){return $this->item(\Runtime\rtl::getContext(), $k);}
 	function __set($k,$v){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\RuntimeUtils::getContext(), $k);
+		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
 	}
 	function __unset($k){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\RuntimeUtils::getContext(), $k);
+		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
 	}
 	public function offsetExists($k){return isset($this->_arr[$k]);}
-	public function offsetGet($k){return $this->item(\Runtime\RuntimeUtils::getContext(), $k);}
+	public function offsetGet($k){return $this->item(\Runtime\rtl::getContext(), $k);}
 	public function offsetSet($k,$v){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\RuntimeUtils::getContext(), $k);
+		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
 	}
 	public function offsetUnset($k){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\RuntimeUtils::getContext(), $k);
+		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
 	}
 	
 	
@@ -439,6 +440,10 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> push(T value){ throw new RuntimeException("Deprecated Collection push"); }
+	public Collection<T> push1(T value) => this.pushIm(value);
+	public Collection<T> append1(T value) => this.push(value);
+	public Collection<T> appendIm(T value) => this.pushIm(value);
 	
 	
 	
@@ -459,6 +464,10 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> unshift(T value){ throw new RuntimeException("Deprecated Collection unshift"); }
+	public Collection<T> unshift1(T value) => this.unshiftIm(value);
+	public Collection<T> prepend1(T value) => this.unshift(value);
+	public Collection<T> prependIm(T value) => this.unshiftIm(value);
 	
 	
 	
@@ -479,6 +488,7 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> removeLast(T value) => this.removeLastIm(value);
 	
 	
 	
@@ -499,6 +509,7 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> removeFirst(T value) => this.removeFirstIm(value);
 	
 	
 	
@@ -520,6 +531,7 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> insert(T value) => this.insertIm(value);
 	
 	
 	
@@ -542,6 +554,7 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> remove1(T value) => this.removeIm(value);
 	
 	
 	
@@ -563,6 +576,7 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> removeRange(T value) => this.removeRangeIm(value);
 	
 	
 	
@@ -591,22 +605,8 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
-	
-	
-	
-	/**
-	 * Append value to the end of the vector
-	 * @param T value
-	 */
-	public Collection<T> appendIm(T value) => this.pushIm(value);
-	
-	
-	
-	/**
-	 * Insert first value to begin of the vector
-	 * @return T value
-	 */
-	public Collection<T> prependIm(T value) => this.unshiftIm(value);
+	public Collection<T> set(T value){ throw new RuntimeException("Deprecated Collection set"); }
+	public Collection<T> set1(T value) => this.setIm(value);
 	
 	
 	
@@ -614,19 +614,11 @@ class Collection<T> extends _Collection
 	 * Append vector to the end of the vector
 	 * @param Collection<T> arr
 	 */
-	public Collection<T> concatIm(Collection<T> arr) => this.appendCollectionIm(arr);
-	
-	
-	
-	/**
-	 * Append vector to the end of the vector
-	 * @param Collection<T> arr
-	 */
-	public Collection<T> appendCollectionIm(Collection<T> arr)
+	public Collection<T> concatIm(Collection<T> arr)
 	{
+		if (arr == null) return this;
 		#switch
 		#case ifcode JAVASCRIPT then
-		if (arr == null) return this;
 		if (arr.length == 0) return this;
 		var res = this.cp(ctx);
 		for (var i=0; i<arr.length; i++)
@@ -645,6 +637,8 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> appendCollection1(Collection<T> arr) => this.concatIm(arr);
+	public Collection<T> concat(Collection<T> arr) => this.concatIm(arr);
 	
 	
 	
@@ -675,21 +669,7 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
-	
-	
-	
-	/**
-	 * Remove value
-	 */
-	public Collection<T> removeValueIm(T value)
-	{
-		var index = this.indexOf(value);
-		if (index != -1)
-		{
-			return this.removeIm(index);
-		}
-		return this;
-	}
+	public Collection<T> prependCollection1(Collection<T> arr) => this.prependCollectionIm(arr);
 	
 	
 	
@@ -698,8 +678,11 @@ class Collection<T> extends _Collection
 	 */
 	public Collection<T> removeItemIm(T value)
 	{
-		return this.removeValueIm(value);
+		var index = this.indexOf(value);
+		if (index != -1) return this.remove(index);
+		return this;
 	}
+	public Collection<T> removeItem(T value) => this.removeItemIm(value);
 	
 	
 	
@@ -715,6 +698,7 @@ class Collection<T> extends _Collection
 		}
 		return res;
 	}
+	public Collection<T> removeItems(Collection<T> values) => this.removeItemsIm(values);
 	
 	
 	
@@ -866,32 +850,6 @@ class Collection<T> extends _Collection
 	 * @param Collection<T> arr
 	 * @return Collection<T>
 	 */
-	Collection<T> concat(Collection<T> arr = null)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (arr == null && arr == undefined)
-		{
-			return this;
-		}
-		var new_arr = Array.prototype.slice.call(this).concat(arr);
-		Object.setPrototypeOf(new_arr, this.constructor.prototype);
-		return new_arr;
-		#case ifcode PHP then
-		if ($arr == null) return $this;
-		$arr2 = static::Instance($ctx);
-		$arr2->_arr = array_merge($this->_arr, $arr->_arr);
-		return $arr2;
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Returns Collection
-	 * @param Collection<T> arr
-	 * @return Collection<T>
-	 */
 	Collection<T> intersect(Collection<T> arr)
 	{
 		return this.filter( bool (var item) use (arr) => arr.indexOf(item) >= 0 );
@@ -950,6 +908,7 @@ class Collection<T> extends _Collection
 		return $arr2;
 		#endswitch
 	}
+	public Collection<T> reverse() => this.reverseIm();
 	
 	
 	
@@ -983,13 +942,13 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> sort(fn f = null) => this.sortIm(f);
 	
 	
 	
 	/**
 	 * Remove dublicate values
 	 */
-	public Collection<T> removeDublicatesIm() => this.removeDuplicatesIm();
 	public Collection<T> removeDuplicatesIm()
 	{
 		#switch
@@ -1020,6 +979,7 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
+	public Collection<T> removeDuplicates() => this.removeDuplicatesIm();
 	
 	
 	

@@ -1,0 +1,746 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.rs;
+use Runtime.rtl;
+use Runtime.lib;
+use Runtime.Collection;
+use Runtime.BaseDriver;
+use Runtime.BaseStruct;
+use Runtime.Entity;
+use Runtime.IntrospectionClass;
+use Runtime.IntrospectionInfo;
+use Runtime.LambdaChain;
+use Runtime.LambdaChainClass;
+use Runtime.Dict;
+use Runtime.Driver;
+use Runtime.Entity;
+use Runtime.Map;
+use Runtime.Vector;
+use Runtime.RuntimeUtils;
+use Runtime.Exceptions.FileNotFound;
+use Runtime.Exceptions.RuntimeException;
+
+
+struct Context extends BaseStruct
+{
+	/* Struct data */
+	string base_path = null;
+	Dict<string> enviroments = null;
+	Dict<var> settings = null;
+	Collection<string> modules = null;
+	Collection<BaseStruct> entities = null;
+	Collection<string> cli_args = null;
+	
+	/* Drivers */
+	Map<BaseDriver> drivers = new Map<BaseDriver>();
+	
+	/* Variable data */
+	bool initialized = false;
+	bool started = false;
+	int start_time = 0;
+	string tz = "UTC";
+	
+	/* Entrypoint and main class */
+	string app_name = "";
+	string entry_point = "";
+	string main_module = "";
+	string main_class = "";
+	
+	
+	/**
+	 * Returns app name
+	 * @return string
+	 */
+	pure string appName() => "";
+	
+	
+	
+	/**
+	 * Returns context settings
+	 * @return Dict<string>
+	 */
+	pure Dict<string> getSettings(Dict env) => null;
+	
+	
+	
+	/**
+	 * Extends entities
+	 */
+	pure Collection<BaseStruct> getEntities(Collection<BaseStruct> entities) => null;
+	
+	
+	
+	/**
+	 * Returns enviroment by eky
+	 */
+	var env(string key, var def_value = "") =>
+		this
+		|> attr "enviroments"
+		|> lib::get(key, def_value)
+	;
+	
+	
+	
+	/**
+	 * Returns settings
+	 * @return Dict<string>
+	 */
+	var config(Collection items, primitive d = null) =>
+		this
+		|> attr "settings"
+		|> lib::get("config", null)
+		|> lib::attr(items, d)
+	;
+	
+	
+	
+	/**
+	 * Returns docker secret key
+	 */
+	var secret(string key) =>
+		this
+		|> attr "settings"
+		|> lib::get("secrets", null)
+		|> lib::get(key, "")
+	;
+	
+	
+	
+	/**
+	 * Create context
+	 *
+	 * @params Dict env
+	 * @params Collection<string> modules
+	 * @params Dict settings
+	 * @return Context
+	 */
+	pure Context create(Dict env = null)
+	{
+		Dict settings = {};
+		
+		/* Context data */
+		Dict obj = {
+			"enviroments": env,
+			"settings": settings,
+			"modules": [],
+		};
+		
+		/* Create context */
+		Context ctx = static::newInstance(obj);
+		
+		return ctx;
+	}
+	
+	
+	
+	/**
+	 * Set main module
+	 */
+	pure Context setMainModule(Context c, string main_module)
+	{
+		Dict settings = {};
+		string main_module_class_name = "";
+		
+		/* Get settings */
+		if (main_module)
+		{
+			main_module_class_name = main_module ~ ".ModuleDescription";
+			if (rtl::method_exists(main_module_class_name, "appSettings"))
+			{
+				fn f = rtl::method(main_module_class_name, "appSettings");
+				settings = f(c.enviroments);
+			}
+		}
+		
+		/* Add main module */
+		if (main_module)
+		{
+			c <= modules <= c.modules.pushIm(main_module);
+		}
+		
+		/* Set main module */
+		c <= main_module <= main_module;
+		c <= main_class <= main_module_class_name;
+		
+		/* Set entry point */
+		c <= entry_point <= main_module_class_name;
+		
+		/* Set new settings */
+		c <= settings <= settings;
+		
+		return c;
+	}
+	
+	
+	
+	/**
+	 * Set app name
+	 */
+	pure Context setAppName(Context c, string app_name) =>
+		c.copy{ "app_name": app_name }
+	;
+	
+	
+	
+	/**
+	 * Set main class
+	 */
+	pure Context setMainClass(Context c, string main_class) =>
+		c.copy{ "main_class": main_class, "entry_point": main_class }
+	;
+	
+	
+	
+	/**
+	 * Set entry point
+	 */
+	pure Context setEntryPoint(Context c, string entry_point) =>
+		c.copy{ "entry_point": entry_point }
+	;
+	
+	
+	
+	/**
+	 * Init context
+	 */
+	static Context appInit(Context c)
+	{
+		@ = c;
+		if (c.initialized) return c;
+		
+		/* Extends modules */
+		Collection<string> modules = static::getRequiredModules(c.modules);
+		
+		/* Get modules entities */
+		Collection<BaseStruct> entities = static::getEntitiesFromModules(modules);
+		entities = entities.prependCollectionIm( static::getEntities(c.env) );
+		
+		/* Base path */
+		string base_path = (c.base_path != "") ? c.base_path : rtl::attr(c.env, ["BASE_PATH"], "", "string");
+		
+		/* Add entities */
+		if (c.entities != null) entities = entities.appendCollectionIm(c.entities);
+		c <= entities <= entities;
+		
+		/* Extend entities */
+		entities = c.chain("Runtime.Entities", [c, entities]) |> attr 1;
+		entities = static::extendEntities(c, entities);
+		entities = static::getRequiredEntities(entities);
+		
+		/* Add lambda chains */
+		entities = entities.concat
+		(
+			static::getSubEntities
+			(
+				entities,
+				classof LambdaChainClass,
+				classof LambdaChain
+			)
+		);
+		
+		return c.copy
+		{
+			"modules": modules,
+			"entities": entities,
+			"base_path": base_path,
+			"initialized": true,
+		};
+	}
+	
+	
+	
+	/**
+	 * Start context
+	 */
+	static async Context appStart(Context c)
+	{
+		@ = c;
+		if (c.started) return c;
+		
+		/* Get drivers from entity */
+		Collection<BaseStruct> drivers = c.entities.filter
+		(
+			bool (BaseStruct item) => item instanceof Driver
+		);
+		
+		/* Create drivers */
+		for (int i=0; i<drivers.count(); i++)
+		{
+			Driver driver_entity = drivers.item(i);
+			
+			string driver_name = driver_entity.name;
+			string class_name = driver_entity.value;
+			if (class_name == "") class_name = driver_entity.name;
+			
+			BaseDriver driver = rtl::newInstance(class_name, [driver_name, driver_entity]);
+			driver = @.chain(class_name, [driver]) |> attr 0;
+			if (class_name != driver_name)
+			{
+				driver = @.chain(driver_name, [driver]) |> attr 0;
+			}
+			
+			if (driver == null)
+			{
+				throw new RuntimeException("Driver '" ~ class_name ~ "' not found");
+			}
+			
+			c.drivers.setValue(driver_name, driver);
+		}
+		
+		/* Start drivers */
+		Collection keys = c.drivers.keys()
+		for (int i=0; i<keys.count(); i++)
+		{
+			string driver_name = keys[i];
+			BaseDriver driver = c.drivers[driver_name];
+			await driver.startDriver();
+			
+			#ifcode JAVASCRIPT then
+			if (driver.entity.global)
+			{
+				window[driver_name] = driver;
+			}
+			#endif
+		}
+		
+		return c.copy{"started": true};
+	}
+	
+	
+	
+	/**
+	 * Init
+	 */
+	static async Context init(Context c)
+	{
+		string main_class = c.main_class;
+		
+		/* Init app */
+		if (main_class != "" and rtl::method_exists(main_class, "appInit"))
+		{
+			fn appInit = rtl::method(main_class, "appInit");
+			c = appInit(c);
+		}
+		else
+		{
+			c = c::appInit(c);
+		}
+		
+		return c;
+	}
+	
+	
+	
+	/**
+	 * Start
+	 */
+	static async Context start(Context c)
+	{
+		string main_class = c.main_class;
+		
+		/* Start app */
+		if (main_class != "" and rtl::method_exists(main_class, "appStart"))
+		{
+			fn appStart = rtl::method(main_class, "appStart");
+			c = await appStart(c);
+		}
+		else
+		{
+			c = await c::appStart(c);
+		}
+		
+		return c;
+	}
+	
+	
+	
+	/**
+	 * Run entry point
+	 */
+	static async Context run(Context c)
+	{
+		@ = c;
+		string entry_point = c.entry_point;
+		
+		/* Run entrypoint */
+		if (entry_point != "")
+		{
+			fn appRun = rtl::method(entry_point, "appRun");
+			await @appRun(c);
+		}
+		
+		return c;
+	}
+	
+	
+	
+	/**
+	 * Add driver
+	 */
+	Context addDriver(BaseDriver obj)
+	{
+		this.drivers.setValue(obj.getObjectName(), obj);
+		return this;
+	}
+	
+	
+	
+	/**
+	 * Add driver
+	 */
+	BaseDriver getDriver(string name)
+	{
+		return this.drivers.get(name, null);
+	}
+	
+	
+	/* ---------------------- Chain --------------------- */
+	
+	/**
+	 * Apply Lambda Chain
+	 */
+	fn chain(string chain_name, Collection args)
+	{
+		Collection<BaseStruct> entities = this.entities.filter
+		(
+			bool (BaseStruct item) use (chain_name) =>
+				item instanceof LambdaChain and
+				item.name == chain_name and
+				item.is_async == false
+		);
+		entities = entities.sortIm
+		(
+			int (LambdaChain a, LambdaChain b) => a.pos > b.pos
+		);
+		
+		for (int i=0; i<entities.count(); i++)
+		{
+			LambdaChain item = entities.item(i);
+			string item_chain_name = item.chain;
+			if (item_chain_name != "")
+			{
+				args = this.chain(item_chain_name, args);
+			}
+			else
+			{
+				Collection arr = rs::split("::", item.value);
+				string class_name = arr.get(0, "");
+				string method_name = arr.get(1, "");
+				fn f = rtl::method(class_name, method_name);
+				args = rtl::apply(f, args);
+			}
+		}
+		return args;
+	}
+	
+	
+	
+	/**
+	 * Apply Lambda Chain Await
+	 */
+	async fn chainAsync(string chain_name, Collection args)
+	{
+		Collection<BaseStruct> entities = this.entities.filter
+		(
+			bool (BaseStruct item) use (chain_name) =>
+				item instanceof LambdaChain and
+				item.name == chain_name
+		);
+		entities = entities.sortIm
+		(
+			int (LambdaChain a, LambdaChain b) => a.pos > b.pos
+		);
+		
+		for (int i=0; i<entities.count(); i++)
+		{
+			LambdaChain item = entities.item(i);
+			string item_chain_name = item.chain;
+			if (item_chain_name != "")
+			{
+				args = await this.chainAsync(item_chain_name, args);
+			}
+			else
+			{
+				Collection arr = rs::split("::", item.value);
+				string class_name = arr.get(0, "");
+				string method_name = arr.get(1, "");
+				fn f = rtl::method(class_name, method_name);
+				
+				if (item.is_async)
+				{
+					args = await rtl::applyAsync(f, args);
+				}
+				else
+				{
+					args = rtl::apply(f, args);
+				}
+			}
+		}
+		return args;
+	}
+	
+	
+	
+	/**
+	 * Translate message
+	 * @params string space - message space
+	 * @params string message - message need to be translated
+	 * @params Map params - Messages params. Default null.
+	 * @params string locale - Different locale. Default "".
+	 * @return string - translated string
+	 */
+	fn translate(string space, string message, Map params = null, string locale = "")
+	{
+		message = (params == null) ? message :
+			params.reduce
+			(
+				string (string message, string value, string key) =>
+					rs::replace("%" ~ key ~ "%", value, message)
+				,
+				message
+			)
+		;
+		return message;
+	}
+	
+	
+	
+	/* -------------------- Functions ------------------- */
+	
+	/**
+	 * Returns required modules
+	 * @param string class_name
+	 * @return Collection<string>
+	 */
+	pure void _getRequiredModules
+	(
+		Vector<string> res,
+		Map<string> cache,
+		Collection<string> modules,
+		fn filter = null
+	)
+	{
+		if (modules == null) return;
+		if (filter) modules = modules.filter(filter);
+		for (int i=0; i<modules.count(); i++)
+		{
+			string module_name = modules.item(i);
+			if (cache.get(module_name, false) == false)
+			{
+				cache.setValue(module_name, true);
+				fn f = rtl::method(module_name ~ ".ModuleDescription", "requiredModules");
+				Dict<string> sub_modules = f();
+				if (sub_modules != null)
+				{
+					Collection<string> sub_modules = sub_modules.keys();
+					static::_getRequiredModules(res, cache, sub_modules);
+				}
+				res.pushValue(module_name);
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Returns all modules
+	 * @param Collection<string> modules
+	 * @return Collection<string>
+	 */
+	pure Collection<string> getRequiredModules(Collection<string> modules)
+	{
+		Vector<string> res = new Vector();
+		Map<string> cache = new Map();
+		static::_getRequiredModules(res, cache, modules);
+		res = res.removeDuplicates();
+		return res.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Returns modules entities
+	 */
+	pure Collection<BaseStruct> getEntitiesFromModules(Collection<string> modules)
+	{
+		Vector<BaseStruct> entities = new Vector();
+		for (int i=0; i<modules.count(); i++)
+		{
+			string module_class_name = modules.item(i) ~ ".ModuleDescription";
+			if (rtl::method_exists(module_class_name, "entities"))
+			{
+				fn f = rtl::method(module_class_name, "entities");
+				Collection<BaseStruct> arr = f();
+				entities.appendVector(arr);
+			}
+		}
+		return entities.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Extend entities
+	 */
+	pure Collection<BaseStruct> getRequiredEntities(Collection<BaseStruct> entities)
+	{
+		Vector<BaseStruct> e = entities.toVector();
+		for (int i=0; i<entities.count(); i++)
+		{
+			BaseStruct item1 = entities.item(i);
+			string item1_class_name = item1.getClassName();
+			if (item1_class_name == "Runtime.Entity")
+			{
+				string class_name = (item1.value != "") ? item1.value : item1.name;
+				Collection annotations = rtl::getClassAnnotations(class_name);
+				for (int j=0; j<annotations.count(); j++)
+				{
+					BaseStruct item2 = annotations.item(j);
+					string item2_class_name = item2.getClassName();
+					if (item2 instanceof Entity and item2_class_name != "Runtime.Entity")
+					{
+						item2 = item2.copy({ "name": class_name });
+						e.pushValue(item2);
+					}
+				}
+			}	
+		}
+		return e.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Returns sub entities from classes
+	 */
+	pure Collection getSubEntities
+	(
+		Collection entitites,
+		string entity_class_name,
+		string entity_class_method
+	)
+	{
+		Collection class_names = entitites.filter( lib::isInstance(entity_class_name) );
+		
+		Vector<BaseStruct> methods = new Vector();
+		methods.appendVector( entitites.filter( lib::isInstance(entity_class_method) ) );
+		
+		for (int class_names_inc=0; class_names_inc<class_names.count(); class_names_inc++)
+		{
+			Entity class_item = class_names[class_names_inc];
+			string class_name = class_item.name;
+			if (class_name == "") continue;
+			
+			Dict annotations = rtl::getMethodsAnnotations(class_name);
+			annotations.each
+			(
+				void (Collection annotations, string class_method_name) use
+				(methods, class_item, class_name, entity_class_name, entity_class_method)
+				{
+					Dict method_info = rtl::methodApply
+					(
+						class_name,
+						"getMethodInfoByName",
+						[class_method_name]
+					);
+					for (int annotations_inc=0; annotations_inc<annotations.count(); annotations_inc++)
+					{
+						BaseStruct annotation = annotations[annotations_inc];
+						if (annotation)
+						{
+							if (rtl::is_instanceof(annotation, entity_class_method))
+							{
+								annotation = annotation.addClassItem
+								(
+									class_name,
+									class_method_name,
+									class_item,
+									method_info
+								);
+								methods.pushValue(annotation);
+							}
+						}
+					}
+				}
+			);
+			
+		}
+		
+		return methods;
+	}
+	
+	
+	
+	/**
+	 * Extends entities
+	 */
+	pure Collection<BaseStruct> extendEntities(Context c, Collection<BaseStruct> entities) => entities;
+	
+	
+	
+	/**
+	 * Start App
+	 */
+	static async void startApp(Dict env, string module_name, string main_class)
+	{
+		Context context = static::create(env);
+		
+		/* Set global context */
+		rtl::@setContext(context);
+		@ = context;
+		
+		#ifcode JAVASCRIPT then
+		window["globalContext"] = context;
+		#endif
+		
+		context = context::setAppName(context, module_name);
+		context = context::setMainModule(context, module_name);
+		context = context::setMainClass(context, main_class);
+		context = context::setEntryPoint(context, main_class);
+		
+		/* Init context */
+		context = await context::init(context);
+		
+		/* Start context */
+		context = await context::start(context);
+		
+		/* Set global context */
+		rtl::@setContext(context);
+		@ = context;
+		
+		#ifcode JAVASCRIPT then
+		window["globalContext"] = context;
+		#endif
+		
+		try
+		{
+			/* Run app */
+			await context::run(context);
+		}
+		catch (var e)
+		{
+			#ifcode JAVASCRIPT then
+			console.log( e.stack );
+			#endif
+		}
+	}
+	
+}

@@ -24,18 +24,28 @@ class Callback
 {
 	protected $obj;
 	protected $name;
-	function __construct($obj, $name)
+	function __construct($obj_name, $name)
 	{
-		if (gettype($obj) == "string")
+		$obj = null;
+		if (gettype($obj_name) == "string")
 		{
-			$obj = \Runtime\rtl::find_class($obj);
+			$obj = \Runtime\rtl::find_class($obj_name);
 			if (!class_exists($obj))
 			{
 				throw new \Exception("Class " . $obj . " not found ");
 			}
-			if (!method_exists($obj, $name)){
+			if (!method_exists($obj, $name))
+			{
 				throw new \Exception("Method '" . $name . "' not found in " . $obj);
 			}
+		}
+		else if (is_object($obj_name))
+		{
+			$obj = $obj_name;
+		}
+		else
+		{
+			throw new \Exception("Wrong object name");
 		}
 		$this->obj = $obj;
 		$this->name = $name;

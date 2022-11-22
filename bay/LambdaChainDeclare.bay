@@ -19,19 +19,12 @@
 namespace Runtime;
 
 use Runtime.BaseStruct;
-use Runtime.rtl;
-use Runtime.lib;
-use Runtime.Collection;
-use Runtime.Dict;
-use Runtime.IntrospectionInfo;
+use Runtime.rs;
 
 
-struct IntrospectionClass extends BaseStruct
+struct LambdaChainDeclare extends BaseStruct
 {
-	string class_name = "";
-	Collection<BaseStruct> class_info = null;
-	Dict<Collection> fields = null;
-	Dict<Collection> methods = null;
-	Collection<string> interfaces = null;
+	string name = "";
+	bool is_await = false;
+	string logName() => this.getClassName() ~ " -> " ~ this.name;
 }
-

@@ -52,8 +52,8 @@ class BaseObject
 	pure BaseObject createInstance(Dict items) => static::newInstance(items);
 	
 	
-	/* Old functions */
-	var assignValue(string k, var v){}
-	var takeValue(string k, var v = null){}
-	
+	#switch
+	#case ifcode PHP then
+	function __getKey($k){return $k;}
+	#endswitch
 }

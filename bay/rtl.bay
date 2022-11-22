@@ -106,41 +106,6 @@ class rtl
 	
 	
 	
-	static bool @isBrowser()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		return typeof window !== "undefined";
-		#endswitch
-		return false;
-	}
-	
-	
-	
-	/**
-	 * Define props
-	 */
-	static bool @defProp(var obj, var name)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		Object.defineProperty
-		(
-			obj,
-			name,
-			{
-				get:() => { return obj["__" + name] },
-				set:(value) => {
-					var AssignStructValueError = use("Runtime.Exceptions.AssignStructValueError");
-					throw new AssignStructValueError(null, name); 
-				}
-			}
-		);
-		#endswitch
-	}
-	
-	
-	
 	/**
 	 * Define class
 	 */
@@ -374,7 +339,7 @@ class rtl
 	 * Create object by class_name. If class name does not exists return null
 	 * @return Object
 	 */
-	static Object newInstance(string class_name, Vector<var> args = null)
+	static Object newInstance(string class_name, Collection<var> args = null)
 	{
 		#switch
 		#case ifcode PHP then
@@ -392,7 +357,7 @@ class rtl
 		var obj = this.find_class(class_name);
 		if (!this.exists(ctx, obj)) return null;
 		if (!(obj instanceof Function)) return null;
-		if (args == undefined || args == null) args = [];
+		if (args == undefined || args == null){ args = []; } else { args = args.toArray(); }
 		args = args.slice(); 
 		args.unshift(ctx);
 		args.unshift(null);
@@ -453,11 +418,17 @@ class rtl
 	 */
 	static var apply(fn f, Collection args)
 	{
+		bool is_ctx = false;
+		
+		#ifdef ENABLE_CONTEXT then
+		is_ctx = true;
+		#endif
+		
 		#switch
 		#case ifcode PHP then
 		
 		$arr = ($args != null) ? (($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : [];
-		array_unshift($arr, $ctx);
+		if ($is_ctx) array_unshift($arr, $ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
 			return $f->invokeArgs($arr);
@@ -471,7 +442,7 @@ class rtl
 		if (args == null) args = [];
 		else args = Array.prototype.slice.call(args);
 		
-		args.unshift(ctx);
+		if (typeof ctx != "undefined") args.unshift(ctx);
 		if (this.isString(ctx, f))
 		{
 			var a = f.split("::");
@@ -500,36 +471,68 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$arr = $args->_getArr();
-		array_unshift($arr, $ctx);
+		$arr = ($args != null) ? (($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : [];
+		if (isset($ctx)) array_unshift($arr, $ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
 			return $f->invokeArgs($arr);
 		}
+		if (gettype($f) == "string") $f = static::find_class($f);
 		return call_user_func_array($f, $arr);
 		
 		#case ifcode JAVASCRIPT then
-		await f.apply(null, args);
+		
+		var res;
+		if (args == null) args = [];
+		else args = Array.prototype.slice.call(args);
+		
+		if (typeof ctx != "undefined") args.unshift(ctx);
+		if (this.isString(ctx, f))
+		{
+			var a = f.split("::");
+			var c = a[0]; var m = a[1];
+			c = this.find_class(c);
+			f = c[m];
+			res = await f.apply(c, args);
+		}
+		else
+		{
+			res = await f.apply(null, args);
+		}
+		
+		return res;
+		
 		#endswitch
 	}
 	
 	
 	
 	/**
-	 * Run thread
+	 * Apply method
+	 * @return var
 	 */
-	static void runThread(fn f, Collection<var> args = null)
+	static var methodApply(string class_name, string method_name, Collection args = null)
 	{
-		if (args == null) args = [];
-		
-		#ifcode JAVASCRIPT then
-		(async () => {
-			try { args = args.prependIm(ctx); await f.apply(args); }
-			catch (e) { console.log(e.stack); }
-		})();
-		#endif
+		fn f = rtl::method(class_name, method_name);
+		return rtl::apply(f, args);
 	}
+	static var applyMethod(string class_name, string method_name, Collection args = null) =>
+		static::methodApply(class_name, method_name, args);
 	
+	
+	
+	/**
+	 * Apply method async
+	 * @return var
+	 */
+	static async var methodApplyAsync(string class_name, string method_name, Collection args = null)
+	{
+		fn f = rtl::method(class_name, method_name);
+		return await rtl::applyAsync(f, args);
+	}
+	static async var applyMethodAsync(string class_name, string method_name, Collection args = null) =>
+		await static::methodApplyAsync(class_name, method_name, args);
+		
 	
 	
 	/**
@@ -537,40 +540,7 @@ class rtl
 	 */
 	static var get(var item, string key, var def_val = null)
 	{
-		if (item === null) return def_val;
-		
-		#switch
-		#case ifcode PHP then
-		if ($item === null) return $def_val;
-		if ($item instanceof \Runtime\Dict ||
-			$item instanceof \Runtime\Collection ||
-			$item instanceof \Runtime\BaseStruct
-		)
-		{
-			return $item->get($ctx, $key, $def_val);
-		}
-		if (gettype($item) == "array" or method_exists($item, "__get"))
-		{
-			if (is_int($key) or is_float($key) or is_string($key) or is_bool($key)) return $item[$key];
-		}
-		if (gettype($item) == "string")
-		{
-			if (is_int($key)) return mb_substr($item, $key, 1);
-		}
-		return $def_val;
-		#case ifcode JAVASCRIPT then
-		if (item == undefined) return def_val;
-		if (item instanceof Runtime.Dict ||
-			item instanceof Runtime.Collection ||
-			item instanceof Runtime.BaseStruct
-		)
-		{
-			return item.get(ctx, key, def_val);
-		}
-		return item[key];
-		#endswitch
-		
-		return def_val;
+		return static::attr(item, key, def_val)
 	}
 	
 	
@@ -581,13 +551,13 @@ class rtl
 	 */
 	static var attr(var item, Collection path, var def_val = null)
 	{
-		if (path == null) return def_val;
+		if (path === null) return def_val;
 		#switch
 		#case ifcode PHP then
 		
 		if ($item === null) return $def_val;
-		if (gettype($path) == "string") $path = \Runtime\Collection::from([$path]);
-		else if (gettype($path) == "array") $path = \Runtime\Collection::from($path);
+		if (gettype($path) == "array") $path = \Runtime\Collection::from($path);
+		else if (static::isScalarValue($ctx, $path)) $path = \Runtime\Collection::from([$path]);
 		if (!($path instanceof \Runtime\Collection)) return $def_val;
 		if (count($path->_arr) == 0) 
 		{
@@ -604,7 +574,7 @@ class rtl
 		}
 		else if ($item instanceof \Runtime\BaseStruct)
 		{
-			$item = $item->takeValue($ctx, $key, $def_val);
+			$item = $item->get($ctx, $key, $def_val);
 			$val = static::attr($ctx, $item, $path, $def_val);
 			return $val;
 		}
@@ -617,8 +587,9 @@ class rtl
 		
 		if (def_val == undefined) def_val = null;
 		if (item === null) return def_val;
-		if (typeof path == "string") path = Collection.from([path]);
-		else if (Array.isArray(path) && path.count == undefined) path = Collection.from(path);
+		if (item === undefined) return def_val;
+		if (Array.isArray(path) && path.count == undefined) path = Collection.from(path);
+		if (this.isScalarValue(ctx, path)) path = Collection.from([path]);
 		if (!(path instanceof Collection)) return def_val;
 		if (path.count() == 0)
 		{
@@ -629,14 +600,20 @@ class rtl
 		var val = def_val;
 		if (item instanceof Dict || item instanceof Collection)
 		{
-			item = item.get(ctx, key, def_val);
-			val = this.attr(ctx, item, path, def_val);
+			var new_item = item.get(ctx, key, def_val);
+			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
 		else if (item instanceof BaseStruct)
 		{
-			item = item.takeValue(ctx, key, def_val);
-			val = this.attr(ctx, item, path, def_val);
+			var new_item = item.get(ctx, key, def_val);
+			val = this.attr(ctx, new_item, path, def_val);
+			return val;
+		}
+		else
+		{
+			var new_item = item[key] || def_val;
+			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
 		return val;
@@ -675,7 +652,7 @@ class rtl
 			{
 				var attr_data = data.get(attr_name, null);
 				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);			
-				new_data = data.copy( (new Map()).set(attr_name, res) );
+				new_data = data.copy( (new Map()).setValue(attr_name, res) );
 			}
 			else if (data instanceof Dict)
 			{
@@ -1004,7 +981,10 @@ class rtl
 	 */
 	static string @toStr(var value)
 	{
+		#ifdef ENABLE_CONTEXT then
 		return static::toString(null, value);
+		#endif
+		return static::toString(value);
 	}
 	
 	
@@ -1183,63 +1163,6 @@ class rtl
 		return Math.round(value);
 		
 		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Json encode data
-	 * @param var data
-	 * @return string
-	 */
-	public static string json_encode(var data)
-	{
-		fn f = static::method("Runtime.RuntimeUtils", "json_encode");
-		return f(data);
-	}
-	
-	
-	/**
-	 * Json decode to primitive values
-	 * @param string s Encoded string
-	 * @return var
-	 */
-	public static string json_decode(var obj)
-	{
-		fn f = static::method("Runtime.RuntimeUtils", "json_decode");
-		return f(obj);
-	}
-	
-	
-	
-	/* ====================== Chains ====================== */
-	
-	/**
-	 * Apply async chain
-	 */
-	static async Collection<var> chainAsync(Collection<string> chain, Collection<var> args)
-	{
-		for (int i=0; i<chain.count(); i++)
-		{
-			string chain_name = chain.item(i);
-			args = await rtl::apply(chain_name, args);
-		}
-		return args;
-	}
-	
-	
-	
-	/**
-	 * Apply chain
-	 */
-	static Collection<var> chain(Collection<string> chain, Collection<var> args)
-	{
-		for (int i=0; i<chain.count(); i++)
-		{
-			string chain_name = chain.item(i);
-			args = rtl::apply(chain_name, args);
-		}
-		return args;
 	}
 	
 	
@@ -1606,129 +1529,6 @@ class rtl
 	
 	
 	/**
-	 * Clone var
-	 * @param {var} value - Variable
-	 * @return {var} result
-	 */
-	static var clone(var val)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		if ($val == null) return null;
-		if (self::isScalarValue($val)) return $val;
-		return clone $val;
-		
-		#case ifcode JAVASCRIPT then
-		
-		var Collection = use("Runtime.Collection");
-		var Dict = use("Runtime.Dict");
-		var BaseObject = use("Runtime.BaseObject");
-		var BaseStruct = use("Runtime.BaseStruct");
-		var FakeStruct = use("Runtime.FakeStruct");
-		var Reference = use("Runtime.Reference");
-		
-		if (val == null)
-			return null;
-		
-		else if (val instanceof Number || typeof val == "number")
-		{
-			return val;
-		}
-		else if (val instanceof String || typeof val == "string")
-		{
-			return (new String(val)).toString();
-		}
-		else if (val instanceof Boolean || typeof val == "boolean")
-		{
-			return val;
-		}
-		else if (typeof val == "symbol")
-		{
-			return Symbol();
-		}
-		else if (val instanceof Date)
-		{
-			return new Date(val);
-		}
-		else if (typeof val == 'object' && val.nodeType && typeof val.cloneNode == "function")
-		{
-			return val.cloneNode(true);
-		}
-		else if (val instanceof Collection)
-		{
-			var res = val.constructor.Instance();
-			for (var i=0;i<val.length;i++)
-			{
-				res.push(ctx, this.clone(ctx, val[i]));
-			}
-			return res;
-		}
-		else if (val instanceof Dict)
-		{
-			var res = val.constructor.Instance();
-			for (var key in val._map)
-			{
-				res._map[key] = this.clone(ctx, val._map[key]);
-			}
-			return res;
-		}
-		else if (Array.isArray(val))
-		{	
-			var proto = Object.getPrototypeOf(val);
-			var res = Object.create(proto);
-			for (var i=0;i<val.length;i++)
-			{
-				res.push(ctx, this.clone(ctx, val[i]));
-			}
-			return res;
-		}
-		else if (val instanceof BaseStruct)
-		{
-			return val;
-		}
-		else if (val instanceof FakeStruct)
-		{
-			return val.clone(ctx);
-		}
-		else if (val instanceof Reference)
-		{
-			return new Reference(ctx, val.ref);
-		}
-		else if (val instanceof BaseObject || typeof val == 'object')
-		{
-			var proto = Object.getPrototypeOf(val);
-			var res = Object.create(proto);
-			var a = Object.getOwnPropertyNames(val);
-			for (var i=0;i<a.length;i++)
-			{
-				var key = a[i];
-				res[key] = this.clone(ctx, val[key]);
-			}
-			return res;
-		}
-		
-		return null;
-		
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Convert to timestamp
-	 */
-	static int timestamp(string s)
-	{
-		#switch
-		#case ifcode PHP then
-		return strtotime($s);
-		#endswitch
-	}
-	
-	
-	
-	/**
 	 * Debug
 	 */
 	void @trace()
@@ -1768,6 +1568,249 @@ class rtl
 	}
 	
 	#endif
+	
+	
+	
+	/* ================================ Context Functions ================================ */
+	
+	protected static var _global_context = null;
+	
+	
+	/**
+	 * Returns global context
+	 * @return Context
+	 */
+	public static var @getContext()
+	{
+		#switch
+		#case ifcode PHP then
+		return self::$_global_context;
+		#case ifcode NODEJS then
+		return rtl._global_context;
+		#case ifcode ES6 then
+		return Runtime.rtl._global_context;
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Set global context
+	 * @param Context context
+	 */
+	public static var @setContext(var context)
+	{
+		#switch
+		#case ifcode PHP then
+		self::$_global_context = $context;
+		#case ifcode JAVASCRIPT then
+		use("Runtime.rtl")._global_context = context;
+		#endswitch
+		return context;
+	}
+	
+	
+	
+	/* ============================= Runtime Utils Functions ============================= */
+	
+	
+	/**
+	 * Json encode data
+	 * @param var data
+	 * @return string
+	 */
+	public static string json_encode(var data)
+	{
+		fn f = static::method("Runtime.RuntimeUtils", "json_encode");
+		return f(data);
+	}
+	
+	
+	
+	/**
+	 * Json decode to primitive values
+	 * @param string s Encoded string
+	 * @return var
+	 */
+	public static string json_decode(var obj)
+	{
+		fn f = static::method("Runtime.RuntimeUtils", "json_decode");
+		return f(obj);
+	}
+	
+	
+	
+	/**
+	 * Returns parents class names
+	 * @return Vector<string>
+	 */
+	pure memorize Collection<string> getParents(string class_name)
+	{
+		Vector<string> res = new Vector();
+		while (class_name != "")
+		{
+			res.pushValue(class_name);
+			class_name = static::methodApply(class_name, "getParentClassName");
+		}
+		
+		return res.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Returns class annotations
+	 */
+	pure memorize Collection getClassAnnotations(string class_name, Collection res = null)
+	{
+		if (res == null) res = [];
+		Dict info = static::methodApply(class_name, "getClassInfo");
+		Collection arr = info["annotations"] |> default Collection [];
+		return res.concat(arr);
+	}
+	
+	
+	
+	/**
+	 * Returns class annotations with parents
+	 */
+	pure memorize Collection getClassAnnotationsWithParents(string class_name)
+	{
+		Collection res = {};
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			res = static::getClassAnnotations(parent_class_name, res);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns field info
+	 */
+	pure memorize Dict getFieldInfo(string class_name, string field_name)
+	{
+		Dict res = static::methodApply(class_name, "getFieldInfoByName", [field_name]);
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns field info
+	 */
+	pure memorize Dict getFieldInfoWithParents(string class_name, string field_name)
+	{
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			Dict res = static::methodApply(parent_class_name, "getFieldInfoByName", [field_name]);
+			if (res != null) return res;
+		}
+		return null;
+	}
+	
+	
+	
+	/**
+	 * Returns fields of class
+	 */
+	pure memorize Collection getFields(string class_name, int flag = 255)
+	{
+		Vector<string> names = new Vector();
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			Collection<string> item_fields = static::methodApply
+			(
+				parent_class_name, "getFieldsList", [flag]
+			);
+			if (item_fields != null)
+			{
+				names.appendVector(item_fields);
+			}
+		}
+		return names.toCollection().removeDuplicatesIm();
+	}
+	
+	
+	
+	/**
+	 * Returns fields annotations
+	 */
+	pure memorize Dict getFieldsAnnotations(string class_name, Dict res = null)
+	{
+		if (res == null) res = {};
+		Collection<string> methods = static::methodApply(class_name, "getFieldsList", [255]);
+		for (int i=0; i<methods.count(); i++)
+		{
+			string method_name = methods[i];
+			Dict info = static::methodApply(class_name, "getFieldInfoByName", [method_name]);
+			Collection annotations = info["annotations"];
+			Collection arr = res[method_name] |> default Collection [];
+			res <= { method_name } <= arr.concat(annotations);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns fields annotations with parents
+	 */
+	pure memorize Dict getFieldsAnnotationsWithParents(string class_name)
+	{
+		Dict res = {};
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			res = static::getFieldsAnnotations(parent_class_name, res);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns methods annotations
+	 */
+	pure memorize Dict getMethodsAnnotations(string class_name, Dict res = null)
+	{
+		if (res == null) res = {};
+		Collection<string> methods = static::methodApply(class_name, "getMethodsList", [255]);
+		for (int i=0; i<methods.count(); i++)
+		{
+			string method_name = methods[i];
+			Dict info = static::methodApply(class_name, "getMethodInfoByName", [method_name]);
+			Collection annotations = info["annotations"];
+			Collection arr = res[method_name] |> default Collection [];
+			res <= { method_name } <= arr.concat(annotations);
+		}
+		return res;
+	}
+	
+	
+	
+	/**
+	 * Returns methods annotations with parents
+	 */
+	pure memorize Dict getMethodsAnnotationsWithParents(string class_name)
+	{
+		Dict res = {};
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			res = static::getMethodsAnnotations(parent_class_name, res);
+		}
+		return res;
+	}
 }
 
 

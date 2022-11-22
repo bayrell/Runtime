@@ -18,39 +18,45 @@
 
 namespace Runtime;
 
+use Runtime.BaseObject;
+use Runtime.Entity;
 
-static class ModuleDescription
+
+class BaseDriver extends BaseObject
 {
-	
-	/**
-	 * Returns module name
-	 * @return string
-	 */
-	pure string getModuleName() => "Runtime";
-	
+	protected string object_name = "";
+	protected Entity entity = null;
 	
 	
 	/**
-	 * Returns module name
-	 * @return string
+	 * Returns object name
 	 */
-	pure string getModuleVersion() => "0.11.0";
+	public string getObjectName() => this.object_name;
 	
 	
 	
 	/**
-	 * Returns required modules
-	 * @return Map<string>
+	 * Returns entity
 	 */
-	pure Map<string> requiredModules() => null;
-	
+	public string getEntity() => this.entity;
 	
 	
 	/**
-	 * Returns enities
+	 * Constructor
 	 */
-	pure Collection<Dict> entities() => 
-	[
-	];
+	public void constructor(string object_name = "", Entity entity = null)
+	{
+		parent();
+		this.object_name = object_name;
+		this.entity = entity;
+	}
+	
+	
+	/**
+	 * Start driver
+	 */
+	public async void startDriver()
+	{
+	}
 	
 }

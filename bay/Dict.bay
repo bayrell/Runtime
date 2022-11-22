@@ -23,7 +23,7 @@ use Runtime.Collection;
 use Runtime.Exceptions.KeyNotFound;
 
 
-abstract class _Map{}
+declare class _Map{}
 
 #switch
 #case ifcode JAVASCRIPT then
@@ -42,7 +42,7 @@ Runtime._Map = function(ctx, map)
 				this._map[i] = map._map[i];
 			}
 		}
-		else
+		else if (typeof map == "object" && !(map instanceof Runtime._Collection))
 		{
 			for (var i in map)
 			{
@@ -76,11 +76,8 @@ Object.assign(Runtime._Map,
 {
 	from: function(map)
 	{
-		var res = this.Instance(null);
-		for (var i in map)
-		{
-			res._map["|" + i] = map[i];
-		}
+		var ctx = null;
+		var res = this.Instance(ctx, map);
 		return res;
 	},
 	getCurrentNamespace: function(){ return "Runtime"; },
@@ -223,9 +220,9 @@ class Dict<T> extends _Map
 	 * Returns new Instance
 	 * @return Object
 	 */
-	static Dict<T> Instance()
+	static Dict<T> Instance(var val = null)
 	{
-		return new Dict();
+		return new Dict(val);
 	}
 	
 	
@@ -502,6 +499,7 @@ class Dict<T> extends _Map
 		return $res;
 		#endswitch
 	}
+	public Dict<T> set1(string key, T value) => this.setIm(key, value);
 	
 	
 	
@@ -533,6 +531,7 @@ class Dict<T> extends _Map
 		return $this;
 		#endswitch
 	}
+	public Dict<T> remove1(string key) => this.removeIm(key);
 	
 	
 	
@@ -559,9 +558,9 @@ class Dict<T> extends _Map
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var res = new Runtime.Collection(ctx);
-		for (var key in this._map) res.push(key.substring(1));
-		return res;
+		var res = new Runtime.Vector(ctx);
+		for (var key in this._map) res.pushValue(ctx, key.substring(1));
+		return res.toCollection();
 		#case ifcode PHP then
 		$keys = array_keys($this->_map);
 		$res = \Runtime\Collection::from($keys);
@@ -738,17 +737,19 @@ class Dict<T> extends _Map
 	 */
 	public Dict<T> concat(Dict<T> map = null)
 	{
+		if (map == null) return this;
 		#switch
 		#case ifcode JAVASCRIPT then
 		var _map = {};
+		var f = false;
 		var Dict = use("Runtime.Dict");
 		if (map == null) return this;
 		if (map instanceof Dict) _map = map._map;
-		else if (typeof map == "object") _map = map;
+		else if (typeof map == "object") { _map = map; f = true; }
 		var res = this.cp(ctx);
 		for (var key in _map)
 		{
-			res._map[key] = _map[key];
+			res._map[(f ? "|" : "") + key] = _map[key];
 		}
 		return res;
 		#case ifcode PHP then
@@ -782,10 +783,31 @@ class Dict<T> extends _Map
 			void (string field_name) use (skip_empty, obj)
 			{
 				if (skip_empty and not this.has(field_name)) return;
-				obj.set(field_name, this.get(field_name, null));
+				obj.setValue(field_name, this.get(field_name, null));
 			}
 		);
 		
 		return obj.toDict();
+	}
+	
+	
+	
+	/**
+	 * Check equal
+	 */
+	public bool equal(Dict item)
+	{
+		if (item == null) return false;
+		
+		Collection keys = (new Collection).concat(this.keys()).concat(item.keys()).removeDuplicatesIm();
+		for (int i=0; i<keys.count(); i++)
+		{
+			string key = keys[i];
+			if (not this.has(key)) return false;
+			if (not item.has(key)) return false;
+			if (this.get(key) != item.get(key)) return false;
+		}
+		
+		return true;
 	}
 }

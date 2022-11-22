@@ -31,7 +31,7 @@ interface SerializeInterface
 	 * @param string variable_name
 	 * @return var
 	 */
-	public var takeValue(string variable_name, var default_value = null);
+	public var get(string variable_name, var default_value = null);
 	
 	
 }

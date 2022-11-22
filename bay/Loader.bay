@@ -1,4 +1,3 @@
-<?php
 /*!
  *  Bayrell Runtime Library
  *
@@ -17,10 +16,17 @@
  *  limitations under the License.
  */
 
+namespace Runtime;
+
+
+#switch
+#case ifcode PHP then
+
+
 use Runtime\Collection;
+use Runtime\Context;
 use Runtime\Dict;
 use Runtime\RuntimeUtils;
-use Runtime\Core\Context;
 
 
 /**
@@ -33,6 +39,7 @@ class Loader
 	public $args = null;
 	public $env = null;
 	public $main_module = "";
+	public $main_class = "";
 	public $entry_point = "";
 	public $include_path = [];
 	
@@ -121,7 +128,7 @@ class Loader
 	 */
 	function shutdown()
 	{
-		$ctx = RuntimeUtils::getContext();
+		$ctx = \Runtime\rtl::getContext();
 		$error = error_get_last();
 		if ($ctx != null)
 		{
@@ -197,6 +204,17 @@ class Loader
 	
 	
 	/**
+	 * Set main class
+	 */
+	function setMainClass($value)
+	{
+		$this->main_class = $value;
+		return $this;
+	}
+	
+	
+	
+	/**
 	 * Set entrypoint
 	 */
 	function setEntryPoint($value)
@@ -208,9 +226,9 @@ class Loader
 	
 	
 	/**
-	 * Run application
+	 * Create context
 	 */
-	function run()
+	function createContext()
 	{
 		/* Create context */
 		$context = Context::create(null, Dict::from($this->env));
@@ -222,33 +240,83 @@ class Loader
 			"base_path" => getcwd(),
 		]));
 		
+		/* Set app name */
+		if ($this->main_module) $context = $context::setAppName($context, $context, $this->main_module);
+		
 		/* Set main module */
 		if ($this->main_module) $context = $context::setMainModule($context, $context, $this->main_module);
+		
+		/* Set main class */
+		if ($this->main_class) $context = $context::setMainClass($context, $context, $this->main_class);
 		
 		/* Set entry point */
 		if ($this->entry_point) $context = $context::setEntryPoint($context, $context, $this->entry_point);
 
 		/* Set global context */
-		RuntimeUtils::setContext($context);
-
-		/* Run entry */
-		$context = $context::run
-		(
-			$context, $context,
-			
-			/* Before start */
-			function ($ctx, $c){ return $c; },
-			
-			/* Before run */
-			function ($ctx, $c)
-			{
-				/* Set global context */
-				RuntimeUtils::setContext($c);
-				return $c;
-			},
-		);
+		\Runtime\rtl::setContext($context);
+		
+		/* Return context */
+		return $context;
+	}
+	
+	
+	
+	/**
+	 * Start context
+	 */
+	function startContext()
+	{
+		/* Create context */
+		$context = $this->createContext();
+		
+		/* Init context */
+		$context = $context::init($context, $context);
+		
+		/* Start context */
+		$context = $context::start($context, $context);
+		
+		/* Set global context */
+		\Runtime\rtl::setContext($context);
+		
+		/* Return context */
+		return $context;
+	}
+	
+	
+	
+	/**
+	 * Run application
+	 */
+	function run()
+	{
+		/* Start context */
+		$context = $this->startContext();
+		
+		/* Run app */
+		$context = $context::run($context, $context);
 		
 		return $this;
 	}
 	
 }
+
+
+
+#case ifcode ES6 then
+
+/* Run web app */
+function runWebApp(env, module_name, class_name)
+{
+	window.addEventListener
+	(
+		"load",
+		(function(obj){ return function() {
+			(async () => {
+				var ctx = null;
+				Runtime.Context.startApp(ctx,Runtime.Dict.from(obj.env),obj.module_name,obj.class_name);
+			})();
+		}})({ "env": env, "module_name": module_name, "class_name": class_name })
+	);
+}
+
+#endswitch

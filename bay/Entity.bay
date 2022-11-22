@@ -15,31 +15,22 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
- 
+
 namespace Runtime;
 
+use Runtime.rtl;
+use Runtime.BaseStruct;
 
-class Mutex
+
+struct Entity extends BaseStruct
 {
+	string name = "";
+	string value = "";
+	Dict params = {};
 	
-	void lock()
-	{
-	}
-	
-	void unLock()
-	{
-	}
-	
-	void isLocked()
-	{
-	}
-	
-	async void wait()
-	{
-	}
-	
-	async void waitAndLock()
-	{
-	}
-	
+	/* Functions */
+	string className() => this.name != "" ? (this.value != "" ? this.value : this.name) : "";
+	string logName() =>
+		this.getClassName() ~ " -> " ~ ( this.value != "" ? (this.name ~ " -> " ~ this.value) : this.name )
+	;
 }

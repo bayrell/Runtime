@@ -18,39 +18,12 @@
 
 namespace Runtime;
 
+use Runtime.BaseStruct;
+use Runtime.Entity;
+use Runtime.rs;
 
-static class ModuleDescription
+
+struct LambdaChainClass extends Entity
 {
-	
-	/**
-	 * Returns module name
-	 * @return string
-	 */
-	pure string getModuleName() => "Runtime";
-	
-	
-	
-	/**
-	 * Returns module name
-	 * @return string
-	 */
-	pure string getModuleVersion() => "0.11.0";
-	
-	
-	
-	/**
-	 * Returns required modules
-	 * @return Map<string>
-	 */
-	pure Map<string> requiredModules() => null;
-	
-	
-	
-	/**
-	 * Returns enities
-	 */
-	pure Collection<Dict> entities() => 
-	[
-	];
-	
 }
+ 

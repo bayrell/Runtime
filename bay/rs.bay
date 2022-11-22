@@ -20,7 +20,6 @@ namespace Runtime;
 
 use Runtime.re;
 use Runtime.rtl;
-use Runtime.PathInfo;
 use Runtime.Collection;
 use Runtime.Vector;
 
@@ -45,11 +44,6 @@ class rs
 		#case ifcode JAVASCRIPT then
 		
 		return use("Runtime.rtl").toStr(s).length;
-		/*
-		if (isBrowser())
-			return Runtime.rtl.toStr(s).length;
-		return rtl.toStr(s).length;
-		*/
 		
 		#endswitch
 	}
@@ -75,10 +69,6 @@ class rs
 		#case ifcode JAVASCRIPT then
 		
 		var _rtl = use("Runtime.rtl");
-		/*
-		if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
-		if (!_rtl.exists(offset)) offset = 0;
-		*/
 		var res = _rtl.toStr(s).indexOf(search);
 		return res;
 		
@@ -114,10 +104,6 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		/*
-		var _rtl = null; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
-		var _rs = null; if (isBrowser()) _rs = Runtime.rs; else _rs = rs;
-		*/
 		var _rtl = use("Runtime.rtl");
 		var _rs = use("Runtime.rs");
 		if (start < 0) start = s.length + start;
@@ -169,12 +155,6 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		/*
-		if (isBrowser())
-			return Runtime.rtl.toStr(ch).charCodeAt(0);
-		return rtl.toStr(ch).charCodeAt(0);
-		*/
-		
 		return use("Runtime.rtl").toStr(ch).charCodeAt(0);
 		
 		#endswitch
@@ -196,12 +176,6 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		/*
-		if (isBrowser())
-			return Runtime.rtl.toStr(s).toLowerCase();
-		return rtl.toStr(s).toLowerCase();
-		*/
-		
 		return use("Runtime.rtl").toStr(s).toLowerCase();
 		
 		#endswitch
@@ -222,12 +196,6 @@ class rs
 		return mb_strtoupper($s);
 		
 		#case ifcode JAVASCRIPT then
-		
-		/*
-		if (isBrowser())
-			return Runtime.rtl.toStr(s).toUpperCase();
-		return rtl.toStr(s).toUpperCase();
-		*/
 		
 		return use("Runtime.rtl").toStr(s).toUpperCase();
 		
@@ -300,10 +268,6 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		/*
-		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
-		var _Collection; if (isBrowser()) _Collection = Runtime.Collection; else _Collection = Collection;
-		*/
 		var _rtl = use("Runtime.rtl");
 		var _Collection = use("Runtime.Collection");
 		
@@ -343,10 +307,6 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		/*
-		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
-		var _Collection; if (isBrowser()) _Collection = Runtime.Collection; else _Collection = Collection;
-		*/
 		var _rtl = use("Runtime.rtl");
 		var _Collection = use("Runtime.Collection");
 		
@@ -409,11 +369,6 @@ class rs
 		#case ifcode JAVASCRIPT then
 		
 		if (ch == undefined) ch = "";
-		
-		/*
-		if (isBrowser()) s = Runtime.rtl.toStr(s);
-		else s = rtl.toStr(s);
-		*/
 		
 		s = use("Runtime.rtl").toStr(s);
 		
@@ -520,14 +475,14 @@ class rs
 	 *         extension  - расширение файла
 	 *         filename   - имя файла без расширения
 	 */
-	static PathInfo pathinfo(string filepath)
+	static Dict pathinfo(string filepath)
 	{
 		Vector<string> arr1 = static::explode(".", filepath).toVector();
 		Vector<string> arr2 = static::explode("/", filepath).toVector();
 		
 		string filepath = filepath;
-		string extension = arr1.pop();
-		string basename = arr2.pop();
+		string extension = arr1.popValue();
+		string basename = arr2.popValue();
 		string dirname = static::join("/", arr2);
 		
 		int ext_length = static::strlen(extension);
@@ -537,7 +492,7 @@ class rs
 		delete arr1;
 		delete arr2;
 		
-		return new PathInfo
+		return
 		{
 			"filepath": filepath,
 			"extension": extension,
@@ -556,9 +511,9 @@ class rs
 	 */
 	static string filename(string filepath)
 	{
-		PathInfo ret = self::pathinfo(filepath);
-		string res = ret.basename;
-		string ext = ret.extension;
+		Dict ret = self::pathinfo(filepath);
+		string res = ret["basename"];
+		string ext = ret["extension"];
 		if (ext != "")
 		{
 			int sz = 0 - rs::strlen(ext) - 1;
@@ -577,8 +532,8 @@ class rs
 	 */
 	static string basename(string filepath)
 	{
-		PathInfo ret = self::pathinfo(filepath);
-		string res = ret.basename;
+		Dict ret = self::pathinfo(filepath);
+		string res = ret["basename"];
 		delete ret;
 		return res;
 	}
@@ -592,8 +547,8 @@ class rs
 	 */
 	static string extname(string filepath)
 	{
-		PathInfo ret = self::pathinfo(filepath);
-		string res = ret.extension;
+		Dict ret = self::pathinfo(filepath);
+		string res = ret["extension"];
 		delete ret;
 		return res;
 	}
@@ -607,8 +562,8 @@ class rs
 	 */
 	static string dirname(string filepath)
 	{
-		PathInfo ret = self::pathinfo(filepath);
-		string res = ret.dirname;
+		Dict ret = self::pathinfo(filepath);
+		string res = ret["dirname"];
 		delete ret;
 		return res;
 	}
@@ -706,11 +661,6 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		/*
-		var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;
-		var _Collection; if (isBrowser()) _Collection = Runtime.Collection; else _Collection = Collection;
-		*/
-		
 		var _rtl = use("Runtime.rtl");
 		var _Collection = use("Runtime.Collection");
 		
@@ -772,7 +722,6 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		/*var _rtl; if (isBrowser()) _rtl = Runtime.rtl; else _rtl = rtl;*/
 		var _rtl = use("Runtime.rtl");
 		
 		if (!_rtl.exists(offset)) offset = 0;

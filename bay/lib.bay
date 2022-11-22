@@ -106,7 +106,7 @@ class lib
 		=> bool (BaseStruct item1) use (key, value)
 			=> (item1 != null) ? rtl::attr(item1, key) != value : false
 	;
-	pure fn equalAttrNot(string key, var value) => static::equalNotAttr;
+	pure fn equalAttrNot(string key, var value) => static::equalNotAttr(key, value);
 	
 	
 	
@@ -369,7 +369,7 @@ class lib
 		async var (string class_name) use (method_name, args)
 		{
 			fn f = rtl::method(class_name, method_name);
-			return rtl::apply(f, args);
+			return await rtl::applyAsync(f, args);
 		}
 	;
 	
@@ -379,20 +379,20 @@ class lib
 	 * Apply function
 	 * @return fn
 	 */
-	pure fn apply(Collection args = null) =>
-		var (fn f) use (args) =>
-			rtl::apply(f, args)
+	pure fn apply(fn f) =>
+		var (var value) use (f) =>
+			f(value)
 	;
 	
 	
 	
 	/**
-	 * Apply async function
+	 * Apply function
 	 * @return fn
 	 */
-	pure fn applyAsync(Collection args = null) =>
-		async var (fn f) use (args) =>
-			await rtl::applyAsync(f, args)
+	pure fn applyAsync(fn f) =>
+		async var (var value) use (f) =>
+			await f(value)
 	;
 	
 	
@@ -446,9 +446,9 @@ class lib
 			{
 				fn f = arr[i];
 				bool res = f(item);
-				if (res) return true;
+				if (not res) return false;
 			}
-			return false;
+			return true;
 		}
 	;
 	

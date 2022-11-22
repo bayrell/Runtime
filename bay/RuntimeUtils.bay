@@ -18,274 +18,26 @@
 
 namespace Runtime;
 
+use Runtime.BaseStruct;
 use Runtime.Collection;
+use Runtime.Context;
 use Runtime.Date;
 use Runtime.DateTime;
-use Runtime.Context;
-use Runtime.BaseStruct;
 use Runtime.Dict;
+use Runtime.Entity;
 use Runtime.lib;
 use Runtime.Map;
 use Runtime.rs;
 use Runtime.rtl;
-use Runtime.UIStruct;
 use Runtime.Vector;
 use Runtime.IntrospectionClass;
 use Runtime.IntrospectionInfo;
 use Runtime.SerializeInterface;
 
 
-#switch
-#case ifcode JAVASCRIPT then
-var isBrowser=function(){return typeof window !== "undefined" && this === window;}
-#endswitch
-
-
 static class RuntimeUtils
 {
-	
-	
-	
-	/* ================================ Context Functions ================================ */
-	
-	
-	protected static var _global_context = null;
 	protected static Map _variables_names = null;
-	
-	
-	/**
-	 * Returns global context
-	 * @return Context
-	 */
-	public static Context @getContext()
-	{
-		#switch
-		#case ifcode PHP then
-		return self::$_global_context;
-		#case ifcode NODEJS then
-		return RuntimeUtils._global_context;
-		#case ifcode ES6 then
-		return Runtime.RuntimeUtils._global_context;
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Set global context
-	 * @param Context context
-	 */
-	public static Context @setContext(Context context)
-	{
-		#switch
-		#case ifcode PHP then
-		self::$_global_context = $context;
-		#case ifcode JAVASCRIPT then
-		/*if (isBrowser()) Runtime.RuntimeUtils._global_context = context;
-		else RuntimeUtils._global_context = context;*/
-		use("Runtime.RuntimeUtils")._global_context = context;
-		#endswitch
-		return context;
-	}
-	
-	
-	
-	/* ========================== Class Introspection Functions ========================== */
-	
-	
-	/**
-	 * Returns parents class names
-	 * @return Vector<string>
-	 */
-	pure memorize Collection<string> getParents(string class_name)
-	{
-		Vector<string> res = new Vector();
-		res.push(class_name);
-		
-		while (class_name != "")
-		{
-			var f = rtl::method(class_name, "getParentClassName");
-			class_name = f();
-			if (class_name != "")
-			{
-				res.push(class_name);
-			}
-		}
-		
-		return res.toCollection();
-	}
-	
-	
-	
-	/**
-	 * Returns Introspection of the class name
-	 * @param string class_name
-	 * @return Vector<IntrospectionInfo>
-	 */
-	pure memorize Collection<string> getVariablesNames(string class_name, int flag = 2)
-	{
-		/* Get parents names */
-		Collection<string> class_names = self::getParents(class_name);
-		
-		Vector<string> names = class_names.reduce
-		(
-			Vector<string> (Vector<string> names, string item_class_name) use (flag)
-			{
-				Collection<string> item_fields = null;
-				fn f = rtl::method(item_class_name, "getFieldsList");
-				try { item_fields = f(flag); } catch (var e) {}
-				if (item_fields != null)
-				{
-					names.appendVector(item_fields);
-				}
-				return names;
-			},
-			new Vector()
-		);
-		
-		return names.toCollection();
-	}
-	
-	
-	
-	/**
-	 * Returns Introspection of the class name
-	 * @param string class_name
-	 * @return Vector<IntrospectionInfo>
-	 */
-	pure memorize IntrospectionClass getClassIntrospection(string class_name, bool include_parents = false)
-	{
-		Collection<BaseStruct> class_info = null;
-		Map<Collection> fields = new Map();
-		Map<Collection> methods = new Map();
-		IntrospectionInfo info = null;
-		
-		if (not rtl::class_exists(class_name)) return null;
-		
-		/* Append annotations */
-		fn appendAnnotations = void (Map<Collection> arr, string name, IntrospectionInfo info)
-		{
-			if (info == null) return;
-			if (not arr.has(name)) arr.set(name, new Vector());
-			Vector v = arr.item(name);
-			v.appendVector(info.annotations);
-		};
-		
-		/* Get Class Info */
-		try
-		{ 
-			info = rtl::method(class_name, "getClassInfo")();
-			if (info != null) class_info = info.annotations;
-		}
-		catch (var e){}
-		
-		/* Get parents names */
-		Collection<string> class_names = [];
-		if (include_parents) class_names = self::getParents(class_name);
-		else class_names = [ class_name ];
-		for (int i=0; i<class_names.count(); i++)
-		{
-			string item_class_name = class_names.item(i);
-			
-			/* Get fields introspection */
-			Collection<string> item_fields = null;
-			try { item_fields = rtl::method(item_class_name, "getFieldsList")(255); } catch (var e) {}
-			for (int j=0; j<item_fields.count(); j++)
-			{
-				string field_name = item_fields.item(j);
-				info = rtl::method(item_class_name, "getFieldInfoByName")(field_name);
-				appendAnnotations(fields, field_name, info);
-			}
-			
-			/* Get methods introspection */
-			Collection<string> item_methods = null;
-			try { item_methods = rtl::method(item_class_name, "getMethodsList")(255); } catch (var e) {}
-			for (int j=0; j<item_methods.count(); j++)
-			{
-				string method_name = item_methods.item(j);
-				info = rtl::method(item_class_name, "getMethodInfoByName")(method_name);
-				appendAnnotations(methods, method_name, info);
-			}
-		}
-		
-		/* To Collection */
-		methods = methods.map(Collection (Vector item, string name) => item.toCollection());
-		fields = fields.map(Collection (Vector item, string name) => item.toCollection());
-		
-		return new IntrospectionClass
-		{
-			"class_name": class_name,
-			"class_info": (class_info != null) ? class_info.toCollection() : null,
-			"fields": fields.toDict(),
-			"methods": methods.toDict(),
-			"interfaces": rtl::getInterfaces(class_name),
-		};
-	}
-	
-	
-	
-	/**
-	 * Returns Introspection of the class name
-	 * @param string class_name
-	 * @return Vector<IntrospectionInfo>
-	 */
-	pure memorize IntrospectionClass getClassIntrospectionWithParents(string class_name)
-	{
-		return static::getClassIntrospection(class_name, true);
-	}
-	
-	
-	
-	/**
-	 * Returns methods in class by annotation name
-	 */
-	pure Collection<string> getMethodsIntrospection(string class_name, Collection<string> annotations)
-	{
-		IntrospectionClass class_info = RuntimeUtils::getClassIntrospection( class_name );
-		Dict d = class_info.methods.filter
-		(
-			void (Collection<var> arr, string method_name) use (annotations, class_name)
-			{
-				arr = arr.filter
-				(
-					bool (var item) use (annotations)
-					{
-						for (int i=0; i<annotations.count(); i++)
-						{
-							string annotation_name = annotations.item(i);
-							if (rtl::is_instanceof(item, annotation_name))
-							{
-								return true;
-							}
-						}
-						return false;
-					}
-				);
-				
-				return arr.count() > 0;
-			}
-		);
-		return d.keys();
-	}
-	
-	
-	
-	/**
-	 * Returns IntrospectionInfo of field
-	 */
-	pure memorize IntrospectionInfo getFieldInfo(string class_name, string field_name)
-	{
-		Collection<string> parents = static::getParents(class_name);
-		for (int i=0; i<parents.count(); i++)
-		{
-			string parent_class_name = parents[i];
-			fn getFieldInfoByName = rtl::method(parent_class_name, "getFieldInfoByName");
-			IntrospectionInfo res = getFieldInfoByName(field_name);
-			if (res != null) return res;
-		}
-		return null;
-	}
-	
 	
 	
 	/* ============================= Serialization Functions ============================= */
@@ -352,19 +104,19 @@ static class RuntimeUtils
 		if (obj instanceof BaseStruct)
 		{
 			Map<var> values = new Map();
-			Collection<string> names = static::getVariablesNames(obj.getClassName(), 1);
+			Collection<string> names = rtl::getFields(obj.getClassName());
 			
 			for (int i=0; i<names.count(); i++)
 			{
 				string variable_name = names.item(i);
-				var value = obj.takeValue(variable_name, null);
+				var value = obj.get(variable_name, null);
 				var value = self::ObjectToPrimitive( value, force_class_name );
-				values.set(variable_name, value);
+				values.setValue(variable_name, value);
 			}
 			
 			if (force_class_name)
 			{
-				values.set("__class_name__", obj.getClassName());
+				values.setValue("__class_name__", obj.getClassName());
 			}
 			delete names;
 			
@@ -394,7 +146,7 @@ static class RuntimeUtils
 			{
 				var value = obj.item(i);
 				value = self::PrimitiveToObject(value);
-				res.push(value);
+				res.pushValue(value);
 			}
 			return res.toCollection();
 		}
@@ -409,7 +161,7 @@ static class RuntimeUtils
 				string key = keys.item(i);
 				var value = obj.item(key);
 				value = self::PrimitiveToObject(value);
-				res.set(key, value);
+				res.setValue(key, value);
 			}
 			
 			delete keys;
@@ -433,14 +185,14 @@ static class RuntimeUtils
 			
 			/* Assign values */
 			Map<var> obj = new Map();
-			Collection<string> names = static::getVariablesNames(class_name, 1);
+			Collection<string> names = rtl::getFields(class_name);
 			for (int i=0; i<names.count(); i++)
 			{
 				string variable_name = names.item(i);
 				if (variable_name != "__class_name__") 
 				{
 					var value = res.get(variable_name, null);
-					obj.set(variable_name, value);
+					obj.setValue(variable_name, value);
 				}
 			}
 			
@@ -521,11 +273,6 @@ static class RuntimeUtils
 		return $value;
 	
 		#case ifcode JAVASCRIPT then
-		
-		/*var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
-		var _Utils = null; if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
-		var _Vector=null; if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
-		var _Map=null; if (isBrowser()) _Map=Runtime.Map; else _Map=Map;*/
 		
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
@@ -616,11 +363,6 @@ static class RuntimeUtils
 		
 		#case ifcode JAVASCRIPT then
 		
-		/*var _rtl = null; if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
-		var _Utils = null; if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=Utils;
-		var _Collection=null; if (isBrowser()) _Collection=Runtime.Collection; else _Collection=Collection;
-		var _Dict=null; if (isBrowser()) _Dict=Runtime.Dict; else _Dict=Dict;*/
-		
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
@@ -687,12 +429,6 @@ static class RuntimeUtils
 		#case ifcode JAVASCRIPT then
 		if (flags == undefined) flags = 0;
 		if (convert == undefined) convert = true;
-		/*
-		var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
-		var _Collection=null;if (isBrowser()) _Collection=Runtime.Collection; else _Collection=Collection;
-		var _Dict=null;if (isBrowser()) _Dict=Runtime.Dict; else _Dict=Dict;
-		var _rtl=null;if (isBrowser()) _rtl=Runtime.rtl; else _rtl=rtl;
-		*/
 		
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
@@ -728,11 +464,6 @@ static class RuntimeUtils
 	
 		#case ifcode JAVASCRIPT then
 		try{
-			/*
-			var _Utils=null;if (isBrowser()) _Utils=Runtime.RuntimeUtils; else _Utils=RuntimeUtils;
-			var _Vector=null;if (isBrowser()) _Vector=Runtime.Vector; else _Vector=Vector;
-			var _Map=null;if (isBrowser()) _Map=Runtime.Map; else _Map=Map;	
-			*/
 			
 			var _rtl = use("Runtime.rtl");
 			var _Utils = use("Runtime.RuntimeUtils");

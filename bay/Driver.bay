@@ -19,26 +19,16 @@
 namespace Runtime;
 
 use Runtime.BaseStruct;
-use Runtime.StringInterface;
+use Runtime.Collection;
+use Runtime.Dict;
+use Runtime.Entity;
+use Runtime.Map;
+use Runtime.rs;
+use Runtime.rtl;
+use Runtime.Vector;
 
 
-struct PathInfo extends BaseStruct implements StringInterface
+struct Driver extends Entity
 {
-	
-	string filepath = "";
-	string dirname = "";
-	string basename = "";
-	string extension = "";
-	string filename = "";
-	
-	
-	/**
-	 * Returns string
-	 */
-	public string toString()
-	{
-		return this.filepath;
-	}
-	
-	
+	bool global = false;
 }
