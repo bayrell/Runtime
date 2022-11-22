@@ -49,14 +49,13 @@ class BaseObject
 	 * Returns new instance
 	 */
 	pure BaseObject newInstance(Dict items) => null;
-	pure BaseObject createInstance(Dict items) => static::newInstance(items);
 	
 	
 	
 	/**
 	 * Init struct data
 	 */
-	static Dict _initData(BaseObject old, Dict changed) => changed;
+	static Dict _init_data(BaseObject old, Dict changed) => changed;
 	
 	
 	
@@ -66,7 +65,7 @@ class BaseObject
 	static void _assign(BaseObject new_item, BaseObject old_item, Dict obj)
 	{
 		obj = rtl::convert(obj, classof Dict);
-		obj = new_item::_initData(old_item, obj);
+		obj = new_item::_init_data(old_item, obj);
 		
 		if (obj == null)
 		{

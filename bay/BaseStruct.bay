@@ -28,17 +28,7 @@ use Runtime.SerializeInterface;
 
 
 class BaseStruct extends BaseObject implements SerializeInterface
-{
-	
-	
-	/**
-	 * Returns field value
-	 */
-	protected static Dict _initDataGet(BaseStruct old, Dict changed, string field_name) =>
-		(changed != null and changed.has(field_name)) ? changed[field_name] : old[field_name]
-	;
-	
-	
+{	
 	
 	/** 
 	 * Constructor
@@ -115,30 +105,15 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		if (fields == null) return {};
 		
 		Map obj = new Map();
-		fields.each
-		( 
-			void (string field_name) use (obj)
-			{
-				obj.setValue(field_name, this.takeValue(field_name));
-			}
-		);
+		for (int i=0; i<fields.count(); i++)
+		{
+			string field_name = fields[i];
+			obj.setValue(field_name, this.get(field_name));
+		}
 		
 		/* Return object */
 		BaseStruct res = rtl::newInstance( this.getClassName(), [ obj.toDict() ] );
 		return res;
-	}
-	
-	
-	
-	/**
-	 * Create new struct with new value
-	 * @param string field_name
-	 * @param fn f
-	 * @return BaseStruct
-	 */
-	public BaseStruct map(string field_name, fn f)
-	{
-		return this.copy( (new Map()).setValue( field_name, f(this.takeValue(field_name)) ).toDict() );
 	}
 	
 	
@@ -150,7 +125,12 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		return new (Function.prototype.bind.apply(this, (typeof ctx != "undefined") ? [null, ctx, items] : [null, items]));
+		return new (
+			Function.prototype.bind.apply(
+				this,
+				(typeof ctx != "undefined") ? [null, ctx, items] : [null, items]
+			)
+		);
 		#case ifcode PHP then
 		$class_name = static::class;
 		return new $class_name($ctx, $items);
@@ -165,7 +145,9 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	 * @param var value
 	 * @return BaseStruct
 	 */
-	pure BaseStruct setAttr(BaseStruct item, Collection<string> path, var value) => rtl::setAttr(item, path, value);
+	pure BaseStruct set(BaseStruct item, Collection<string> path, var value) =>
+		rtl::setAttr(item, path, value)
+	;
 	
 	
 	
@@ -173,7 +155,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	 * Returns struct as Dict
 	 * @return Dict
 	 */
-	Dict takeDict()
+	Dict toDict()
 	{
 		Map<var> values = new Map();
 		Collection<string> names = rtl::getFields(this.getClassName());
@@ -187,17 +169,6 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		
 		delete names;
 		return values.toDict();
-	}
-	
-	
-	
-	/**
-	 * Returns struct as Dict
-	 * @return Dict
-	 */
-	Dict toDict()
-	{
-		return this.takeDict();
 	}
 	
 	

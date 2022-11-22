@@ -19,26 +19,22 @@
 namespace Runtime;
 
 use Runtime.Entity;
-use Runtime.rs;
 
 
-struct LambdaChain extends Entity
+struct Chain extends Entity
 {
 	string name = "";
 	string value = "";
-	string chain = "";
 	double pos = 0;
 	bool is_async = false;
 	
-	/* Entity name for task output */
-	string entityName() => this.getClassName() ~ " -> " ~ this.name ~ " -> [" ~ this.pos ~ "] " ~ this.value;
+	public void constructor(string name, string class_name, string method_name, double pos = 0)
+	{
+		parent::constructor({
+			"name": name,
+			"value": class_name ~ "::" ~ method_name,
+			"pos": pos,
+		});
+	}
 	
-	/* Add class info in Context::getSubEntities */
-	LambdaChain addMethodInfo(string class_name, string class_method_name, Entity class_entity, Dict method_info) =>
-		this.copy
-		{
-			"is_async": (method_info["async"] |> default bool false),
-			"value": class_name ~ "::" ~ class_method_name
-		}
-	;
 }

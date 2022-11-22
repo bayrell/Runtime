@@ -18,20 +18,14 @@
 
 namespace Runtime;
 
-use Runtime.BaseStruct;
-use Runtime.Collection;
-use Runtime.Dict;
 use Runtime.Entity;
-use Runtime.Map;
-use Runtime.rs;
-use Runtime.rtl;
-use Runtime.Vector;
+use Runtime.Chain;
 
 
-struct Driver extends Entity
+struct ChainAsync extends Chain
 {
-	bool global = false;
-	
-	/* Entity name for task output */
-	string entityName() => this.getClassName() ~ " -> " ~ this.name ~ " -> " ~ ((this.value != "") ? this.value : this.name);
+	string name = "";
+	string value = "";
+	double pos = 0;
+    bool is_async = true;
 }
