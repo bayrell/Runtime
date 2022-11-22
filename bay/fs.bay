@@ -70,6 +70,7 @@ class fs
 		Collection arr = [];
 		#switch
 		#case ifcode JAVASCRIPT then
+		var arr = [];
 		var Collection = use("Runtime.Collection");
 		for (var i=1; i<arguments.length; i++) arr.push( arguments[i] );
 		arr = Collection.from(arr);

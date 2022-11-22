@@ -40,6 +40,245 @@ static class RuntimeUtils
 	protected static Map _variables_names = null;
 	
 	
+	/* ================================ Context Functions ================================ */
+	
+	
+	protected static var _global_context = null;
+	
+	
+	/**
+	 * Returns global context
+	 * @return Context
+	 */
+	public static Context @getContext()
+	{
+		#switch
+		#case ifcode PHP then
+		return self::$_global_context;
+		#case ifcode NODEJS then
+		return RuntimeUtils._global_context;
+		#case ifcode ES6 then
+		return Runtime.RuntimeUtils._global_context;
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Set global context
+	 * @param Context context
+	 */
+	public static Context @setContext(Context context)
+	{
+		#switch
+		#case ifcode PHP then
+		self::$_global_context = $context;
+		#case ifcode JAVASCRIPT then
+		/*if (isBrowser()) Runtime.RuntimeUtils._global_context = context;
+		else RuntimeUtils._global_context = context;*/
+		use("Runtime.RuntimeUtils")._global_context = context;
+		#endswitch
+		return context;
+	}
+	
+	
+	/* ========================== Class Introspection Functions ========================== */
+	
+	
+	/**
+	 * Returns parents class names
+	 * @return Vector<string>
+	 */
+	pure memorize Collection<string> getParents(string class_name)
+	{
+		Vector<string> res = new Vector();
+		res.push(class_name);
+		
+		while (class_name != "")
+		{
+			var f = rtl::method(class_name, "getParentClassName");
+			class_name = f();
+			if (class_name != "")
+			{
+				res.push(class_name);
+			}
+		}
+		
+		return res.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Returns Introspection of the class name
+	 * @param string class_name
+	 * @return Vector<IntrospectionInfo>
+	 */
+	pure memorize Collection<string> getVariablesNames(string class_name, int flag = 2)
+	{
+		/* Get parents names */
+		Collection<string> class_names = self::getParents(class_name);
+		
+		Vector<string> names = class_names.reduce
+		(
+			Vector<string> (Vector<string> names, string item_class_name) use (flag)
+			{
+				Collection<string> item_fields = null;
+				fn f = rtl::method(item_class_name, "getFieldsList");
+				try { item_fields = f(flag); } catch (var e) {}
+				if (item_fields != null)
+				{
+					names.appendVector(item_fields);
+				}
+				return names;
+			},
+			new Vector()
+		);
+		
+		return names.toCollection();
+	}
+	
+	
+	
+	/**
+	 * Returns Introspection of the class name
+	 * @param string class_name
+	 * @return Vector<IntrospectionInfo>
+	 */
+	pure memorize IntrospectionClass getClassIntrospection(string class_name, bool include_parents = false)
+	{
+		Collection<BaseStruct> class_info = null;
+		Map<Collection> fields = new Map();
+		Map<Collection> methods = new Map();
+		IntrospectionInfo info = null;
+		
+		if (not rtl::class_exists(class_name)) return null;
+		
+		/* Append annotations */
+		fn appendAnnotations = void (Map<Collection> arr, string name, IntrospectionInfo info)
+		{
+			if (info == null) return;
+			if (not arr.has(name)) arr.setValue(name, new Vector());
+			Vector v = arr.item(name);
+			v.appendVector(info.annotations);
+		};
+		
+		/* Get Class Info */
+		try
+		{ 
+			info = rtl::method(class_name, "getClassInfo")();
+			if (info != null) class_info = info.annotations;
+		}
+		catch (var e){}
+		
+		/* Get parents names */
+		Collection<string> class_names = [];
+		if (include_parents) class_names = self::getParents(class_name);
+		else class_names = [ class_name ];
+		for (int i=0; i<class_names.count(); i++)
+		{
+			string item_class_name = class_names.item(i);
+			
+			/* Get fields introspection */
+			Collection<string> item_fields = null;
+			try { item_fields = rtl::method(item_class_name, "getFieldsList")(255); } catch (var e) {}
+			for (int j=0; j<item_fields.count(); j++)
+			{
+				string field_name = item_fields.item(j);
+				info = rtl::method(item_class_name, "getFieldInfoByName")(field_name);
+				appendAnnotations(fields, field_name, info);
+			}
+			
+			/* Get methods introspection */
+			Collection<string> item_methods = null;
+			try { item_methods = rtl::method(item_class_name, "getMethodsList")(255); } catch (var e) {}
+			for (int j=0; j<item_methods.count(); j++)
+			{
+				string method_name = item_methods.item(j);
+				info = rtl::method(item_class_name, "getMethodInfoByName")(method_name);
+				appendAnnotations(methods, method_name, info);
+			}
+		}
+		
+		/* To Collection */
+		methods = methods.map(Collection (Vector item, string name) => item.toCollection());
+		fields = fields.map(Collection (Vector item, string name) => item.toCollection());
+		
+		return new IntrospectionClass
+		{
+			"class_name": class_name,
+			"class_info": (class_info != null) ? class_info.toCollection() : null,
+			"fields": fields.toDict(),
+			"methods": methods.toDict(),
+			"interfaces": rtl::getInterfaces(class_name),
+		};
+	}
+	
+	
+	
+	/**
+	 * Returns Introspection of the class name
+	 * @param string class_name
+	 * @return Vector<IntrospectionInfo>
+	 */
+	pure memorize IntrospectionClass getClassIntrospectionWithParents(string class_name)
+	{
+		return static::getClassIntrospection(class_name, true);
+	}
+	
+	
+	
+	/**
+	 * Returns methods in class by annotation name
+	 */
+	pure Collection<string> getMethodsIntrospection(string class_name, Collection<string> annotations)
+	{
+		IntrospectionClass class_info = RuntimeUtils::getClassIntrospection( class_name );
+		Dict d = class_info.methods.filter
+		(
+			void (Collection<var> arr, string method_name) use (annotations, class_name)
+			{
+				arr = arr.filter
+				(
+					bool (var item) use (annotations)
+					{
+						for (int i=0; i<annotations.count(); i++)
+						{
+							string annotation_name = annotations.item(i);
+							if (rtl::is_instanceof(item, annotation_name))
+							{
+								return true;
+							}
+						}
+						return false;
+					}
+				);
+				
+				return arr.count() > 0;
+			}
+		);
+		return d.keys();
+	}
+	
+	
+	
+	/**
+	 * Returns IntrospectionInfo of field
+	 */
+	pure memorize IntrospectionInfo getFieldInfo(string class_name, string field_name)
+	{
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			fn getFieldInfoByName = rtl::method(parent_class_name, "getFieldInfoByName");
+			IntrospectionInfo res = getFieldInfoByName(field_name);
+			if (res != null) return res;
+		}
+		return null;
+	}
+	
+	
 	/* ============================= Serialization Functions ============================= */
 	
 	

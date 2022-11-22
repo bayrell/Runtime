@@ -1009,7 +1009,7 @@ class rtl
 		#ifdef ENABLE_CONTEXT then
 		return static::toString(null, value);
 		#endif
-		return static::toString(value);
+		return static::toString(null, value);
 	}
 	
 	

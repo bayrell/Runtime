@@ -56,7 +56,7 @@ class Map<T> extends Dict<T>
 		return $this;
 		#endswitch
 	}
-	
+	public Collection<T> set(string key, T value) => this.setValue(key, value);
 	
 	
 	/**
@@ -81,7 +81,7 @@ class Map<T> extends Dict<T>
 		return $this;
 		#endswitch
 	}
-	
+	public Collection<T> remove(string key) => this.removeValue(key);
 	
 	
 	/**
