@@ -18,37 +18,61 @@
 
 namespace Runtime;
 
-use Runtime.rs;
-use Runtime.rtl;
-use Runtime.lib;
-use Runtime.Collection;
-use Runtime.BaseDriver;
+use Runtime.BaseObject;
 use Runtime.BaseStruct;
-use Runtime.Entity;
-use Runtime.IntrospectionClass;
-use Runtime.IntrospectionInfo;
-use Runtime.LambdaChain;
-use Runtime.LambdaChainClass;
-use Runtime.Dict;
-use Runtime.Driver;
-use Runtime.Entity;
-use Runtime.Map;
-use Runtime.Vector;
-use Runtime.RuntimeUtils;
-use Runtime.Exceptions.FileNotFound;
-use Runtime.Exceptions.RuntimeException;
-
 
 struct Context extends BaseStruct
 {
 	/* Struct data */
-	string base_path = null;
+	string base_path = "";
 	Collection<string> cli_args = [];
-	Collection<string> modules = null;
-	Dict<string> enviroments = null;
-	Collection<BaseObject> providers = null;
-	Collection<BaseStruct> entities = null;
-	Dict<var> settings = null;
+	Collection<string> modules = [];
+	Dict<string> enviroments = {};
+	Collection<BaseObject> providers = [];
+	Collection<BaseStruct> entities = [];
+	Dict<var> settings = {};
 	int start_time = 0;
 	string tz = "UTC";
+	
+	
+	/**
+	 * Init
+	 */
+	static async Context init(Context c)
+	{
+		@ = c;
+		if (c.initialized) return c;
+		
+		/* Base path */
+		string base_path = (c.base_path != "") ?
+			c.base_path : rtl::attr(c.env, ["BASE_PATH"], "", "string")
+		;
+		
+		/* Get modules entities */
+		Collection<BaseStruct> entities = static::getEntitiesFromModules(c.modules);
+		c <= entities <= entities;
+		
+		return c;
+	}
+	
+	
+	
+	/**
+	 * Returns modules entities
+	 */
+	pure Collection<BaseStruct> getEntitiesFromModules(Collection<string> modules)
+	{
+		Vector<BaseStruct> entities = new Vector();
+		for (int i=0; i<modules.count(); i++)
+		{
+			string module_class_name = modules.item(i) ~ ".ModuleDescription";
+			if (rtl::method_exists(module_class_name, "entities"))
+			{
+				fn f = rtl::method(module_class_name, "entities");
+				Collection<BaseStruct> arr = f();
+				entities.appendVector(arr);
+			}
+		}
+		return entities.removeDuplicates().toCollection();
+	}
 }

@@ -53,13 +53,4 @@ static class ModuleDescription
 	[
 	];
 	
-	
-	
-	/**
-	 * Start app
-	 */
-	async void start_app(Context c)
-	{
-		return c;
-	}
 }
