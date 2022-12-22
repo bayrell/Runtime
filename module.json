@@ -36,7 +36,6 @@
 		"LambdaChain",
 		"LambdaChainClass",
 		"LambdaChainDeclare",
-		"RuntimeUtils",
 		"ModuleDescription",
 		"Loader"
 	]

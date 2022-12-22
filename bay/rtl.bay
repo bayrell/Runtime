@@ -116,7 +116,7 @@ class rtl
 		#switch
 		#case ifcode ES6 then
 		if (Runtime.rtl._classes == undefined) Runtime.rtl._classes = {};
-		Runtime.rtl._classes[obj.getCurrentClassName()] = obj;
+		Runtime.rtl._classes[obj.getClassName()] = obj;
 		#endswitch
 	}
 	
@@ -180,7 +180,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$class_name = self::find_class($class_name);
+		$class_name = static::find_class($class_name);
 		if ($obj == null) return false;
 		if (gettype($obj) != "object") return false;
 		if (is_subclass_of($obj, $class_name)){ return true;}
@@ -207,7 +207,7 @@ class rtl
 		#case ifcode PHP then
 	
 		$class_name = get_class($obj);
-		return self::class_implements($class_name, $interface_name);
+		return static::class_implements($class_name, $interface_name);
 	
 		#case ifcode JAVASCRIPT then
 		if (obj == undefined) return false;
@@ -249,8 +249,8 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$class_name = self::find_class($class_name);
-		$interface_name = self::find_class($interface_name);
+		$class_name = static::find_class($class_name);
+		$interface_name = static::find_class($interface_name);
 		$arr = @class_implements($class_name, true);
 		if ($arr == false){
 			return false;
@@ -599,22 +599,22 @@ class rtl
 		if (Array.isArray(path) && path.count == undefined) path = Collection.from(path);
 		if (this.isScalarValue(ctx, path)) path = Collection.from([path]);
 		if (!(path instanceof Collection)) return def_val;
-		if (path.count() == 0)
+		if (path.constructor.count(ctx,path) == 0)
 		{
 			return item;
 		}
-		var key = path.first(ctx);
-		var path = path.removeFirstIm(ctx);
+		var key = path.constructor.first(ctx,path);
+		var path = path.constructor.removeFirstIm(ctx,path);
 		var val = def_val;
 		if (item instanceof Dict || item instanceof Collection)
 		{
-			var new_item = item.get(ctx, key, def_val);
+			var new_item = item.constructor.get(ctx, item, key, def_val);
 			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
 		else if (item instanceof BaseStruct)
 		{
-			var new_item = item.get(ctx, key, def_val);
+			var new_item = item.constructor.get(ctx, item, key, def_val);
 			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
@@ -759,10 +759,10 @@ class rtl
 	 */
 	static var checkValue(var value, string tp)
 	{
-		if (tp == "int") return self::isInt(value);
-		if (tp == "float" or tp == "double") return self::isDouble(value);
-		if (tp == "string") return self::isString(value);
-		if (tp == "bool" or tp == "boolean") return self::isBoolean(value);
+		if (tp == "int") return static::isInt(value);
+		if (tp == "float" or tp == "double") return static::isDouble(value);
+		if (tp == "string") return static::isString(value);
+		if (tp == "bool" or tp == "boolean") return static::isBoolean(value);
 		if (rtl::is_instanceof(value, tp)){ return true;}
 		return false;
 	}
@@ -1611,7 +1611,7 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
-		return self::$_global_context;
+		return static::$_global_context;
 		#case ifcode NODEJS then
 		return rtl._global_context;
 		#case ifcode ES6 then
@@ -1629,7 +1629,7 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
-		self::$_global_context = $context;
+		static::$_global_context = $context;
 		#case ifcode JAVASCRIPT then
 		use("Runtime.rtl")._global_context = context;
 		#endswitch
@@ -1819,14 +1819,14 @@ class rtl
 	
 	static var ObjectToNative(var value, bool force_class_name = true)
 	{
-		var value1 = self::ObjectToPrimitive(value, force_class_name);
-		var value2 = self::PrimitiveToNative(value1);
+		var value1 = static::ObjectToPrimitive(value, force_class_name);
+		var value2 = static::PrimitiveToNative(value1);
 		return value2;
 	}
 	static var NativeToObject(var value)
 	{
-		var value1 = self::NativeToPrimitive(value);
-		var value2 = self::PrimitiveToObject(value1);
+		var value1 = static::NativeToPrimitive(value);
+		var value2 = static::PrimitiveToObject(value1);
 		return value2;
 	}
 	
@@ -1884,7 +1884,7 @@ class rtl
 			{
 				string variable_name = names.item(i);
 				var value = obj.get(variable_name, null);
-				var value = self::ObjectToPrimitive( value, force_class_name );
+				var value = static::ObjectToPrimitive( value, force_class_name );
 				values.setValue(variable_name, value);
 			}
 			
@@ -1918,7 +1918,7 @@ class rtl
 			for (int i=0; i<obj.count(); i++)
 			{
 				var value = obj.item(i);
-				value = self::PrimitiveToObject(value);
+				value = static::PrimitiveToObject(value);
 				res.pushValue(value);
 			}
 			return res.toCollection();
@@ -1933,7 +1933,7 @@ class rtl
 			{
 				string key = keys.item(i);
 				var value = obj.item(key);
-				value = self::PrimitiveToObject(value);
+				value = static::PrimitiveToObject(value);
 				res.setValue(key, value);
 			}
 			
@@ -2017,7 +2017,7 @@ class rtl
 			{
 				$res = \Runtime\Dict::from($value);
 				$res = $res->map($ctx, function ($ctx, $val, $key){
-					return self::NativeToPrimitive($ctx, $val);
+					return static::NativeToPrimitive($ctx, $val);
 				});
 				return $res;
 			}
@@ -2041,7 +2041,7 @@ class rtl
 				{
 					$res = \Runtime\Dict::from($value);
 					$res = $res->map($ctx, function ($ctx, $val, $key){
-						return self::NativeToPrimitive($ctx, $val);
+						return static::NativeToPrimitive($ctx, $val);
 					});
 					return $res;
 				}
@@ -2049,7 +2049,7 @@ class rtl
 			$arr = array_values($value);
 			$res = \Runtime\Collection::from($arr);
 			$res = $res->map($ctx, function ($ctx, $item){
-				return self::NativeToPrimitive($ctx, $item);
+				return static::NativeToPrimitive($ctx, $item);
 			});
 			return $res;
 		}
@@ -2204,7 +2204,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		if ($convert){
-			$value = self::ObjectToNative($ctx, $value);
+			$value = static::ObjectToNative($ctx, $value);
 		}
 		$json_flags = JSON_UNESCAPED_UNICODE;
 		if ( ($flags & 1) == 1 ) $json_flags = $json_flags | JSON_PRETTY_PRINT;
@@ -2248,7 +2248,7 @@ class rtl
 		$res = @json_decode($obj, false);
 		if ($res === null || $res === false)
 			return null;
-		return self::NativeToObject($ctx, $res);
+		return static::NativeToObject($ctx, $res);
 	
 		#case ifcode JAVASCRIPT then
 		try{

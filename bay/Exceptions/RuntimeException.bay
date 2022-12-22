@@ -36,13 +36,12 @@ Runtime.Exceptions.ClassException.prototype = Object.create(Error.prototype);
 Runtime.Exceptions.ClassException.prototype.constructor = Runtime.Exceptions.ClassException;
 Object.assign(Runtime.Exceptions.ClassException.prototype,
 {
-	_init: function(){},
-	getClassName: function(){ return "Runtime.Exceptions.ClassException"; },
 });
 Object.assign(Runtime.Exceptions.ClassException,
 {
-	getCurrentNamespace: function(){ return "Runtime.Exceptions"; },
-	getCurrentClassName: function(){ return "Runtime.Exceptions.ClassException"; },
+	_init: function(ctx,_this){},
+	getNamespace: function(){ return "Runtime.Exceptions"; },
+	getClassName: function(){ return "Runtime.Exceptions.ClassException"; },
 	getParentClassName: function(){ return ""; },
 });
 #case ifcode NODEJS then
@@ -54,7 +53,7 @@ class ClassException extends \Exception
 	{
 		parent::__construct($message, (int)$code, $prev);
 	}
-	function _init($ctx){}
+	static function _init($ctx){}
 }
 #endswitch
 

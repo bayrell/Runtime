@@ -47,13 +47,13 @@ class Map<T> extends Dict<T>
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		key = this.toStr(key);
-		this._map["|" + key] = value;
+		key = _this.toStr(key);
+		_this._map["|" + key] = value;
 		return this;
 		#case ifcode PHP then
 		$key = rtl::toStr($key);
-		$this->_map[$key] = $value;
-		return $this;
+		$_this->_map[$key] = $value;
+		return $_this;
 		#endswitch
 	}
 	

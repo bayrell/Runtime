@@ -50,20 +50,20 @@ class Vector<T> extends Collection
 		if (offset == undefined) offset = 0;
 		if (length == undefined)
 		{
-			var arr = Array.prototype.slice.call(this, offset);
-			Object.setPrototypeOf(arr, this.constructor.prototype);
+			var arr = Array.prototype.slice.call(_this, offset);
+			Object.setPrototypeOf(arr, _this.constructor.prototype);
 			return arr;
 		}
 		if (length >= 0)
 		{
 			length = offset + length;
 		}
-		var arr = Array.prototype.slice.call(this, offset, length);
-		Object.setPrototypeOf(arr, this.constructor.prototype);
+		var arr = Array.prototype.slice.call(_this, offset, length);
+		Object.setPrototypeOf(arr, _this.constructor.prototype);
 		return arr;
 		#case ifcode PHP then
 		$arr2 = static::Instance($ctx);
-		$arr2->_arr = array_slice($this->_arr, $offset, $length);
+		$arr2->_arr = array_slice($_this->_arr, $offset, $length);
 		return $arr2;
 		#endswitch
 	}
@@ -78,11 +78,11 @@ class Vector<T> extends Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		Array.prototype.push.call(this, value);
-		return this;
+		Array.prototype.push.call(_this, value);
+		return _this;
 		#case ifcode PHP then
-		$this->_arr[] = $value;
-		return $this;
+		$_this->_arr[] = $value;
+		return $_this;
 		#endswitch
 	}
 	public Collection<T> pushValue(T value) => this.appendValue(value);
@@ -97,11 +97,11 @@ class Vector<T> extends Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		Array.prototype.unshift.call(this, value);
-		return this;
+		Array.prototype.unshift.call(_this, value);
+		return _this;
 		#case ifcode PHP then
-		array_unshift($this->_arr, $value);
-		return $this;
+		array_unshift($_this->_arr, $value);
+		return $_this;
 		#endswitch
 	}
 	public Collection<T> unshiftValue(T value) => this.prependValue(value);
@@ -116,9 +116,9 @@ class Vector<T> extends Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		return Array.prototype.pop.call(this);
+		return Array.prototype.pop.call(_this);
 		#case ifcode PHP then
-		return array_pop($this->_arr);
+		return array_pop($_this->_arr);
 		#endswitch
 	}
 	
@@ -132,10 +132,10 @@ class Vector<T> extends Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		return Array.prototype.shift.call(this);
+		return Array.prototype.shift.call(_this);
 		#case ifcode PHP then
-		array_shift($this->_arr);
-		return $this;
+		array_shift($_this->_arr);
+		return $_this;
 		#endswitch
 	}
 	
@@ -150,11 +150,11 @@ class Vector<T> extends Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		Array.prototype.splice.call(this, pos, 0, value);
-		return this;
+		Array.prototype.splice.call(_this, pos, 0, value);
+		return _this;
 		#case ifcode PHP then
-		array_splice($this->_arr, $pos, 0, [$value]);
-		return $this;
+		array_splice($_this->_arr, $pos, 0, [$value]);
+		return $_this;
 		#endswitch
 	}
 	
@@ -169,11 +169,11 @@ class Vector<T> extends Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		Array.prototype.splice.call(this, pos, count);
-		return this;
+		Array.prototype.splice.call(_this, pos, count);
+		return _this;
 		#case ifcode PHP then
-		array_splice($this->_arr, $pos, $count);
-		return $this;
+		array_splice($_this->_arr, $pos, $count);
+		return $_this;
 		#endswitch
 	}
 	
@@ -214,11 +214,11 @@ class Vector<T> extends Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		Array.prototype.splice.call(this, pos_begin, pos_end - pos_begin + 1);
-		return this;
+		Array.prototype.splice.call(_this, pos_begin, pos_end - pos_begin + 1);
+		return _this;
 		#case ifcode PHP then
-		$this->remove($pos_begin, $pos_end - $pos_begin + 1);
-		return $this;
+		$_this->remove($pos_begin, $pos_end - $pos_begin + 1);
+		return $_this;
 		#endswitch
 	}
 	
@@ -233,20 +233,20 @@ class Vector<T> extends Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		if (pos < 0 || pos >= this.length)
+		if (pos < 0 || pos >= _this.length)
 		{
 			var IndexOutOfRange = use ("Runtime.Exceptions.IndexOutOfRange");
 			throw new IndexOutOfRange();
 		}
-		this[pos] = value;
-		return this;
+		_this[pos] = value;
+		return _this;
 		#case ifcode PHP then
-		if (!array_key_exists($pos, $this->_arr))
+		if (!array_key_exists($pos, $_this->_arr))
 		{
 			throw new IndexOutOfRange();
 		}
-		$this->_arr[$pos] = $value;
-		return $this;
+		$_this->_arr[$pos] = $value;
+		return $_this;
 		#endswitch
 	}
 	
@@ -259,11 +259,11 @@ class Vector<T> extends Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		Array.prototype.splice.call(this, 0, this.length);
-		return this;
+		Array.prototype.splice.call(_this, 0, _this.length);
+		return _this;
 		#case ifcode PHP then
-		$this->_arr = [];
-		return $this;
+		$_this->_arr = [];
+		return $_this;
 		#endswitch
 	}
 	
