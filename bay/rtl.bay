@@ -599,22 +599,22 @@ class rtl
 		if (Array.isArray(path) && path.count == undefined) path = Collection.from(path);
 		if (this.isScalarValue(ctx, path)) path = Collection.from([path]);
 		if (!(path instanceof Collection)) return def_val;
-		if (path.constructor.count(ctx,path) == 0)
+		if (path.count(ctx) == 0)
 		{
 			return item;
 		}
-		var key = path.constructor.first(ctx,path);
-		var path = path.constructor.removeFirstIm(ctx,path);
+		var key = path.first(ctx);
+		var path = path.removeFirstIm(ctx);
 		var val = def_val;
 		if (item instanceof Dict || item instanceof Collection)
 		{
-			var new_item = item.constructor.get(ctx, item, key, def_val);
+			var new_item = item.get(ctx, key, def_val);
 			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
 		else if (item instanceof BaseStruct)
 		{
-			var new_item = item.constructor.get(ctx, item, key, def_val);
+			var new_item = item.get(ctx, key, def_val);
 			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}

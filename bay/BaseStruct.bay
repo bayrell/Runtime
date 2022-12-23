@@ -66,11 +66,11 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		
 		#case ifcode JAVASCRIPT then
 		
-		var proto = Object.getPrototypeOf(_this);
+		var proto = Object.getPrototypeOf(this);
 		var item = Object.create(proto); /* item._init(); */
-		item = Object.assign(item, _this);
+		item = Object.assign(item, this);
 		
-		_this.constructor._assign(ctx, item, _this, obj);
+		this.constructor._assign(ctx, item, this, obj);
 		
 		Object.freeze(item);
 		
@@ -175,7 +175,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	
 	#switch
 	#case ifcode PHP then
-	static function get($ctx,$_this,$k,$v = nul){$k="__".$k;return isset($_this->$k)?$_this->$k:$v;}
+	function get($ctx,$k,$v = nul){$k="__".$k;return isset($_this->$k)?$_this->$k:$v;}
 	function __get($k){$k="__".$k;return isset($this->$k)?$this->$k:null;}
 	function __getKey($k){return "__".$k;}
 	function __set($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
@@ -188,9 +188,9 @@ class BaseStruct extends BaseObject implements SerializeInterface
 }
 
 #ifcode JAVASCRIPT then
-Runtime.BaseStruct.get = function(ctx, _this, k, v)
+Runtime.BaseStruct.prototype.get = function(ctx, k, v)
 {
 	if (v == undefined) v = null;
-	return _this[k] != undefined ? _this[k] : v;
+	return this[k] != undefined ? this[k] : v;
 };
 #endif

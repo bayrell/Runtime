@@ -73,7 +73,7 @@ class BaseObject
 		}
 		
 		bool check_types = false;
-		string class_name = new_item.getClassName();
+		string class_name = new_item::getClassName();
 		
 		#ifdef ENABLE_CHECK_TYPES then
 		

@@ -36,10 +36,10 @@ Runtime.Exceptions.ClassException.prototype = Object.create(Error.prototype);
 Runtime.Exceptions.ClassException.prototype.constructor = Runtime.Exceptions.ClassException;
 Object.assign(Runtime.Exceptions.ClassException.prototype,
 {
+	_init: function(ctx){},
 });
 Object.assign(Runtime.Exceptions.ClassException,
 {
-	_init: function(ctx,_this){},
 	getNamespace: function(){ return "Runtime.Exceptions"; },
 	getClassName: function(){ return "Runtime.Exceptions.ClassException"; },
 	getParentClassName: function(){ return ""; },
@@ -53,7 +53,7 @@ class ClassException extends \Exception
 	{
 		parent::__construct($message, (int)$code, $prev);
 	}
-	static function _init($ctx){}
+	function _init($ctx){}
 }
 #endswitch
 
