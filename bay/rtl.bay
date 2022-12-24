@@ -2268,7 +2268,7 @@ class rtl
 				}
 				return value;
 			});
-			return _Utils.PrimitiveToObject(ctx, obj);
+			return this.PrimitiveToObject(ctx, obj);
 		}
 		catch(e){
 			throw e;

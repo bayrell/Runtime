@@ -28,7 +28,7 @@ struct Context extends BaseStruct
 	Collection<string> cli_args = [];
 	Collection<string> modules = [];
 	Dict<string> enviroments = {};
-	Collection<BaseObject> providers = [];
+	Dict<BaseObject> providers = {};
 	Collection<BaseStruct> entities = [];
 	Dict<var> settings = {};
 	int start_time = 0;
