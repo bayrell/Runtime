@@ -43,6 +43,10 @@ class fs
 	static const string DIRECTORY_SEPARATOR = "/";
 	
 	
+	static string removeFirstSlash(string path) => re::replace("^/+", "", path);
+	static string removeLastSlash(string path) => re::replace("/+$", "", path);
+	
+	
 	/**
 	 * Join
 	 */
@@ -50,6 +54,8 @@ class fs
 	{
 		string path = rs::join(static::DIRECTORY_SEPARATOR, arr);
 		path = re::replace("//", "/", path);
+		path = re::replace("/\\./", "/", path);
+		path = re::replace("/+$", "", path);
 		return path;
 	}
 	
@@ -209,6 +215,33 @@ class fs
 		}
 		
 		return res.toCollection();
+	}
+	
+	
+	/**
+	 * Make dir recursive
+	 */
+	static async bool mkdir(string filepath, string mode = "755")
+	{
+		#switch
+		
+		#case ifcode JAVASCRIPT then
+		
+		filepath = resolve(filepath);
+		var exists = await fileExists(filepath);
+		if (!exists)
+		{
+			await mkdir(filepath, { "mode": mode, "recursive": true });
+		}
+		
+		#case ifcode PHP then
+		
+		if ($filepath == false) return false;
+		return @mkdir($filepath, octdec($mode), true);
+		
+		#endswitch
+		
+		return "";
 	}
 	
 }

@@ -707,7 +707,7 @@ class rs
 	 * @return {variable} Если строка найдена, то возвращает позицию вхождения, начиная с 0.
 	 *                    Если строка не найдена, то вернет -1
 	 */
-	static int strpos(string s, string search, string offset = 0)
+	static int indexOf(string s, string search, string offset = 0)
 	{
 		#switch
 		#case ifcode PHP then
@@ -730,6 +730,8 @@ class rs
 		
 		#endswitch
 	}
+	static int strpos(string s, string search, string offset = 0)
+		=> static::indexOf(s, search, offset);
 	
 	
 	
