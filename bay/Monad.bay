@@ -48,4 +48,12 @@ class Monad
 		return this.val;
 	}
 	
+	
+	/**
+	 * Call monad
+	 */
+	public var monad(fn f)
+	{
+		return f(this);
+	}
 }

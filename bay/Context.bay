@@ -20,6 +20,8 @@ namespace Runtime;
 
 use Runtime.BaseObject;
 use Runtime.BaseStruct;
+use Runtime.Exceptions.RuntimeException;
+
 
 struct Context extends BaseStruct
 {
@@ -28,7 +30,7 @@ struct Context extends BaseStruct
 	Collection<string> cli_args = [];
 	Collection<string> modules = [];
 	Dict<string> enviroments = {};
-	Dict<BaseObject> providers = {};
+	Map<BaseObject> providers = new Map();
 	Collection<BaseStruct> entities = [];
 	Dict<var> settings = {};
 	int start_time = 0;
@@ -74,5 +76,34 @@ struct Context extends BaseStruct
 			}
 		}
 		return entities.removeDuplicates().toCollection();
+	}
+	
+	
+	
+	/**
+	 * Add provider
+	 */
+	void addProvider(string provider_name, BaseObject provider)
+	{
+		if (this.providers.has(provider_name))
+		{
+			throw new RuntimeException("Provider + '" + provider_name + "' already registered");
+		}
+		this.providers.setValue(provider_name, provider);
+	}
+	
+	
+	
+	/**
+	 * Returns provider by name
+	 */
+	BaseObject getProvider(string provider_name)
+	{
+		if (not this.providers.has(provider_name))
+		{
+			throw new RuntimeException("Provider + '" + provider_name + "' not found");
+		}
+		
+		return this.providers.get(provider_name);
 	}
 }
