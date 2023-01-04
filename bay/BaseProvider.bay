@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library 
+ *  Bayrell Runtime Library
  *
  *  (c) Copyright 2016-2023 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -16,19 +16,20 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Exceptions;
+namespace Runtime;
 
-use Runtime.Exceptions.RuntimeException;
+use Runtime.BaseObject;
 
 
-class ApiException extends RuntimeException
+class BaseProvider extends BaseObject
 {
-	var response = null;
-	
-	void constructor(string message = "", int code = -1, var response = null, Object prev = null)
-	{
-		parent(message, code, prev);
-		this.response = response;
-	}
-
+    
+    /**
+     * Start provider
+     */
+    async void start()
+    {
+        
+    }
+    
 }

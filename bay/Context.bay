@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2021 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2023 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,15 +18,20 @@
 
 namespace Runtime;
 
+use Runtime.lib;
 use Runtime.BaseObject;
+use Runtime.BaseProvider;
 use Runtime.BaseStruct;
+use Runtime.Provider;
 use Runtime.Exceptions.RuntimeException;
 
 
 struct Context extends BaseStruct
 {
 	/* Struct data */
+	var app = null;
 	string base_path = "";
+	string entry_point = "";
 	Collection<string> cli_args = [];
 	Collection<string> modules = [];
 	Dict<string> enviroments = {};
@@ -35,30 +40,9 @@ struct Context extends BaseStruct
 	Dict<var> settings = {};
 	int start_time = 0;
 	string tz = "UTC";
+	bool initialized = false;
 	
-	
-	/**
-	 * Init
-	 */
-	static async Context init(Context c)
-	{
-		@ = c;
-		if (c.initialized) return c;
 		
-		/* Base path */
-		string base_path = (c.base_path != "") ?
-			c.base_path : rtl::attr(c.env, ["BASE_PATH"], "", "string")
-		;
-		
-		/* Get modules entities */
-		Collection<BaseStruct> entities = static::getEntitiesFromModules(c.modules);
-		c <= entities <= entities;
-		
-		return c;
-	}
-	
-	
-	
 	/**
 	 * Returns modules entities
 	 */
@@ -83,11 +67,16 @@ struct Context extends BaseStruct
 	/**
 	 * Add provider
 	 */
-	void addProvider(string provider_name, BaseObject provider)
+	void addProvider(string provider_name, BaseProvider provider)
 	{
 		if (this.providers.has(provider_name))
 		{
 			throw new RuntimeException("Provider + '" + provider_name + "' already registered");
+		}
+		if (not(provider instanceof BaseProvider))
+		{
+			throw new RuntimeException("Provider + '" + provider_name +
+				"' must be intstanceof BaseProvider");
 		}
 		this.providers.setValue(provider_name, provider);
 	}
@@ -97,13 +86,151 @@ struct Context extends BaseStruct
 	/**
 	 * Returns provider by name
 	 */
-	BaseObject getProvider(string provider_name)
+	BaseObject provider(string provider_name)
 	{
 		if (not this.providers.has(provider_name))
 		{
 			throw new RuntimeException("Provider + '" + provider_name + "' not found");
 		}
-		
 		return this.providers.get(provider_name);
+	}
+	
+	
+	
+	/**
+	 * Create context
+	 */
+	static async void create(Dict d = {})
+	{
+		#switch
+		#case ifcode PHP then
+		#case ifcode NODEJS then
+		
+		let Collection = use("Runtime.Collection");
+		
+		if (!d.has(ctx, "start_time"))
+		{
+			d = d.setIm(ctx, "start_time", Date.now());
+		}
+		if (!d.has(ctx, "cli_args"))
+		{
+			d = d.setIm(ctx, "cli_args", Collection.from(process.argv.slice(1)));
+		}
+		if (!d.has(ctx, "base_path"))
+		{
+			d = d.setIm(ctx, "base_path", process.cwd());
+		}
+		
+		#endswitch
+		
+		if (d.has("modules"))
+		{
+			var modules = d.get("modules");
+			if (not(modules instanceof Collection))
+			{
+				d <= modules <= Collection::@from(modules);
+			}
+		}
+		
+		Context instance = rtl::newInstance(static::getClassName(), [ d ]);
+		
+		/* Init context */
+		instance = await instance.init();
+		
+		return instance;
+	}
+	
+	
+	
+	/**
+	 * Init
+	 */
+	async Context init()
+	{
+		Context c = this;
+		
+		if (c.initialized) return c;
+		
+		/* Get modules */
+		Collection<string> modules = c.modules;
+		if (modules.indexOf("Runtime"))
+		{
+			modules = modules.prependIm("Runtime");
+		}
+		
+		/* Get modules entities */
+		Collection<BaseStruct> entities = static::getEntitiesFromModules(modules);
+		c <= entities <= entities;
+		
+		/* TODO: Hook entities app */
+		
+		/* Create providers */
+		Collection<Provider> providers = c.entities.filter( lib::isInstance(classof Provider) );
+		for (int i=0; i<providers.count(); i++)
+		{
+			Provider info = providers[i];
+			if (info.value)
+			{
+				BaseProvider provider = rtl::newInstance(info.value);
+				c.addProvider(info.name, provider);
+			}
+		}
+		
+		/* Set initialized */
+		c <= initialized <= true;
+		
+		/* Create app */
+		if (this.entry_point != "")
+		{
+			c <= app <= rtl::newInstance(this.entry_point);
+			
+			if (rtl::method_exists(c.app, "init"))
+			{
+				c = await c.app.init(c);
+			}
+		}
+		
+		/* TODO: Hook init app */
+		
+		return c;
+	}
+	
+	
+	
+	/**
+	 * Run context
+	 */
+	async int run()
+	{
+		int code = 0;
+		
+		/* Start providers */
+		Collection<string> providers_names = this.providers.keys();
+		for (int i=0; i<providers_names.count(); i++)
+		{
+			string provider_name = providers_names[i];
+			BaseProvider provider = this.providers[provider_name];
+			await provider.start();
+		}
+		
+		/* Run app */
+		if (this.app == null)
+			return;
+		
+		/* Start app */
+		if (rtl::method_exists(this.app, "start"))
+		{
+			await this.app.start();
+		}
+		
+		/* TODO: Hook start app */
+		
+		/* Run entry_point */
+		if (rtl::method_exists(this.app, "main"))
+		{
+			code = await this.app.main();
+		}
+		
+		return code;
 	}
 }

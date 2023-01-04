@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2021 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2023 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -371,7 +371,7 @@ class rtl
 		args.unshift(null);
 		var f = Function.prototype.bind.apply(obj, args);
 		return new f;
-	
+		
 		#endswitch
 	}
 	
@@ -1636,6 +1636,43 @@ class rtl
 		return context;
 	}
 	
+	
+	/**
+	 * Create global context
+	 * @param Dict d
+	 */
+	public static async var @createContext(var d)
+	{
+		var context = null;
+		
+		#switch
+		#case ifcode PHP then
+		
+		#case ifcode JAVASCRIPT then
+		
+		let Dict = use("Runtime.Dict");
+		let class_name = use("Runtime.Context");
+		context = await class_name.create(null, Dict.from(d));
+		
+		#endswitch
+		
+		/* Setup global context */
+		static::setContext(context);
+		
+		return context;
+	}
+	
+	
+	
+	/**
+	 * Run application
+	 * @param Dict d
+	 */
+	public static async int @runContext(var d)
+	{
+		var ctx = await static::createContext(d);
+		return await ctx.run(ctx);
+	}
 	
 	
 	/* ============================= Runtime Utils Functions ============================= */
