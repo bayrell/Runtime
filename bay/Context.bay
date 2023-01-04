@@ -24,6 +24,7 @@ use Runtime.BaseProvider;
 use Runtime.BaseStruct;
 use Runtime.Provider;
 use Runtime.Exceptions.RuntimeException;
+use Runtime.Hooks.AppHook;
 
 
 struct Context extends BaseStruct
@@ -162,8 +163,6 @@ struct Context extends BaseStruct
 		Collection<BaseStruct> entities = static::getEntitiesFromModules(modules);
 		c <= entities <= entities;
 		
-		/* TODO: Hook entities app */
-		
 		/* Create providers */
 		Collection<Provider> providers = c.entities.filter( lib::isInstance(classof Provider) );
 		for (int i=0; i<providers.count(); i++)
@@ -183,14 +182,25 @@ struct Context extends BaseStruct
 		if (this.entry_point != "")
 		{
 			c <= app <= rtl::newInstance(this.entry_point);
-			
-			if (rtl::method_exists(c.app, "init"))
-			{
-				c = await c.app.init(c);
-			}
 		}
 		
-		/* TODO: Hook init app */
+		/* Init hooks */
+		/*
+		var hook = c.provider("hook");
+		if (hook)
+		{
+			await hook.init();
+		}
+		*/
+		
+		/* Hook init app */
+		await c.callAsyncHook(AppHook::INIT);
+		
+		/* Init app */
+		if (c.app != null and rtl::method_exists(c.app, "init"))
+		{
+			c = await c.app.init(c);
+		}
 		
 		return c;
 	}
@@ -217,13 +227,14 @@ struct Context extends BaseStruct
 		if (this.app == null)
 			return;
 		
+		/* Hook start app */
+		await this.callAsyncHook(AppHook::START);
+		
 		/* Start app */
 		if (rtl::method_exists(this.app, "start"))
 		{
 			await this.app.start();
 		}
-		
-		/* TODO: Hook start app */
 		
 		/* Run entry_point */
 		if (rtl::method_exists(this.app, "main"))
@@ -233,4 +244,26 @@ struct Context extends BaseStruct
 		
 		return code;
 	}
+	
+	
+	
+	/**
+	 * Call hook
+	 */
+	Dict callHook(string hook_name, Dict d = {})
+	{
+		return d;
+	}
+	
+	
+	
+	/**
+	 * Call async hook
+	 */
+	async Dict callAsyncHook(string hook_name, Dict d = {})
+	{
+		return d;
+	}
+	
+	
 }

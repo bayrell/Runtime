@@ -19,6 +19,7 @@
 namespace Runtime.Providers;
 
 use Runtime.BaseProvider;
+use Runtime.Exceptions.RuntimeException;
 
 
 class OutputProvider extends BaseProvider
@@ -156,14 +157,26 @@ class OutputProvider extends BaseProvider
 	/**
 	 * Print message to output
 	 */
-	void print(string message)
+	void print(string message, bool new_line = true, string type="")
 	{
+		if (not rtl::isString(message))
+			throw new RuntimeException("print message must be string");
+		
 		#switch
 		#case ifcode PHP then
 		
-		echo $message . "\n";
+		echo $message;
+		if ($new_line) echo "\n";
 		
-		#case ifcode JAVASCRIPT then
+		#case ifcode NODEJS then
+		
+		var output = process.stdout;
+		if (type == "error") output = process.stderr;
+		
+		output.write(message);
+		if (new_line) output.write("\n");
+		
+		#case ifcode ES6 then
 		
 		console.log(message);
 		
@@ -177,7 +190,30 @@ class OutputProvider extends BaseProvider
 	 */
 	void print_error(string message)
 	{
-		this.print( this.color("red", message) );
+		#switch
+		#case ifcode PHP then
+		
+		$this->print( $ctx, $this->color($ctx, "red", $message), true, "err" );
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (message instanceof Error)
+		{
+			let color = this.getColor(ctx, "red");
+			let char_27 = String.fromCharCode(27);
+			
+			this.print( ctx, char_27 + "[" + color + "m", false, "err" );
+			this.print( ctx, message.stack, false, "err" );
+			this.print( ctx, char_27 + "[0m", true, "err" );
+		}
+		
+		else
+		{
+			this.print( ctx, this.color(ctx, "red", message), true, "err" );
+		}
+		
+		#endswitch
+		
 	}
 	
 	

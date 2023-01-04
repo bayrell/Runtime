@@ -1379,19 +1379,6 @@ class rtl
 		usleep( $time * 1000 );
 		#case ifcode JAVASCRIPT then
 		await new Promise((f, e) => setTimeout(f, time));
-		#case ifcode ES5 then
-		setTimeout
-		(
-			(function (__async_t)
-			{
-				return function()
-				{
-					__async_t.resolve(ctx, null);
-				};
-			})(__async_t),
-			time
-		);
-		return;
 		#endswitch
 	}
 	
@@ -1406,18 +1393,7 @@ class rtl
 		#case ifcode PHP then
 		usleep($time);
 		#case ifcode JAVASCRIPT then
-		setTimeout
-		(
-			(function (__async_t)
-			{
-				return function()
-				{
-					__async_t.resolve(ctx, null);
-				};
-			})(__async_t),
-			Math.round(time / 1000)
-		);
-		return;
+		await new Promise((f, e) => setTimeout(f, Math.round(time / 1000)));
 		#endswitch
 	}
 	
@@ -1574,28 +1550,6 @@ class rtl
 		
 		#endswitch
 	}
-	
-	
-	
-	#ifdef BACKEND then
-	
-	/**
-	 * Returns module path. For backend only
-	 */
-	static string getModulePath(string module_name)
-	{
-		#switch
-		#case ifcode PHP then
-		$class = "\\" . preg_replace("/\\./", "\\", $module_name . ".ModuleDescription");
-		$reflector = new \ReflectionClass($class);
-		$path = $reflector->getFileName();
-		return dirname( dirname($path) );
-		#endswitch
-		return "";
-	}
-	
-	#endif
-	
 	
 	
 	/* ================================ Context Functions ================================ */
@@ -2319,9 +2273,31 @@ class rtl
 #switch
 #case ifcode PHP then
 rtl::$_memorize_not_found = (object) ['s' => 'memorize_key_not_found'];
+
 #case ifcode ES6 then
 var use = function(s){return Runtime.rtl.find_class(s);}
+
 #case ifcode JAVASCRIPT then
 if (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined')
 	Runtime.rtl._memorize_not_found = {'s':'memorize_key_not_found','id':Symbol()};
+
+#case ifcode NODEJS then
+
+Runtime.rtl.runApp = async function (d)
+{
+	let code = 0;
+	
+	try
+	{
+		code = await Runtime.rtl.runContext(d);
+	}
+	catch (e)
+	{
+		process.stderr.write("\x1B[0;91m");
+		process.stderr.write(e.stack);
+		process.stderr.write("\x1B[0m\n");
+	}
+
+	process.exit(code);
+}
 #endswitch

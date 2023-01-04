@@ -16,47 +16,11 @@
  *  limitations under the License.
  */
 
-namespace Runtime;
-
-use Runtime.Provider;
+namespace Runtime.Hooks;
 
 
-static class ModuleDescription
+class AppHook
 {
-	
-	/**
-	 * Returns module name
-	 * @return string
-	 */
-	pure string getModuleName() => "Runtime";
-	
-	
-	
-	/**
-	 * Returns module name
-	 * @return string
-	 */
-	pure string getModuleVersion() => "0.11.1";
-	
-	
-	
-	/**
-	 * Returns required modules
-	 * @return Map<string>
-	 */
-	pure Map<string> requiredModules() => null;
-	
-	
-	
-	/**
-	 * Returns enities
-	 */
-	pure Collection<Dict> entities() => 
-	[
-		new Provider("input", null),
-		new Provider("output", "Runtime.Providers.OutputProvider"),
-		new Provider("log", null),
-		new Provider("hook", null),
-	];
-	
+    static const string INIT = "runtime::app_init";
+    static const string START = "runtime::app_start";
 }

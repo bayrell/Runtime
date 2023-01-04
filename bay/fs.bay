@@ -197,16 +197,17 @@ class fs
 		for (int i=0; i<items.count(); i++)
 		{
 			string item_name = items.item(i);
-			string item_path = static::concat(dirpath, item_name);
-			string item_name2 = fs::concat(parent_name, item_name);
+			string item_path = static::join([ dirpath, item_name ]);
+			string item_name2 = static::join([ parent_name, item_name ]);
 			
 			if (item_name == "." or item_name == "..") continue;
-			res.push( item_name2 );
+			item_name2 = static::removeFirstSlash(item_name2);
+			res.pushValue( item_name2 );
 			
 			bool is_dir = await static::isDir(item_path);
 			if (is_dir)
 			{
-				Collection<string> sub_items = await static::readDirectoryRecursive
+				Collection<string> sub_items = await static::listDirRecursive
 				(
 					item_path, item_name2
 				);
