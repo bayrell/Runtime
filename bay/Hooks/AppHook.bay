@@ -23,4 +23,5 @@ class AppHook
 {
     static const string INIT = "runtime::app_init";
     static const string START = "runtime::app_start";
+    static const string ENV = "runtime::app_env";
 }

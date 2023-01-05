@@ -352,23 +352,23 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
-	
+		
 		$class_name = static::find_class($class_name);
 		if ($args == null)
 			return new $class_name($ctx);
 		$r = new \ReflectionClass($class_name);
 		$arr = $args->_arr;
-		array_unshift($arr, $ctx);
+		if (isset( $ctx )) array_unshift($arr, $ctx);
 		return $r->newInstanceArgs($arr);
-	
+		
 		#case ifcode JAVASCRIPT then
-	
+		
 		var obj = this.find_class(class_name);
 		if (!this.exists(ctx, obj)) return null;
 		if (!(obj instanceof Function)) return null;
 		if (args == undefined || args == null){ args = []; } else { args = args.toArray(); }
 		args = args.slice(); 
-		args.unshift(ctx);
+		if (typeof ctx != "undefined") args.unshift(ctx);
 		args.unshift(null);
 		var f = Function.prototype.bind.apply(obj, args);
 		return new f;
@@ -480,8 +480,10 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$arr = ($args != null) ? (($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : [];
-		if (isset($ctx)) array_unshift($arr, $ctx);
+		$arr = ($args != null) ?
+			(($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : []
+		;
+		if (isset( $ctx )) array_unshift($arr, $ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
 			return $f->invokeArgs($arr);
@@ -660,8 +662,9 @@ class rtl
 			if (data instanceof BaseStruct)
 			{
 				var attr_data = data.get(attr_name, null);
-				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);			
-				new_data = data.copy( (new Map()).setValue(attr_name, res) );
+				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);
+				var d = (new Map()).setValue(attr_name, res);
+				new_data = data.copy(d);
 			}
 			else if (data instanceof Dict)
 			{
@@ -1601,7 +1604,8 @@ class rtl
 	 */
 	public static async int @createContext(var d)
 	{
-		var context = Context::create( null, d );
+		var ctx = null;
+		var context = Context::create(ctx, d);
 		
 		/* Init context */
 		context = await context.init();
@@ -1620,7 +1624,8 @@ class rtl
 	 */
 	public static async int @runApp(string class_name)
 	{
-		fn get_modules = rtl::method(null, class_name, "modules");
+		var ctx = null;
+		fn get_modules = rtl::method(ctx, class_name, "modules");
 		Collection<string> modules = get_modules();
 		
 		Dict d = {
@@ -1631,7 +1636,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$context = static::createContext(d);
+		$context = static::createContext($d);
 		$code = $context->run();
 		exit($code);
 		

@@ -203,8 +203,7 @@ class _Map implements \ArrayAccess, \JsonSerializable
 	public function offsetUnset($k){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
 	
 	/* Class name */
-	public function getClassName(){return "Runtime._Map";}
-	public static function getCurrentClassName(){return "Runtime._Map";}
+	public static function getClassName(){return "Runtime._Map";}
 	public static function getParentClassName(){return "";}
 }
 
@@ -417,7 +416,7 @@ class Dict<T> extends _Map
 	 * @param T default_value
 	 * @return T
 	 */
-	public T get(string key, T default_value)
+	public T get(string key, T default_value = null)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then

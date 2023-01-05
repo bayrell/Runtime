@@ -34,7 +34,7 @@ struct Context extends BaseStruct
 	string base_path = "";
 	string entry_point = "";
 	Collection<string> cli_args = [];
-	Dict<string> env = {};
+	Dict<string> environments = {};
 	Collection<string> modules = [];
 	Dict<BaseObject> providers = {};
 	Collection<BaseStruct> entities = [];
@@ -104,9 +104,26 @@ struct Context extends BaseStruct
 	
 	
 	/**
+	 * Return environment
+	 */
+	var env(string name)
+	{
+		var value = this.environments[name];
+		
+		Dict hook_res = this.callHook(AppHook::ENV, {
+			"name": name,
+			"value": value,
+		});
+		
+		return hook_res["value"];
+	}
+	
+	
+	
+	/**
 	 * Create context
 	 */
-	static void create(Dict d = {})
+	static void create(Dict d)
 	{
 		if (not (d instanceof Dict))
 		{
@@ -138,9 +155,9 @@ struct Context extends BaseStruct
 		{
 			d = d.setIm(ctx, "base_path", process.cwd());
 		}
-		if (!d.has(ctx, "env"))
+		if (!d.has(ctx, "environments"))
 		{
-			d = d.setIm(ctx, "env", Dict.from(process.env));
+			d = d.setIm(ctx, "environments", Dict.from(process.env));
 		}
 		
 		#endswitch
@@ -261,7 +278,7 @@ struct Context extends BaseStruct
 			return;
 		
 		/* Hook start app */
-		await this.callAsyncHook(AppHook::START);
+		await this.callAsyncHook(AppHook::START, {});
 		
 		/* Start app */
 		if (rtl::method_exists(this.app, "start"))
@@ -283,7 +300,7 @@ struct Context extends BaseStruct
 	/**
 	 * Call hook
 	 */
-	Dict callHook(string hook_name, Dict d = {})
+	Dict callHook(string hook_name, Dict d)
 	{
 		return d;
 	}
@@ -293,7 +310,7 @@ struct Context extends BaseStruct
 	/**
 	 * Call async hook
 	 */
-	async Dict callAsyncHook(string hook_name, Dict d = {})
+	async Dict callAsyncHook(string hook_name, Dict d)
 	{
 		return d;
 	}

@@ -60,7 +60,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		#switch
 		#case ifcode PHP then
 		
-		$item = clone $this;		
+		$item = clone $this;
 		static::_assign($ctx, $item, $this, $obj);
 		return $item;
 		

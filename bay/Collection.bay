@@ -90,7 +90,7 @@ use.add(Runtime._Collection);
 #case ifcode PHP then
 class _Collection implements \ArrayAccess, \JsonSerializable
 {
-	$_arr = [];
+	var $_arr = [];
 	
 	
 	/**
