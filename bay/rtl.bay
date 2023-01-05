@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.BaseStruct;
 use Runtime.Collection;
+use Runtime.Context;
 use Runtime.Date;
 use Runtime.DateTime;
 use Runtime.Dict;
@@ -1586,29 +1587,24 @@ class rtl
 		static::$_global_context = $context;
 		#case ifcode JAVASCRIPT then
 		use("Runtime.rtl")._global_context = context;
+		#case ifcode ES6 then
+		window['global_context'] = context;
 		#endswitch
 		return context;
 	}
 	
 	
+	
 	/**
-	 * Create global context
+	 * Run context
 	 * @param Dict d
 	 */
-	public static async var @createContext(var d)
+	public static async int @createContext(var d)
 	{
-		var context = null;
+		var context = Context::create( null, d );
 		
-		#switch
-		#case ifcode PHP then
-		
-		#case ifcode JAVASCRIPT then
-		
-		let Dict = use("Runtime.Dict");
-		let class_name = use("Runtime.Context");
-		context = await class_name.create(null, Dict.from(d));
-		
-		#endswitch
+		/* Init context */
+		context = await context.init();
 		
 		/* Setup global context */
 		static::setContext(context);
@@ -1622,10 +1618,42 @@ class rtl
 	 * Run application
 	 * @param Dict d
 	 */
-	public static async int @runContext(var d)
+	public static async int @runApp(string class_name)
 	{
-		var ctx = await static::createContext(d);
-		return await ctx.run(ctx);
+		fn get_modules = rtl::method(null, class_name, "modules");
+		Collection<string> modules = get_modules();
+		
+		Dict d = {
+			"entry_point": class_name,
+			"modules": modules,
+		};
+		
+		#switch
+		#case ifcode PHP then
+		
+		$context = static::createContext(d);
+		$code = $context->run();
+		exit($code);
+		
+		#case ifcode NODEJS then
+		
+		let code = 0;
+	
+		try
+		{
+			let context = await Runtime.rtl.createContext(d);
+			code = await context.run(context);
+		}
+		catch (e)
+		{
+			process.stderr.write("\x1B[0;91m");
+			process.stderr.write(e.stack);
+			process.stderr.write("\x1B[0m\n");
+		}
+
+		process.exit(code);
+		
+		#endswitch
 	}
 	
 	
@@ -2248,18 +2276,25 @@ class rtl
 			var _Utils = use("Runtime.RuntimeUtils");
 			var _Collection = use("Runtime.Collection");
 			var _Dict = use("Runtime.Dict");
-			
-			var obj = JSON.parse(obj, function (key, value){
-				if (value == null) return value;
-				if (Array.isArray(value)){
-					return _Collection.from(value);
-				}
-				if (typeof value == 'object'){
-					return _Dict.from(value);
-				}
-				return value;
-			});
-			return this.PrimitiveToObject(ctx, obj);
+			var res = null;
+			try
+			{
+				res = JSON.parse(obj, function (key, value){
+					if (value == null) return value;
+					if (Array.isArray(value)){
+						return _Collection.from(value);
+					}
+					if (typeof value == 'object'){
+						return _Dict.from(value);
+					}
+					return value;
+				});
+			}
+			catch (e)
+			{
+				res = null;
+			}
+			return this.PrimitiveToObject(ctx, res);
 		}
 		catch(e){
 			throw e;
@@ -2283,21 +2318,4 @@ if (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined')
 
 #case ifcode NODEJS then
 
-Runtime.rtl.runApp = async function (d)
-{
-	let code = 0;
-	
-	try
-	{
-		code = await Runtime.rtl.runContext(d);
-	}
-	catch (e)
-	{
-		process.stderr.write("\x1B[0;91m");
-		process.stderr.write(e.stack);
-		process.stderr.write("\x1B[0m\n");
-	}
-
-	process.exit(code);
-}
 #endswitch

@@ -34,9 +34,9 @@ struct Context extends BaseStruct
 	string base_path = "";
 	string entry_point = "";
 	Collection<string> cli_args = [];
+	Dict<string> env = {};
 	Collection<string> modules = [];
-	Dict<string> enviroments = {};
-	Map<BaseObject> providers = new Map();
+	Dict<BaseObject> providers = {};
 	Collection<BaseStruct> entities = [];
 	Dict<var> settings = {};
 	int start_time = 0;
@@ -68,8 +68,10 @@ struct Context extends BaseStruct
 	/**
 	 * Add provider
 	 */
-	void addProvider(string provider_name, BaseProvider provider)
+	Context addProvider(string provider_name, BaseProvider provider)
 	{
+		Context c = this;
+		
 		if (this.providers.has(provider_name))
 		{
 			throw new RuntimeException("Provider + '" + provider_name + "' already registered");
@@ -79,7 +81,10 @@ struct Context extends BaseStruct
 			throw new RuntimeException("Provider + '" + provider_name +
 				"' must be intstanceof BaseProvider");
 		}
-		this.providers.setValue(provider_name, provider);
+		
+		c <= providers <= c.providers.setIm(provider_name, provider);
+		
+		return c;
 	}
 	
 	
@@ -101,18 +106,30 @@ struct Context extends BaseStruct
 	/**
 	 * Create context
 	 */
-	static async void create(Dict d = {})
+	static void create(Dict d = {})
 	{
-		#switch
-		#case ifcode PHP then
-		#case ifcode NODEJS then
+		if (not (d instanceof Dict))
+		{
+			d = Dict::@from(d);
+		}
 		
-		let Collection = use("Runtime.Collection");
+		#switch
+		
+		#case ifcode PHP then
+		
+		
+		#case ifcode JAVASCRIPT then
 		
 		if (!d.has(ctx, "start_time"))
 		{
 			d = d.setIm(ctx, "start_time", Date.now());
 		}
+		
+		#case ifcode NODEJS then
+		
+		let Collection = use("Runtime.Collection");
+		let Dict = use("Runtime.Dict");
+		
 		if (!d.has(ctx, "cli_args"))
 		{
 			d = d.setIm(ctx, "cli_args", Collection.from(process.argv.slice(1)));
@@ -120,6 +137,10 @@ struct Context extends BaseStruct
 		if (!d.has(ctx, "base_path"))
 		{
 			d = d.setIm(ctx, "base_path", process.cwd());
+		}
+		if (!d.has(ctx, "env"))
+		{
+			d = d.setIm(ctx, "env", Dict.from(process.env));
 		}
 		
 		#endswitch
@@ -135,9 +156,6 @@ struct Context extends BaseStruct
 		
 		Context instance = rtl::newInstance(static::getClassName(), [ d ]);
 		
-		/* Init context */
-		instance = await instance.init();
-		
 		return instance;
 	}
 	
@@ -148,6 +166,8 @@ struct Context extends BaseStruct
 	 */
 	async Context init()
 	{
+		var hook_res;
+		
 		Context c = this;
 		
 		if (c.initialized) return c;
@@ -171,12 +191,9 @@ struct Context extends BaseStruct
 			if (info.value)
 			{
 				BaseProvider provider = rtl::newInstance(info.value);
-				c.addProvider(info.name, provider);
+				c = c.addProvider(info.name, provider);
 			}
 		}
-		
-		/* Set initialized */
-		c <= initialized <= true;
 		
 		/* Create app */
 		if (this.entry_point != "")
@@ -193,14 +210,27 @@ struct Context extends BaseStruct
 		}
 		*/
 		
+		/* Init providers */
+		Collection<string> providers_names = this.providers.keys();
+		for (int i=0; i<providers_names.count(); i++)
+		{
+			string provider_name = providers_names[i];
+			BaseProvider provider = this.providers[provider_name];
+			c = await provider.init(c);
+		}
+		
 		/* Hook init app */
-		await c.callAsyncHook(AppHook::INIT);
+		hook_res = await c.callAsyncHook(AppHook::INIT, { "context": c });
+		c = hook_res["context"];
 		
 		/* Init app */
 		if (c.app != null and rtl::method_exists(c.app, "init"))
 		{
 			c = await c.app.init(c);
 		}
+		
+		/* Set initialized */
+		c <= initialized <= true;
 		
 		return c;
 	}
@@ -220,7 +250,10 @@ struct Context extends BaseStruct
 		{
 			string provider_name = providers_names[i];
 			BaseProvider provider = this.providers[provider_name];
-			await provider.start();
+			if (not provider.started)
+			{
+				await provider.start();
+			}
 		}
 		
 		/* Run app */

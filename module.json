@@ -4,6 +4,7 @@
 	[
 		"rtl",
 		"lib",
+		"io",
 		"re",
 		"rs",
 		"Collection",
@@ -21,19 +22,20 @@
 		"SerializeInterface",
 		"StringInterface",
 		"BaseObject",
+		"BaseProvider",
 		"BaseStruct",
-		"BaseDriver",
 		"Date",
 		"DateTime",
 		"Reference",
 		"Context",
 		"Entity",
-		"Driver",
+		"Provider",
 		"LambdaChain",
 		"LambdaChainClass",
 		"LambdaChainDeclare",
 		"ModuleDescription",
-		"Loader"
+		"Hooks/AppHook",
+		"Providers/OutputProvider"
 	],
 	"src": "./bay",
 	"dest":

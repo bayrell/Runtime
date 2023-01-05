@@ -19,17 +19,30 @@
 namespace Runtime;
 
 use Runtime.BaseObject;
+use Runtime.Context;
 
 
 class BaseProvider extends BaseObject
 {
-    
-    /**
-     * Start provider
-     */
-    async void start()
-    {
-        
-    }
-    
+	bool started = false;
+	
+	
+	/**
+	 * Init provider
+	 */
+	async void init(Context c)
+	{
+		return c;
+	}
+	
+	
+	
+	/**
+	 * Start provider
+	 */
+	async void start()
+	{
+		this.started = true;
+	}
+	
 }

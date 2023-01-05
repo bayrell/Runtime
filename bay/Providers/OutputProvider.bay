@@ -195,7 +195,11 @@ class OutputProvider extends BaseProvider
 		
 		$this->print( $ctx, $this->color($ctx, "red", $message), true, "err" );
 		
-		#case ifcode JAVASCRIPT then
+		#case ifcode ES6 then
+		
+		console.log(message);
+		
+		#case ifcode NODEJS then
 		
 		if (message instanceof Error)
 		{
