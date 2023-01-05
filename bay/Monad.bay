@@ -1,7 +1,7 @@
 /*!
  *  Bayrell Runtime Library
  *
- *  (c) Copyright 2016-2023 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
  */
  
 namespace Runtime;
+
+use Runtime.Exceptions.RuntimeException;
 
 
 class Monad
@@ -35,6 +37,124 @@ class Monad
 	}
 	
 	
+	
+	/**
+	 * Return attr of object
+	 */
+	public var attr(string attr_name)
+	{
+		if (this.val === null or this.err != null) return this;
+		return new Monad( rtl::attr(this.val, [ attr_name ], null) );
+	}
+	
+	
+	
+	/**
+	 * Call function on value
+	 */
+	public var call(fn f)
+	{
+		if (this.val === null or this.err != null) return this;
+		
+		var res = null;
+		var err = null;
+		try
+		{
+			res = f(this.val);
+		}
+		catch (RuntimeException e)
+		{
+			res = null;
+			err = e;
+		}
+		
+		return new Monad( res, err );
+	}
+	
+	
+	
+	/**
+	 * Call async function on value
+	 */
+	public async var callAsync(fn f)
+	{
+		if (this.val === null or this.err != null) return this;
+		
+		var res = null;
+		var err = null;
+		try
+		{
+			res = await f(this.val);
+		}
+		catch (RuntimeException e)
+		{
+			res = null;
+			err = e;
+		}
+		
+		return new Monad( res, err );
+	}
+	
+	
+	
+	/**
+	 * Call method on value
+	 */
+	public var callMethod(fn f, Collection args = null)
+	{
+		if (this.val === null or this.err != null) return this;
+		
+		var res = null;
+		var err = null;
+		try
+		{
+			res = rtl::apply(f, args);
+		}
+		catch (RuntimeException e)
+		{
+			res = null;
+			err = e;
+		}
+		
+		return new Monad( res, err );
+	}
+	
+	
+	
+	/**
+	 * Call async method on value
+	 */
+	public async var callMethodAsync(fn f, Collection args = null)
+	{
+		if (this.val === null or this.err != null) return this;
+		
+		var res = null;
+		var err = null;
+		try
+		{
+			res = await rtl::applyAsync(f, args);
+		}
+		catch (RuntimeException e)
+		{
+			res = null;
+			err = e;
+		}
+		
+		return new Monad( res, err );
+	}
+	
+	
+	
+	/**
+	 * Call function on monad
+	 */
+	public var monad(fn f)
+	{
+		return f(this);
+	}
+	
+	
+	
 	/**
 	 * Returns value
 	 */
@@ -48,12 +168,4 @@ class Monad
 		return this.val;
 	}
 	
-	
-	/**
-	 * Call monad
-	 */
-	public var monad(fn f)
-	{
-		return f(this);
-	}
 }
