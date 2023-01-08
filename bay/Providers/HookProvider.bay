@@ -1,0 +1,68 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2023 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime.Providers;
+
+use Runtime.BaseProvider;
+use Runtime.Exceptions.RuntimeException;
+
+
+class HookProvider extends BaseProvider
+{
+	Map<Map<Vector>> hooks = new Map();
+	
+	
+	/**
+	 * Register hook
+	 */
+	void register(string hook_name, fn f, int priority = 0)
+	{
+		if (not this.hooks.has(hook_name)) this.hooks.setValue(hook_name, new Map());
+		
+		Map priorities = this.hooks[hook_name];
+		if (not priorities.has(priority)) priorities.setValue(priority, new Vector());
+		
+		Vector methods_list = priorities.get(priority);
+		methods_list.pushValue(f);
+	}
+	
+	
+	
+	/**
+	 * Returns method list
+	 */
+	Collection<fn> getMethods(string hook_name)
+	{
+		if (not this.hooks.has(hook_name)) return [];
+		
+		Vector res = new Vector();
+		
+		Map priorities = this.hooks[hook_name];
+		Collection priorities_keys = priorities.keys().sort();
+		for (int i=0; i<priorities_keys.count(); i++)
+		{
+			int priority = priorities_keys[i];
+			Vector methods_list = priorities.get(priority);
+			
+			res.appendVector(methods_list);
+		}
+		
+		return res.toCollection();
+	}
+	
+}

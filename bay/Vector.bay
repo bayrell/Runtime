@@ -271,9 +271,9 @@ class Vector<T> extends Collection
 	
 	/**
 	 * Append vector to the end of the vector
-	 * @param Vector<T> arr
+	 * @param Collection<T> arr
 	 */
-	public Vector<T> appendVector(Vector<T> arr)
+	public Vector<T> appendVector(Collection<T> arr)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then

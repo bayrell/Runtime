@@ -175,7 +175,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	
 	#switch
 	#case ifcode PHP then
-	function get($ctx,$k,$v = nul){$k="__".$k;return isset($_this->$k)?$_this->$k:$v;}
+	function get($ctx,$k,$v = null){$k="__".$k;return isset($this->$k)?$this->$k:$v;}
 	function __get($k){$k="__".$k;return isset($this->$k)?$this->$k:null;}
 	function __getKey($k){return "__".$k;}
 	function __set($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}

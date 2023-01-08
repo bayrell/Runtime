@@ -56,7 +56,7 @@ static class ModuleDescription
 		new Provider("input", null),
 		new Provider("output", "Runtime.Providers.OutputProvider"),
 		new Provider("log", null),
-		new Provider("hook", null),
+		new Provider("hook", "Runtime.Providers.HookProvider"),
 	];
 	
 }

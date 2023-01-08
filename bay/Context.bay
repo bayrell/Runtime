@@ -280,6 +280,7 @@ struct Context extends BaseStruct
 			if (not provider.started)
 			{
 				await provider.start();
+				provider.started = true;
 			}
 		}
 		
@@ -312,6 +313,15 @@ struct Context extends BaseStruct
 	 */
 	Dict callHook(string hook_name, Dict d)
 	{
+		var hook = this.provider("hook");
+		Collection<fn> methods_list = hook.getMethods(hook_name);
+		
+		for (int i=0; i<methods_list.count(); i++)
+		{
+			fn f = methods_list[i];
+			d = f(d);
+		}
+		
 		return d;
 	}
 	
@@ -322,6 +332,15 @@ struct Context extends BaseStruct
 	 */
 	async Dict callAsyncHook(string hook_name, Dict d)
 	{
+		var hook = this.provider("hook");
+		Collection<fn> methods_list = hook.getMethods(hook_name);
+		
+		for (int i=0; i<methods_list.count(); i++)
+		{
+			fn f = methods_list[i];
+			d = await f(d);
+		}
+		
 		return d;
 	}
 	
@@ -375,6 +394,7 @@ struct Context extends BaseStruct
 		res = res.removeDuplicates();
 		return res.toCollection();
 	}
+	
 	
 	
 	/**
