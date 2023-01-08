@@ -155,13 +155,6 @@ class RuntimeException extends ClassException
 		#endswitch
 	}
 	
-	#switch
-	#case ifcode PHP then
-	public function __toString (){
-		return $this->toString(null);
-	}
-	#endswitch
-	
 	
 	
 	/**

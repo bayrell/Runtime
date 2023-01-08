@@ -21,7 +21,7 @@ namespace Runtime;
 use Runtime.Entity;
 
 
-class Provider extends Entity
+struct Provider extends Entity
 {
 	/* Provider class name */
 	string value = "";

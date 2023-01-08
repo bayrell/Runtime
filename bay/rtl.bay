@@ -18,6 +18,7 @@
 
 namespace Runtime;
 
+use Runtime.BaseObject;
 use Runtime.BaseStruct;
 use Runtime.Collection;
 use Runtime.Context;
@@ -665,6 +666,13 @@ class rtl
 				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);
 				var d = (new Map()).setValue(attr_name, res);
 				new_data = data.copy(d);
+			}
+			else if (data instanceof BaseObject)
+			{
+				var attr_data = data.takeValue(attr_name, null);
+				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);
+				new_data = data;
+				new_data.assignValue(attr_name, res);
 			}
 			else if (data instanceof Dict)
 			{
@@ -1622,15 +1630,11 @@ class rtl
 	 * Run application
 	 * @param Dict d
 	 */
-	public static async int @runApp(string class_name)
+	public static async int @runApp(string module_name, string class_name)
 	{
-		var ctx = null;
-		fn get_modules = rtl::method(ctx, class_name, "modules");
-		Collection<string> modules = get_modules();
-		
 		Dict d = {
 			"entry_point": class_name,
-			"modules": modules,
+			"modules": [ module_name ],
 		};
 		
 		#switch

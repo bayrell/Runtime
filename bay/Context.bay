@@ -43,7 +43,8 @@ struct Context extends BaseStruct
 	string tz = "UTC";
 	bool initialized = false;
 	
-		
+	
+	
 	/**
 	 * Returns modules entities
 	 */
@@ -96,7 +97,7 @@ struct Context extends BaseStruct
 	{
 		if (not this.providers.has(provider_name))
 		{
-			throw new RuntimeException("Provider + '" + provider_name + "' not found");
+			throw new RuntimeException("Provider '" ~ provider_name ~ "' not found");
 		}
 		return this.providers.get(provider_name);
 	}
@@ -191,10 +192,11 @@ struct Context extends BaseStruct
 		
 		/* Get modules */
 		Collection<string> modules = c.modules;
-		if (modules.indexOf("Runtime"))
-		{
-			modules = modules.prependIm("Runtime");
-		}
+		if (modules.indexOf("Runtime")) modules = modules.prependIm("Runtime");
+		
+		/* Extends modules */
+		Collection<string> modules = static::getRequiredModules(modules);
+		c <= modules <= modules;
 		
 		/* Get modules entities */
 		Collection<BaseStruct> entities = static::getEntitiesFromModules(modules);
@@ -207,7 +209,15 @@ struct Context extends BaseStruct
 			Provider info = providers[i];
 			if (info.value)
 			{
-				BaseProvider provider = rtl::newInstance(info.value);
+				BaseProvider provider = null;
+				if (info.value instanceof BaseProvider)
+				{
+					provider = info.value;
+				}
+				else if (rtl::isString(info.value))
+				{
+					provider = rtl::newInstance(info.value);
+				}
 				c = c.addProvider(info.name, provider);
 			}
 		}
@@ -316,4 +326,59 @@ struct Context extends BaseStruct
 	}
 	
 	
+	
+	/**
+	 * Returns required modules
+	 * @param string class_name
+	 * @return Collection<string>
+	 */
+	pure void _getRequiredModules
+	(
+		Vector<string> res,
+		Map<string> cache,
+		Collection<string> modules,
+		fn filter = null
+	)
+	{
+		if (modules == null) return;
+		if (filter) modules = modules.filter(filter);
+		for (int i=0; i<modules.count(); i++)
+		{
+			string module_name = modules.item(i);
+			if (cache.get(module_name, false) == false)
+			{
+				cache.setValue(module_name, true);
+				fn f = rtl::method(module_name ~ ".ModuleDescription", "requiredModules");
+				Dict<string> sub_modules = f();
+				if (sub_modules != null)
+				{
+					Collection<string> sub_modules = sub_modules.keys();
+					static::_getRequiredModules(res, cache, sub_modules);
+				}
+				res.pushValue(module_name);
+			}
+		}
+	}
+	
+	
+	
+	/**
+	 * Returns all modules
+	 * @param Collection<string> modules
+	 * @return Collection<string>
+	 */
+	pure Collection<string> getRequiredModules(Collection<string> modules)
+	{
+		Vector<string> res = new Vector();
+		Map<string> cache = new Map();
+		static::_getRequiredModules(res, cache, modules);
+		res = res.removeDuplicates();
+		return res.toCollection();
+	}
+	
+	
+	/**
+	 * Translate message
+	 */
+	string translate(string s, Dict params = null) => s;
 }

@@ -236,14 +236,14 @@ class Vector<T> extends Collection
 		if (pos < 0 || pos >= this.length)
 		{
 			var IndexOutOfRange = use ("Runtime.Exceptions.IndexOutOfRange");
-			throw new IndexOutOfRange();
+			throw new IndexOutOfRange(pos);
 		}
 		this[pos] = value;
 		return this;
 		#case ifcode PHP then
 		if (!array_key_exists($pos, $this->_arr))
 		{
-			throw new IndexOutOfRange();
+			throw new \Runtime\Exceptions\IndexOutOfRange($pos);
 		}
 		$this->_arr[$pos] = $value;
 		return $this;
