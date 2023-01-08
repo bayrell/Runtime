@@ -19,9 +19,9 @@
 namespace Runtime.Hooks;
 
 
-class AppHook
+class RuntimeHook
 {
-    static const string INIT = "runtime::app_init";
-    static const string START = "runtime::app_start";
-    static const string ENV = "runtime::app_env";
+    static const string INIT = "runtime::init";
+    static const string START = "runtime::start";
+    static const string ENV = "runtime::env";
 }

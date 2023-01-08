@@ -24,7 +24,7 @@ use Runtime.BaseProvider;
 use Runtime.BaseStruct;
 use Runtime.Provider;
 use Runtime.Exceptions.RuntimeException;
-use Runtime.Hooks.AppHook;
+use Runtime.Hooks.RuntimeHook;
 
 
 struct Context extends BaseStruct
@@ -110,7 +110,7 @@ struct Context extends BaseStruct
 	{
 		var value = this.environments[name];
 		
-		Dict hook_res = this.callHook(AppHook::ENV, {
+		Dict hook_res = this.callHook(RuntimeHook::ENV, {
 			"name": name,
 			"value": value,
 		});
@@ -237,7 +237,7 @@ struct Context extends BaseStruct
 		}
 		
 		/* Hook init app */
-		hook_res = await c.callAsyncHook(AppHook::INIT, { "context": c });
+		hook_res = await c.callAsyncHook(RuntimeHook::INIT, { "context": c });
 		c = hook_res["context"];
 		
 		/* Init app */
@@ -278,7 +278,7 @@ struct Context extends BaseStruct
 			return;
 		
 		/* Hook start app */
-		await this.callAsyncHook(AppHook::START, {});
+		await this.callAsyncHook(RuntimeHook::START, {});
 		
 		/* Start app */
 		if (rtl::method_exists(this.app, "start"))

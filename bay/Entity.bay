@@ -27,9 +27,6 @@ struct Entity extends BaseStruct
 	/* Entity name */
 	string name = "";
 	
-	/* Entity value */
-	string value = "";
-	
 	/* Entity params */
 	Dict params = {};
 }

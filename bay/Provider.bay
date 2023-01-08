@@ -23,6 +23,9 @@ use Runtime.Entity;
 
 class Provider extends Entity
 {
+	/* Provider class name */
+	string value = "";
+	
 	void constructor(string name, string value)
 	{
 		parent({
