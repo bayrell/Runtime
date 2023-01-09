@@ -35,6 +35,7 @@
 		"LambdaChainDeclare.bay",
 		"ModuleDescription.bay",
 		"Hooks/RuntimeHook.bay",
+		"Providers/HookProvider.bay",
 		"Providers/OutputProvider.bay"
 	],
 	"src": "./bay",

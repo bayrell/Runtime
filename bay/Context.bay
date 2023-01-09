@@ -218,7 +218,10 @@ struct Context extends BaseStruct
 				{
 					provider = rtl::newInstance(info.value);
 				}
-				c = c.addProvider(info.name, provider);
+				if (provider)
+				{
+					c = c.addProvider(info.name, provider);
+				}
 			}
 		}
 		
@@ -400,5 +403,5 @@ struct Context extends BaseStruct
 	/**
 	 * Translate message
 	 */
-	string translate(string s, Dict params = null) => s;
+	string translate(string module, string s, Dict params = null) => s;
 }
