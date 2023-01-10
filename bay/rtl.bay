@@ -1641,6 +1641,7 @@ class rtl
 		#case ifcode PHP then
 		
 		$context = static::createContext($d);
+		$context->start();
 		$code = $context->run();
 		exit($code);
 		
@@ -1651,6 +1652,7 @@ class rtl
 		try
 		{
 			let context = await Runtime.rtl.createContext(d);
+			await context.start();
 			code = await context.run(context);
 		}
 		catch (e)

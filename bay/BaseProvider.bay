@@ -42,7 +42,6 @@ class BaseProvider extends BaseObject
 	 */
 	async void start()
 	{
-		this.started = true;
 	}
 	
 }

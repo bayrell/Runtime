@@ -226,26 +226,17 @@ struct Context extends BaseStruct
 		}
 		
 		/* Create app */
-		if (this.entry_point != "")
+		if (c.entry_point != "")
 		{
-			c <= app <= rtl::newInstance(this.entry_point);
+			c <= app <= rtl::newInstance(c.entry_point);
 		}
-		
-		/* Init hooks */
-		/*
-		var hook = c.provider("hook");
-		if (hook)
-		{
-			await hook.init();
-		}
-		*/
 		
 		/* Init providers */
-		Collection<string> providers_names = this.providers.keys();
+		Collection<string> providers_names = c.providers.keys();
 		for (int i=0; i<providers_names.count(); i++)
 		{
 			string provider_name = providers_names[i];
-			BaseProvider provider = this.providers[provider_name];
+			BaseProvider provider = c.providers[provider_name];
 			c = await provider.init(c);
 		}
 		
@@ -268,12 +259,10 @@ struct Context extends BaseStruct
 	
 	
 	/**
-	 * Run context
+	 * Start context
 	 */
-	async int run()
+	async void start()
 	{
-		int code = 0;
-		
 		/* Start providers */
 		Collection<string> providers_names = this.providers.keys();
 		for (int i=0; i<providers_names.count(); i++)
@@ -287,18 +276,28 @@ struct Context extends BaseStruct
 			}
 		}
 		
-		/* Run app */
-		if (this.app == null)
-			return;
-		
 		/* Hook start app */
 		await this.callAsyncHook(RuntimeHook::START, {});
 		
 		/* Start app */
-		if (rtl::method_exists(this.app, "start"))
+		if (this.app and rtl::method_exists(this.app, "start"))
 		{
 			await this.app.start();
 		}
+	}
+	
+	
+	
+	/**
+	 * Run context
+	 */
+	async int run()
+	{
+		int code = 0;
+		
+		/* Run app */
+		if (this.app == null)
+			return;
 		
 		/* Run entry_point */
 		if (rtl::method_exists(this.app, "main"))
@@ -321,7 +320,8 @@ struct Context extends BaseStruct
 		
 		for (int i=0; i<methods_list.count(); i++)
 		{
-			fn f = methods_list[i];
+			Dict info = methods_list[i];
+			fn f = rtl::method(info["obj"], info["method_name"]);
 			d = f(d);
 		}
 		
@@ -340,7 +340,8 @@ struct Context extends BaseStruct
 		
 		for (int i=0; i<methods_list.count(); i++)
 		{
-			fn f = methods_list[i];
+			Dict info = methods_list[i];
+			fn f = rtl::method(info["obj"], info["method_name"]);
 			d = await f(d);
 		}
 		

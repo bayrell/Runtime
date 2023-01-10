@@ -16,57 +16,18 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Hooks;
+namespace Runtime;
 
-use Runtime.BaseHook;
+use Runtime.rtl;
+use Runtime.Entity;
 
 
-class RuntimeHook extends BaseHook
+struct Hook extends Entity
 {
-	static const string INIT = "runtime::init";
-	static const string START = "runtime::start";
-	static const string ENV = "runtime::env";
-	
-	
-	/**
-	 * Returns method name by hook name
-	 */
-	string getMethodName(string hook_name)
+	void constructor(string name)
 	{
-		if (hook_name == static::INIT) return "init";
-		if (hook_name == static::START) return "start";
-		if (hook_name == static::ENV) return "env";
-		return "";
+		parent({
+			"name": name,
+		});
 	}
-	
-	
-	
-	/**
-	 * Init context
-	 */
-	async Dict init(Dict d)
-	{
-		return d;
-	}
-	
-	
-	
-	/**
-	 * Init context
-	 */
-	async Dict start(Dict d)
-	{
-		return d;
-	}
-	
-	
-	
-	/**
-	 * Init context
-	 */
-	Dict env(Dict d)
-	{
-		return d;
-	}
-	
 }

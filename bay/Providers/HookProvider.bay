@@ -18,19 +18,54 @@
 
 namespace Runtime.Providers;
 
+use Runtime.lib;
+use Runtime.BaseHook;
 use Runtime.BaseProvider;
+use Runtime.Context;
+use Runtime.Hook;
 use Runtime.Exceptions.RuntimeException;
 
 
 class HookProvider extends BaseProvider
 {
+	Vector<BaseHook> base_hooks = new Vector();
 	Map<Map<Vector>> hooks = new Map();
+	
+	
+	/**
+	 * Init provider
+	 */
+	async void init(Context c)
+	{
+		Collection<Hook> hooks = c.entities.filter( lib::isInstance(classof Hook) );
+		
+		for (int i=0; i<hooks.count(); i++)
+		{
+			Hook hook = hooks[i];
+			BaseHook base_hook = rtl::newInstance(hook.name);
+			this.base_hooks.pushValue(base_hook);
+			base_hook.hook = this;
+			base_hook.register_hooks();
+		}
+		
+		return c;
+	}
+	
+	
+	
+	/**
+	 * Start provider
+	 */
+	async void start()
+	{
+	}
+	
 	
 	
 	/**
 	 * Register hook
 	 */
-	void register(string hook_name, fn f, int priority = 0)
+	void register(string hook_name, var obj, string method_name, int priority = 0)
 	{
 		if (not this.hooks.has(hook_name)) this.hooks.setValue(hook_name, new Map());
 		
@@ -38,7 +73,35 @@ class HookProvider extends BaseProvider
 		if (not priorities.has(priority)) priorities.setValue(priority, new Vector());
 		
 		Vector methods_list = priorities.get(priority);
-		methods_list.pushValue(f);
+		methods_list.pushValue({
+			"obj": obj,
+			"method_name": method_name,
+		});
+	}
+	
+	
+	
+	/**
+	 * Remove hook
+	 */
+	void remove(string hook_name, var obj, string method_name, int priority = 0)
+	{
+		if (not this.hooks.has(hook_name)) this.hooks.setValue(hook_name, new Map());
+		
+		Map priorities = this.hooks[hook_name];
+		if (not priorities.has(priority)) priorities.setValue(priority, new Vector());
+		
+		Vector methods_list = priorities.get(priority);
+		int index = methods_list.find(
+			bool (Dict info) use (obj, method_name)
+			{
+				return info["obj"] == obj and info["method_name"] == method_name;
+			}
+		);
+		if (index > -1)
+		{
+			methods_list.removePosition(index);
+		}
 	}
 	
 	

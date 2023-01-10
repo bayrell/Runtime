@@ -16,57 +16,40 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Hooks;
+namespace Runtime;
 
-use Runtime.BaseHook;
+use Runtime.BaseObject;
+use Runtime.Providers.HookProvider;
 
 
-class RuntimeHook extends BaseHook
+class BaseHook extends BaseObject
 {
-	static const string INIT = "runtime::init";
-	static const string START = "runtime::start";
-	static const string ENV = "runtime::env";
+	HookProvider hook = null;
 	
 	
 	/**
 	 * Returns method name by hook name
 	 */
-	string getMethodName(string hook_name)
-	{
-		if (hook_name == static::INIT) return "init";
-		if (hook_name == static::START) return "start";
-		if (hook_name == static::ENV) return "env";
-		return "";
-	}
-	
+	string getMethodName(string hook_name) => "";
 	
 	
 	/**
-	 * Init context
+	 * Register hook
 	 */
-	async Dict init(Dict d)
+	void register(string hook_name, int priority = 0)
 	{
-		return d;
+		string method_name = this.getMethodName(hook_name);
+		if (method_name == "") return;
+		
+		this.hook.register(hook_name, this, method_name, priority);
 	}
-	
 	
 	
 	/**
-	 * Init context
+	 * Register hooks
 	 */
-	async Dict start(Dict d)
+	void register_hooks()
 	{
-		return d;
+		
 	}
-	
-	
-	
-	/**
-	 * Init context
-	 */
-	Dict env(Dict d)
-	{
-		return d;
-	}
-	
 }
