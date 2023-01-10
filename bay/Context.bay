@@ -22,7 +22,7 @@ use Runtime.lib;
 use Runtime.BaseObject;
 use Runtime.BaseProvider;
 use Runtime.BaseStruct;
-use Runtime.Provider;
+use Runtime.Entity.Provider;
 use Runtime.Exceptions.RuntimeException;
 use Runtime.Hooks.RuntimeHook;
 
@@ -221,6 +221,10 @@ struct Context extends BaseStruct
 				if (provider)
 				{
 					c = c.addProvider(info.name, provider);
+				}
+				else if (info.value)
+				{
+					throw new RuntimeException("Wrong declare provider '" ~ info.name ~ "'");
 				}
 			}
 		}

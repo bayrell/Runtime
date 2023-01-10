@@ -16,21 +16,18 @@
  *  limitations under the License.
  */
 
-namespace Runtime;
+namespace Runtime.Entity;
 
+use Runtime.rtl;
 use Runtime.Entity;
 
 
-struct Provider extends Entity
+struct Hook extends Entity
 {
-	/* Provider class name */
-	string value = "";
-	
-	void constructor(string name, string value)
+	void constructor(string name)
 	{
 		parent({
 			"name": name,
-			"value": value,
 		});
 	}
 }

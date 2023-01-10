@@ -18,7 +18,7 @@
 
 namespace Runtime;
 
-use Runtime.Provider;
+use Runtime.Entity.Provider;
 
 
 static class ModuleDescription

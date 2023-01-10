@@ -22,7 +22,7 @@ use Runtime.lib;
 use Runtime.BaseHook;
 use Runtime.BaseProvider;
 use Runtime.Context;
-use Runtime.Hook;
+use Runtime.Entity.Hook;
 use Runtime.Exceptions.RuntimeException;
 
 
