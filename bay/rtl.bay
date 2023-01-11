@@ -1645,6 +1645,12 @@ class rtl
 		$code = $context->run();
 		exit($code);
 		
+		#case ifcode ES6 then
+		
+		let context = await Runtime.rtl.createContext(d);
+		await context.start();
+		await context.run(context);
+		
 		#case ifcode NODEJS then
 		
 		let code = 0;
