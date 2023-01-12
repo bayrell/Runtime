@@ -288,6 +288,9 @@ struct Context extends BaseStruct
 		{
 			await this.app.start();
 		}
+		
+		/* Hook launched app */
+		await this.callAsyncHook(RuntimeHook::LAUNCHED, {});
 	}
 	
 	

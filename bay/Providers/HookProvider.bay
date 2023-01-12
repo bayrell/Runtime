@@ -28,7 +28,7 @@ use Runtime.Exceptions.RuntimeException;
 
 class HookProvider extends BaseProvider
 {
-	Vector<BaseHook> base_hooks = new Vector();
+	Collection<BaseHook> base_hooks = [];
 	Map<Map<Vector>> hooks = new Map();
 	
 	
@@ -39,14 +39,18 @@ class HookProvider extends BaseProvider
 	{
 		Collection<Hook> hooks = c.entities.filter( lib::isInstance(classof Hook) );
 		
+		Vector<BaseHook> base_hooks = new Vector();
 		for (int i=0; i<hooks.count(); i++)
 		{
 			Hook hook = hooks[i];
 			BaseHook base_hook = rtl::newInstance(hook.name);
-			this.base_hooks.pushValue(base_hook);
+			base_hooks.pushValue(base_hook);
 			base_hook.hook = this;
 			base_hook.register_hooks();
+			base_hooks.pushValue(base_hook);
 		}
+		
+		this.base_hooks = base_hooks.toCollection();
 		
 		return c;
 	}

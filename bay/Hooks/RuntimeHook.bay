@@ -25,6 +25,7 @@ class RuntimeHook extends BaseHook
 {
 	static const string INIT = "runtime::init";
 	static const string START = "runtime::start";
+	static const string LAUNCHED = "runtime::launched";
 	static const string ENV = "runtime::env";
 	
 	
@@ -35,6 +36,7 @@ class RuntimeHook extends BaseHook
 	{
 		if (hook_name == static::INIT) return "init";
 		if (hook_name == static::START) return "start";
+		if (hook_name == static::LAUNCHED) return "launched";
 		if (hook_name == static::ENV) return "env";
 		return "";
 	}

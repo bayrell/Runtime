@@ -1647,9 +1647,16 @@ class rtl
 		
 		#case ifcode ES6 then
 		
-		let context = await Runtime.rtl.createContext(d);
-		await context.start();
-		await context.run(context);
+		try
+		{
+			let context = await Runtime.rtl.createContext(d);
+			await context.start();
+			await context.run(context);
+		}
+		catch (e)
+		{
+			console.log(e.stack);
+		}
 		
 		#case ifcode NODEJS then
 		
@@ -2156,9 +2163,7 @@ class rtl
 		if ($value instanceof \Runtime\Collection)
 		{
 			$arr = [];
-			$value->each
-			(
-				$ctx,
+			$value->each($ctx,
 				function ($ctx, $v) use (&$arr)
 				{
 					$arr[] = static::PrimitiveToNative($ctx, $v);
@@ -2170,9 +2175,7 @@ class rtl
 		if ($value instanceof \Runtime\Dict)
 		{
 			$arr = [];
-			$value->each
-			(
-				$ctx,
+			$value->each($ctx,
 				function ($ctx, $v, $k) use (&$arr)
 				{
 					$arr[$k] = static::PrimitiveToNative($ctx, $v);
