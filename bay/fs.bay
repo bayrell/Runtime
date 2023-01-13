@@ -53,9 +53,9 @@ class fs
 	static string join(Collection arr)
 	{
 		string path = rs::join(static::DIRECTORY_SEPARATOR, arr);
-		path = re::replace("//", "/", path);
-		path = re::replace("/\\./", "/", path);
-		path = re::replace("/+$", "", path);
+		path = re::replace("\\/+", "/", path);
+		path = re::replace("\\/\\.\\/", "/", path);
+		path = re::replace("\\/+$", "", path);
 		return path;
 	}
 	

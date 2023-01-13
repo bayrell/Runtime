@@ -1641,8 +1641,8 @@ class rtl
 		#case ifcode PHP then
 		
 		$context = static::createContext($d);
-		$context->start();
-		$code = $context->run();
+		$context->start($context);
+		$code = $context->run($context);
 		exit($code);
 		
 		#case ifcode ES6 then
@@ -1650,7 +1650,7 @@ class rtl
 		try
 		{
 			let context = await Runtime.rtl.createContext(d);
-			await context.start();
+			await context.start(context);
 			await context.run(context);
 		}
 		catch (e)
@@ -1661,11 +1661,11 @@ class rtl
 		#case ifcode NODEJS then
 		
 		let code = 0;
-	
+		
 		try
 		{
 			let context = await Runtime.rtl.createContext(d);
-			await context.start();
+			await context.start(context);
 			code = await context.run(context);
 		}
 		catch (e)
@@ -1674,7 +1674,7 @@ class rtl
 			process.stderr.write(e.stack);
 			process.stderr.write("\x1B[0m\n");
 		}
-
+		
 		process.exit(code);
 		
 		#endswitch
