@@ -950,6 +950,7 @@ class Collection<T> extends _Collection
 			$f1 = function($a, $b) use ($ctx, $f){ return $f($ctx, $a, $b); };
 			usort($res->_arr, $f1);
 		}
+		$res->_arr = array_values($res->_arr);
 		return $res;
 		#endswitch
 	}

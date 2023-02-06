@@ -309,6 +309,9 @@ struct Context extends BaseStruct
 		/* Run entry_point */
 		if (rtl::method_exists(this.app, "main"))
 		{
+			/* Hook launched app */
+			await this.callAsyncHook(RuntimeHook::RUN, {});
+			
 			code = await this.app.main();
 		}
 		

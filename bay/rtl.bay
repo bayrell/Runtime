@@ -590,12 +590,19 @@ class rtl
 			$val = static::attr($ctx, $item, $path, $def_val);
 			return $val;
 		}
-		return $val;
+		else if ($item instanceof \Runtime\BaseObject)
+		{
+			$item = $item->takeValue($ctx, $key, $def_val);
+			$val = static::attr($ctx, $item, $path, $def_val);
+			return $val;
+		}
+		return $def_val;
 		
 		#case ifcode JAVASCRIPT then
 		var Collection = use("Runtime.Collection");
 		var Dict = use("Runtime.Dict");
 		var BaseStruct = use("Runtime.BaseStruct");
+		var BaseObject = use("Runtime.BaseObject");
 		
 		if (def_val == undefined) def_val = null;
 		if (item === null) return def_val;
@@ -622,13 +629,19 @@ class rtl
 			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
+		else if (item instanceof BaseObject)
+		{
+			item = item.takeValue(ctx, key, def_val);
+			val = this.attr(ctx, new_item, path, def_val);
+			return val;
+		}
 		else
 		{
 			var new_item = item[key] || def_val;
 			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
-		return val;
+		return def_val;
 		
 		#endswitch
 	}
@@ -1630,12 +1643,12 @@ class rtl
 	 * Run application
 	 * @param Dict d
 	 */
-	public static async int @runApp(string module_name, string class_name)
+	public static async int @runApp(string module_name, string class_name, Dict d = null)
 	{
-		Dict d = {
-			"entry_point": class_name,
-			"modules": [ module_name ],
-		};
+		if (d == null) d = {};
+		
+		d <= entry_point <= class_name;
+		d <= modules <= [ module_name ];
 		
 		#switch
 		#case ifcode PHP then

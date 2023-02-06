@@ -26,6 +26,7 @@ class RuntimeHook extends BaseHook
 	static const string INIT = "runtime::init";
 	static const string START = "runtime::start";
 	static const string LAUNCHED = "runtime::launched";
+	static const string RUN = "runtime::run";
 	static const string ENV = "runtime::env";
 	
 	
@@ -37,6 +38,7 @@ class RuntimeHook extends BaseHook
 		if (hook_name == static::INIT) return "init";
 		if (hook_name == static::START) return "start";
 		if (hook_name == static::LAUNCHED) return "launched";
+		if (hook_name == static::RUN) return "run";
 		if (hook_name == static::ENV) return "env";
 		return "";
 	}
@@ -54,13 +56,30 @@ class RuntimeHook extends BaseHook
 	
 	
 	/**
-	 * Init context
+	 * Start context
 	 */
 	async Dict start(Dict d)
 	{
 		return d;
 	}
 	
+	
+	/**
+	 * Launched context
+	 */
+	async Dict launched(Dict d)
+	{
+		return d;
+	}
+	
+	
+	/**
+	 * Run entry point
+	 */
+	async Dict run(Dict d)
+	{
+		return d;
+	}
 	
 	
 	/**
