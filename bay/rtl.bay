@@ -719,7 +719,15 @@ class rtl
 	static var @to(var v, var o)
 	{
 		var ctx = null;
-		var e = o.e;
+		var e = "";
+		
+		#switch
+		#case ifcode PHP then
+		$e = $o["e"];
+		#case ifcode JAVSCRIPT then
+		e = o.e;
+		#endswitch
+		
 		if (e == "mixed" or e == "primitive" or e == "var" or e == "fn" or e == "callback") return v;
 		if (e == "bool") return static::toBool(ctx, v);
 		else if (e == "string") return static::toString(ctx, v);

@@ -268,7 +268,7 @@ class Collection<T> extends _Collection
 	 * Returns value from position
 	 * @param int pos - position
 	 */
-	T get(int pos, T default_value)
+	T get(int pos, T default_value = null)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
