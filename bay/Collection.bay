@@ -209,7 +209,7 @@ class Collection<T> extends _Collection
 	
 	
 	/**
-	 * Returns copy of Collectiom
+	 * Returns copy of Collection
 	 * @param int pos - position
 	 */
 	Collection<T> cp()
@@ -854,6 +854,39 @@ class Collection<T> extends _Collection
 		#endswitch
 	}
 	
+	
+	/**
+	 * flatten Collection
+	 */
+	Collection<T> flatten()
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		let res = [];
+		
+		for (var i=0; i<this.length; i++)
+		{
+			let item = this[i];
+			if (item instanceof Runtime.Collection)
+			{
+				item = item.flatten();
+				res = res.concat( item );
+			}
+			else
+			{
+				res.push(item);
+			}
+		}
+		
+		Object.setPrototypeOf(res, this.constructor.prototype);
+		return res;
+		
+		#case ifcode PHP then
+		
+		throw new \Exception("Flatten error");
+		
+		#endswitch
+	}
 	
 	
 	/**

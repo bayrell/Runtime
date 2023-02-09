@@ -107,6 +107,7 @@ class rtl
 	static const int ERROR_HTTP_PROCESSING = -102;
 	static const int ERROR_HTTP_OK = -200;
 	static const int ERROR_HTTP_BAD_GATEWAY = -502;
+	static const int ERROR_USER = -10000;
 	
 	
 	

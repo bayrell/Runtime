@@ -189,7 +189,6 @@ class OutputProvider extends BaseProvider
 	}
 	
 	
-	
 	/**
 	 * Print error
 	 */
@@ -198,7 +197,14 @@ class OutputProvider extends BaseProvider
 		#switch
 		#case ifcode PHP then
 		
-		$this->print( $ctx, $this->color($ctx, "red", $message), true, "err" );
+		if (php_sapi_name() == "cli")
+		{
+			$this->print($ctx, $this->color($ctx, "red", $message), true, "err");
+		}
+		else
+		{
+			$this->print($ctx, nl2br($message), true, "err");
+		}
 		
 		#case ifcode ES6 then
 		
@@ -226,7 +232,6 @@ class OutputProvider extends BaseProvider
 	}
 	
 	
-	
 	/**
 	 * Format text by color
 	 */
@@ -237,7 +242,6 @@ class OutputProvider extends BaseProvider
 		message = message ~ rs::chr(27) ~ "[0m";
 		return message;
 	}
-	
 	
 	
 	/**

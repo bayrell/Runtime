@@ -68,8 +68,8 @@ class RuntimeException extends ClassException
 	public string error_str = "";
 	public int error_code = 0;
 	public string error_file = "";
-	public int error_line = -1;
-	public int error_pos = -1;
+	public string error_line = "";
+	public string error_pos = "";
 	
 	
 	void constructor(string message = "", int code = -1, Object prev = null)
@@ -94,7 +94,7 @@ class RuntimeException extends ClassException
 	
 	public string getErrorMessage()
 	{
-		return this.error_message;
+		return this.error_str;
 	}
 	
 	public string getErrorString()

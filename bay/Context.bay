@@ -38,7 +38,12 @@ struct Context extends BaseStruct
 	Collection<string> modules = [];
 	Dict<BaseObject> providers = {};
 	Collection<BaseStruct> entities = [];
-	Dict<var> settings = {};
+	Dict<var> settings = {
+		"current_locale": {
+			"code": "en",
+			"locale": "en_US",
+		},
+	};
 	int start_time = 0;
 	string tz = "UTC";
 	bool initialized = false;

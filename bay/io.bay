@@ -57,8 +57,8 @@ class io
 	 */
 	static void log(string type, string message)
 	{
-		var log = @.provider("log");
-		log.log(type, message);
+		var p = @.provider("log");
+		p.log(type, message);
 	}
 	
 	
