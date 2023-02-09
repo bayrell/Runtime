@@ -31,14 +31,14 @@ class re
 	 * @param string s string
 	 * @return bool
 	 */
-	static bool match(string r, string s)
+	static bool match(string r, string s, string pattern="")
 	{
 		#switch
 		
 		#case ifcode PHP then
 		
 		$matches = [];
-		if (preg_match("/" . $r . "/", $s, $matches))
+		if (preg_match("/" . $r . "/" . $pattern, $s, $matches))
 		{
 			return $matches != null;
 		}
@@ -46,7 +46,9 @@ class re
 		return false;
 		
 		#case ifcode JAVASCRIPT then
-		return s.match( new RegExp(r, "g") ) != null;
+		
+		pattern = "g" + pattern;
+		return s.match( new RegExp(r, pattern) ) != null;
 		
 		#endswitch
 	}
@@ -59,14 +61,14 @@ class re
 	 * @param string s string
 	 * @return Vector result
 	 */
-	static Collection<string> matchAll(string r, string s)
+	static Collection<string> matchAll(string r, string s, string pattern="")
 	{
 		#switch
 		
 		#case ifcode PHP then
 		
 		$matches = [];
-		if (preg_match_all("/" . $r . "/i", $s, $matches))
+		if (preg_match_all("/" . $r . "/" . $pattern, $s, $matches))
 		{
 			$res = [];
 			foreach ($matches as $index1 => $obj1)
@@ -88,7 +90,10 @@ class re
 		return null;
 		
 		#case ifcode JAVASCRIPT then
-		var arr = [...s.matchAll( new RegExp(r, "g") )];
+		
+		pattern = "g" + pattern;
+		
+		var arr = [...s.matchAll( new RegExp(r, pattern) )];
 		if (arr.length == 0) return null;
 		return Runtime.Collection.from( arr.map( (v) => Runtime.Collection.from(v) ) );
 		
@@ -106,18 +111,20 @@ class re
 	 * @param string s - replaceable string
 	 * @return string
 	 */
-	static string replace(var r, string replace, string s)
+	static string replace(var r, string replace, string s, string pattern="")
 	{
 		#switch
 		
 		#case ifcode PHP then
-		return preg_replace("/" . $r . "/", $replace, $s);
+		return preg_replace("/" . $r . "/" . $pattern, $replace, $s);
 		
 		#case ifcode ES6 then
-		return s.replace(new RegExp(r, "g"), replace);
+		pattern = "g" + pattern;
+		return s.replace(new RegExp(r, pattern), replace);
 		
 		#case ifcode NODEJS then
-		return s.replace(new RegExp(r, "g"), replace);
+		pattern = "g" + pattern;
+		return s.replace(new RegExp(r, pattern), replace);
 		
 		#endswitch
 	}

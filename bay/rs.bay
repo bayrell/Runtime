@@ -26,8 +26,6 @@ use Runtime.Vector;
 
 class rs
 {
-
-
 	/**
 	 * Returns string lenght
 	 * @param string s The string
@@ -47,41 +45,6 @@ class rs
 		
 		#endswitch
 	}
-	
-	
-	
-	/**
-	 * Search 'search' in s.
-	 */
-	static int search(string s, string search, string offset = 0)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		if ($search == ""){
-			return -1;
-		}
-		$res = mb_strpos($s, $search, $offset);
-		if ($res === false)
-			return -1;
-		return $res;
-		
-		#case ifcode JAVASCRIPT then
-		
-		var _rtl = use("Runtime.rtl");
-		var res = _rtl.toStr(s).indexOf(search);
-		return res;
-		
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Is start
-	 */
-	pure bool start(string s, string search) => static::search(s, search) == 0;
-	
 	
 	
 	/**
@@ -121,7 +84,6 @@ class rs
 	}
 	
 	
-	
 	/**
 	 * Returns char from string at the position
 	 * @param string s The string
@@ -135,7 +97,6 @@ class rs
 			return static::substr(s, pos, 1);
 		return "";
 	}
-	
 	
 	
 	/**
@@ -157,7 +118,6 @@ class rs
 	}
 	
 	
-	
 	/**
 	 * Returns ASCII symbol code
 	 * @param char ch
@@ -175,7 +135,6 @@ class rs
 		
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -198,7 +157,6 @@ class rs
 	}
 	
 	
-	
 	/**
 	 * Convert string to upper case
 	 * @param string s
@@ -219,7 +177,6 @@ class rs
 	}
 	
 	
-	
 	/**
 	 * Заменяет одну строку на другую
 	 */
@@ -236,7 +193,6 @@ class rs
 		
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -264,7 +220,6 @@ class rs
 		
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -301,7 +256,6 @@ class rs
 		
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -342,7 +296,6 @@ class rs
 	}
 	
 	
-	
 	/**
 	 * Соединяет строки
 	 * @param string ch - разделитель
@@ -365,7 +318,6 @@ class rs
 		
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -391,62 +343,12 @@ class rs
 		if (ch == ""){
 			return s.trim();
 		}
-		return s.replace(new RegExp("^[" + ch + "]+", "g"),"").replace(new RegExp("[" + ch + "]+$", "g"),"");
+		return s.replace(new RegExp("^[" + ch + "]+", "g"),"")
+			.replace(new RegExp("[" + ch + "]+$", "g"),"")
+		;
 		
 		#endswitch
 	}
-	
-	
-	
-	/**
-	 * json encode scalar values
-	 * @param {mixed} obj - объект
-	 * @param {int} flags - Флаги
-	 * @return {string} json строка
-	 */
-	static string json_encode_primitive(var s, int flags)
-	{
-
-		#switch
-		#case ifcode PHP then
-		
-		$flags = $flags || JSON_UNESCAPED_UNICODE;
-		return json_encode($s, JSON_UNESCAPED_UNICODE);
-		
-		#case ifcode JAVASCRIPT then
-		
-		if (flags & 128 == 128) 
-			return JSON.stringify(obj, null, 2);
-		return JSON.stringify(obj);
-		
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Json encode data
-	 * @param var data
-	 * @return string
-	 */
-	public static string json_encode(var data)
-	{
-		fn f = rtl::method("Runtime.RuntimeUtils", "json_encode");
-		return f(data);
-	}
-	
-	
-	/**
-	 * Json decode to primitive values
-	 * @param string s Encoded string
-	 * @return var
-	 */
-	public static string json_decode(var obj)
-	{
-		fn f = rtl::method("Runtime.RuntimeUtils", "json_decode");
-		return f(obj);
-	}
-	
 	
 	
 	/**
@@ -479,7 +381,6 @@ class rs
 		#endswitch
 	}
 	pure string escapeHtml(string s) => static::htmlEscape(s);
-	
 	
 	
 	/**
@@ -519,7 +420,6 @@ class rs
 	}
 	
 	
-	
 	/**
 	 * Возвращает имя файла без расширения
 	 * @param {string} filepath - путь к файлу
@@ -540,7 +440,6 @@ class rs
 	}
 	
 	
-	
 	/**
 	 * Возвращает полное имя файла
 	 * @param {string} filepath - путь к файлу
@@ -553,7 +452,6 @@ class rs
 		delete ret;
 		return res;
 	}
-	
 	
 	
 	/**
@@ -570,7 +468,6 @@ class rs
 	}
 	
 	
-	
 	/**
 	 * Возвращает путь к папке, содержащий файл
 	 * @param {string} filepath - путь к файлу
@@ -585,53 +482,6 @@ class rs
 	}
 	
 	
-	
-	/**
-	 * Returns relative path of the filepath
-	 * @param string filepath
-	 * @param string basepath
-	 * @param string ch - Directory separator
-	 * @return string relative path
-	 */
-	static string relativePath(string filepath, string basepath, string ch = "/")
-	{
-		Vector<string> source = rs::explode(ch, filepath);
-		Vector<string> base = rs::explode(ch, basepath);
-		
-		source = source.filter(bool (string s){ return s != ""; });
-		base = base.filter(bool (string s){ return s != ""; });
-		
-		int i=0;
-		while (source.count() > 0 and base.count() > 0 and source.item(0) == base.item(0))
-		{
-			source.shift();
-			base.shift();
-		}
-		
-		base.each(
-			void (string s) use (source)
-			{
-				source.unshift("..");
-			}
-		);
-		
-		return rs::implode(ch, source);
-	}
-	
-	
-	
-	/**
-	 * Return normalize path
-	 * @param string filepath - File path
-	 * @return string
-	 */
-	static string normalize(string filepath)
-	{
-		return filepath;
-	}
-	
-	
-	
 	/**
 	 * New line to br
 	 */
@@ -639,7 +489,6 @@ class rs
 	{
 		return static::replace("\n", "<br/>", s);
 	}
-	
 	
 	
 	/**
@@ -652,66 +501,6 @@ class rs
 		s = re::replace("\n", "", s);
 		return s;
 	}
-	
-	
-	
-	/* =================== Deprecated =================== */
-	
-	
-	/**
-	 * Разбивает строку на подстроки
-	 * @param string delimiter - разделитель
-	 * @param string s - строка, которую нужно разбить
-	 * @param integer limit - ограничение 
-	 * @return Vector<string>
-	 */
-	static Vector<string> explode(string delimiter, string s, int limit = -1)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		$arr = [];
-		if ($limit < 0) $arr = explode($delimiter, $s);
-		else $arr = explode($delimiter, $s, $limit);
-		return Collection::from($arr);
-		
-		#case ifcode JAVASCRIPT then
-		
-		var _rtl = use("Runtime.rtl");
-		var _Collection = use("Runtime.Collection");
-		
-		var arr = null;
-		if (!_rtl.exists(limit))
-			arr = s.split(delimiter);
-		arr = s.split(delimiter, limit);
-		return _Collection.from(arr);
-		
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Разбивает строку на подстроки
-	 * @param string ch - разделитель
-	 * @param string s - строка, которую нужно разбить
-	 * @param integer limit - ограничение 
-	 * @return Vector<string>
-	 */
-	static string implode(string ch, Vector<string> arr)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		return implode($s, $arr->_getArr());
-		
-		#case ifcode JAVASCRIPT then
-		
-		return arr.join(ctx, ch);
-		
-		#endswitch
-	}
-	
 	
 	
 	/**
@@ -750,7 +539,6 @@ class rs
 		=> static::indexOf(s, search, offset);
 	
 	
-	
 	/**
 	 * URL encode
 	 * @param string s
@@ -765,7 +553,6 @@ class rs
 		return encodeURIComponent(s);
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -786,7 +573,6 @@ class rs
 	}
 	
 	
-	
 	/**
 	 * Base64 decode
 	 * @param string s
@@ -803,7 +589,6 @@ class rs
 		return Buffer.from(s, 'base64').toString('ascii');
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -835,7 +620,6 @@ class rs
 	}
 	
 	
-	
 	/**
 	 * Base64 decode
 	 * @param string s
@@ -861,7 +645,6 @@ class rs
 		return Buffer.from(s, 'base64').toString('ascii');
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -905,4 +688,194 @@ class rs
 		
 		return s;
 	}
+	
+	
+	/**
+	 * Strip tags
+	 */
+	pure string strip_tags(string content, Collection<string> allowed_tags = null)
+	{
+		if (allowed_tags == null)
+		{
+			return re::replace("<[^>]+>", "", content);
+		}
+		
+		Collection matches = re::matchAll("<[^>]+>", content, "i");
+		for (int i=0; i<matches.count(); i++)
+		{
+			Collection match = matches[i];
+			string tag_str = match[0];
+			
+			Collection tag_match = re::matchAll("<(\/|)([a-zA-Z]+)(|[^>]*)>", tag_str, "i");
+			if (tag_match)
+			{
+				string tag_name = static::strtolower(tag_match[0][2]);
+				if (allowed_tags.indexOf(tag_name) == -1)
+				{
+					content = static::replace(tag_str, "", content);
+				}
+			}
+		}
+		
+		return content;
+	}
+	
+	
+	/* =================== Deprecated =================== */
+	
+	
+	/**
+	 * Разбивает строку на подстроки
+	 * @param string delimiter - разделитель
+	 * @param string s - строка, которую нужно разбить
+	 * @param integer limit - ограничение 
+	 * @return Vector<string>
+	 */
+	static Vector<string> explode(string delimiter, string s, int limit = -1)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		$arr = [];
+		if ($limit < 0) $arr = explode($delimiter, $s);
+		else $arr = explode($delimiter, $s, $limit);
+		return Collection::from($arr);
+		
+		#case ifcode JAVASCRIPT then
+		
+		var _rtl = use("Runtime.rtl");
+		var _Collection = use("Runtime.Collection");
+		
+		var arr = null;
+		if (!_rtl.exists(limit))
+			arr = s.split(delimiter);
+		arr = s.split(delimiter, limit);
+		return _Collection.from(arr);
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Разбивает строку на подстроки
+	 * @param string ch - разделитель
+	 * @param string s - строка, которую нужно разбить
+	 * @param integer limit - ограничение 
+	 * @return Vector<string>
+	 */
+	static string implode(string ch, Vector<string> arr)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return implode($s, $arr->_getArr());
+		
+		#case ifcode JAVASCRIPT then
+		
+		return arr.join(ctx, ch);
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Returns relative path of the filepath
+	 * @param string filepath
+	 * @param string basepath
+	 * @param string ch - Directory separator
+	 * @return string relative path
+	 */
+	static string relativePath(string filepath, string basepath, string ch = "/")
+	{
+		Vector<string> source = rs::explode(ch, filepath);
+		Vector<string> base = rs::explode(ch, basepath);
+		
+		source = source.filter(bool (string s){ return s != ""; });
+		base = base.filter(bool (string s){ return s != ""; });
+		
+		int i=0;
+		while (source.count() > 0 and base.count() > 0 and source.item(0) == base.item(0))
+		{
+			source.shift();
+			base.shift();
+		}
+		
+		base.each(
+			void (string s) use (source)
+			{
+				source.unshift("..");
+			}
+		);
+		
+		return rs::implode(ch, source);
+	}
+	
+	
+	/**
+	 * Return normalize path
+	 * @param string filepath - File path
+	 * @return string
+	 */
+	static string normalize(string filepath)
+	{
+		return filepath;
+	}
+	
+	
+	/**
+	 * json encode scalar values
+	 * @param {mixed} obj - объект
+	 * @param {int} flags - Флаги
+	 * @return {string} json строка
+	 */
+	static string json_encode_primitive(var s, int flags)
+	{
+
+		#switch
+		#case ifcode PHP then
+		
+		$flags = $flags || JSON_UNESCAPED_UNICODE;
+		return json_encode($s, JSON_UNESCAPED_UNICODE);
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (flags & 128 == 128) 
+			return JSON.stringify(obj, null, 2);
+		return JSON.stringify(obj);
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Search 'search' in s.
+	 */
+	static int search(string s, string search, string offset = 0)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if ($search == ""){
+			return -1;
+		}
+		$res = mb_strpos($s, $search, $offset);
+		if ($res === false)
+			return -1;
+		return $res;
+		
+		#case ifcode JAVASCRIPT then
+		
+		var _rtl = use("Runtime.rtl");
+		var res = _rtl.toStr(s).indexOf(search);
+		return res;
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Is start
+	 */
+	pure bool start(string s, string search) => static::search(s, search) == 0;
+	
 }
