@@ -38,12 +38,6 @@ struct Context extends BaseStruct
 	Collection<string> modules = [];
 	Dict<BaseObject> providers = {};
 	Collection<BaseStruct> entities = [];
-	Dict<var> settings = {
-		"current_locale": {
-			"code": "en",
-			"locale": "en_US",
-		},
-	};
 	int start_time = 0;
 	string tz = "UTC";
 	bool initialized = false;
@@ -176,6 +170,15 @@ struct Context extends BaseStruct
 				d <= modules <= Collection::@from(modules);
 			}
 		}
+		
+		/* Setup default environments */
+		if (not d.has("environments")) d <= environments <= new Dict();
+		
+		Dict env = d["environments"];
+		if (not env.has("DEBUG")) env <= DEBUG <= false;
+		if (not env.has("LOCALE")) env <= LOCALE <= "en_US";
+		if (not env.has("LOCALE_CODE")) env <= LOCALE_CODE <= "en";
+		d <= environments <= env;
 		
 		Context instance = rtl::newInstance(static::getClassName(), [ d ]);
 		
@@ -419,5 +422,17 @@ struct Context extends BaseStruct
 	/**
 	 * Translate message
 	 */
-	string translate(string module, string s, Dict params = null) => s;
+	string translate(string module, string s, Dict params = null)
+	{
+		if (params == null) return s;
+		
+		params.each(
+			void (string value, string key) use (s)
+			{
+				s = rs::replace("%" ~ key ~ "%", value, s);
+			}
+		);
+		
+		return s;
+	}
 }

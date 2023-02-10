@@ -366,8 +366,8 @@ class rtl
 		#case ifcode JAVASCRIPT then
 		
 		var obj = this.find_class(class_name);
-		if (!this.exists(ctx, obj)) return null;
-		if (!(obj instanceof Function)) return null;
+		if (!this.exists(ctx, obj) || !(obj instanceof Function))
+			throw new Runtime.Exceptions.FileNotFound(class_name, "class name");
 		if (args == undefined || args == null){ args = []; } else { args = args.toArray(); }
 		args = args.slice(); 
 		if (typeof ctx != "undefined") args.unshift(ctx);
