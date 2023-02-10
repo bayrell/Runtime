@@ -46,6 +46,15 @@ class BaseHook extends BaseObject
 	
 	
 	/**
+	 * Register hook
+	 */
+	void registerMethod(string hook_name, string method_name, int priority = 0)
+	{
+		this.hook.register(hook_name, this, method_name, priority);
+	}
+	
+	
+	/**
 	 * Register hooks
 	 */
 	void register_hooks()
