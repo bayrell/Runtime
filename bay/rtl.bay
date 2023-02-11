@@ -1656,6 +1656,10 @@ class rtl
 	{
 		if (d == null) d = {};
 		
+		#ifcode NODEJS then
+		let ctx = null;
+		#endif
+		
 		d <= entry_point <= class_name;
 		d <= modules <= [ module_name ];
 		
