@@ -4,6 +4,7 @@
 	[
 		"rtl.bay",
 		"lib.bay",
+		"math.bay",
 		"io.bay",
 		"re.bay",
 		"rs.bay",
