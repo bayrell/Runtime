@@ -101,6 +101,7 @@ class rtl
 	static const int ERROR_API_NOT_FOUND = -18;
 	static const int ERROR_API_WRONG_FORMAT = -19;
 	static const int ERROR_API_WRONG_APP_NAME = -20;
+	static const int ERROR_API_ERROR = -21;
 	static const int ERROR_FATAL = -99;
 	static const int ERROR_HTTP_CONTINUE = -100;
 	static const int ERROR_HTTP_SWITCH = -101;

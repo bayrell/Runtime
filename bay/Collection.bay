@@ -798,7 +798,7 @@ class Collection<T> extends _Collection
 		foreach ($this->_arr as $key => $value)
 		{
 			$p = $f($ctx, $value, $key);
-			$d->_map[$p[1]] = $p[0];
+			$d->_map[$p->_arr[1]] = $p->_arr[0];
 		}
 		return $d;
 		#endswitch
