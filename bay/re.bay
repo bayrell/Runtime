@@ -24,6 +24,41 @@ use Runtime.Vector;
 class re
 {
 	
+	/**
+	 * Разбивает строку на подстроки
+	 * @param string delimiter - regular expression
+	 * @param string s - строка, которую нужно разбить
+	 * @param integer limit - ограничение
+	 * @return Collection<string>
+	 */
+	pure string split(string delimiter, string s, int limit = -1)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		$arr = preg_split("/" . $delimiter . "/", $s, $limit);
+		return Collection::from($arr);
+		
+		#case ifcode JAVASCRIPT then
+		
+		var _rtl = use("Runtime.rtl");
+		var _Collection = use("Runtime.Collection");
+		
+		var arr = null;
+		var delimiter = new RegExp(delimiter, "g");
+		if (!_rtl.exists(limit))
+		{
+			arr = s.split(delimiter);
+		}
+		else
+		{
+			arr = s.split(delimiter, limit);
+		}
+		return _Collection.from(arr);
+		
+		#endswitch
+	}
+	
 	
 	/**
 	 * Search regular expression

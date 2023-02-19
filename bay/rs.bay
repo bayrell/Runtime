@@ -226,7 +226,7 @@ class rs
 	 * Разбивает строку на подстроки
 	 * @param string delimiter - regular expression
 	 * @param string s - строка, которую нужно разбить
-	 * @param integer limit - ограничение 
+	 * @param integer limit - ограничение
 	 * @return Collection<string>
 	 */
 	pure string split(string delimiter, string s, int limit = -1)
@@ -234,7 +234,9 @@ class rs
 		#switch
 		#case ifcode PHP then
 		
-		$arr = preg_split("/".$delimiter."/", $s, $limit);
+		$arr = [];
+		if ($limit < 0) $arr = explode($delimiter, $s);
+		else $arr = explode($delimiter, $s, $limit);
 		return Collection::from($arr);
 		
 		#case ifcode JAVASCRIPT then
@@ -243,15 +245,9 @@ class rs
 		var _Collection = use("Runtime.Collection");
 		
 		var arr = null;
-		var delimiter = new RegExp(delimiter, "g");
 		if (!_rtl.exists(limit))
-		{
 			arr = s.split(delimiter);
-		}
-		else
-		{
-			arr = s.split(delimiter, limit);
-		}
+		arr = s.split(delimiter, limit);
 		return _Collection.from(arr);
 		
 		#endswitch
