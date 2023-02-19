@@ -1600,10 +1600,13 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
+		if (!static::$_global_context) return new \Runtime\Context();
 		return static::$_global_context;
 		#case ifcode NODEJS then
+		if (!rtl._global_context) return new use("Runtime.Context")();
 		return rtl._global_context;
 		#case ifcode ES6 then
+		if (!Runtime.rtl._global_context) return new Runtime.Context();
 		return Runtime.rtl._global_context;
 		#endswitch
 	}
