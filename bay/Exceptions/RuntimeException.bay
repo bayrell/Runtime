@@ -64,7 +64,6 @@ class ClassException extends \Exception
 class RuntimeException extends ClassException
 {
 	protected Object prev = null;
-	public string error_message = "";
 	public string error_str = "";
 	public int error_code = 0;
 	public string error_file = "";
@@ -84,7 +83,11 @@ class RuntimeException extends ClassException
 		this.error_str = message;
 		this.error_code = code;
 		this.prev = prev;
-		this.updateError();
+		
+		#switch
+		#case ifcode ES6 then
+		this.message = this.buildMessage();
+		#endswitch
 	}
 	
 	public Object getPreviousException()
@@ -94,12 +97,7 @@ class RuntimeException extends ClassException
 	
 	public string getErrorMessage()
 	{
-		return this.error_str;
-	}
-	
-	public string getErrorString()
-	{
-		return this.error_str;
+		return this.buildMessage();
 	}
 	
 	public int getErrorCode()
@@ -140,22 +138,11 @@ class RuntimeException extends ClassException
 	{
 		return this.buildMessage();
 	}
-
+	
 	public string buildMessage()
 	{
 		return this.error_str;
 	}
-	
-	void updateError()
-	{
-		this.error_message = this.buildMessage();
-		#switch
-		#case ifcode ES6 then
-		this.message = this.error_message;
-		#endswitch
-	}
-	
-	
 	
 	/**
 	 * Returns trace
