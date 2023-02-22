@@ -39,4 +39,43 @@ class math
 		#endswitch
 	}
 	
+	
+	/**
+	 * Floor ceil
+	 */
+	pure int ceil(double a)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return ceil($a);
+		
+		#case ifcode JAVASCRIPT then
+		
+		return Math.ceil(a);
+		
+		#endswitch
+	}
+	
+	
+	
+	/**
+	 * Returns max
+	 */
+	pure var max(var a, var b)
+	{
+		if (a > b) return a;
+		else return b;
+	}
+	
+	
+	/**
+	 * Returns min
+	 */
+	pure var min(var a, var b)
+	{
+		if (a < b) return a;
+		else return b;
+	}
+	
 }

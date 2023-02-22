@@ -2211,7 +2211,7 @@ class rtl
 					$arr[$k] = static::PrimitiveToNative($ctx, $v);
 				}
 			);
-			return $arr;
+			return (object)$arr;
 		}
 		
 		#case ifcode JAVASCRIPT then
