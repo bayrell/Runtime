@@ -37,7 +37,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	{
 		parent();
 		
-		static::_assign(this, null, obj);
+		static::_assign_values(null, this, obj);
 		
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -61,7 +61,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		#case ifcode PHP then
 		
 		$item = clone $this;
-		static::_assign($ctx, $item, $this, $obj);
+		static::_assign_values($ctx, $this, $item, $obj);
 		return $item;
 		
 		#case ifcode JAVASCRIPT then
@@ -70,7 +70,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		var item = Object.create(proto); /* item._init(); */
 		item = Object.assign(item, this);
 		
-		this.constructor._assign(ctx, item, this, obj);
+		this.constructor._assign_values(ctx, this, item, obj);
 		
 		Object.freeze(item);
 		
@@ -158,7 +158,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	Dict toDict()
 	{
 		Map<var> values = new Map();
-		Collection<string> names = rtl::getFields(this.getClassName());
+		Collection<string> names = rtl::getFields(static::getClassName());
 		
 		for (int i=0; i<names.count(); i++)
 		{

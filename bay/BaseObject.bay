@@ -55,25 +55,36 @@ class BaseObject
 	/**
 	 * Init struct data
 	 */
-	static Dict _init_data(BaseObject old, Dict changed) => changed;
+	static protected Dict _init_data(BaseObject old_item, BaseObject new_item) => null;
 	
 	
 	
 	/**
-	 * Assign
+	 * Assign new values
 	 */
-	static void _assign(BaseObject new_item, BaseObject old_item, Dict obj)
+	static protected void _assign_values(BaseObject old_item, BaseObject new_item, Dict obj = null)
 	{
+		/* Assign values */
 		obj = rtl::convert(obj, classof Dict);
-		obj = new_item::_init_data(old_item, obj);
+		static::_assign_dict(new_item, obj);
 		
-		if (obj == null)
-		{
-			return;
-		}
+		/* Assign new values */
+		obj = new_item::_init_data(old_item, new_item);
+		static::_assign_dict(new_item, obj);
+	}
+	
+	
+	/**
+	 * Assign dict
+	 */
+	static protected void _assign_dict(BaseObject item, Dict obj = null)
+	{
+		if (obj == null) return;
+		if (obj.keys().count() == 0) return;
 		
 		bool check_types = false;
-		string class_name = new_item::getClassName();
+		string class_name = item::getClassName();
+		
 		
 		#ifdef ENABLE_CHECK_TYPES then
 		
@@ -93,8 +104,8 @@ class BaseObject
 		{
 			foreach ($obj as $key => $value)
 			{
-				$k = $new_item->__getKey($key);
-				if (property_exists($new_item, $k))
+				$k = $item->__getKey($key);
+				if (property_exists($item, $k))
 				{
 					if ($check_types)
 					{
@@ -104,7 +115,7 @@ class BaseObject
 							$value = \Runtime\rtl::convert($ctx, $value, $info->t, null);
 						}
 					}
-					$new_item->$k = $value;
+					$item->$k = $value;
 				}
 			}
 		}
@@ -127,7 +138,7 @@ class BaseObject
 						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
 					}
 				}
-				new_item[real_key] = value;
+				item[real_key] = value;
 			}
 		}
 		else
@@ -137,13 +148,13 @@ class BaseObject
 				var value = obj[key];
 				if (check_types)
 				{
-					info = rtl.getFieldInfoWithParents(ctx, new_item.getClassName(), key);
+					info = rtl.getFieldInfoWithParents(ctx, item.getClassName(), key);
 					if (info)
 					{
 						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
 					}
 				}
-				new_item[key] = value;
+				item[key] = value;
 			}
 		}
 		
