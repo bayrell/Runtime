@@ -43,7 +43,6 @@ struct Context extends BaseStruct
 	bool initialized = false;
 	
 	
-	
 	/**
 	 * Returns modules entities
 	 */
@@ -62,7 +61,6 @@ struct Context extends BaseStruct
 		}
 		return entities.removeDuplicates().toCollection();
 	}
-	
 	
 	
 	/**
@@ -88,7 +86,6 @@ struct Context extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Returns provider by name
 	 */
@@ -100,7 +97,6 @@ struct Context extends BaseStruct
 		}
 		return this.providers.get(provider_name);
 	}
-	
 	
 	
 	/**
@@ -117,7 +113,6 @@ struct Context extends BaseStruct
 		
 		return hook_res["value"];
 	}
-	
 	
 	
 	/**
@@ -184,7 +179,6 @@ struct Context extends BaseStruct
 		
 		return instance;
 	}
-	
 	
 	
 	/**
@@ -269,7 +263,6 @@ struct Context extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Start context
 	 */
@@ -302,7 +295,6 @@ struct Context extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Run context
 	 */
@@ -327,7 +319,6 @@ struct Context extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Call hook
 	 */
@@ -347,7 +338,6 @@ struct Context extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Call async hook
 	 */
@@ -365,7 +355,6 @@ struct Context extends BaseStruct
 		
 		return d;
 	}
-	
 	
 	
 	/**
@@ -402,7 +391,6 @@ struct Context extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Returns all modules
 	 * @param Collection<string> modules
@@ -418,11 +406,21 @@ struct Context extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Translate message
 	 */
 	string translate(string module, string s, Dict params = null)
+	{
+		if (params == null) return s;
+		
+		return this.format(s, params);
+	}
+	
+	
+	/**
+	 * Format string
+	 */
+	string format(string s, Dict params = null)
 	{
 		if (params == null) return s;
 		

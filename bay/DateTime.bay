@@ -61,7 +61,6 @@ struct DateTime extends BaseStruct
 	#endif
 	
 	
-	
 	/**
 	 * Create date time from timestamp
 	 */
@@ -86,14 +85,12 @@ struct DateTime extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Returns datetime
 	 * @param string tz
 	 * @return DateTime
 	 */
 	pure DateTime now (string tz = "UTC") => static::create(-1, tz);
-	
 	
 	
 	/**
@@ -107,7 +104,6 @@ struct DateTime extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Shift tz
 	 */
@@ -117,7 +113,6 @@ struct DateTime extends BaseStruct
 		DateTime dt = static::create(timestamp, tz);
 		return dt;
 	}
-	
 	
 	
 	/**
@@ -150,7 +145,6 @@ struct DateTime extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Returns timestamp
 	 * @return int
@@ -174,12 +168,11 @@ struct DateTime extends BaseStruct
 	int timestamp() => this.getTimestamp();
 	
 	
-	
 	/**
 	 * Returns day of week
 	 * @return int
 	 */
-	int getDayOfWeek ()
+	int getDayOfWeek()
 	{
 		#switch
 		
@@ -195,7 +188,6 @@ struct DateTime extends BaseStruct
 		
 		return null;
 	}
-	
 	
 	
 	/**
@@ -241,7 +233,6 @@ struct DateTime extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Return date
 	 * @return string
@@ -251,7 +242,6 @@ struct DateTime extends BaseStruct
 		string value = this.getDateTime(tz);
 		return rs::substr(value, 0, 10);
 	}
-	
 	
 	
 	/**
@@ -309,7 +299,6 @@ struct DateTime extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Return datetime in ISO8601
 	 * @return string
@@ -339,6 +328,32 @@ struct DateTime extends BaseStruct
 		return "";
 	}
 	
+	
+	/**
+	 * Return datetime in database format y-m-d h:i:s
+	 * @return string
+	 */
+	DateTime getDatabaseTime()
+	{
+		#switch
+		
+		#case ifcode PHP then
+		$dt = $this->toObject($ctx);
+		return $dt->format("y-m-d h:i:s");
+		
+		#case ifcode JAVASCRIPT then
+		var y = this.y, m = this.m, d = this.d, h = this.h, i = this.i, s = this.s;
+		m = (m < 10) ? "0" + m : "" + m;
+		d = (d < 10) ? "0" + d : "" + d;
+		h = (h < 10) ? "0" + h : "" + h;
+		i = (i < 10) ? "0" + i : "" + i;
+		s = (s < 10) ? "0" + s : "" + s;
+		return this.y + "-" + m + "-" + d + " " + h + ":" + i + ":" + s;
+		
+		#endswitch
+		
+		return "";
+	}
 	
 	
 	/**
