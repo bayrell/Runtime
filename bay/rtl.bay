@@ -1656,7 +1656,7 @@ class rtl
 	 * Run application
 	 * @param Dict d
 	 */
-	public static async int @runApp(string module_name, string class_name, Dict d = null)
+	public static async int @runApp(Collection<string> modules, string class_name, Dict d = null)
 	{
 		if (d == null) d = {};
 		
@@ -1665,7 +1665,7 @@ class rtl
 		#endif
 		
 		d <= entry_point <= class_name;
-		d <= modules <= [ module_name ];
+		d <= modules <= modules;
 		
 		#switch
 		#case ifcode PHP then

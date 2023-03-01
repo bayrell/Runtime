@@ -33,6 +33,7 @@ struct Context extends BaseStruct
 	var app = null;
 	string base_path = "";
 	string entry_point = "";
+	Collection<string> start_modules = [];
 	Collection<string> cli_args = [];
 	Dict<string> environments = {};
 	Collection<string> modules = [];
@@ -191,6 +192,9 @@ struct Context extends BaseStruct
 		Context c = this;
 		
 		if (c.initialized) return c;
+		
+		/* Add start modules */
+		c <= start_modules <= c.modules;
 		
 		/* Get modules */
 		Collection<string> modules = c.modules;
