@@ -633,7 +633,7 @@ class rtl
 		}
 		else if (item instanceof BaseObject)
 		{
-			item = item.takeValue(ctx, key, def_val);
+			var new_item = item.takeValue(ctx, key, def_val);
 			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
@@ -1951,7 +1951,7 @@ class rtl
 		if (obj instanceof BaseStruct)
 		{
 			Map<var> values = new Map();
-			Collection<string> names = rtl::getFields(obj.getClassName());
+			Collection<string> names = rtl::getFields(obj::getClassName());
 			
 			for (int i=0; i<names.count(); i++)
 			{
@@ -1963,7 +1963,7 @@ class rtl
 			
 			if (force_class_name)
 			{
-				values.setValue("__class_name__", obj.getClassName());
+				values.setValue("__class_name__", obj::getClassName());
 			}
 			delete names;
 			
@@ -2290,7 +2290,7 @@ class rtl
 		var _Date = use("Runtime.Date");
 		var _DateTime = use("Runtime.DateTime");
 		
-		if (convert) value = _Utils.ObjectToPrimitive(ctx, value);
+		if (convert) value = _rtl.ObjectToPrimitive(ctx, value);
 		return JSON.stringify(value, (key, value) => {
 			if (value instanceof _Date) value = value.toDict().setIm("__class_name__", "Runtime.Date");
 			if (value instanceof _DateTime) value = value.toDict().setIm("__class_name__", "Runtime.DateTime");
