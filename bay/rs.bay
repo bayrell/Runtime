@@ -665,7 +665,8 @@ class rs
 					if (arr[0] == key)
 					{
 						find = true;
-						return key ~ "=" ~ static::htmlEscape(value);
+						if (value != "") return key ~ "=" ~ static::htmlEscape(value);
+						return "";
 					}
 					return s;
 				}

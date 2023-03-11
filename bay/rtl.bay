@@ -1896,10 +1896,10 @@ class rtl
 		var value2 = static::PrimitiveToNative(value1);
 		return value2;
 	}
-	static var NativeToObject(var value)
+	static var NativeToObject(var value, bool allow_class_name = true)
 	{
 		var value1 = static::NativeToPrimitive(value);
-		var value2 = static::PrimitiveToObject(value1);
+		var value2 = static::PrimitiveToObject(value1, allow_class_name);
 		return value2;
 	}
 	
@@ -1980,7 +1980,7 @@ class rtl
 	 * @param SerializeContainer container
 	 * @return var
 	 */
-	public static var PrimitiveToObject(var obj)
+	public static var PrimitiveToObject(var obj, bool allow_class_name = true)
 	{
 		if (obj === null) return null;
 		if (rtl::isScalarValue(obj)) return obj;
@@ -1991,7 +1991,7 @@ class rtl
 			for (int i=0; i<obj.count(); i++)
 			{
 				var value = obj.item(i);
-				value = static::PrimitiveToObject(value);
+				value = static::PrimitiveToObject(value, allow_class_name);
 				res.pushValue(value);
 			}
 			return res.toCollection();
@@ -2006,18 +2006,22 @@ class rtl
 			{
 				string key = keys.item(i);
 				var value = obj.item(key);
-				value = static::PrimitiveToObject(value);
+				value = static::PrimitiveToObject(value, allow_class_name);
 				res.setValue(key, value);
 			}
 			
 			delete keys;
 			
 			if ( !res.has("__class_name__") ) return res.toDict();
-			if ( res.item("__class_name__") == "Runtime.Map" or res.item("__class_name__") == "Runtime.Dict" )
+			if ( res.item("__class_name__") == "Runtime.Map" or
+				res.item("__class_name__") == "Runtime.Dict"
+			)
 			{
 				res.remove("__class_name__");
 				return res.toDict();
 			}
+			
+			if (not allow_class_name) return null;
 			
 			string class_name = res.item("__class_name__");
 			if (not rtl::class_exists(class_name))
@@ -2309,7 +2313,7 @@ class rtl
 	 * @param string s Encoded string
 	 * @return var 
 	 */
-	static var json_decode(var obj)
+	static var json_decode(var obj, string allow_class_name = true)
 	{
 		#switch
 		#case ifcode PHP then
@@ -2317,7 +2321,7 @@ class rtl
 		$res = @json_decode($obj, false);
 		if ($res === null || $res === false)
 			return null;
-		return static::NativeToObject($ctx, $res);
+		return static::NativeToObject($ctx, $res, $allow_class_name);
 	
 		#case ifcode JAVASCRIPT then
 		try{
@@ -2344,7 +2348,7 @@ class rtl
 			{
 				res = null;
 			}
-			return this.PrimitiveToObject(ctx, res);
+			return this.PrimitiveToObject(ctx, res, allow_class_name);
 		}
 		catch(e){
 			throw e;
