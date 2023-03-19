@@ -1019,7 +1019,7 @@ class rtl
 		if (is_int($value) or is_float($value) or is_string($value) or is_int($value)) return (string)$value;
 		if ($value === true) return "1";
 		if ($value === false) return "";
-		return "";
+		return (string)$value;
 		
 		#case ifcode JAVASCRIPT then
 		
