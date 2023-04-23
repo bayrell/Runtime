@@ -55,7 +55,9 @@ struct DateTime extends BaseStruct
 		$i = (int)$dt->format("i");
 		$s = (int)$dt->format("s");
 		$tz = $dt->getTimezone()->getName();
-		return new \Runtime\DateTime($ctx, Dict::from(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"tz"=>$tz]));
+		return new \Runtime\DateTime($ctx,
+			Dict::from(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"tz"=>$tz])
+		);
 	}
 	
 	#endif
@@ -86,11 +88,28 @@ struct DateTime extends BaseStruct
 	
 	
 	/**
+	 * Create date time from string
+	 */
+	pure DateTime from(string s, string tz = "UTC")
+	{
+		return new DateTime{
+			"y": rs::substr(s, 0, 4),
+			"m": rs::substr(s, 5, 2),
+			"d": rs::substr(s, 8, 2),
+			"h": rs::substr(s, 11, 2),
+			"i": rs::substr(s, 14, 2),
+			"s": rs::substr(s, 17, 2),
+			"tz": tz
+		};
+	}
+	
+	
+	/**
 	 * Returns datetime
 	 * @param string tz
 	 * @return DateTime
 	 */
-	pure DateTime now (string tz = "UTC") => static::create(-1, tz);
+	pure DateTime now(string tz = "UTC") => static::create(-1, tz);
 	
 	
 	/**
@@ -149,7 +168,7 @@ struct DateTime extends BaseStruct
 	 * Returns timestamp
 	 * @return int
 	 */
-	int getTimestamp ()
+	int getTimestamp()
 	{
 		#switch
 		

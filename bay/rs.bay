@@ -317,6 +317,19 @@ class rs
 	
 	
 	/**
+	 * Join
+	 */
+	static string join_path(Collection arr)
+	{
+		string path = static::join("/", arr);
+		path = re::replace("\\/+", "/", path);
+		path = re::replace("\\/\\.\\/", "/", path);
+		path = re::replace("\\/+$", "", path);
+		return path;
+	}
+	
+	
+	/**
 	 * Удаляет лишние символы слева и справа
 	 * @param {string} s - входная строка
 	 * @return {integer} новая строка
