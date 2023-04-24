@@ -1,0 +1,187 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2023 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+
+abstract class XMLElement {}
+
+
+#ifcode PHP then
+
+class XMLElement extends \SimpleXMLElement
+{
+	/**
+	 * Returns dom element
+	 */
+	function getDOM()
+	{
+		return dom_import_simplexml($this);
+	}
+	
+	
+	/**
+	 * Prepend child
+	 */
+	function prependChild($name, $content = "")
+	{
+		$dom = $this->getDomElement();
+		$elem = $dom->ownerDocument->createElement($name, $content);
+		$item = $dom->insertBefore($elem, $dom->firstChild);
+		$item = simplexml_import_dom($item);
+		return $item;
+	}
+	
+	
+	/**
+	 * Get child item by pos
+	 */
+	function get($pos)
+	{
+		return $this[$pos];
+	}
+	
+	
+	/**
+	 * Get value
+	 */
+	function value($pos = 0)
+	{
+		$value = trim((string)$this[$pos]);
+		return $value;
+	}
+	
+	
+	/**
+	 * Map child items
+	 */
+	function getChilds($f = null)
+	{
+		$arr = [];
+		$pos = 0;
+		
+		foreach ($this->children() as $item)
+		{
+			if ($f) $item = $f($item, $pos);
+			$arr[] = $item;
+			$pos++;
+		}
+		
+		return \Runtime\Collection::from($arr);
+	}
+	
+	
+	/**
+	 * Return items
+	 */
+	function getItems($f = null)
+	{
+		$arr = [];
+		$pos = 0;
+		
+		foreach ($this as $item)
+		{
+			if ($f) $item = $f($item, $pos);
+			$arr[] = $item;
+			$pos++;
+		}
+		
+		return \Runtime\Collection::from($arr);
+	}
+	
+	
+	/**
+	 * Get attribute
+	 */
+	function getAttribute($name)
+	{
+		$attrs = $this->attributes();
+		if (isset($attrs[$name]))
+		{
+			return $attrs[$name];
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * Remove Attribute
+	 */
+	function removeAttribute($name)
+	{
+		$dom = $this->getDomElement();
+		$dom->removeAttribute($name);
+	}
+	 
+	
+	/**
+	 * Add and replace attribute
+	 */
+	function addAttribute($name, $value = NULL, $ns = NULL)
+	{
+		$attrs = $this->attributes();
+		if (isset($attrs[$name]))
+		{
+			$this->removeAttribute($name);
+		}
+		parent::addAttribute($name, $value, $ns);
+	}
+	
+	
+	/**
+	 * Remove current element
+	 */
+	function remove()
+	{
+		$item = $this->getDomElement();
+		$item->parentNode->removeChild($item);
+	}
+	
+	
+	/**
+	 * Remove all childs
+	 */
+	function removeChilds()
+	{
+		$childs = $this->children();
+		if (count($childs) == 0)
+		{
+			$item = dom_import_simplexml($this);
+			$item->nodeValue = "";
+		}
+		else
+		{
+			foreach ($childs as $child)
+			{
+				$this->removeChild($child);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Returns true if element is exists
+	 */
+	function exists()
+	{
+		return $this->getName() != "";
+	}
+}
+
+#endif
+

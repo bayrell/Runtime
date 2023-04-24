@@ -92,13 +92,15 @@ struct DateTime extends BaseStruct
 	 */
 	pure DateTime from(string s, string tz = "UTC")
 	{
+		if (rs::strlen(s) < 19) return null;
+		if (rs::strlen(s) > 19) tz = rs::substr(s, 19);
 		return new DateTime{
-			"y": rs::substr(s, 0, 4),
-			"m": rs::substr(s, 5, 2),
-			"d": rs::substr(s, 8, 2),
-			"h": rs::substr(s, 11, 2),
-			"i": rs::substr(s, 14, 2),
-			"s": rs::substr(s, 17, 2),
+			"y": (int)rs::substr(s, 0, 4),
+			"m": (int)rs::substr(s, 5, 2),
+			"d": (int)rs::substr(s, 8, 2),
+			"h": (int)rs::substr(s, 11, 2),
+			"i": (int)rs::substr(s, 14, 2),
+			"s": (int)rs::substr(s, 17, 2),
 			"tz": tz
 		};
 	}
@@ -213,7 +215,7 @@ struct DateTime extends BaseStruct
 	 * Return db datetime
 	 * @return string
 	 */
-	string getDateTime(string tz = "")
+	string toString(string tz = "")
 	{
 		#switch
 		
@@ -341,33 +343,6 @@ struct DateTime extends BaseStruct
 		if (tz < 10 && tz >= 0) tz = "0" + tz;
 		if (tz >= 0) tz = "+" + tz;
 		return this.y + "-" + m + "-" + d + "T" + h + ":" + i + ":" + s + tz + "00";
-		
-		#endswitch
-		
-		return "";
-	}
-	
-	
-	/**
-	 * Return datetime in database format y-m-d h:i:s
-	 * @return string
-	 */
-	DateTime getDatabaseTime()
-	{
-		#switch
-		
-		#case ifcode PHP then
-		$dt = $this->toObject($ctx);
-		return $dt->format("y-m-d h:i:s");
-		
-		#case ifcode JAVASCRIPT then
-		var y = this.y, m = this.m, d = this.d, h = this.h, i = this.i, s = this.s;
-		m = (m < 10) ? "0" + m : "" + m;
-		d = (d < 10) ? "0" + d : "" + d;
-		h = (h < 10) ? "0" + h : "" + h;
-		i = (i < 10) ? "0" + i : "" + i;
-		s = (s < 10) ? "0" + s : "" + s;
-		return this.y + "-" + m + "-" + d + " " + h + ":" + i + ":" + s;
 		
 		#endswitch
 		
