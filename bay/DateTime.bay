@@ -255,6 +255,15 @@ struct DateTime extends BaseStruct
 	
 	
 	/**
+	 * Returns database time by UTC
+	 */
+	string getDatabaseTime()
+	{
+		return this.toString("UTC");
+	}
+	
+	
+	/**
 	 * Return date
 	 * @return string
 	 */

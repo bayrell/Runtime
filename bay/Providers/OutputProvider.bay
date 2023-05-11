@@ -206,25 +206,26 @@ class OutputProvider extends BaseProvider
 			$this->print($ctx, nl2br($message), true, "err");
 		}
 		
-		#case ifcode ES6 then
-		
-		console.log(message);
-		
+		#case ifcode JAVASCRIPT then
+		let text_color = "dark_red";
 		#case ifcode NODEJS then
+		let text_color = "red";
+		
+		#case ifcode JAVASCRIPT then
 		
 		if (message instanceof Error)
 		{
-			let color = this.getColor(ctx, "red");
+			let color = this.getColor(ctx, text_color);
 			let char_27 = String.fromCharCode(27);
 			
-			this.print( ctx, char_27 + "[" + color + "m", false, "err" );
-			this.print( ctx, message.stack, false, "err" );
-			this.print( ctx, char_27 + "[0m", true, "err" );
+			this.print(ctx, char_27 + "[" + color + "m", false, "err");
+			this.print(ctx, message.stack, false, "err");
+			this.print(ctx, char_27 + "[0m", true, "err");
 		}
 		
 		else
 		{
-			this.print( ctx, this.color(ctx, "red", message), true, "err" );
+			this.print(ctx, this.color(ctx, text_color, message), true, "err");
 		}
 		
 		#endswitch
