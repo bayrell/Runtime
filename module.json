@@ -28,6 +28,7 @@
 		"BaseStruct.bay",
 		"Date.bay",
 		"DateTime.bay",
+		"ModelProxy.bay",
 		"Reference.bay",
 		"Context.bay",
 		"Entity.bay",
