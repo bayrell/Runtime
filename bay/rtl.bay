@@ -577,6 +577,7 @@ class rtl
 		{
 			return $item;
 		}
+		if (is_string($item)) return mb_substr($item, $path->_arr[0], 1);
 		$key = $path->first($ctx);
 		$path = $path->removeFirstIm($ctx);
 		$val = $def_val;
@@ -616,6 +617,7 @@ class rtl
 		{
 			return item;
 		}
+		if (typeof item == "string") return item.charAt(path[0]);
 		var key = path.first(ctx);
 		var path = path.removeFirstIm(ctx);
 		var val = def_val;
@@ -1527,6 +1529,52 @@ class rtl
 		return Math.floor(Math.random() * (b - a + 1) + a);
 			
 		#endswitch
+	}
+	
+	
+	/**
+	 * Generate random string
+	 * @var len - string length
+	 * @var spec
+	 *   - a - alpha
+	 *   - n - numberic
+	 * @return string
+	 */
+	static string random_string(int len = 8, string spec = "aun")
+	{
+		string s = "";
+		string res = "";
+		int sz = rs::strlen(spec);
+		
+		for (int i=0; i<sz; i++)
+		{
+			string ch = spec[i];
+			if (ch == "a")
+			{
+				s ~= "qwertyuiopasdfghjklzxcvbnm";
+			}
+			if (ch == "u")
+			{
+				s ~= "QWERTYUIOPASDFGHJKLZXCVBNM";
+			}
+			else if (ch == "n")
+			{
+				s ~= "0123456789";
+			}
+			else if (ch == "s")
+			{
+				s ~= "!@#$%^&*()-_+='\":;'.,<>?/|~";
+			}
+		}
+		
+		int sz_s = rs::strlen(s);
+		for (int i=0; i<len; i++)
+		{
+			int code = static::random(0, sz_s - 1);
+			res ~= s[code];
+		}
+		
+		return res;
 	}
 	
 	

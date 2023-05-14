@@ -92,10 +92,7 @@ class rs
 	 */
 	static string charAt(string s, int pos)
 	{
-		int sz = static::strlen(s);
-		if (pos >= 0 and pos < sz)
-			return static::substr(s, pos, 1);
-		return "";
+		return static::substr(s, pos, 1);
 	}
 	
 	

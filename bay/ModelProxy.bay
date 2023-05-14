@@ -137,7 +137,7 @@ class ModelProxy<T> extends BaseObject
 	/**
 	 * Commit model
 	 */
-	var commitAsync(string method_name)
+	async void commitAsync(string method_name)
 	{
 		Collection<string> args = null;
 		BaseStruct model = this.data();
