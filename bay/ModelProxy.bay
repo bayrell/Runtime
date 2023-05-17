@@ -137,8 +137,9 @@ class ModelProxy<T> extends BaseObject
 	/**
 	 * Commit model
 	 */
-	async void commitAsync(string method_name)
+	async var commitAsync(string method_name)
 	{
+		var res = null;
 		Collection<string> args = null;
 		BaseStruct model = this.data();
 		string class_name = model::getClassName();
@@ -154,12 +155,14 @@ class ModelProxy<T> extends BaseObject
 		{
 			fn f = rtl::method(class_name, method_name);
 			args = args.prependIm(this);
-			await rtl::applyAsync(f, args);
+			res = await rtl::applyAsync(f, args);
 		}
 		else
 		{
 			throw new FileNotFound(class_name ~ "::" ~ method_name, "Method");
 		}
+		
+		return res;
 	}
 	
 	
