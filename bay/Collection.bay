@@ -276,6 +276,7 @@ class Collection<T> extends _Collection
 		var val = this[pos];
 		return val;
 		#case ifcode PHP then
+		if ($pos < 0 || $pos >= count($this->_arr)) return $default_value;
 		$val = isset($this->_arr[$pos]) ? $this->_arr[$pos] : $default_value;
 		return $val;
 		#endswitch
