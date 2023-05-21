@@ -1932,9 +1932,9 @@ class rtl
 	/**
 	 * Returns methods annotations
 	 */
-	pure memorize Dict getMethodsAnnotations(string class_name, Dict res = null)
+	pure memorize Dict getMethodsAnnotations(string class_name)
 	{
-		if (res == null) res = {};
+		Dict res = {};
 		Collection<string> methods = static::methodApply(class_name, "getMethodsList", [255]);
 		for (int i=0; i<methods.count(); i++)
 		{
@@ -1959,7 +1959,7 @@ class rtl
 		for (int i=0; i<parents.count(); i++)
 		{
 			string parent_class_name = parents[i];
-			res = static::getMethodsAnnotations(parent_class_name, res);
+			res = res.concatIm( static::getMethodsAnnotations(parent_class_name) );
 		}
 		return res;
 	}
@@ -2099,7 +2099,7 @@ class rtl
 				return res.toDict();
 			}
 			
-			if (not allow_class_name) return null;
+			if (not allow_class_name) return res.toDict();
 			
 			string class_name = res.item("__class_name__");
 			if (not rtl::class_exists(class_name))
