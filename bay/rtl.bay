@@ -532,7 +532,8 @@ class rtl
 	}
 	static var applyMethod(string class_name, string method_name, Collection args = null) =>
 		static::methodApply(class_name, method_name, args);
-	
+	static var callMethod(string class_name, string method_name, Collection args = null) =>
+		static::methodApply(class_name, method_name, args);
 	
 	
 	/**
@@ -546,7 +547,8 @@ class rtl
 	}
 	static async var applyMethodAsync(string class_name, string method_name, Collection args = null) =>
 		await static::methodApplyAsync(class_name, method_name, args);
-		
+	static async var callMethodAsync(string class_name, string method_name, Collection args = null) =>
+		await static::methodApplyAsync(class_name, method_name, args);
 	
 	
 	/**
