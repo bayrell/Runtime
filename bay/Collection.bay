@@ -915,12 +915,12 @@ class Collection<T> extends _Collection
 		if (offset == undefined) offset = 0;
 		if (length == undefined)
 		{
-			if (offset == 0) return this;
+			if (offset <= 0) return this;
 			var arr = Array.prototype.slice.call(this, offset);
 			Object.setPrototypeOf(arr, this.constructor.prototype);
 			return arr;
 		}
-		if (offset == 0 && length == this.length) return this;
+		if (offset <= 0 && length == this.length) return this;
 		if (length >= 0)
 		{
 			length = offset + length;
@@ -929,6 +929,7 @@ class Collection<T> extends _Collection
 		Object.setPrototypeOf(arr, this.constructor.prototype);
 		return arr;
 		#case ifcode PHP then
+		if ($offset <= 0) $offset = 0;
 		$arr2 = static::Instance($ctx);
 		$arr2->_arr = array_slice($this->_arr, $offset, $length);
 		return $arr2;
