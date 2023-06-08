@@ -264,17 +264,6 @@ struct DateTime extends BaseStruct
 	
 	
 	/**
-	 * Return date
-	 * @return string
-	 */
-	string getDate(string tz = "")
-	{
-		string value = this.getDateTime(tz);
-		return rs::substr(value, 0, 10);
-	}
-	
-	
-	/**
 	 * Return datetime in RFC822
 	 * @return string
 	 */
