@@ -37,7 +37,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	{
 		parent();
 		
-		static::_assign_values(null, this, obj);
+		this._assign_values(obj);
 		
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -61,7 +61,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		#case ifcode PHP then
 		
 		$item = clone $this;
-		static::_assign_values($ctx, $this, $item, $obj);
+		$item->_assign_values($ctx, $obj);
 		return $item;
 		
 		#case ifcode JAVASCRIPT then
@@ -70,7 +70,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		var item = Object.create(proto); /* item._init(); */
 		item = Object.assign(item, this);
 		
-		this.constructor._assign_values(ctx, this, item, obj);
+		item._assign_values(ctx, obj);
 		
 		Object.freeze(item);
 		

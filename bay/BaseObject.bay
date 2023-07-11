@@ -44,46 +44,44 @@ class BaseObject
 	}
 	
 	
-	
 	/**
 	 * Returns new instance
 	 */
 	pure BaseObject newInstance(Dict items) => null;
 	
 	
-	
 	/**
 	 * Init struct data
 	 */
-	static protected Dict _init_data(BaseObject old_item, BaseObject new_item) => null;
-	
+	protected Dict _init_data(Dict obj) => obj;
 	
 	
 	/**
 	 * Assign new values
 	 */
-	static protected void _assign_values(BaseObject old_item, BaseObject new_item, Dict obj = null)
+	protected void _assign_values(Dict obj = null)
 	{
-		/* Assign values */
-		obj = rtl::convert(obj, classof Dict);
-		static::_assign_dict(new_item, obj);
+		#switch
+		#case ifcode PHP then
+		if (gettype($obj) == "array")
+		{
+			$obj = new \Runtime\Dict($obj);
+		}
+		#case ifcode JAVASCRIPT then
+		if (typeof obj == 'object' && !(obj instanceof Runtime.Dict))
+		{
+			obj = new Runtime.Dict(obj);
+		}
+		#endswitch
 		
-		/* Assign new values */
-		obj = new_item::_init_data(old_item, new_item);
-		static::_assign_dict(new_item, obj);
-	}
-	
-	
-	/**
-	 * Assign dict
-	 */
-	static protected void _assign_dict(BaseObject item, Dict obj = null)
-	{
+		
 		if (obj == null) return;
 		if (obj.keys().count() == 0) return;
 		
 		bool check_types = false;
-		string class_name = item::getClassName();
+		string class_name = static::getClassName();
+		
+		obj = this._init_data(obj);
 		
 		
 		#ifdef ENABLE_CHECK_TYPES then
@@ -104,8 +102,8 @@ class BaseObject
 		{
 			foreach ($obj as $key => $value)
 			{
-				$k = $item->__getKey($key);
-				if (property_exists($item, $k))
+				$k = $this->__getKey($key);
+				if (property_exists($this, $k))
 				{
 					if ($check_types)
 					{
@@ -115,7 +113,7 @@ class BaseObject
 							$value = \Runtime\rtl::convert($ctx, $value, $info->t, null);
 						}
 					}
-					$item->$k = $value;
+					$this->$k = $value;
 				}
 			}
 		}
@@ -138,7 +136,7 @@ class BaseObject
 						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
 					}
 				}
-				item[real_key] = value;
+				this[real_key] = value;
 			}
 		}
 		else
@@ -148,13 +146,13 @@ class BaseObject
 				var value = obj[key];
 				if (check_types)
 				{
-					info = rtl.getFieldInfoWithParents(ctx, item.getClassName(), key);
+					info = rtl.getFieldInfoWithParents(ctx, class_name, key);
 					if (info)
 					{
 						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
 					}
 				}
-				item[key] = value;
+				this[key] = value;
 			}
 		}
 		
