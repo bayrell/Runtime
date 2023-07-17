@@ -320,15 +320,32 @@ class rtl
 		
 		if (gettype($class_name) == "object")
 		{
-			if (method_exists($class_name, $method_name)) return true;
+			try
+			{
+				$r = new \ReflectionMethod(get_class($class_name),$method_name);
+				if (!$r) return false;
+				if ($r->isStatic()) return false;
+				return true;
+			}
+			catch (\Exception $e) {}
+			
 			return false;
 		}
 		
 		$class_name = static::find_class($class_name);
 		if (!class_exists($class_name)) return false;
-		if (!method_exists($class_name, $method_name)) return false;
-		return true;
-	
+		
+		try
+		{
+			$r = new \ReflectionMethod($class_name,$method_name);
+			if (!$r) return false;
+			if (!$r->isStatic()) return false;
+			return true;
+		}
+		catch (\Exception $e) {}
+		
+		return false;
+		
 		#case ifcode JAVASCRIPT then
 		
 		if (typeof(class_name) == "object")
