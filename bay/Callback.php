@@ -45,7 +45,7 @@ class Callback
 		}
 		else
 		{
-			throw new \Exception("Wrong object name");
+			throw new \Exception("Wrong callback object name");
 		}
 		$this->obj = $obj;
 		$this->name = $name;
