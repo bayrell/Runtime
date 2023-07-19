@@ -704,26 +704,32 @@ class rs
 	{
 		if (allowed_tags == null)
 		{
-			return re::replace("<[^>]+>", "", content);
+			content = re::replace("<[^>]+>", "", content);
+			content = rs::trim(rs::spaceless(content));
+			return content;
 		}
 		
 		Collection matches = re::matchAll("<[^>]+>", content, "i");
-		for (int i=0; i<matches.count(); i++)
+		if (matches)
 		{
-			Collection match = matches[i];
-			string tag_str = match[0];
-			
-			Collection tag_match = re::matchAll("<(\/|)([a-zA-Z]+)(|[^>]*)>", tag_str, "i");
-			if (tag_match)
+			for (int i=0; i<matches.count(); i++)
 			{
-				string tag_name = static::strtolower(tag_match[0][2]);
-				if (allowed_tags.indexOf(tag_name) == -1)
+				Collection match = matches[i];
+				string tag_str = match[0];
+				
+				Collection tag_match = re::matchAll("<(\/|)([a-zA-Z]+)(|[^>]*)>", tag_str, "i");
+				if (tag_match)
 				{
-					content = static::replace(tag_str, "", content);
+					string tag_name = static::strtolower(tag_match[0][2]);
+					if (allowed_tags.indexOf(tag_name) == -1)
+					{
+						content = static::replace(tag_str, "", content);
+					}
 				}
 			}
 		}
 		
+		content = rs::trim(rs::spaceless(content));
 		return content;
 	}
 	
