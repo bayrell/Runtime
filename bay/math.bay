@@ -23,6 +23,24 @@ class math
 {
 	
 	/**
+	 * Round double
+	 */
+	pure int round(double a)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return round($a);
+		
+		#case ifcode JAVASCRIPT then
+		
+		return Math.round(a);
+		
+		#endswitch
+	}
+	
+	
+	/**
 	 * Floor double
 	 */
 	pure int floor(double a)
