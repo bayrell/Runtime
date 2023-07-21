@@ -36,7 +36,7 @@ class BaseHook extends BaseObject
 	/**
 	 * Register hook
 	 */
-	void register(string hook_name, int priority = 0)
+	void register(string hook_name, int priority = 100)
 	{
 		string method_name = this.getMethodName(hook_name);
 		if (method_name == "") return;
@@ -48,7 +48,7 @@ class BaseHook extends BaseObject
 	/**
 	 * Register hook
 	 */
-	void registerMethod(string hook_name, string method_name, int priority = 0)
+	void registerMethod(string hook_name, string method_name, int priority = 100)
 	{
 		this.hook.register(hook_name, this, method_name, priority);
 	}

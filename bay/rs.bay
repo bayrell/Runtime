@@ -136,7 +136,7 @@ class rs
 	
 	/**
 	 * Convert string to lower case
-	 * @param string s 
+	 * @param string s
 	 * @return string
 	 */
 	static string strtolower(string s)
@@ -160,6 +160,46 @@ class rs
 	 * @return string
 	 */
 	static string strtoupper(string s)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return mb_strtoupper($s);
+		
+		#case ifcode JAVASCRIPT then
+		
+		return use("Runtime.rtl").toStr(s).toUpperCase();
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Convert string to lower case
+	 * @param string s
+	 * @return string
+	 */
+	static string lower(string s)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return mb_strtolower($s);
+		
+		#case ifcode JAVASCRIPT then
+		
+		return use("Runtime.rtl").toStr(s).toLowerCase();
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Convert string to upper case
+	 * @param string s
+	 * @return string
+	 */
+	static string upper(string s)
 	{
 		#switch
 		#case ifcode PHP then
