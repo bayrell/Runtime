@@ -217,6 +217,8 @@ struct DateTime extends BaseStruct
 	 */
 	string toString(string tz = "")
 	{
+		if (tz == "") tz = @.tz;
+		
 		#switch
 		
 		#case ifcode PHP then
