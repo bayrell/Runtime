@@ -694,15 +694,53 @@ class rs
 	
 	
 	/**
+	 * Parser url
+	 * @param string s The string
+	 * @return int
+	 */
+	static Dict parse_url(string s)
+	{
+		int pos;
+		string uri, query, hash;
+		
+		pos = static::strpos(s, "#");
+		s = (pos >= 0) ? static::substr(s, 0, pos) : s;
+		hash = (pos >= 0) ? static::substr(s, pos + 1) : "";
+		uri = (pos >= 0) ? static::substr(s, 0, pos) : s;
+		query = (pos >= 0) ? static::substr(s, pos + 1) : "";
+		Collection arr = static::explode("&", query);
+		
+		Dict arr2 = arr
+			.filter( bool (string s) => s != "" )
+			.transition(
+				list (string item)
+				{
+					Collection arr = static::explode("=", item);
+					return [arr[1], arr[0]];
+				}
+			)
+		;
+		
+		return {
+			"uri": uri,
+			"query": query,
+			"query_arr": arr2,
+			"hash": hash,
+		};
+	}
+	
+	
+	/**
 	 * Returns string lenght
 	 * @param string s The string
 	 * @return int
 	 */
 	static string url_get_add(string s, string key, string value)
 	{
-		int pos = static::strpos(s, "?");
-		string s1 = (pos >= 0) ? static::substr(s, 0, pos) : s;
-		string s2 = (pos >= 0) ? static::substr(s, pos + 1) : "";
+		Dict r = static::parse_url(s);
+		
+		string s1 = r["uri"];
+		string s2 = r["query"];
 		bool find = false;
 		
 		Collection arr = static::explode("&", s2);
