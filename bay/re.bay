@@ -128,9 +128,16 @@ class re
 		
 		pattern = "g" + pattern;
 		
-		var arr = [...s.matchAll( new RegExp(r, pattern) )];
-		if (arr.length == 0) return null;
-		return Runtime.Collection.from( arr.map( (v) => Runtime.Collection.from(v) ) );
+		var r = new RegExp(r, pattern);
+		var res = [];
+		while ((m = r.exec(s)) !== null)
+		{
+			res.push( Runtime.Collection.from(m) );
+		}
+		
+		if (res.length == 0) return null;
+		
+		return Runtime.Collection.from(res);
 		
 		#endswitch
 		
