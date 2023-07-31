@@ -128,16 +128,20 @@ class re
 		
 		pattern = "g" + pattern;
 		
+		var arr = [];
 		var r = new RegExp(r, pattern);
-		var res = [];
-		while ((m = r.exec(s)) !== null)
+		
+		if (s.matchAll == undefined)
 		{
-			res.push( Runtime.Collection.from(m) );
+			while ((m = r.exec(s)) !== null)
+			{
+				arr.push(m);
+			}
 		}
+		else arr = [...s.matchAll(r)];
 		
-		if (res.length == 0) return null;
-		
-		return Runtime.Collection.from(res);
+		if (arr.length == 0) return null;
+		return Runtime.Collection.from( arr.map( (v) => Runtime.Collection.from(v) ) );
 		
 		#endswitch
 		
