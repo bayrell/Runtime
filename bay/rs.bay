@@ -706,6 +706,7 @@ class rs
 		pos = static::strpos(s, "#");
 		s = (pos >= 0) ? static::substr(s, 0, pos) : s;
 		hash = (pos >= 0) ? static::substr(s, pos + 1) : "";
+		pos = static::strpos(s, "?");
 		uri = (pos >= 0) ? static::substr(s, 0, pos) : s;
 		query = (pos >= 0) ? static::substr(s, pos + 1) : "";
 		Collection arr = static::explode("&", query);

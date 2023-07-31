@@ -2246,7 +2246,7 @@ class rtl
 		{
 			var new_value = _Collection.from(value);
 			new_value = new_value.map(ctx, (ctx, val)=>{
-				return _Utils.NativeToPrimitive(ctx, val);
+				return Runtime.rtl.NativeToPrimitive(ctx, val);
 			});
 			return new_value;
 		}
@@ -2264,7 +2264,7 @@ class rtl
 			}
 			var new_value = _Dict.from(value);
 			new_value = new_value.map(ctx, (ctx, val, key)=>{
-				return _Utils.NativeToPrimitive(ctx, val);
+				return Runtime.rtl.NativeToPrimitive(ctx, val);
 			});
 			return new_value;
 		}
@@ -2340,7 +2340,7 @@ class rtl
 		{
 			var arr = [];
 			value.each(ctx, (ctx, v)=>{
-				arr.push( _Utils.PrimitiveToNative(ctx, v) );
+				arr.push( Runtime.rtl.PrimitiveToNative(ctx, v) );
 			});
 			return arr;
 		}
@@ -2348,7 +2348,7 @@ class rtl
 		{
 			var obj = {};
 			value.each(ctx, (ctx, v, k)=>{
-				obj[k] = _Utils.PrimitiveToNative(ctx, v);
+				obj[k] = Runtime.rtl.PrimitiveToNative(ctx, v);
 			});
 			return obj;
 		}
