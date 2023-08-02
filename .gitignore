@@ -1,8 +1,9 @@
 # bower and nodejs modules dir
 /bower_components
 /node_modules
-
 /tests
+/es6
+/php
 
 # cache dir
 .cache
