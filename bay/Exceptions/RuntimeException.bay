@@ -156,7 +156,6 @@ class RuntimeException extends ClassException
 	}
 	
 	
-	
 	/**
 	 * Returns trace
 	 */
@@ -165,6 +164,25 @@ class RuntimeException extends ClassException
 		#switch
 		#case ifcode PHP then
 		return $this->getTraceAsString();
+		#endswitch
+	}
+	
+	
+	/**
+	 * Returns trace
+	 */
+	Collection<string> getTraceCollection()
+	{
+		#switch
+		#case ifcode PHP then
+		$error_trace = $this->getTrace();
+		$error_trace = array_map(
+			function ($item){
+				return $item["file"] . "(" . $item["line"] . "): " . $item["function"];
+			},
+			$error_trace
+		);
+		return \Runtime\Collection::from($error_trace);
 		#endswitch
 	}
 	
