@@ -31,7 +31,15 @@ if (typeof Runtime == 'undefined') Runtime = {};
 Runtime._Collection = function()
 {
 	Array.call(this);
-	for (var i=1; i<arguments.length; i++) Array.prototype.push.call(this, arguments[i]);
+	if (arguments.length > 0)
+	{
+		var start=1;
+		if (!Runtime.rtl.is_context()) start=0;
+		for (var i=start; i<arguments.length; i++)
+		{
+			Array.prototype.push.call(this, arguments[i]);
+		}
+	}
 	this.__uq__ = Symbol();
 }
 Runtime._Collection.prototype = Object.create(Array.prototype);
@@ -126,7 +134,13 @@ class _Collection implements \ArrayAccess, \JsonSerializable
 	 */
 	function __construct()
 	{
-		$this->_arr = array_slice(func_get_args(), 1);
+		$count = func_get_args();
+		if ($count > 0)
+		{
+			$start = 1;
+			if (!\Runtime\rtl::is_context()) $start = 0;
+			$this->_arr = array_slice($count, $start);
+		}
 	}
 	
 	
