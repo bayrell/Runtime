@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.re;
 use Runtime.rtl;
+use Runtime.math;
 use Runtime.Collection;
 use Runtime.Vector;
 
@@ -969,5 +970,104 @@ class rs
 	 * Is start
 	 */
 	pure bool start(string s, string search) => static::search(s, search) == 0;
+	
+	
+	/**
+	 * Hex decode
+	 */
+	pure int hexdec(string s)
+	{
+		#switch
+		
+		#case ifcode PHP then
+		return hexdec($s);
+		
+		#case ifcode JAVASCRIPT then
+		return parseInt(s, 16);
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * From rgb
+	 */
+	pure list rgbToInt(string color)
+	{
+		string ch = static::substr(color, 0, 1);
+		if (ch == "#") color = static::substr(color, 1);
+		
+		string r = "";
+		string g = "";
+		string b = "";
+		
+		int sz = static::strlen(color);
+		if (sz == 3)
+		{
+			r = rs::substr(color, 0, 1); r ~= r;
+			g = rs::substr(color, 1, 1); g ~= g;
+			b = rs::substr(color, 2, 1); b ~= b;
+		}
+		else if (sz == 6)
+		{
+			r = rs::substr(color, 0, 2);
+			g = rs::substr(color, 2, 2);
+			b = rs::substr(color, 4, 2);
+		}
+		
+		r = static::hexdec(r);
+		g = static::hexdec(g);
+		b = static::hexdec(b);
+		
+		return [r, g, b];
+	}
+	
+	
+	/**
+	 * From rgb
+	 */
+	pure string intToRgb(int r, int g, int b)
+	{
+		#switch
+		
+		#case ifcode PHP then
+		return sprintf("%02x%02x%02x", $r, $g, $b);
+		
+		#case ifcode JAVASCRIPT then
+		
+		r = r.toString(16).padStart(2, '0');
+		g = g.toString(16).padStart(2, '0');
+		b = b.toString(16).padStart(2, '0');
+		
+		return r + g + b;
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Brightness
+	 */
+	static string brightness(string color, int percent)
+	{
+		Collection color = static::rgbToInt(color);
+		
+		int r = color[0];
+		int g = color[1];
+		int b = color[2];
+		
+		r = math::round(r + (r * percent / 100));
+		g = math::round(g + (g * percent / 100));
+		b = math::round(b + (b * percent / 100));
+		
+		if (r > 255) r = 255;
+		if (g > 255) g = 255;
+		if (b > 255) b = 255;
+		if (r < 0) r = 0;
+		if (g < 0) g = 0;
+		if (b < 0) b = 0;
+		
+		return "#" ~ static::intToRgb(r,g,b);
+	}
 	
 }

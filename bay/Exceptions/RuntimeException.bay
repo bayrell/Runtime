@@ -178,7 +178,12 @@ class RuntimeException extends ClassException
 		$error_trace = $this->getTrace();
 		$error_trace = array_map(
 			function ($item){
-				return $item["file"] . "(" . $item["line"] . "): " . $item["function"];
+				$prefix = "internal";
+				if (isset($item["file"]))
+					$prefix = $item["file"] . "(" . $item["line"] . ")";
+				else if (isset($item["class"]))
+					$prefix = $item["class"];
+				return $prefix . ": " . $item["function"];
 			},
 			$error_trace
 		);
