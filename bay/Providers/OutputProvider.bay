@@ -208,8 +208,11 @@ class OutputProvider extends BaseProvider
 		
 		#case ifcode JAVASCRIPT then
 		let text_color = "dark_red";
+		let isNode = false;
+		
 		#case ifcode NODEJS then
 		let text_color = "red";
+		let isNode = true;
 		
 		#case ifcode JAVASCRIPT then
 		
@@ -218,9 +221,17 @@ class OutputProvider extends BaseProvider
 			let color = this.getColor(ctx, text_color);
 			let char_27 = String.fromCharCode(27);
 			
-			this.print(ctx, char_27 + "[" + color + "m", false, "err");
-			this.print(ctx, message.stack, false, "err");
-			this.print(ctx, char_27 + "[0m", true, "err");
+			if (isNode)
+			{
+				this.print(ctx, char_27 + "[" + color + "m", false, "err");
+				this.print(ctx, message.stack, false, "err");
+				this.print(ctx, char_27 + "[0m", true, "err");
+			}
+			else
+			{
+				let s = char_27 + "[" + color + "m" + message.stack + char_27 + "[0m";
+				this.print(ctx, s, true, "err");
+			}
 		}
 		
 		else

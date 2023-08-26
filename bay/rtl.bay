@@ -467,7 +467,9 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$arr = ($args != null) ? (($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : [];
+		$arr = ($args != null) ?
+			(($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : [];
+		
 		if ($is_ctx) array_unshift($arr, $ctx);
 		if ($f instanceof \Runtime\Callback)
 		{
@@ -478,6 +480,7 @@ class rtl
 		
 		#case ifcode JAVASCRIPT then
 		
+		var c = null;
 		var res;
 		if (args == null) args = [];
 		else args = Array.prototype.slice.call(args);
@@ -489,11 +492,25 @@ class rtl
 			var c = a[0]; var m = a[1];
 			c = this.find_class(c);
 			f = c[m];
-			res = f.apply(c, args);
+		}
+		
+		if (f.constructor.name == 'AsyncFunction')
+		{
+			res = null;
+			(async () => {
+				try
+				{
+					await f.apply(c, args);
+				}
+				catch (e)
+				{
+					Runtime.io.print_error(e);
+				}
+			})()
 		}
 		else
 		{
-			res = f.apply(null, args);
+			res = f.apply(c, args);
 		}
 		
 		return res;
