@@ -154,19 +154,18 @@ class ModelProxy<T> extends BaseObject
 		{
 			fn f = rtl::method(old_model, method_name);
 			new_model = rtl::apply(f, args);
+			this.setNewModel(new_model);
 		}
 		elseif ( rtl::method_exists(class_name, method_name) )
 		{
 			fn f = rtl::method(class_name, method_name);
 			args = args.prependIm(this);
-			new_model = rtl::apply(f, args);
+			rtl::apply(f, args);
 		}
 		else
 		{
 			throw new FileNotFound(class_name ~ "::" ~ method_name, "Method");
 		}
-		
-		this.setNewModel(new_model);
 	}
 	
 	
