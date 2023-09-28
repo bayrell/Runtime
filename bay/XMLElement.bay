@@ -53,7 +53,7 @@ class XMLElement extends \SimpleXMLElement
 	 */
 	function get($pos)
 	{
-		return $this[$pos];
+		return $this->$pos;
 	}
 	
 	
@@ -62,7 +62,7 @@ class XMLElement extends \SimpleXMLElement
 	 */
 	function value($pos = 0)
 	{
-		$value = trim((string)$this[$pos]);
+		$value = trim((string)$this->get($pos));
 		return $value;
 	}
 	
@@ -70,19 +70,9 @@ class XMLElement extends \SimpleXMLElement
 	/**
 	 * Map child items
 	 */
-	function getChilds($f = null)
+	function count()
 	{
-		$arr = [];
-		$pos = 0;
-		
-		foreach ($this->children() as $item)
-		{
-			if ($f) $item = $f($item, $pos);
-			$arr[] = $item;
-			$pos++;
-		}
-		
-		return \Runtime\Collection::from($arr);
+		return count($this);
 	}
 	
 	
@@ -103,6 +93,10 @@ class XMLElement extends \SimpleXMLElement
 		
 		return \Runtime\Collection::from($arr);
 	}
+	function getChilds($f = null)
+	{
+		return this.getItems($f);
+	}
 	
 	
 	/**
@@ -116,6 +110,21 @@ class XMLElement extends \SimpleXMLElement
 			return $attrs[$name];
 		}
 		return null;
+	}
+	
+	
+	/**
+	 * Get attribute
+	 */
+	function getAttributes()
+	{
+		$attrs = $this->attributes();
+		$items = new \Runtime\Map();
+		foreach ($attrs as $key => $value)
+		{
+			$items->setValue($key, $value);
+		}
+		return $items->toDict();
 	}
 	
 	
@@ -180,6 +189,59 @@ class XMLElement extends \SimpleXMLElement
 	function exists()
 	{
 		return $this->getName() != "";
+	}
+	
+	
+	/**
+	 * To xml
+	 */
+	function toXml()
+	{
+		$xml_str = $this->asXml();
+		$xml_str = tidy_repair_string($xml_str, ['input-xml'=> 1, 'indent' => 1, 'wrap' => 0]);
+		return $xml_str;
+	}
+	
+	
+	/**
+	 * To string
+	 */
+	function toString()
+	{
+		return (string)$this;
+	}
+	
+	
+	/**
+	 * Get errors
+	 */
+	static function getErrors()
+	{
+		$res = [];
+		foreach(libxml_get_errors() as $error)
+		{
+			$res[] = $error->message;
+		}
+		return $res;
+	}
+	
+	
+	/**
+	 * Load xml
+	 */
+	static function loadXml($xml_str)
+	{
+		$old_value = libxml_use_internal_errors(true);
+		libxml_clear_errors();
+		$xml = simplexml_load_string($xml_str, static::class, LIBXML_NOCDATA | LIBXML_NONET);
+		$errors = new \Runtime\Vector();
+		foreach(libxml_get_errors() as $error)
+		{
+			$errors->pushValue($error->message);
+		}
+		libxml_use_internal_errors($old_value);
+		if ($xml == false) $xml = null;
+		return \Runtime\Collection::from([$xml, $errors->toCollection()]);
 	}
 }
 
