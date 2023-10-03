@@ -40,6 +40,7 @@ struct Context extends BaseStruct
 	Dict<BaseObject> providers = {};
 	Collection<BaseStruct> entities = [];
 	int start_time = 0;
+	int exit_code = 0;
 	string tz = "UTC";
 	bool initialized = false;
 	
@@ -203,6 +204,12 @@ struct Context extends BaseStruct
 		/* Extends modules */
 		Collection<string> modules = static::getRequiredModules(modules);
 		c <= modules <= modules;
+		
+		/* Extends app modules */
+		if (c.app != null and rtl::method_exists(c.app, "modules"))
+		{
+			c = await c.app.modules(c);
+		}
 		
 		/* Get modules entities */
 		Collection<BaseStruct> entities = static::getEntitiesFromModules(modules);
