@@ -40,7 +40,6 @@ struct Context extends BaseStruct
 	Dict<BaseObject> providers = {};
 	Collection<BaseStruct> entities = [];
 	int start_time = 0;
-	int exit_code = 0;
 	string tz = "UTC";
 	bool initialized = false;
 	
@@ -194,6 +193,12 @@ struct Context extends BaseStruct
 		
 		if (c.initialized) return c;
 		
+		/* Create app */
+		if (c.entry_point != "")
+		{
+			c <= app <= rtl::newInstance(c.entry_point);
+		}
+		
 		/* Add start modules */
 		c <= start_modules <= c.modules;
 		
@@ -212,7 +217,7 @@ struct Context extends BaseStruct
 		}
 		
 		/* Get modules entities */
-		Collection<BaseStruct> entities = static::getEntitiesFromModules(modules);
+		Collection<BaseStruct> entities = static::getEntitiesFromModules(c.modules);
 		c <= entities <= entities;
 		
 		/* Create providers */
@@ -240,12 +245,6 @@ struct Context extends BaseStruct
 					throw new RuntimeException("Wrong declare provider '" ~ info.name ~ "'");
 				}
 			}
-		}
-		
-		/* Create app */
-		if (c.entry_point != "")
-		{
-			c <= app <= rtl::newInstance(c.entry_point);
 		}
 		
 		/* Init providers */

@@ -28,6 +28,7 @@ use Runtime.Dict;
 use Runtime.Map;
 use Runtime.Monad;
 use Runtime.Vector;
+use Runtime.Exceptions.AssertException;
 
 
 class rtl
@@ -590,7 +591,11 @@ class rtl
 		fn f = rtl::method(class_name, method_name);
 		return await rtl::applyAsync(f, args);
 	}
+	static async var applyAsyncMethod(string class_name, string method_name, Collection args = null) =>
+		await static::methodApplyAsync(class_name, method_name, args);
 	static async var applyMethodAsync(string class_name, string method_name, Collection args = null) =>
+		await static::methodApplyAsync(class_name, method_name, args);
+	static async var callAsyncMethod(string class_name, string method_name, Collection args = null) =>
 		await static::methodApplyAsync(class_name, method_name, args);
 	static async var callMethodAsync(string class_name, string method_name, Collection args = null) =>
 		await static::methodApplyAsync(class_name, method_name, args);
@@ -1276,6 +1281,17 @@ class rtl
 		#endswitch
 	}
 	
+	
+	
+	/* ====================== Assert ====================== */
+	
+	static void assert(bool expr, string message)
+	{
+		if (not expr)
+		{
+			throw new AssertException(message);
+		}
+	}
 	
 	
 	/* ================ Memorize functions ================ */
