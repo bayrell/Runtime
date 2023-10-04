@@ -19,96 +19,171 @@
 namespace Runtime;
 
 
-abstract class XMLElement {}
-
-
-#ifcode PHP then
-
-class XMLElement extends \SimpleXMLElement
+class XMLElement
 {
+	var xml = null;
+	Collection errors = null;
+	
+	
 	/**
-	 * Returns dom element
+	 * Load xml
 	 */
-	function getDOM()
+	static XMLElement loadXml(string xml_str)
 	{
-		return dom_import_simplexml($this);
+		XMLElement res = static::newInstance();
+		
+		#ifcode PHP then
+		
+		$old_value = libxml_use_internal_errors(true);
+		libxml_clear_errors();
+		$xml = simplexml_load_string(
+			$xml_str, \SimpleXMLElement::class, LIBXML_NOCDATA | LIBXML_NONET
+		);
+		$errors = new \Runtime\Vector();
+		foreach (libxml_get_errors() as $error)
+		{
+			$errors->pushValue( trim($error->message) );
+		}
+		libxml_use_internal_errors($old_value);
+		
+		$res->xml = $xml;
+		$res->errors = $errors->toCollection();
+		
+		#endif
+		
+		return res;
 	}
 	
 	
 	/**
-	 * Prepend child
+	 * Returns new instance
 	 */
-	function prependChild($name, $content = "")
+	static XMLElement newInstance() => rtl::newInstance(static::getClassName());
+	
+	
+	/**
+	 * Returns true if XML is exists
+	 */
+	bool exists()
 	{
-		$dom = $this->getDomElement();
-		$elem = $dom->ownerDocument->createElement($name, $content);
-		$item = $dom->insertBefore($elem, $dom->firstChild);
-		$item = simplexml_import_dom($item);
-		return $item;
+		if (this.xml == null) return false;
+		if (this.errors == null) return true;
+		if (this.errors.count() == 0) return true;
+		return false;
 	}
 	
 	
 	/**
-	 * Get child item by pos
+	 * Return current name
 	 */
-	function get($pos)
+	XMLElement getName()
 	{
-		return $this->$pos;
+		string res = "";
+		
+		#ifcode PHP then
+		if ($this->xml)
+		{
+			$res = $this->xml->getName();
+		}
+		#endif
+		
+		return res;
+	}
+	
+	
+	/**
+	 * Return items by name
+	 */
+	Collection<XMLElement> get(string name)
+	{
+		#ifcode PHP then
+		$res = [];
+		
+		if ($this->xml)
+		{
+			$xml = $this->xml->$name;
+			for ($i=0; $i<$xml->count(); $i++)
+			{
+				$item = static::newInstance();
+				$item->xml = $xml[$i];
+				$res[] = $item;
+			}
+		}
+		
+		return \Runtime\Collection::from($res);
+		#endif
+		
+		return new Collection();
 	}
 	
 	
 	/**
 	 * Get value
 	 */
-	function value($pos = 0)
+	string value()
 	{
-		$value = trim((string)$this->get($pos));
-		return $value;
+		string res = "";
+		
+		#ifcode PHP then
+		if ($this->xml)
+			$res = (string)$this->xml;
+		#endif
+		
+		return res;
 	}
 	
 	
 	/**
-	 * Map child items
+	 * Returns childs count
 	 */
-	function count()
+	int count()
 	{
-		return count($this);
+		#ifcode PHP then
+		if ($this->xml)
+			return $this->xml->children()->count();
+		#endif
+		
+		return 0;
 	}
 	
 	
 	/**
 	 * Return items
 	 */
-	function getItems($f = null)
+	Collection<XMLElement> childs()
 	{
+		#ifcode PHP then
 		$arr = [];
 		$pos = 0;
 		
-		foreach ($this as $item)
+		foreach ($this->xml as $child)
 		{
-			if ($f) $item = $f($item, $pos);
+			$item = static::newInstance();
+			$item->xml = $child;
 			$arr[] = $item;
 			$pos++;
 		}
 		
 		return \Runtime\Collection::from($arr);
-	}
-	function getChilds($f = null)
-	{
-		return this.getItems($f);
+		#endif
+		
+		return new Collection();
 	}
 	
 	
 	/**
 	 * Get attribute
 	 */
-	function getAttribute($name)
+	string getAttribute(string name)
 	{
+		#ifcode PHP then
 		$attrs = $this->attributes();
 		if (isset($attrs[$name]))
 		{
 			return $attrs[$name];
 		}
+		#endif
+		
 		return null;
 	}
 	
@@ -116,134 +191,100 @@ class XMLElement extends \SimpleXMLElement
 	/**
 	 * Get attribute
 	 */
-	function getAttributes()
+	Dict getAttributes()
 	{
+		Map items = new Map();
+		
+		#ifcode PHP then
 		$attrs = $this->attributes();
-		$items = new \Runtime\Map();
 		foreach ($attrs as $key => $value)
 		{
 			$items->setValue($key, $value);
 		}
-		return $items->toDict();
+		#endif
+		
+		return items.toDict();
 	}
 	
 	
 	/**
 	 * Remove Attribute
 	 */
-	function removeAttribute($name)
+	void removeAttribute(string name)
 	{
-		$dom = $this->getDomElement();
+		#ifcode PHP then
+		$dom = dom_import_simplexml($this->xml);
 		$dom->removeAttribute($name);
-	}
-	 
-	
-	/**
-	 * Add and replace attribute
-	 */
-	function addAttribute($name, $value = NULL, $ns = NULL)
-	{
-		$attrs = $this->attributes();
-		if (isset($attrs[$name]))
-		{
-			$this->removeAttribute($name);
-		}
-		parent::addAttribute($name, $value, $ns);
+		#endif
 	}
 	
 	
 	/**
 	 * Remove current element
 	 */
-	function remove()
+	void remove()
 	{
-		$item = $this->getDomElement();
-		$item->parentNode->removeChild($item);
+		#ifcode PHP then
+		$item = dom_import_simplexml($this->xml);
+		$item->xml->parentNode->removeChild($item);
+		#endif
 	}
 	
 	
 	/**
-	 * Remove all childs
+	 * Append XML
 	 */
-	function removeChilds()
+	XMLElement append(XMLElement append)
 	{
-		$childs = $this->children();
-		if (count($childs) == 0)
+		string name = append.getName();
+		string content = append.value();
+		XMLElement child = static::newInstance();
+		
+		#ifcode PHP then
+		$item = $this->xml->addChild($name, $content);
+		$child->xml = $item;
+		#endif
+		
+		/* Append childs */
+		child.appendItems(append.childs());
+		
+		return child;
+	}
+	
+	
+	/**
+	 * Append childs from XML
+	 */
+	void appendItems(Collection<XMLElement> items)
+	{
+		for (int i=0; i<items.count(); i++)
 		{
-			$item = dom_import_simplexml($this);
-			$item->nodeValue = "";
+			XMLElement item = items.get(i);
+			this.append(item);
 		}
-		else
-		{
-			foreach ($childs as $child)
-			{
-				$this->removeChild($child);
-			}
-		}
-	}
-	
-	
-	/**
-	 * Returns true if element is exists
-	 */
-	function exists()
-	{
-		return $this->getName() != "";
-	}
-	
-	
-	/**
-	 * To xml
-	 */
-	function toXml()
-	{
-		$xml_str = $this->asXml();
-		$xml_str = tidy_repair_string($xml_str, ['input-xml'=> 1, 'indent' => 1, 'wrap' => 0]);
-		return $xml_str;
 	}
 	
 	
 	/**
 	 * To string
 	 */
-	function toString()
+	string toString(Dict params = null)
 	{
-		return (string)$this;
+		bool indent = params['indent'] |> default bool true;
+		bool wrap = params['wrap'] |> default bool false;
+		string xml_str = '';
+		
+		#ifcode PHP then
+		if ($params != null) $params = $params->_map;
+		if ($params == null) $params = [];
+		if (!isset($params['indent'])) $params['indent'] = true;
+		if (!isset($params['wrap'])) $params['wrap'] = false;
+		if (!isset($params['input-xml'])) $params['input-xml'] = true;
+		$xml_str = $this->xml->asXml();
+		$xml_str = tidy_repair_string($xml_str, $params);
+		#endif
+		
+		return xml_str;
 	}
 	
-	
-	/**
-	 * Get errors
-	 */
-	static function getErrors()
-	{
-		$res = [];
-		foreach(libxml_get_errors() as $error)
-		{
-			$res[] = $error->message;
-		}
-		return $res;
-	}
-	
-	
-	/**
-	 * Load xml
-	 */
-	static function loadXml($xml_str)
-	{
-		$old_value = libxml_use_internal_errors(true);
-		libxml_clear_errors();
-		$xml = simplexml_load_string($xml_str, static::class, LIBXML_NOCDATA | LIBXML_NONET);
-		$errors = new \Runtime\Vector();
-		foreach(libxml_get_errors() as $error)
-		{
-			$errors->pushValue($error->message);
-		}
-		libxml_use_internal_errors($old_value);
-		if ($xml == false) $xml = null;
-		return \Runtime\Collection::from([$xml, $errors->toCollection()]);
-	}
 }
-
-#endif
-

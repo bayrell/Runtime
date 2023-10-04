@@ -1797,7 +1797,7 @@ class rtl
 	 * Run application
 	 * @param Dict d
 	 */
-	public static async int @runApp(Collection<string> modules, string class_name, Dict d = null)
+	public static async int @runApp(string class_name, Collection<string> modules, Dict d = null)
 	{
 		if (d == null) d = {};
 		
@@ -1814,7 +1814,7 @@ class rtl
 		$context = static::createContext($d);
 		$context->start($context);
 		$code = $context->run($context);
-		exit($code);
+		return $code;
 		
 		#case ifcode ES6 then
 		
@@ -1846,9 +1846,11 @@ class rtl
 			process.stderr.write("\x1B[0m\n");
 		}
 		
-		process.exit(code);
+		return code;
 		
 		#endswitch
+		
+		return 0;
 	}
 	
 	
@@ -2497,6 +2499,44 @@ class rtl
 		return null;
 		#endswitch
 	}
+	
+	
+	#ifdef PHP then
+	/**
+	 * Register PHP error handler
+	 */
+	void set_default_exception_handler()
+	{
+		#ifcode PHP then
+		
+		set_exception_handler( function ($e){
+		
+			if (!$e) return;
+			
+			http_response_code(500);
+			
+			$message = "Fatal Error:\n";
+			$message .= $e->getMessage() . "\n";
+			$message .= "in file " . $e->getFile() . ":" . $e->getLine() . "\n";
+			$message .= $e->getTraceAsString() . "\n";
+			
+			if (php_sapi_name() === 'cli')
+			{
+				$color = "0;91";
+				echo chr(27) . "[" . $color . "m" . $message . chr(27) . "[0m";
+			}
+			else
+			{
+				echo nl2br($message);
+			}
+			
+			exit (1);
+		} );
+		
+		#endif
+	}
+	
+	#endif
 }
 
 
