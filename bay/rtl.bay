@@ -893,6 +893,23 @@ class rtl
 	}
 	
 	
+	/**
+	 * Returns true if value is scalar value
+	 * @return bool
+	 */
+	static string getType(var value)
+	{
+		if (value == null) return "null";
+		if (rtl::isString(value)) return "string";
+		if (rtl::isNumber(value)) return "number";
+		if (rtl::isBoolean(value)) return "boolean";
+		if (rtl::isFn(value)) return "fn";
+		if (value instanceof Collection) return "collection";
+		if (value instanceof Dict) return "dict";
+		if (value instanceof BaseObject) return "object";
+		return "unknown";
+	}
+	
 	
 	/**
 	 * Returns true if value is scalar value
