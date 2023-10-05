@@ -44,6 +44,7 @@ static class ModuleDescription
 	pure Dict<string> requiredModules() =>
 	{
 		"Runtime": ">=0.11",
+		"Runtime.Unit": ">=0.11",
 	};
 	
 	
@@ -52,8 +53,6 @@ static class ModuleDescription
 	 */
 	pure Collection<Dict> entities() =>
 	[
-		new UnitTest("Runtime.Test.XML.XmlAppend"),
-		new UnitTest("Runtime.Test.XML.XmlTest"),
 	];
 	
 }
