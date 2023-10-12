@@ -437,8 +437,14 @@ class rtl
 		if (obj[method_name] == null || obj[method_name] == "undefined")
 		{
 			var class_name = "";
-			if (obj.getClassName != undefined) class_name = obj.getClassName();
-			else if (obj.getCurrentClassName != undefined) class_name = obj.getCurrentClassName();
+			if (obj.getClassName != undefined)
+			{
+				class_name = obj.getClassName();
+			}
+			else if (obj.constructor.getClassName != undefined)
+			{
+				class_name = obj.constructor.getClassName();
+			}
 			else class_name = save;
 			throw new Error("Method " + method_name + " not found in " + class_name);
 		}
