@@ -1849,7 +1849,7 @@ class rtl
 		}
 		catch (e)
 		{
-			console.log(e.stack);
+			console.log("\x1B[0;31m" + e.stack + "\x1B[0m\n");
 		}
 		
 		#case ifcode NODEJS then

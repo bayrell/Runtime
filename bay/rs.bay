@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.re;
 use Runtime.rtl;
+use Runtime.lib;
 use Runtime.math;
 use Runtime.Collection;
 use Runtime.Vector;
@@ -1069,5 +1070,147 @@ class rs
 		
 		return "#" ~ static::intToRgb(r,g,b);
 	}
+	
+	
+	/**
+	 * Retuns css hash
+	 * @param string component class name
+	 * @return string hash
+	 */
+	static memorize string hash(string s)
+	{
+		string r = "";
+		string a = "1234567890abcdef";
+		int sz = rs::strlen(s);
+		int h = 0;
+		for (int i=0; i<sz; i++)
+		{
+			int c = rs::ord( rs::substr(s, i, 1) );
+			h = ((h << 2) + (h >> 14) + c) & 65535;
+		}
+		int p = 0;
+		while (h != 0 or p < 4)
+		{
+			int c = h & 15;
+			h = h >> 4;
+			r ~= rs::substr(a, c, 1);
+			p = p + 1;
+		}
+		return r;
+	}
+	
+	
+	/**
+	 * Returns css hash
+	 */
+	pure memorize string getCssHash(string class_name) =>
+		rtl::getParents(class_name)
+			|> .filter
+			(
+				bool (string class_name) =>
+					class_name != "Runtime.BaseObject" and
+					class_name != "Runtime.Web.Component"
+			)
+			|> .map
+			(
+				string (string class_name) => "h-" ~ static::hash(class_name)
+			)
+			|> lib::join(" ")
+		;
+	
+	
+	/**
+	 * Escape html
+	 */
+	pure string _escape_html(var s)
+	{
+		#switch
+		#case ifcode PHP then
+		if (gettype($s) == "array") return $s;
+		if ($s instanceof \Runtime\RawString) return $s;
+		#endswitch
+		if (rtl::isString(s)) return rs::escapeHtml(s);
+		if (s instanceof Collection) return rs::join("", s);
+		return rs::escapeHtml( rtl::toString(s) );
+	}
+	
+	
+	/**
+	 * To html
+	 */
+	pure string _to_html(var s)
+	{
+		return s;
+	}
+	
+	
+	/**
+	 * Concat attr
+	 */
+	pure Dict _concat_attrs(Dict arr1, var arr2)
+	{
+		if (rtl::isString(arr2)) arr2 = [ arr2 ];
+		return arr1 != null ? arr1.concat(arr2) : arr2;
+	}
+	
+	
+	/**
+	 * Merge attrs
+	 */
+	pure Dict _merge_attrs(Dict res, Dict attr2)
+	{
+		if (not rtl::exists(attr2)) return res;
+		#ifcode JAVASCRIPT then
+		return Object.assign(res, attr2.toObject());
+		#endif
+		return res;
+	}
+	
+	
+	/**
+	 * Join attrs to string
+	 */
+	pure string _join_attrs(Dict attrs) =>
+		rtl::exists(attrs) ?
+			rs::join
+			(
+				" ",
+				attrs.map(
+					string (string k, string v) => k ~ "= '" ~ static::_escape_attr(v) ~ "'"
+				)
+			) : ""
+	;
+	
+	
+	/**
+	 * Escape attr
+	 */
+	pure string _escape_attr(var s)
+	{
+		if (s instanceof Dict)
+		{
+			s = s.reduce
+			(
+				string (string s, string val, string key) => s ~ key ~ ":" ~ val ~ ";",
+				""
+			);
+		}
+		return rs::escapeHtml(s);
+	}
+	
+	
+	#ifcode PHP then
+	static function _p(&$arr1, $s)
+	{
+		if (gettype($s) == "string" || $s instanceof \Runtime\RawString)
+		{
+			$arr1[] = $s;
+		}
+		if (gettype($s) == "array")
+		{
+			foreach ($s as $v) $arr1[] = $v;
+		}
+	}
+	#endif
 	
 }
