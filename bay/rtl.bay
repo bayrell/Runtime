@@ -446,7 +446,7 @@ class rtl
 				class_name = obj.constructor.getClassName();
 			}
 			else class_name = save;
-			throw new Error("Method " + method_name + " not found in " + class_name);
+			throw new Error("Method '" + method_name + "' not found in '" + class_name + "'");
 		}
 		
 		return obj[method_name].bind(obj);
