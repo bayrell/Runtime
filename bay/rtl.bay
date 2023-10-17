@@ -255,6 +255,17 @@ class rtl
 	}
 	
 	
+	/**
+	 * Returns true if class exists
+	 * @return bool
+	 */
+	static bool get_class_name(var obj)
+	{
+		if (static::isString(obj)) return obj;
+		return obj::getClassName();
+	}
+	
+	
 	
 	/**
 	 * Returns true if class exists

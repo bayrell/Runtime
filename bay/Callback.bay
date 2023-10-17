@@ -1,0 +1,163 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2023 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.BaseStruct;
+use Runtime.Exceptions.RuntimeException;
+
+
+struct Callback extends BaseStruct
+{
+	var obj;
+	string name;
+	
+	
+	/**
+	 * Constructor
+	 */
+	public void constructor(Dict obj = null)
+	{
+		if (not(obj instanceof Dict))
+		{
+			Collection<string> args = null;
+			
+			#switch
+			#case ifcode PHP then
+			$args = \Runtime\Collection::from(func_get_args());
+			#case ifcode ES6 then
+			args = Runtime.Collection.from( [ ...arguments ] );
+			#endswitch
+			
+			obj = {
+				"obj": args.get(0),
+				"name": args.get(1),
+			}
+		}
+		
+		parent(obj);
+		
+		this.checkExists();
+	}
+	
+	
+	/**
+	 * Check if method exists
+	 */
+	void checkExists()
+	{
+		if (not rtl::method_exists(this.obj, this.name))
+		{
+			throw new RuntimeException("Method '" ~
+				this.name ~ "' not found in " ~
+				rtl::get_class_name(this.obj)
+			);
+		}
+	}
+	
+	
+	/**
+	 * Call function
+	 */
+	var call(Collection args)
+	{
+		#switch
+		
+		#case ifcode PHP then
+		
+		$obj = $this->obj;
+		
+		if (gettype($obj) == "string")
+		{
+			$obj = \Runtime\rtl::find_class($obj);
+		}
+		
+		if ($args instanceof \Runtime\Collection)
+		{
+			$args = $args->_arr;
+		}
+		
+		return call_user_func_array([$obj, $this->name], $args);
+		
+		#case ifcode JAVASCRIPT then
+		
+		obj = this.obj;
+		
+		if (typeof(obj) == "string")
+		{
+			obj = Runtime.rtl.find_class(obj);
+		}
+		
+		return Runtime.rtl.apply(obj[this.name].bind(obj), args);
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Call function
+	 */
+	async var callAsync(Collection args)
+	{
+		#switch
+		
+		#case ifcode PHP then
+		
+		$obj = $this->obj;
+		
+		if (gettype($obj) == "string")
+		{
+			$obj = \Runtime\rtl::find_class($obj);
+		}
+		
+		if ($args instanceof \Runtime\Collection)
+		{
+			$args = $args->_arr;
+		}
+		
+		return call_user_func_array([$obj, $this->name], $args);
+		
+		#case ifcode JAVASCRIPT then
+		
+		obj = this.obj;
+		
+		if (typeof(obj) == "string")
+		{
+			obj = Runtime.rtl.find_class(obj);
+		}
+		
+		return await Runtime.rtl.applyAsync(obj[this.name].bind(obj), args);
+		
+		#endswitch
+	}
+	
+	
+	#ifcode PHP then
+	
+	function __invoke()
+	{
+		return $this->call(func_get_args());
+	}
+	
+	function invokeArgs($args)
+	{
+		return $this->call($args);
+	}
+	
+	#endif
+}

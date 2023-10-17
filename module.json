@@ -26,6 +26,7 @@
 		"BaseHook.bay",
 		"BaseProvider.bay",
 		"BaseStruct.bay",
+		"Callback.bay",
 		"Date.bay",
 		"DateTime.bay",
 		"ModelProxy.bay",
