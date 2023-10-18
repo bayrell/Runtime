@@ -705,7 +705,7 @@ class Collection<T> extends _Collection
 	Collection<T> removeItemIm(T value)
 	{
 		var index = this.indexOf(value);
-		if (index != -1) return this.remove(index);
+		if (index != -1) return this.removeIm(index);
 		return this;
 	}
 	Collection<T> removeItem(T value) => this.removeItemIm(value);
@@ -726,6 +726,16 @@ class Collection<T> extends _Collection
 	}
 	Collection<T> removeItems(Collection<T> values) => this.removeItemsIm(values);
 	
+	
+	/**
+	 * Find value and remove
+	 */
+	Collection<T> findAndRemove(fn f)
+	{
+		var index = this.find(f);
+		if (index != -1) return this.removeIm(index);
+		return this;
+	}
 	
 	
 	/**

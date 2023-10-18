@@ -26,6 +26,7 @@ struct Callback extends BaseStruct
 {
 	var obj;
 	string name;
+	var tag = null;
 	
 	
 	/**
