@@ -14,6 +14,7 @@
 		"Monad.bay",
 		"Vector.bay",
 		"Exceptions/RuntimeException.bay",
+		"Exceptions/AssertException.bay",
 		"Exceptions/ApiException.bay",
 		"Exceptions/AssignStructValueError.bay",
 		"Exceptions/FileNotFound.bay",
