@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.BaseObject;
 use Runtime.BaseStruct;
+use Runtime.Callback;
 use Runtime.Reference;
 use Runtime.Exceptions.FileNotFound;
 use Runtime.Exceptions.RuntimeException;
@@ -152,15 +153,15 @@ class ModelProxy<T> extends BaseObject
 		
 		if ( rtl::method_exists(old_model, method_name) )
 		{
-			fn f = rtl::method(old_model, method_name);
-			new_model = rtl::apply(f, args);
+			fn f = new Callback{"obj": old_model, "name": method_name};
+			new_model = f.call(args);
 			this.setNewModel(new_model);
 		}
 		elseif ( rtl::method_exists(class_name, method_name) )
 		{
-			fn f = rtl::method(class_name, method_name);
+			fn f = new Callback{"obj": class_name, "name": method_name};
 			args = args.prependIm(this);
-			rtl::apply(f, args);
+			new_model = f.call(args);
 		}
 		else
 		{
@@ -188,9 +189,9 @@ class ModelProxy<T> extends BaseObject
 		
 		if ( rtl::method_exists(class_name, method_name) )
 		{
-			fn f = rtl::method(class_name, method_name);
+			fn f = new Callback{"obj": class_name, "name": method_name};
 			args = args.prependIm(this);
-			res = await rtl::applyAsync(f, args);
+			res = await f.callAsync(args);
 		}
 		else
 		{

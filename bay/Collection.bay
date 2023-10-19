@@ -750,7 +750,11 @@ class Collection<T> extends _Collection
 		var arr = this.cp(ctx);
 		for (var i=0; i<arr.length; i++)
 		{
-			arr[i] = f(ctx, arr[i], i);
+			if (f instanceof Runtime.Callback)
+			{
+				arr[i] = f.call(ctx, arr[i], i);
+			}
+			else arr[i] = f(ctx, arr[i], i);
 		}
 		return arr;
 		#case ifcode PHP then
@@ -778,7 +782,10 @@ class Collection<T> extends _Collection
 		for (var i=0; i<this.length; i++)
 		{
 			var item = this[i];
-			var flag = f(ctx, item, i);
+			var flag = (f instanceof Runtime.Callback)
+				? f.call(ctx, item, i)
+				: f(ctx, item, i)
+			;
 			if (flag)
 			{
 				Array.prototype.push.call(res, item);
