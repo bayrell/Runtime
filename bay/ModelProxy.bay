@@ -129,6 +129,49 @@ class ModelProxy<T> extends BaseObject
 	
 	
 	/**
+	 * Call method name
+	 */
+	async var callAsync(string method_name)
+	{
+		Collection<string> args = null;
+		BaseStruct old_model = this.data();
+		var value = null;
+		
+		#switch
+		#case ifcode PHP then
+		$args = \Runtime\Collection::from(func_get_args())->slice(1);
+		#case ifcode ES6 then
+		args = Runtime.Collection.from( [ ...arguments ].slice(1) );
+		#endswitch
+		
+		if (old_model == null)
+		{
+			throw new RuntimeException("model is null");
+		}
+		
+		string class_name = old_model::getClassName();
+		
+		if ( rtl::method_exists(old_model, method_name) )
+		{
+			fn f = rtl::method(old_model, method_name);
+			value = await rtl::applyAsync(f, args);
+		}
+		elseif ( rtl::method_exists(class_name, method_name) )
+		{
+			fn f = rtl::method(class_name, method_name);
+			args = args.prependIm(this);
+			value = await rtl::applyAsync(f, args);
+		}
+		else
+		{
+			throw new FileNotFound(class_name ~ "::" ~ method_name, "Method");
+		}
+		
+		return value;
+	}
+	
+	
+	/**
 	 * Commit model
 	 */
 	var commit(string method_name)

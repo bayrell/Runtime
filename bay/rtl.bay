@@ -2334,12 +2334,12 @@ class rtl
 		{
 			if (value["__class_name__"] == "Runtime.Date")
 			{
-				var new_value = _Date.from(value);
+				var new_value = new _Date(value);
 				return new_value;
 			}
 			if (value["__class_name__"] == "Runtime.DateTime")
 			{
-				var new_value = _DateTime.from(value);
+				var new_value = new _DateTime(value);
 				return new_value;
 			}
 			var new_value = _Dict.from(value);
