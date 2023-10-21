@@ -75,7 +75,7 @@ struct Callback extends BaseStruct
 	/**
 	 * Call function
 	 */
-	var call(Collection args)
+	var call(Collection args = null)
 	{
 		#switch
 		
@@ -92,6 +92,8 @@ struct Callback extends BaseStruct
 		{
 			$args = $args->_arr;
 		}
+		
+		if ($args == null) $args = [];
 		
 		return call_user_func_array([$obj, $this->name], $args);
 		
@@ -113,7 +115,7 @@ struct Callback extends BaseStruct
 	/**
 	 * Call function
 	 */
-	async var callAsync(Collection args)
+	async var callAsync(Collection args = null)
 	{
 		#switch
 		
@@ -130,6 +132,8 @@ struct Callback extends BaseStruct
 		{
 			$args = $args->_arr;
 		}
+		
+		if ($args == null) $args = [];
 		
 		return call_user_func_array([$obj, $this->name], $args);
 		
