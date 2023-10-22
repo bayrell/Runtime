@@ -752,7 +752,7 @@ class Collection<T> extends _Collection
 		{
 			if (f instanceof Runtime.Callback)
 			{
-				arr[i] = f.call(ctx, arr[i], i);
+				arr[i] = f.call(ctx, [arr[i], i]);
 			}
 			else arr[i] = f(ctx, arr[i], i);
 		}
@@ -783,7 +783,7 @@ class Collection<T> extends _Collection
 		{
 			var item = this[i];
 			var flag = (f instanceof Runtime.Callback)
-				? f.call(ctx, item, i)
+				? f.call(ctx, [item, i])
 				: f(ctx, item, i)
 			;
 			if (flag)
