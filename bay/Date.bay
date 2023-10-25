@@ -21,9 +21,10 @@ namespace Runtime;
 use Runtime.rtl;
 use Runtime.BaseStruct;
 use Runtime.Dict;
+use Runtime.StringInterface;
 
 
-struct Date extends BaseStruct
+struct Date extends BaseStruct implements StringInterface
 {
 	public int y = 0;
 	public int m = 0;
@@ -40,11 +41,20 @@ struct Date extends BaseStruct
 	}
 	
 	
-	
 	/**
 	 * Normalize date time
 	 */
 	DateTime normalize() => this;
+	
+	
+	/**
+	 * Return db datetime
+	 * @return string
+	 */
+	string toString()
+	{
+		return this.y ~ "-" ~ this.m ~ "-" ~ this.d;
+	}
 }
 
 

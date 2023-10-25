@@ -21,9 +21,10 @@ namespace Runtime;
 use Runtime.rtl;
 use Runtime.BaseStruct;
 use Runtime.Dict;
+use Runtime.StringInterface;
 
 
-struct DateTime extends BaseStruct
+struct DateTime extends BaseStruct implements StringInterface
 {
 	public int y = 1970;
 	public int m = 1;

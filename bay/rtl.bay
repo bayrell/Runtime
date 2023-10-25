@@ -512,7 +512,11 @@ class rtl
 			f = c[m];
 		}
 		
-		if (f.constructor.name == 'AsyncFunction')
+		if (f instanceof Runtime.Callback)
+		{
+			return f.call(args);
+		}
+		else if (f.constructor.name == 'AsyncFunction')
 		{
 			res = null;
 			(async () => {
@@ -562,6 +566,11 @@ class rtl
 		var res;
 		if (args == null) args = [];
 		else args = Array.prototype.slice.call(args);
+		
+		if (f instanceof Runtime.Callback)
+		{
+			return await f.callAsync(args);
+		}
 		
 		if (typeof ctx != "undefined") args.unshift(ctx);
 		if (this.isString(ctx, f))
@@ -1103,15 +1112,16 @@ class rtl
 		$t = gettype($value);
 		if ($value === null) return "";
 		if ($value instanceof \Runtime\RawString) return $value->toString();
-		if ($value instanceof \Runtime\Interfaces\StringInterface) return $value->toString();
-		if (is_int($value) or is_float($value) or is_string($value) or is_int($value)) return (string)$value;
+		if ($value instanceof \Runtime\StringInterface) return $value->toString();
+		if (is_int($value) or is_float($value) or is_string($value) or is_int($value))
+			return (string)$value;
 		if ($value === true) return "1";
 		if ($value === false) return "";
 		return (string)$value;
 		
 		#case ifcode JAVASCRIPT then
 		
-		var _StringInterface = use("Runtime.Interfaces.StringInterface");
+		var _StringInterface = use("Runtime.StringInterface");
 		
 		if (value === null) return "";
 		if (typeof value == 'string') return value;

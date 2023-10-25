@@ -246,11 +246,20 @@ class ModelProxy<T> extends BaseObject
 	
 	
 	/**
-	 * Commit model
+	 * Get child model
 	 */
 	ModelProxy proxy(Collection path)
 	{
 		if (rtl::isString(path)) path = [ path ];
 		return new ModelProxy(this.container, this.getPath().concat(path));
+	}
+	
+	
+	/**
+	 * Get parent proxy
+	 */
+	ModelProxy parentProxy()
+	{
+		return new ModelProxy(this.container, this.getPath().removeLastIm());
 	}
 }
