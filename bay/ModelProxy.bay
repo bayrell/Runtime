@@ -262,4 +262,14 @@ class ModelProxy<T> extends BaseObject
 	{
 		return new ModelProxy(this.container, this.getPath().removeLastIm());
 	}
+	
+	
+	/**
+	 * fork proxy
+	 */
+	ModelProxy fork(Collection path)
+	{
+		if (rtl::isString(path)) path = [ path ];
+		return new ModelProxy(this.container, path);
+	}
 }
