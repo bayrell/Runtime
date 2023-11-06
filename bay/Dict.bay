@@ -287,7 +287,7 @@ class Dict<T> extends _Map
 		$new_obj = static::Instance($ctx);
 		if ($fields != null)
 		{
-			foreach ($fields->_arr as $key)
+			foreach ($fields->_map as $key)
 			{
 				if (isset($this->_map[$key]))
 				{
