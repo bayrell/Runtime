@@ -206,7 +206,7 @@ class OutputProvider extends BaseProvider
 			$this->print($ctx, nl2br($message), true, "err");
 		}
 		
-		#case ifcode JAVASCRIPT then
+		#case ifcode ES6 then
 		let text_color = "dark_red";
 		let isNode = false;
 		
