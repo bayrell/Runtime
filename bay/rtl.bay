@@ -408,7 +408,7 @@ class rtl
 		
 		var obj = this.find_class(class_name);
 		if (!this.exists(ctx, obj) || !(obj instanceof Function))
-			throw new Runtime.Exceptions.FileNotFound(class_name, "class name");
+			throw new Runtime.Exceptions.FileNotFound(ctx, class_name, "class name");
 		if (args == undefined || args == null){ args = []; } else { args = args.toArray(); }
 		args = args.slice(); 
 		if (typeof ctx != "undefined") args.unshift(ctx);
@@ -1827,7 +1827,7 @@ class rtl
 		var context = Context::create(ctx, d);
 		
 		/* Init context */
-		context = await context.init();
+		context = await context.init(ctx);
 		
 		/* Setup global context */
 		static::setContext(context);

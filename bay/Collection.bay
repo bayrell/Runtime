@@ -748,9 +748,10 @@ class Collection<T> extends _Collection
 		#switch
 		#case ifcode JAVASCRIPT then
 		var arr = this.cp(ctx);
+		var Callback = use("Runtime.Callback");
 		for (var i=0; i<arr.length; i++)
 		{
-			if (f instanceof Runtime.Callback)
+			if (f instanceof Callback)
 			{
 				arr[i] = f.call(ctx, [arr[i], i]);
 			}
@@ -779,10 +780,11 @@ class Collection<T> extends _Collection
 		#switch
 		#case ifcode JAVASCRIPT then
 		var res = this.constructor.Instance(ctx);
+		var Callback = use("Runtime.Callback");
 		for (var i=0; i<this.length; i++)
 		{
 			var item = this[i];
-			var flag = (f instanceof Runtime.Callback)
+			var flag = (f instanceof Callback)
 				? f.call(ctx, [item, i])
 				: f(ctx, item, i)
 			;
@@ -895,11 +897,12 @@ class Collection<T> extends _Collection
 		#switch
 		#case ifcode JAVASCRIPT then
 		let res = [];
+		var Callback = use("Runtime.Callback");
 		
 		for (var i=0; i<this.length; i++)
 		{
 			let item = this[i];
-			if (item instanceof Runtime.Collection)
+			if (item instanceof Collection)
 			{
 				item = item.flatten();
 				res = res.concat( item );
