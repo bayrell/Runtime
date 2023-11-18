@@ -862,4 +862,22 @@ class rs
 		
 		return res;
 	}
+	
+	
+	/**
+	 * Format string
+	 */
+	string format(string s, Dict params = null)
+	{
+		if (params == null) return s;
+		
+		params.each(
+			void (string value, string key) use (s)
+			{
+				s = rs::replace("%" ~ key ~ "%", value, s);
+			}
+		);
+		
+		return s;
+	}
 }

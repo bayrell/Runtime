@@ -376,7 +376,7 @@ class rtl
 	 * Call function
 	 * @return fn
 	 */
-	static var apply(fn f, Collection args)
+	static var apply(fn f, Collection args = null)
 	{
 		#switch
 		#case ifcode PHP then
@@ -393,7 +393,6 @@ class rtl
 		
 		#case ifcode JAVASCRIPT then
 		
-		var res;
 		if (args == null) args = [];
 		else args = Array.prototype.slice.call(args);
 		
@@ -408,10 +407,10 @@ class rtl
 	
 	
 	/**
-	 * Returns callback
+	 * Run async function
 	 * @return fn
 	 */
-	static void runPromise(var promise)
+	static void runAsync(fn f, Collection args = null)
 	{
 		#switch
 		#case ifcode PHP then
@@ -419,7 +418,7 @@ class rtl
 		(async () => {
 			try
 			{
-				await promise;
+				await rtl::apply(f, args);
 			}
 			catch (e)
 			{
@@ -692,8 +691,8 @@ class rtl
 		if (rtl::isNumber(value)) return "number";
 		if (rtl::isBoolean(value)) return "boolean";
 		if (rtl::isCallable(value)) return "fn";
-		if (value instanceof Vector) return "vector";
-		if (value instanceof Map) return "map";
+		if (value instanceof Collection) return "collection";
+		if (value instanceof Dict) return "dict";
 		if (value instanceof BaseObject) return "object";
 		return "unknown";
 	}
@@ -818,6 +817,20 @@ class rtl
 	
 	
 	/**
+	 * Return true if value is Promise
+	 * @param var value
+	 * @return bool
+	 */
+	static bool isPromise(var value)
+	{
+		#ifcode JAVASCRIPT then
+		if (value instanceof Promise) return true;
+		#endif
+		return false;
+	}
+	
+	
+	/**
 	 * Convert value to string
 	 * @param var value
 	 * @return string
@@ -829,9 +842,9 @@ class rtl
 		
 		$t = gettype($value);
 		if ($value === null) return "";
-		if ($value instanceof \Runtime\RawString) return $value->toString();
+		if (is_string($value)) return $value;
 		if ($value instanceof \Runtime\StringInterface) return $value->toString();
-		if (is_int($value) or is_float($value) or is_string($value) or is_int($value))
+		if (is_int($value) or is_float($value) or is_int($value))
 			return (string)$value;
 		if ($value === true) return "1";
 		if ($value === false) return "";
