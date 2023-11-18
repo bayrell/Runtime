@@ -451,13 +451,11 @@ class rtl
 		$key = $path->first();
 		$path = $path->slice(1);
 		$val = $def_val;
-		if ($item instanceof \Runtime\Dict or $item instanceof \Runtime\Collection)
-		{
-			$item = $item->get($key, $def_val);
-			$val = static::attr($item, $path, $def_val);
-			return $val;
-		}
-		else if ($item instanceof \Runtime\BaseStruct)
+		if (
+			$item instanceof \Runtime\Dict or
+			$item instanceof \Runtime\Collection or
+			$item instanceof \Runtime\BaseStruct
+		)
 		{
 			$item = $item->get($key, $def_val);
 			$val = static::attr($item, $path, $def_val);
@@ -465,7 +463,8 @@ class rtl
 		}
 		else if ($item instanceof \Runtime\BaseObject)
 		{
-			$item = $item->takeValue($key, $def_val);
+			if (property_exists($item, $key)) $item = $item->$key;
+			else $item = $def_val;
 			$val = static::attr($item, $path, $def_val);
 			return $val;
 		}
@@ -489,23 +488,15 @@ class rtl
 		}
 		if (typeof item == "string") return item.charAt(path[0]);
 		var key = path.first();
-		var path = path.removeFirstIm();
+		var path = path.slice(1);
 		var val = def_val;
-		if (item instanceof Dict || item instanceof Collection)
+		if (
+			item instanceof Dict ||
+			item instanceof Collection ||
+			item instanceof BaseStruct
+		)
 		{
 			var new_item = item.get(key, def_val);
-			val = this.attr(new_item, path, def_val);
-			return val;
-		}
-		else if (item instanceof BaseStruct)
-		{
-			var new_item = item.get(key, def_val);
-			val = this.attr(new_item, path, def_val);
-			return val;
-		}
-		else if (item instanceof BaseObject)
-		{
-			var new_item = item.takeValue(key, def_val);
 			val = this.attr(new_item, path, def_val);
 			return val;
 		}

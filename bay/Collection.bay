@@ -435,29 +435,6 @@ class Collection<T> extends _Collection
 	
 	
 	/**
-	 * Insert first value size_to array
-	 * @return T value
-	 */
-	Collection<T> unshiftIm(T value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var arr = this.cp();
-		Array.prototype.unshift.call(arr, value);
-		return arr;
-		#case ifcode PHP then
-		$res = $this->cp();
-		array_unshift($res->_arr, $value);
-		return $res;
-		#endswitch
-	}
-	Collection<T> unshift(T value)
-	{
-		throw new RuntimeException("Deprecated Collection unshift");
-	}
-	
-	
-	/**
 	 * Insert value to position
 	 * @param T value
 	 * @param int pos - position
