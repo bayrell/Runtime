@@ -137,9 +137,7 @@ class _Collection implements \ArrayAccess, \JsonSerializable
 		$count = func_get_args();
 		if ($count > 0)
 		{
-			$start = 1;
-			if (!\Runtime\rtl::is_context()) $start = 0;
-			$this->_arr = array_slice($count, $start);
+			$this->_arr = array_slice($count, 0);
 		}
 	}
 	
@@ -477,7 +475,7 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
-	Collection<T> insert(T value)
+	Collection<T> insert(int pos, T value)
 	{
 		throw new RuntimeException("Deprecated Collection insert");
 	}
@@ -508,7 +506,7 @@ class Collection<T> extends _Collection
 		return $res;
 		#endswitch
 	}
-	Collection<T> set(T value)
+	Collection<T> set(int pos, T value)
 	{
 		throw new RuntimeException("Deprecated Collection set");
 	}

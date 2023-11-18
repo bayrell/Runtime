@@ -28,7 +28,7 @@ use Runtime.Exceptions.RuntimeException;
 use Runtime.Hooks.RuntimeHook;
 
 
-class Context
+class Context extends BaseObject
 {
 	/* Struct data */
 	protected var app = null;
@@ -77,7 +77,7 @@ class Context
 	/**
 	 * Create context
 	 */
-	static void create(Dict params)
+	static Context create(Dict params)
 	{
 		if (not (params instanceof Dict))
 		{

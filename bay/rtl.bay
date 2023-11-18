@@ -449,7 +449,7 @@ class rtl
 		}
 		if (is_string($item)) return mb_substr($item, $path->_arr[0], 1);
 		$key = $path->first();
-		$path = $path->removeFirstIm();
+		$path = $path->slice(1);
 		$val = $def_val;
 		if ($item instanceof \Runtime\Dict or $item instanceof \Runtime\Collection)
 		{
@@ -688,7 +688,8 @@ class rtl
 	{
 		if (value == null) return "null";
 		if (rtl::isString(value)) return "string";
-		if (rtl::isNumber(value)) return "number";
+		if (rtl::isInt(value)) return "int";
+		if (rtl::isDouble(value)) return "double";
 		if (rtl::isBoolean(value)) return "boolean";
 		if (rtl::isCallable(value)) return "fn";
 		if (value instanceof Collection) return "collection";
@@ -706,7 +707,8 @@ class rtl
 	{
 		if (value == null) return true;
 		if (rtl::isString(value)) return true;
-		if (rtl::isNumber(value)) return true;
+		if (rtl::isInt(value)) return true;
+		if (rtl::isDouble(value)) return true;
 		if (rtl::isBoolean(value)) return true;
 		return false;
 	}
@@ -1280,7 +1282,7 @@ class rtl
 		static::setContext(context);
 		
 		/* Init context */
-		context = await context.init();
+		await context.init();
 		
 		return context;
 	}
