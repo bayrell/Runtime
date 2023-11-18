@@ -18,63 +18,68 @@
 
 namespace Runtime;
 
+
 /* Math Functions */
-class math
+class Math
 {
-	
 	/**
-	 * Round double
+	 * Round up
+	 * @param double value
+	 * @return int
 	 */
-	pure int round(double a)
+	pure string ceil(double value)
 	{
 		#switch
 		#case ifcode PHP then
 		
-		return round($a);
+		return ceil($value);
 		
 		#case ifcode JAVASCRIPT then
 		
-		return Math.round(a);
+		return Math.ceil(value);
 		
 		#endswitch
 	}
 	
 	
 	/**
-	 * Floor double
+	 * Round down
+	 * @param double value
+	 * @return int
 	 */
-	pure int floor(double a)
+	pure string floor(double value)
 	{
 		#switch
 		#case ifcode PHP then
 		
-		return floor($a);
+		return floor($value);
 		
 		#case ifcode JAVASCRIPT then
 		
-		return Math.floor(a);
+		return Math.floor(value);
 		
 		#endswitch
 	}
 	
 	
 	/**
-	 * Floor ceil
+	 * Round down
+	 * @param double value
+	 * @return int
 	 */
-	pure int ceil(double a)
+	pure string round(double value)
 	{
 		#switch
 		#case ifcode PHP then
 		
-		return ceil($a);
+		return round($value);
 		
 		#case ifcode JAVASCRIPT then
 		
-		return Math.ceil(a);
+		return Math.round(value);
 		
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -94,6 +99,46 @@ class math
 	{
 		if (a < b) return a;
 		else return b;
+	}
+	
+	
+	/**
+	 * Returns random value x, where 0 <= x < 1
+	 * @return double
+	 */
+	static double urandom()
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return mt_rand() / (mt_getrandmax() + 1);
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (
+			window != undefined && window.crypto != undefined &&
+			window.crypto.getRandomValues != undefined)
+		{
+			var s = new Uint32Array(1);
+			window.crypto.getRandomValues(s);
+			return s[0] / 4294967296;
+		}
+		
+		return Math.random();
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Returns random value x, where a <= x <= b
+	 * @param int a
+	 * @param int b
+	 * @return int
+	 */
+	static int random(int a, int b)
+	{
+		return static::round(static::urandom() * (b - a + 1) + a);
 	}
 	
 }

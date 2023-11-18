@@ -1,3 +1,5 @@
+<?php
+
 /*!
  *  Bayrell Runtime Library
  *
@@ -18,429 +20,39 @@
 
 namespace Runtime;
 
-use Runtime.lib;
-use Runtime.BaseObject;
-use Runtime.BaseProvider;
-use Runtime.BaseStruct;
-use Runtime.Entity.Provider;
-use Runtime.Exceptions.RuntimeException;
-use Runtime.Hooks.RuntimeHook;
 
-
-struct Context extends BaseStruct
+class Context
 {
-	/* Struct data */
-	var app = null;
-	string base_path = "";
-	string entry_point = "";
-	Collection<string> start_modules = [];
-	Collection<string> cli_args = [];
-	Dict<string> environments = {};
-	Collection<string> modules = [];
-	Dict<BaseObject> providers = {};
-	Collection<BaseStruct> entities = [];
-	int start_time = 0;
-	string tz = "UTC";
-	bool initialized = false;
-	
 	
 	/**
-	 * Returns modules entities
+	 * Call hook
 	 */
-	pure Collection<BaseStruct> getEntitiesFromModules(Collection<string> modules)
+	function callHook($hook_name, Map $params)
 	{
-		Vector<BaseStruct> entities = new Vector();
-		for (int i=0; i<modules.count(); i++)
-		{
-			string module_class_name = modules.item(i) ~ ".ModuleDescription";
-			if (rtl::method_exists(module_class_name, "entities"))
-			{
-				fn f = rtl::method(module_class_name, "entities");
-				Collection<BaseStruct> arr = f();
-				entities.appendVector(arr);
-			}
-		}
-		return entities.removeDuplicates().toCollection();
 	}
 	
 	
 	/**
-	 * Add provider
+	 * Init context
 	 */
-	Context addProvider(string provider_name, BaseProvider provider)
+	function init()
 	{
-		Context c = this;
-		
-		if (this.providers.has(provider_name))
-		{
-			throw new RuntimeException("Provider + '" + provider_name + "' already registered");
-		}
-		if (not(provider instanceof BaseProvider))
-		{
-			throw new RuntimeException("Provider + '" + provider_name +
-				"' must be intstanceof BaseProvider");
-		}
-		
-		c <= providers <= c.providers.setIm(provider_name, provider);
-		
-		return c;
-	}
-	
-	
-	/**
-	 * Returns provider by name
-	 */
-	BaseObject provider(string provider_name)
-	{
-		if (not this.providers.has(provider_name))
-		{
-			throw new RuntimeException("Provider '" ~ provider_name ~ "' not found");
-		}
-		return this.providers.get(provider_name);
-	}
-	
-	
-	/**
-	 * Return environment
-	 */
-	var env(string name)
-	{
-		var value = this.environments[name];
-		
-		Dict hook_res = this.callHook(RuntimeHook::ENV, {
-			"name": name,
-			"value": value,
-		});
-		
-		return hook_res["value"];
-	}
-	
-	
-	/**
-	 * Create context
-	 */
-	static void create(Dict d)
-	{
-		if (not (d instanceof Dict))
-		{
-			d = Dict::@from(d);
-		}
-		
-		#switch
-		
-		#case ifcode PHP then
-		
-		
-		#case ifcode JAVASCRIPT then
-		
-		if (!d.has(ctx, "start_time"))
-		{
-			d = d.setIm(ctx, "start_time", Date.now());
-		}
-		
-		#case ifcode NODEJS then
-		
-		let Collection = use("Runtime.Collection");
-		let Dict = use("Runtime.Dict");
-		
-		if (!d.has(ctx, "cli_args"))
-		{
-			d = d.setIm(ctx, "cli_args", Collection.from(process.argv.slice(1)));
-		}
-		if (!d.has(ctx, "base_path"))
-		{
-			d = d.setIm(ctx, "base_path", process.cwd());
-		}
-		if (!d.has(ctx, "environments"))
-		{
-			d = d.setIm(ctx, "environments", Dict.from(process.env));
-		}
-		
-		#endswitch
-		
-		if (d.has("modules"))
-		{
-			var modules = d.get("modules");
-			if (not(modules instanceof Collection))
-			{
-				d <= modules <= Collection::@from(modules);
-			}
-		}
-		
-		/* Setup default environments */
-		if (not d.has("environments")) d <= environments <= new Dict();
-		
-		Dict env = d["environments"];
-		if (not env.has("DEBUG")) env <= DEBUG <= false;
-		if (not env.has("LOCALE")) env <= LOCALE <= "en_US";
-		if (not env.has("LOCALE_CODE")) env <= LOCALE_CODE <= "en";
-		d <= environments <= env;
-		
-		Context instance = rtl::newInstance(static::getClassName(), [ d ]);
-		
-		return instance;
-	}
-	
-	
-	/**
-	 * Init
-	 */
-	async Context init()
-	{
-		var hook_res;
-		
-		Context c = this;
-		
-		if (c.initialized) return c;
-		
-		/* Create app */
-		if (c.entry_point != "")
-		{
-			c <= app <= rtl::newInstance(c.entry_point);
-		}
-		
-		/* Add start modules */
-		c <= start_modules <= c.modules;
-		
-		/* Get modules */
-		Collection<string> modules = c.modules;
-		if (modules.indexOf("Runtime")) modules = modules.prependIm("Runtime");
-		
-		/* Extends modules */
-		Collection<string> modules = static::getRequiredModules(modules);
-		c <= modules <= modules;
-		
-		/* Extends app modules */
-		if (c.app != null and rtl::method_exists(c.app, "modules"))
-		{
-			c = await c.app.modules(c);
-		}
-		
-		/* Get modules entities */
-		Collection<BaseStruct> entities = static::getEntitiesFromModules(c.modules);
-		c <= entities <= entities;
-		
-		/* Create providers */
-		Collection<Provider> providers = c.entities.filter( lib::isInstance(classof Provider) );
-		for (int i=0; i<providers.count(); i++)
-		{
-			Provider info = providers[i];
-			if (info.value)
-			{
-				BaseProvider provider = null;
-				if (info.value instanceof BaseProvider)
-				{
-					provider = info.value;
-				}
-				else if (rtl::isString(info.value))
-				{
-					provider = rtl::newInstance(info.value);
-				}
-				if (provider)
-				{
-					c = c.addProvider(info.name, provider);
-				}
-				else if (info.value)
-				{
-					throw new RuntimeException("Wrong declare provider '" ~ info.name ~ "'");
-				}
-			}
-		}
-		
-		/* Init providers */
-		Collection<string> providers_names = c.providers.keys();
-		for (int i=0; i<providers_names.count(); i++)
-		{
-			string provider_name = providers_names[i];
-			BaseProvider provider = c.providers[provider_name];
-			c = await provider.init(c);
-		}
-		
-		/* Hook init app */
-		hook_res = await c.callAsyncHook(RuntimeHook::INIT, { "context": c });
-		c = hook_res["context"];
-		
-		/* Init app */
-		if (c.app != null and rtl::method_exists(c.app, "init"))
-		{
-			c = await c.app.init(c);
-		}
-		
-		/* Set initialized */
-		c <= initialized <= true;
-		
-		return c;
 	}
 	
 	
 	/**
 	 * Start context
 	 */
-	async void start()
+	function start()
 	{
-		/* Start providers */
-		Collection<string> providers_names = this.providers.keys();
-		for (int i=0; i<providers_names.count(); i++)
-		{
-			string provider_name = providers_names[i];
-			BaseProvider provider = this.providers[provider_name];
-			if (not provider.started)
-			{
-				await provider.start();
-				provider.started = true;
-			}
-		}
-		
-		/* Hook start app */
-		await this.callAsyncHook(RuntimeHook::START, {});
-		
-		/* Start app */
-		if (this.app and rtl::method_exists(this.app, "start"))
-		{
-			await this.app.start();
-		}
-		
-		/* Hook launched app */
-		await this.callAsyncHook(RuntimeHook::LAUNCHED, {});
 	}
 	
 	
 	/**
 	 * Run context
 	 */
-	async int run()
+	function run()
 	{
-		int code = 0;
-		
-		/* Run app */
-		if (this.app == null)
-			return;
-		
-		/* Run entry_point */
-		if (rtl::method_exists(this.app, "main"))
-		{
-			/* Hook launched app */
-			await this.callAsyncHook(RuntimeHook::RUN, {});
-			
-			code = await this.app.main();
-		}
-		
-		return code;
 	}
 	
-	
-	/**
-	 * Call hook
-	 */
-	Dict callHook(string hook_name, Dict d)
-	{
-		var hook = this.provider("hook");
-		Collection<fn> methods_list = hook.getMethods(hook_name);
-		
-		for (int i=0; i<methods_list.count(); i++)
-		{
-			Dict info = methods_list[i];
-			fn f = rtl::method(info["obj"], info["method_name"]);
-			d = f(d);
-		}
-		
-		return d;
-	}
-	
-	
-	/**
-	 * Call async hook
-	 */
-	async Dict callAsyncHook(string hook_name, Dict d)
-	{
-		var hook = this.provider("hook");
-		Collection<fn> methods_list = hook.getMethods(hook_name);
-		
-		for (int i=0; i<methods_list.count(); i++)
-		{
-			Dict info = methods_list[i];
-			fn f = rtl::method(info["obj"], info["method_name"]);
-			d = await f(d);
-		}
-		
-		return d;
-	}
-	
-	
-	/**
-	 * Returns required modules
-	 * @param string class_name
-	 * @return Collection<string>
-	 */
-	pure void _getRequiredModules
-	(
-		Vector<string> res,
-		Map<string> cache,
-		Collection<string> modules,
-		fn filter = null
-	)
-	{
-		if (modules == null) return;
-		if (filter) modules = modules.filter(filter);
-		for (int i=0; i<modules.count(); i++)
-		{
-			string module_name = modules.item(i);
-			if (cache.get(module_name, false) == false)
-			{
-				cache.setValue(module_name, true);
-				fn f = rtl::method(module_name ~ ".ModuleDescription", "requiredModules");
-				Dict<string> sub_modules = f();
-				if (sub_modules != null)
-				{
-					Collection<string> sub_modules = sub_modules.keys();
-					static::_getRequiredModules(res, cache, sub_modules);
-				}
-				res.pushValue(module_name);
-			}
-		}
-	}
-	
-	
-	/**
-	 * Returns all modules
-	 * @param Collection<string> modules
-	 * @return Collection<string>
-	 */
-	pure Collection<string> getRequiredModules(Collection<string> modules)
-	{
-		Vector<string> res = new Vector();
-		Map<string> cache = new Map();
-		static::_getRequiredModules(res, cache, modules);
-		res = res.removeDuplicates();
-		return res.toCollection();
-	}
-	
-	
-	/**
-	 * Translate message
-	 */
-	string translate(string module, string s, Dict params = null)
-	{
-		if (params == null) return s;
-		
-		return this.format(s, params);
-	}
-	
-	
-	/**
-	 * Format string
-	 */
-	string format(string s, Dict params = null)
-	{
-		if (params == null) return s;
-		
-		params.each(
-			void (string value, string key) use (s)
-			{
-				s = rs::replace("%" ~ key ~ "%", value, s);
-			}
-		);
-		
-		return s;
-	}
 }

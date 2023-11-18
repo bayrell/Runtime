@@ -21,8 +21,7 @@ namespace Runtime;
 use Runtime.re;
 use Runtime.rtl;
 use Runtime.lib;
-use Runtime.math;
-use Runtime.Collection;
+use Runtime.Math;
 use Runtime.Vector;
 
 
@@ -131,46 +130,6 @@ class rs
 		#case ifcode JAVASCRIPT then
 		
 		return use("Runtime.rtl").toStr(ch).charCodeAt(0);
-		
-		#endswitch
-	}
-	
-	
-	/**
-	 * Convert string to lower case
-	 * @param string s
-	 * @return string
-	 */
-	static string strtolower(string s)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		return mb_strtolower($s);
-		
-		#case ifcode JAVASCRIPT then
-		
-		return use("Runtime.rtl").toStr(s).toLowerCase();
-		
-		#endswitch
-	}
-	
-	
-	/**
-	 * Convert string to upper case
-	 * @param string s
-	 * @return string
-	 */
-	static string strtoupper(string s)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		return mb_strtoupper($s);
-		
-		#case ifcode JAVASCRIPT then
-		
-		return use("Runtime.rtl").toStr(s).toUpperCase();
 		
 		#endswitch
 	}
@@ -399,37 +358,6 @@ class rs
 	}
 	
 	
-	/**
-	 * Escape HTML special chars
-	 * @param string s
-	 * @return string
-	 */
-	pure string htmlEscape(string s)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		if ($s instanceof \Runtime\Collection) return $s;
-		return htmlspecialchars($s, ENT_QUOTES | ENT_HTML401);
-		
-		#case ifcode JAVASCRIPT then
-		
-		if (s instanceof Runtime.Collection) return s;
-		var obj = {
-			"<":"&lt;",
-			">": "&gt;", 
-			"&": "&amp;",
-			'"': '&quot;',
-			"'": '&#39;',
-			'`': '&#x60;',
-			'=': '&#x3D;'
-		};
-		return (new String(s)).replace(/[<>&"'`=]/g, function(v){ return obj[v]; });
-		
-		#endswitch
-	}
-	pure string escapeHtml(string s) => static::htmlEscape(s);
-	
 	
 	/**
 	 * Разбивает путь файла на составляющие
@@ -453,9 +381,6 @@ class rs
 		int ext_length = static::strlen(extension);
 		if (ext_length > 0) ext_length++;
 		string filename = static::substr(basename, 0, -1*ext_length);
-		
-		delete arr1;
-		delete arr2;
 		
 		return
 		{
@@ -483,7 +408,6 @@ class rs
 			int sz = 0 - rs::strlen(ext) - 1;
 			res = rs::substr(res, 0, sz);
 		}
-		delete ret;
 		return res;
 	}
 	
@@ -497,7 +421,6 @@ class rs
 	{
 		Dict ret = static::pathinfo(filepath);
 		string res = ret["basename"];
-		delete ret;
 		return res;
 	}
 	
@@ -511,7 +434,6 @@ class rs
 	{
 		Dict ret = static::pathinfo(filepath);
 		string res = ret["extension"];
-		delete ret;
 		return res;
 	}
 	
@@ -525,7 +447,6 @@ class rs
 	{
 		Dict ret = static::pathinfo(filepath);
 		string res = ret["dirname"];
-		delete ret;
 		return res;
 	}
 	
@@ -536,18 +457,6 @@ class rs
 	static string nl2br(string s)
 	{
 		return static::replace("\n", "<br/>", s);
-	}
-	
-	
-	/**
-	 * Remove spaces
-	 */
-	static string spaceless(string s)
-	{
-		s = re::replace("\s+", " ", s);
-		s = re::replace("\t", "", s);
-		s = re::replace("\n", "", s);
-		return s;
 	}
 	
 	
@@ -583,8 +492,6 @@ class rs
 		
 		#endswitch
 	}
-	static int strpos(string s, string search, string offset = 0)
-		=> static::indexOf(s, search, offset);
 	
 	
 	/**
@@ -601,6 +508,38 @@ class rs
 		return encodeURIComponent(s);
 		#endswitch
 	}
+	
+	
+	/**
+	 * Escape HTML special chars
+	 * @param string s
+	 * @return string
+	 */
+	pure string htmlEscape(string s)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if ($s instanceof \Runtime\Collection) return $s;
+		return htmlspecialchars($s, ENT_QUOTES | ENT_HTML401);
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (s instanceof Runtime.Collection) return s;
+		var obj = {
+			"<":"&lt;",
+			">": "&gt;", 
+			"&": "&amp;",
+			'"': '&quot;',
+			"'": '&#39;',
+			'`': '&#x60;',
+			'=': '&#x3D;'
+		};
+		return (new String(s)).replace(/[<>&"'`=]/g, function(v){ return obj[v]; });
+		
+		#endswitch
+	}
+	pure string escapeHtml(string s) => static::htmlEscape(s);
 	
 	
 	/**
@@ -779,198 +718,87 @@ class rs
 	
 	
 	/**
-	 * Strip tags
+	 * Generate uuid
 	 */
-	pure string strip_tags(string content, Collection<string> allowed_tags = null)
-	{
-		if (allowed_tags == null)
-		{
-			content = re::replace("<[^>]+>", "", content);
-			content = rs::trim(rs::spaceless(content));
-			return content;
-		}
-		
-		Collection matches = re::matchAll("<[^>]+>", content, "i");
-		if (matches)
-		{
-			for (int i=0; i<matches.count(); i++)
-			{
-				Collection match = matches[i];
-				string tag_str = match[0];
-				
-				Collection tag_match = re::matchAll("<(\/|)([a-zA-Z]+)(|[^>]*)>", tag_str, "i");
-				if (tag_match)
-				{
-					string tag_name = static::strtolower(tag_match[0][2]);
-					if (allowed_tags.indexOf(tag_name) == -1)
-					{
-						content = static::replace(tag_str, "", content);
-					}
-				}
-			}
-		}
-		
-		content = rs::trim(rs::spaceless(content));
-		return content;
-	}
-	
-	
-	/* =================== Deprecated =================== */
-	
-	
-	/**
-	 * Разбивает строку на подстроки
-	 * @param string delimiter - разделитель
-	 * @param string s - строка, которую нужно разбить
-	 * @param integer limit - ограничение 
-	 * @return Vector<string>
-	 */
-	static Vector<string> explode(string delimiter, string s, int limit = -1)
+	static string uid()
 	{
 		#switch
 		#case ifcode PHP then
 		
-		$arr = [];
-		if ($limit < 0) $arr = explode($delimiter, $s);
-		else $arr = explode($delimiter, $s, $limit);
-		return Collection::from($arr);
+		$bytes = bin2hex(random_bytes(16));
+		return substr($bytes, 0, 8) . "-" .
+			substr($bytes, 8, 4) . "-" .
+			substr($bytes, 12, 4) . "-" .
+			substr($bytes, 16, 4) . "-" .
+			substr($bytes, 20);
 		
 		#case ifcode JAVASCRIPT then
-		
-		var _rtl = use("Runtime.rtl");
-		var _Collection = use("Runtime.Collection");
-		
-		var arr = null;
-		if (!_rtl.exists(limit))
-			arr = s.split(delimiter);
-		arr = s.split(delimiter, limit);
-		return _Collection.from(arr);
 		
 		#endswitch
 	}
 	
 	
 	/**
-	 * Разбивает строку на подстроки
-	 * @param string ch - разделитель
-	 * @param string s - строка, которую нужно разбить
-	 * @param integer limit - ограничение 
-	 * @return Vector<string>
+	 * Generate timestamp based uuid
 	 */
-	static string implode(string ch, Vector<string> arr)
+	static string time_uid()
 	{
 		#switch
 		#case ifcode PHP then
 		
-		return implode($s, $arr->_getArr());
+		$bytes = dechex(time()) . bin2hex(random_bytes(12));
+		return substr($bytes, 0, 8) . "-" .
+			substr($bytes, 8, 4) . "-" .
+			substr($bytes, 12, 4) . "-" .
+			substr($bytes, 16, 4) . "-" .
+			substr($bytes, 20);
 		
 		#case ifcode JAVASCRIPT then
-		
-		return arr.join(ctx, ch);
 		
 		#endswitch
 	}
 	
 	
 	/**
-	 * Returns relative path of the filepath
-	 * @param string filepath
-	 * @param string basepath
-	 * @param string ch - Directory separator
-	 * @return string relative path
+	 * Hash function
+	 * @param string
+	 * @return int hash
 	 */
-	static string relativePath(string filepath, string basepath, string ch = "/")
+	static int hash(string s, bool last=true, int x = 257, int p = 1000000007)
 	{
-		Vector<string> source = rs::explode(ch, filepath);
-		Vector<string> base = rs::explode(ch, basepath);
-		
-		source = source.filter(bool (string s){ return s != ""; });
-		base = base.filter(bool (string s){ return s != ""; });
-		
-		int i=0;
-		while (source.count() > 0 and base.count() > 0 and source.item(0) == base.item(0))
+		int h = 0;
+		int sz = rs::strlen(s);
+		for (int i=0; i<sz; i++)
 		{
-			source.shift();
-			base.shift();
+			int ch = rs::ord( rs::substr(s, i, 1) );
+			h = (h * x + ch) % p;
 		}
-		
-		base.each(
-			void (string s) use (source)
-			{
-				source.unshift("..");
-			}
-		);
-		
-		return rs::implode(ch, source);
+		if (last)
+		{
+			h = (h * x) % p;
+		}
+		return h;
 	}
 	
 	
 	/**
-	 * Return normalize path
-	 * @param string filepath - File path
+	 * Convert int to hex
+	 * @param int
 	 * @return string
 	 */
-	static string normalize(string filepath)
+	static string toHex(int h)
 	{
-		return filepath;
-	}
-	
-	
-	/**
-	 * json encode scalar values
-	 * @param {mixed} obj - объект
-	 * @param {int} flags - Флаги
-	 * @return {string} json строка
-	 */
-	static string json_encode_primitive(var s, int flags)
-	{
-
-		#switch
-		#case ifcode PHP then
-		
-		$flags = $flags || JSON_UNESCAPED_UNICODE;
-		return json_encode($s, JSON_UNESCAPED_UNICODE);
-		
-		#case ifcode JAVASCRIPT then
-		
-		if (flags & 128 == 128) 
-			return JSON.stringify(obj, null, 2);
-		return JSON.stringify(obj);
-		
-		#endswitch
-	}
-	
-	
-	/**
-	 * Search 'search' in s.
-	 */
-	static int search(string s, string search, string offset = 0)
-	{
-		#switch
-		#case ifcode PHP then
-		
-		if ($search == ""){
-			return -1;
+		string r = "";
+		string a = "0123456789abcdef";
+		while (h >= 0)
+		{
+			int c = h & 15;
+			h = h >> 4;
+			r = rs::substr(a, c, 1) ~ r;
+			if (h == 0) break;
 		}
-		$res = mb_strpos($s, $search, $offset);
-		if ($res === false)
-			return -1;
-		return $res;
-		
-		#case ifcode JAVASCRIPT then
-		
-		var _rtl = use("Runtime.rtl");
-		var res = _rtl.toStr(s).indexOf(search);
-		return res;
-		
-		#endswitch
+		return r;
 	}
-	
-	
-	/**
-	 * Is start
-	 */
-	pure bool start(string s, string search) => static::search(s, search) == 0;
 	
 	
 	/**
@@ -991,226 +819,47 @@ class rs
 	
 	
 	/**
-	 * From rgb
+	 * Generate random string
+	 * @var len - string length
+	 * @var spec
+	 *   - a - alpha
+	 *   - n - numberic
+	 * @return string
 	 */
-	pure list rgbToInt(string color)
+	static string random_string(int len = 8, string spec = "aun")
 	{
-		string ch = static::substr(color, 0, 1);
-		if (ch == "#") color = static::substr(color, 1);
+		string s = "";
+		string res = "";
+		int sz = rs::strlen(spec);
 		
-		string r = "";
-		string g = "";
-		string b = "";
-		
-		int sz = static::strlen(color);
-		if (sz == 3)
-		{
-			r = rs::substr(color, 0, 1); r ~= r;
-			g = rs::substr(color, 1, 1); g ~= g;
-			b = rs::substr(color, 2, 1); b ~= b;
-		}
-		else if (sz == 6)
-		{
-			r = rs::substr(color, 0, 2);
-			g = rs::substr(color, 2, 2);
-			b = rs::substr(color, 4, 2);
-		}
-		
-		r = static::hexdec(r);
-		g = static::hexdec(g);
-		b = static::hexdec(b);
-		
-		return [r, g, b];
-	}
-	
-	
-	/**
-	 * From rgb
-	 */
-	pure string intToRgb(int r, int g, int b)
-	{
-		#switch
-		
-		#case ifcode PHP then
-		return sprintf("%02x%02x%02x", $r, $g, $b);
-		
-		#case ifcode JAVASCRIPT then
-		
-		r = r.toString(16).padStart(2, '0');
-		g = g.toString(16).padStart(2, '0');
-		b = b.toString(16).padStart(2, '0');
-		
-		return r + g + b;
-		
-		#endswitch
-	}
-	
-	
-	/**
-	 * Brightness
-	 */
-	static string brightness(string color, int percent)
-	{
-		Collection color = static::rgbToInt(color);
-		
-		int r = color[0];
-		int g = color[1];
-		int b = color[2];
-		
-		r = math::round(r + (r * percent / 100));
-		g = math::round(g + (g * percent / 100));
-		b = math::round(b + (b * percent / 100));
-		
-		if (r > 255) r = 255;
-		if (g > 255) g = 255;
-		if (b > 255) b = 255;
-		if (r < 0) r = 0;
-		if (g < 0) g = 0;
-		if (b < 0) b = 0;
-		
-		return "#" ~ static::intToRgb(r,g,b);
-	}
-	
-	
-	/**
-	 * Retuns css hash
-	 * @param string component class name
-	 * @return string hash
-	 */
-	static memorize string hash(string s)
-	{
-		string r = "";
-		string a = "1234567890abcdef";
-		int sz = rs::strlen(s);
-		int h = 0;
 		for (int i=0; i<sz; i++)
 		{
-			int c = rs::ord( rs::substr(s, i, 1) );
-			h = ((h << 2) + (h >> 14) + c) & 65535;
+			string ch = spec[i];
+			if (ch == "a")
+			{
+				s ~= "qwertyuiopasdfghjklzxcvbnm";
+			}
+			if (ch == "u")
+			{
+				s ~= "QWERTYUIOPASDFGHJKLZXCVBNM";
+			}
+			else if (ch == "n")
+			{
+				s ~= "0123456789";
+			}
+			else if (ch == "s")
+			{
+				s ~= "!@#$%^&*()-_+='\":;'.,<>?/|~";
+			}
 		}
-		int p = 0;
-		while (h != 0 or p < 4)
+		
+		int sz_s = rs::strlen(s);
+		for (int i=0; i<len; i++)
 		{
-			int c = h & 15;
-			h = h >> 4;
-			r ~= rs::substr(a, c, 1);
-			p = p + 1;
+			int code = Math::random(0, sz_s - 1);
+			res ~= s[code];
 		}
-		return r;
-	}
-	
-	
-	/**
-	 * Returns css hash
-	 */
-	pure memorize string getCssHash(string class_name) =>
-		rtl::getParents(class_name)
-			|> .filter
-			(
-				bool (string class_name) =>
-					class_name != "Runtime.BaseObject" and
-					class_name != "Runtime.Web.Component"
-			)
-			|> .map
-			(
-				string (string class_name) => "h-" ~ static::hash(class_name)
-			)
-			|> lib::join(" ")
-		;
-	
-	
-	/**
-	 * Escape html
-	 */
-	pure string _escape_html(var s)
-	{
-		#switch
-		#case ifcode PHP then
-		if (gettype($s) == "array") return $s;
-		if ($s instanceof \Runtime\RawString) return $s;
-		#endswitch
-		if (rtl::isString(s)) return rs::escapeHtml(s);
-		if (s instanceof Collection) return rs::join("", s);
-		return rs::escapeHtml( rtl::toString(s) );
-	}
-	
-	
-	/**
-	 * To html
-	 */
-	pure string _to_html(var s)
-	{
-		return s;
-	}
-	
-	
-	/**
-	 * Concat attr
-	 */
-	pure Dict _concat_attrs(Dict arr1, var arr2)
-	{
-		if (rtl::isString(arr2)) arr2 = [ arr2 ];
-		return arr1 != null ? arr1.concat(arr2) : arr2;
-	}
-	
-	
-	/**
-	 * Merge attrs
-	 */
-	pure Dict _merge_attrs(Dict res, Dict attr2)
-	{
-		if (not rtl::exists(attr2)) return res;
-		#ifcode JAVASCRIPT then
-		return Object.assign(res, attr2.toObject());
-		#endif
+		
 		return res;
 	}
-	
-	
-	/**
-	 * Join attrs to string
-	 */
-	pure string _join_attrs(Dict attrs) =>
-		rtl::exists(attrs) ?
-			rs::join
-			(
-				" ",
-				attrs.map(
-					string (string k, string v) => k ~ "= '" ~ static::_escape_attr(v) ~ "'"
-				)
-			) : ""
-	;
-	
-	
-	/**
-	 * Escape attr
-	 */
-	pure string _escape_attr(var s)
-	{
-		if (s instanceof Dict)
-		{
-			s = s.reduce
-			(
-				string (string s, string val, string key) => s ~ key ~ ":" ~ val ~ ";",
-				""
-			);
-		}
-		return rs::escapeHtml(s);
-	}
-	
-	
-	#ifcode PHP then
-	static function _p(&$arr1, $s)
-	{
-		if (gettype($s) == "string" || $s instanceof \Runtime\RawString)
-		{
-			$arr1[] = $s;
-		}
-		if (gettype($s) == "array")
-		{
-			foreach ($s as $v) $arr1[] = $v;
-		}
-	}
-	#endif
-	
 }

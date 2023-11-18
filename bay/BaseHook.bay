@@ -59,6 +59,5 @@ class BaseHook extends BaseObject
 	 */
 	void register_hooks()
 	{
-		
 	}
 }

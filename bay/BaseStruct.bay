@@ -28,8 +28,7 @@ use Runtime.SerializeInterface;
 
 
 class BaseStruct extends BaseObject implements SerializeInterface
-{	
-	
+{
 	/** 
 	 * Constructor
 	 */
@@ -47,13 +46,72 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	}
 	
 	
+	/**
+	 * Init struct data
+	 */
+	protected Dict _init_changes(Dict changes) => changes;
+	
 	
 	/**
-	 * Copy this struct with new values
+	 * Assign new values
+	 */
+	protected void _assign_values(Dict changes = null)
+	{
+		#switch
+		#case ifcode PHP then
+		if (gettype($changes) == "array")
+		{
+			$changes = new \Runtime\Dict($changes);
+		}
+		#case ifcode JAVASCRIPT then
+		if (typeof changes == 'changesect' && !(changes instanceof Runtime.Dict))
+		{
+			changes = new Runtime.Dict(changes);
+		}
+		#endswitch
+		
+		if (changes == null) return;
+		if (changes.keys().count() == 0) return;
+		
+		changes = this._init_changes(changes);
+		
+		#switch
+		#case ifcode PHP then
+		
+		if ($changes instanceof \Runtime\Dict) $changes = $changes->_map;
+		if (gettype($changes) == "array")
+		{
+			foreach ($changes as $key => $value)
+			{
+				$k = $this->__getKey($key);
+				if (property_exists($this, $k))
+				{
+					$this->$k = $value;
+				}
+			}
+		}
+		
+		#case ifcode JAVASCRIPT then
+		
+		var _Dict = use("Runtime.Dict");
+		var rtl = use("Runtime.rtl");
+		if (changes instanceof _Dict) changes = changes._map;
+		for (var key in changes)
+		{
+			var value = changes[key];
+			this[key] = value;
+		}
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Clone this struct with new values
 	 * @param Map obj = null
 	 * @return BaseStruct
 	 */
-	public BaseStruct copy(Dict obj = null)
+	public BaseStruct clone(Dict obj = null)
 	{
 		if (obj == null) return this;
 		
@@ -67,7 +125,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		#case ifcode JAVASCRIPT then
 		
 		var proto = Object.getPrototypeOf(this);
-		var item = Object.create(proto); /* item._init(); */
+		var item = Object.create(proto);
 		item = Object.assign(item, this);
 		
 		item._assign_values(ctx, obj);
@@ -82,40 +140,15 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	}
 	
 	
-	
 	/**
 	 * Copy this struct with new values
 	 * @param Map obj = null
 	 * @return BaseStruct
 	 */
-	public BaseStruct clone(Dict obj = null)
+	public BaseStruct copy(Dict obj = null)
 	{
-		return this.copy(obj);
+		return this.clone(obj);
 	}
-	
-	
-	
-	/**
-	 * Clone this struct with fields
-	 * @param Collection fields = null
-	 * @return BaseStruct
-	 */
-	public BaseStruct intersect(Collection fields = null)
-	{
-		if (fields == null) return {};
-		
-		Map obj = new Map();
-		for (int i=0; i<fields.count(); i++)
-		{
-			string field_name = fields[i];
-			obj.setValue(field_name, this.get(field_name));
-		}
-		
-		/* Return object */
-		BaseStruct res = rtl::newInstance( this.getClassName(), [ obj.toDict() ] );
-		return res;
-	}
-	
 	
 	
 	/**
@@ -138,24 +171,11 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	}
 	
 	
-	
 	/**
-	 * Update struct
-	 * @param Collection<string> path
-	 * @param var value
-	 * @return BaseStruct
+	 * Returns struct as Map
+	 * @return Map
 	 */
-	pure BaseStruct set(BaseStruct item, Collection<string> path, var value) =>
-		rtl::setAttr(item, path, value)
-	;
-	
-	
-	
-	/**
-	 * Returns struct as Dict
-	 * @return Dict
-	 */
-	Dict toDict()
+	Map toMap()
 	{
 		Map<var> values = new Map();
 		Collection<string> names = rtl::getFields(static::getClassName());
@@ -168,9 +188,8 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		}
 		
 		delete names;
-		return values.toDict();
+		return values;
 	}
-	
 	
 	
 	#switch

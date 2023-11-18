@@ -22,7 +22,7 @@ use Runtime.BaseStruct;
 use Runtime.Exceptions.RuntimeException;
 
 
-struct Callback extends BaseStruct
+class Callback
 {
 	var obj;
 	string name;
@@ -32,27 +32,17 @@ struct Callback extends BaseStruct
 	/**
 	 * Constructor
 	 */
-	public void constructor(Dict obj = null)
+	public void constructor(var obj, string name, var tag = null)
 	{
-		if (not(obj instanceof Dict))
-		{
-			Collection<string> args = null;
-			
-			#switch
-			#case ifcode PHP then
-			$args = \Runtime\Collection::from(func_get_args());
-			#case ifcode ES6 then
-			args = Runtime.Collection.from( [ ...arguments ] );
-			#endswitch
-			
-			obj = {
-				"obj": args.get(0),
-				"name": args.get(1),
-			}
-		}
+		/* Init object */
+		this._init();
 		
-		parent(obj);
+		/* Set variables */
+		this.obj = obj;
+		this.name = name;
+		this.tag = tag;
 		
+		/* Check if callback exists */
 		this.checkExists();
 	}
 	
@@ -70,99 +60,4 @@ struct Callback extends BaseStruct
 			);
 		}
 	}
-	
-	
-	/**
-	 * Call function
-	 */
-	var call(Collection args = null)
-	{
-		#switch
-		
-		#case ifcode PHP then
-		
-		$obj = $this->obj;
-		
-		if (gettype($obj) == "string")
-		{
-			$obj = \Runtime\rtl::find_class($obj);
-		}
-		
-		if ($args instanceof \Runtime\Collection)
-		{
-			$args = $args->_arr;
-		}
-		
-		if ($args == null) $args = [];
-		
-		return call_user_func_array([$obj, $this->name], $args);
-		
-		#case ifcode JAVASCRIPT then
-		
-		obj = this.obj;
-		
-		if (typeof(obj) == "string")
-		{
-			obj = Runtime.rtl.find_class(obj);
-		}
-		
-		return Runtime.rtl.apply(obj[this.name].bind(obj), args);
-		
-		#endswitch
-	}
-	
-	
-	/**
-	 * Call function
-	 */
-	async var callAsync(Collection args = null)
-	{
-		#switch
-		
-		#case ifcode PHP then
-		
-		$obj = $this->obj;
-		
-		if (gettype($obj) == "string")
-		{
-			$obj = \Runtime\rtl::find_class($obj);
-		}
-		
-		if ($args instanceof \Runtime\Collection)
-		{
-			$args = $args->_arr;
-		}
-		
-		if ($args == null) $args = [];
-		
-		return call_user_func_array([$obj, $this->name], $args);
-		
-		#case ifcode JAVASCRIPT then
-		
-		obj = this.obj;
-		
-		if (typeof(obj) == "string")
-		{
-			obj = Runtime.rtl.find_class(obj);
-		}
-		
-		return await Runtime.rtl.applyAsync(obj[this.name].bind(obj), args);
-		
-		#endswitch
-	}
-	
-	
-	#ifcode PHP then
-	
-	function __invoke()
-	{
-		return $this->call(func_get_args());
-	}
-	
-	function invokeArgs($args)
-	{
-		return $this->call($args);
-	}
-	
-	#endif
 }

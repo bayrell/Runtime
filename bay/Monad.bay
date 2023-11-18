@@ -18,6 +18,7 @@
  
 namespace Runtime;
 
+use Runtime.Callback;
 use Runtime.Exceptions.RuntimeException;
 
 
@@ -37,22 +38,20 @@ class Monad
 	}
 	
 	
-	
 	/**
 	 * Return attr of object
 	 */
 	public var attr(string attr_name)
 	{
 		if (this.val === null or this.err != null) return this;
-		return new Monad( rtl::attr(this.val, [ attr_name ], null) );
+		return new Monad( rtl::attr(this.val, attr_name, null) );
 	}
-	
 	
 	
 	/**
 	 * Call function on value
 	 */
-	public var call(fn f)
+	public Monad call(fn f)
 	{
 		if (this.val === null or this.err != null) return this;
 		
@@ -60,7 +59,7 @@ class Monad
 		var err = null;
 		try
 		{
-			res = f(this.val);
+			res = rtl::apply(f, [this.val]);
 		}
 		catch (RuntimeException e)
 		{
@@ -70,13 +69,12 @@ class Monad
 		
 		return new Monad( res, err );
 	}
-	
 	
 	
 	/**
 	 * Call async function on value
 	 */
-	public async var callAsync(fn f)
+	public async Monad callAsync(fn f)
 	{
 		if (this.val === null or this.err != null) return this;
 		
@@ -84,7 +82,7 @@ class Monad
 		var err = null;
 		try
 		{
-			res = await f(this.val);
+			res = await rtl::apply(f, [this.val]);
 		}
 		catch (RuntimeException e)
 		{
@@ -94,67 +92,35 @@ class Monad
 		
 		return new Monad( res, err );
 	}
-	
 	
 	
 	/**
 	 * Call method on value
 	 */
-	public var callMethod(string method_name, Collection args = null)
+	public Monad callMethod(string method_name, Collection args = null)
 	{
 		if (this.val === null or this.err != null) return this;
-		
-		var res = null;
-		var err = null;
-		try
-		{
-			fn f = rtl::method(this.val, method_name);
-			res = rtl::apply(f, args);
-		}
-		catch (RuntimeException e)
-		{
-			res = null;
-			err = e;
-		}
-		
-		return new Monad( res, err );
+		return this.call(new Callback(this.val, method_name));
 	}
-	
 	
 	
 	/**
 	 * Call async method on value
 	 */
-	public async var callMethodAsync(string method_name, Collection args = null)
+	public async Monad callMethodAsync(string method_name, Collection args = null)
 	{
 		if (this.val === null or this.err != null) return this;
-		
-		var res = null;
-		var err = null;
-		try
-		{
-			fn f = rtl::method(this.val, method_name);
-			res = await rtl::applyAsync(f, args);
-		}
-		catch (RuntimeException e)
-		{
-			res = null;
-			err = e;
-		}
-		
-		return new Monad( res, err );
+		return await this.callAsync(new Callback(this.val, method_name));
 	}
-	
 	
 	
 	/**
 	 * Call function on monad
 	 */
-	public var monad(fn f)
+	public Monad monad(fn f)
 	{
-		return f(this);
+		return rtl::apply(f, [this]);
 	}
-	
 	
 	
 	/**
@@ -169,5 +135,4 @@ class Monad
 		if (this.val === null or this.err != null) return null;
 		return this.val;
 	}
-	
 }

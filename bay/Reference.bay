@@ -24,7 +24,6 @@ use Runtime.rtl;
 
 class Reference<T> extends BaseObject
 {
-	
 	string uq = rtl::unique();
 	T ref = null;
 	
@@ -37,21 +36,4 @@ class Reference<T> extends BaseObject
 		parent();
 		this.ref = ref;
 	}
-	
-	
-	
-	/**
-	 * Assign and clone data from other object
-	 * @param BaseObject obj
-	 */
-	void assignObject1(BaseObject obj)
-	{
-		if (obj instanceof Reference)
-		{
-			this.uq = obj.uq;
-			this.ref = this.ref;
-		}
-		parent(obj);
-	}
-	
 }

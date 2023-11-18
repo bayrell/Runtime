@@ -19,12 +19,12 @@
 namespace Runtime;
 
 use Runtime.rtl;
-use Runtime.BaseStruct;
+use Runtime.BaseObject;
 use Runtime.Dict;
 use Runtime.StringInterface;
 
 
-struct DateTime extends BaseStruct implements StringInterface
+class DateTime extends BaseObject implements StringInterface
 {
 	public int y = 1970;
 	public int m = 1;
@@ -95,15 +95,17 @@ struct DateTime extends BaseStruct implements StringInterface
 	{
 		if (rs::strlen(s) < 19) return null;
 		if (rs::strlen(s) > 19) tz = rs::substr(s, 19);
-		return new DateTime{
-			"y": (int)rs::substr(s, 0, 4),
-			"m": (int)rs::substr(s, 5, 2),
-			"d": (int)rs::substr(s, 8, 2),
-			"h": (int)rs::substr(s, 11, 2),
-			"i": (int)rs::substr(s, 14, 2),
-			"s": (int)rs::substr(s, 17, 2),
-			"tz": tz
-		};
+		
+		DateTime dt = new DateTime();
+		dt.y = (int)rs::substr(s, 0, 4),
+		dt.m = (int)rs::substr(s, 5, 2),
+		dt.d = (int)rs::substr(s, 8, 2),
+		dt.h = (int)rs::substr(s, 11, 2),
+		dt.i = (int)rs::substr(s, 14, 2),
+		dt.s = (int)rs::substr(s, 17, 2),
+		dt.tz = tz;
+		
+		return dt;
 	}
 	
 	

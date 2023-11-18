@@ -25,7 +25,6 @@ use Runtime.Vector;
 
 class BaseObject
 {
-	
 	/** 
 	 * Constructor
 	 */
@@ -41,122 +40,6 @@ class BaseObject
 	 */
 	protected void _init()
 	{
-	}
-	
-	
-	/**
-	 * Returns new instance
-	 */
-	pure BaseObject newInstance(Dict items) => null;
-	
-	
-	/**
-	 * Init struct data
-	 */
-	protected Dict _init_data(Dict obj) => obj;
-	
-	
-	/**
-	 * Assign new values
-	 */
-	protected void _assign_values(Dict obj = null)
-	{
-		#switch
-		#case ifcode PHP then
-		if (gettype($obj) == "array")
-		{
-			$obj = new \Runtime\Dict($obj);
-		}
-		#case ifcode JAVASCRIPT then
-		if (typeof obj == 'object' && !(obj instanceof Runtime.Dict))
-		{
-			obj = new Runtime.Dict(obj);
-		}
-		#endswitch
-		
-		
-		if (obj == null) return;
-		if (obj.keys().count() == 0) return;
-		
-		bool check_types = false;
-		string class_name = static::getClassName();
-		
-		obj = this._init_data(obj);
-		
-		
-		#ifdef ENABLE_CHECK_TYPES then
-		
-		/* Enable check types */
-		check_types = true;
-		if (class_name == "Runtime.IntrospectionClass") check_types = false;
-		if (class_name == "Runtime.IntrospectionInfo") check_types = false;
-		
-		#endif
-		
-		
-		#switch
-		#case ifcode PHP then
-		
-		if ($obj instanceof \Runtime\Dict) $obj = $obj->_map;
-		if (gettype($obj) == "array")
-		{
-			foreach ($obj as $key => $value)
-			{
-				$k = $this->__getKey($key);
-				if (property_exists($this, $k))
-				{
-					if ($check_types)
-					{
-						$info = \Runtime\rtl::getFieldInfoWithParents($ctx, $class_name, $key);
-						if ($info)
-						{
-							$value = \Runtime\rtl::convert($ctx, $value, $info->t, null);
-						}
-					}
-					$this->$k = $value;
-				}
-			}
-		}
-		
-		#case ifcode JAVASCRIPT then
-		
-		var _Dict = use("Runtime.Dict");
-		var rtl = use("Runtime.rtl");
-		if (obj instanceof _Dict)
-		{
-			for (var key in obj._map)
-			{
-				var real_key = key.substring(1);
-				var value = obj._map[key];
-				if (check_types)
-				{
-					info = rtl.getFieldInfoWithParents(ctx, class_name, real_key);
-					if (info)
-					{
-						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
-					}
-				}
-				this[real_key] = value;
-			}
-		}
-		else
-		{
-			for (var key in obj)
-			{
-				var value = obj[key];
-				if (check_types)
-				{
-					info = rtl.getFieldInfoWithParents(ctx, class_name, key);
-					if (info)
-					{
-						value = rtl.convert(ctx, value, info.get(ctx, "t"), null);
-					}
-				}
-				this[key] = value;
-			}
-		}
-		
-		#endswitch
 	}
 	
 	

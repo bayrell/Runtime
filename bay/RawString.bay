@@ -20,20 +20,42 @@
 
 namespace Runtime;
 
-class RawString 
+use Runtime.StringInterface;
+
+
+class RawString implements StringInterface
 {
 	protected $s;
-	function __construct($s)
+	
+	/**
+	 * Constructor
+	 */
+	public void constructor(var s)
 	{
-		$s = static::normalize($s);
-		$this->s = $s;
+		s = static::normalize(s);
+		this.s = s;
 	}
+	
+	
+	/**
+	 * To string
+	 */
+	string toString()
+	{
+		if (this.s instanceof Vector)
+		{
+			return rs::join("", this.s);
+		}
+				
+		return this.s;
+	}
+	
+	#ifdef PHP then
 	function __toString(){ return $this->toString(); }
-	function toString()
-	{
-		return gettype($this->s) == "array" ? implode("", $this->s) : $this->s;
-	}
-	static function normalize($s)
+	#endif
+	
+	/*
+	static string normalize($s)
 	{
 		if (gettype($s) == "array")
 		{
@@ -54,5 +76,6 @@ class RawString
 			return $arr1;
 		}
 		return $s;
-	}
+	}*/
+	
 }

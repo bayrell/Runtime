@@ -19,12 +19,12 @@
 namespace Runtime;
 
 use Runtime.rtl;
-use Runtime.BaseStruct;
+use Runtime.BaseObject;
 use Runtime.Dict;
 use Runtime.StringInterface;
 
 
-struct Date extends BaseStruct implements StringInterface
+class Date extends BaseObject implements StringInterface
 {
 	public int y = 0;
 	public int m = 0;

@@ -1,0 +1,486 @@
+/*!
+ *  Bayrell Runtime Library
+ *
+ *  (c) Copyright 2016-2023 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+
+class Serializer
+{	
+	static var ObjectToNative(var value, bool force_class_name = true)
+	{
+		var value1 = static::ObjectToPrimitive(value, force_class_name);
+		var value2 = static::PrimitiveToNative(value1);
+		return value2;
+	}
+	static var NativeToObject(var value, bool allow_class_name = true)
+	{
+		var value1 = static::NativeToPrimitive(value);
+		var value2 = static::PrimitiveToObject(value1, allow_class_name);
+		return value2;
+	}
+	
+	
+	/**
+	 * Returns object to primitive value
+	 * @param var obj
+	 * @return var
+	 */
+	public static var ObjectToPrimitive(var obj, bool force_class_name = true)
+	{
+	
+		if (obj === null) return null;
+		if (rtl::isScalarValue(obj)) return obj;
+		
+		if (obj instanceof Collection)
+		{
+			return obj.map(
+				var (var value) use (force_class_name)
+				{
+					return static::ObjectToPrimitive( value, force_class_name );
+				}
+			);
+		}
+		
+		if (obj instanceof Dict)
+		{
+			
+			obj = obj.map(
+				var (var value, string key) use (force_class_name)
+				{
+					return static::ObjectToPrimitive( value, force_class_name );
+				}
+			);
+			
+			return obj.toDict();
+		}
+		
+		if (obj instanceof Date)
+		{
+			return obj;
+		}
+		if (obj instanceof DateTime)
+		{
+			return obj;
+		}
+		
+		if (obj instanceof BaseStruct)
+		{
+			Map<var> values = new Map();
+			Collection<string> names = rtl::getFields(obj::getClassName());
+			
+			for (int i=0; i<names.count(); i++)
+			{
+				string variable_name = names.item(i);
+				var value = obj.get(variable_name, null);
+				var value = static::ObjectToPrimitive( value, force_class_name );
+				values.setValue(variable_name, value);
+			}
+			
+			if (force_class_name)
+			{
+				values.setValue("__class_name__", obj::getClassName());
+			}
+			delete names;
+			
+			return values.toDict();
+		}
+		
+		return null;
+	}
+	
+	
+	/**
+	 * Returns object to primitive value
+	 * @param SerializeContainer container
+	 * @return var
+	 */
+	public static var PrimitiveToObject(var obj, bool allow_class_name = true)
+	{
+		if (obj === null) return null;
+		if (rtl::isScalarValue(obj)) return obj;
+		
+		if (obj instanceof Collection)
+		{
+			Vector<var> res = new Vector();
+			for (int i=0; i<obj.count(); i++)
+			{
+				var value = obj.item(i);
+				value = static::PrimitiveToObject(value, allow_class_name);
+				res.pushValue(value);
+			}
+			return res.toCollection();
+		}
+		
+		if (obj instanceof Dict)
+		{
+			Map<var> res = new Map();
+			Vector<string> keys = obj.keys();
+		
+			for (int i=0; i<keys.count(); i++)
+			{
+				string key = keys.item(i);
+				var value = obj.item(key);
+				value = static::PrimitiveToObject(value, allow_class_name);
+				res.setValue(key, value);
+			}
+			
+			delete keys;
+			
+			if ( !res.has("__class_name__") ) return res.toDict();
+			if ( res.item("__class_name__") == "Runtime.Map" or
+				res.item("__class_name__") == "Runtime.Dict"
+			)
+			{
+				res.remove("__class_name__");
+				return res.toDict();
+			}
+			
+			if (not allow_class_name) return res.toDict();
+			
+			string class_name = res.item("__class_name__");
+			if (not rtl::class_exists(class_name))
+			{
+				return null;
+			}
+			if (not rtl::class_implements(class_name, "Runtime.SerializeInterface"))
+			{
+				return null;
+			}
+			
+			/* Assign values */
+			Map<var> obj = new Map();
+			Collection<string> names = rtl::getFields(class_name);
+			for (int i=0; i<names.count(); i++)
+			{
+				string variable_name = names.item(i);
+				if (variable_name != "__class_name__") 
+				{
+					var value = res.get(variable_name, null);
+					obj.setValue(variable_name, value);
+				}
+			}
+			
+			/* New instance */
+			var instance = rtl::newInstance(class_name, [obj]);
+			
+			delete res;
+			delete obj;
+			
+			return instance;
+		}
+		
+		if (obj instanceof Date)
+		{
+			return obj;
+		}
+		if (obj instanceof DateTime)
+		{
+			return obj;
+		}
+		
+		return null;
+	}
+	
+	
+	static var NativeToPrimitive(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if ($value === null)
+			return null;
+			
+		if (is_object($value))
+		{
+			if (isset($value->__class_name__) && $value->__class_name__ == "Runtime.Date")
+			{
+				$value = \Runtime\Dict::from($value);
+				$res = new \Runtime\Date($ctx, $value);
+				return $res;
+			}
+			else if (isset($value->__class_name__) && $value->__class_name__ == "Runtime.DateTime")
+			{
+				$value = \Runtime\Dict::from($value);
+				$res = new \Runtime\DateTime($ctx, $value);
+				return $res;
+			}
+			else
+			{
+				$res = \Runtime\Dict::from($value);
+				$res = $res->map($ctx, function ($ctx, $val, $key){
+					return static::NativeToPrimitive($ctx, $val);
+				});
+				return $res;
+			}
+		}
+		
+		if (is_array($value))
+		{
+			if ( isset($value['__class_name__']) )
+			{
+				if ($value['__class_name__'] == "Runtime.Date")
+				{
+					$res = \Runtime\Date::from($value);
+					return $res;
+				}
+				else if ($value['__class_name__'] == "Runtime.DateTime")
+				{
+					$res = \Runtime\DateTime::from($value);
+					return $res;
+				}
+				else
+				{
+					$res = \Runtime\Dict::from($value);
+					$res = $res->map($ctx, function ($ctx, $val, $key){
+						return static::NativeToPrimitive($ctx, $val);
+					});
+					return $res;
+				}
+			}
+			$arr = array_values($value);
+			$res = \Runtime\Collection::from($arr);
+			$res = $res->map($ctx, function ($ctx, $item){
+				return static::NativeToPrimitive($ctx, $item);
+			});
+			return $res;
+		}
+		
+		return $value;
+	
+		#case ifcode JAVASCRIPT then
+		
+		var _rtl = use("Runtime.rtl");
+		var _Utils = use("Runtime.RuntimeUtils");
+		var _Collection = use("Runtime.Collection");
+		var _Date = use("Runtime.Date");
+		var _DateTime = use("Runtime.DateTime");
+		var _Dict = use("Runtime.Dict");
+		
+		if (value === null)
+			return null;
+		
+		if (Array.isArray(value))
+		{
+			var new_value = _Collection.from(value);
+			new_value = new_value.map(ctx, (ctx, val)=>{
+				return Runtime.rtl.NativeToPrimitive(ctx, val);
+			});
+			return new_value;
+		}
+		if (typeof value == 'object')
+		{
+			if (value["__class_name__"] == "Runtime.Date")
+			{
+				var new_value = new _Date(value);
+				return new_value;
+			}
+			if (value["__class_name__"] == "Runtime.DateTime")
+			{
+				var new_value = new _DateTime(value);
+				return new_value;
+			}
+			var new_value = _Dict.from(value);
+			new_value = new_value.map(ctx, (ctx, val, key)=>{
+				return Runtime.rtl.NativeToPrimitive(ctx, val);
+			});
+			return new_value;
+		}
+		
+		return value;
+		#endswitch
+	}
+	
+	static var PrimitiveToNative(var value)
+	{
+		#switch
+		
+		#case ifcode PHP then
+		
+		if ($value === null)
+			return null;
+		
+		if ($value instanceof \Runtime\Date)
+		{
+			$value = $value->toDict($ctx)->setIm($ctx, "__class_name__", "Runtime.Date");
+		}
+		else if ($value instanceof \Runtime\DateTime)
+		{
+			$value = $value->toDict($ctx)->setIm($ctx, "__class_name__", "Runtime.DateTime");
+		}
+		
+		if ($value instanceof \Runtime\Collection)
+		{
+			$arr = [];
+			$value->each($ctx,
+				function ($ctx, $v) use (&$arr)
+				{
+					$arr[] = static::PrimitiveToNative($ctx, $v);
+				}
+			);
+			return $arr;
+		}
+		
+		if ($value instanceof \Runtime\Dict)
+		{
+			$arr = [];
+			$value->each($ctx,
+				function ($ctx, $v, $k) use (&$arr)
+				{
+					$arr[$k] = static::PrimitiveToNative($ctx, $v);
+				}
+			);
+			return (object)$arr;
+		}
+		
+		#case ifcode JAVASCRIPT then
+		
+		var _rtl = use("Runtime.rtl");
+		var _Utils = use("Runtime.RuntimeUtils");
+		var _Collection = use("Runtime.Collection");
+		var _DateTime = use("Runtime.DateTime");
+		var _Date = use("Runtime.Date");
+		var _Dict = use("Runtime.Dict");
+		
+		if (value === null)
+			return null;
+		
+		if (value instanceof _Date)
+		{
+			value = value.toDict(ctx).setIm(ctx, "__class_name__", "Runtime.Date");
+		}
+		else if (value instanceof _DateTime)
+		{
+			value = value.toDict(ctx).setIm(ctx, "__class_name__", "Runtime.DateTime");
+		}
+		
+		if (value instanceof _Collection)
+		{
+			var arr = [];
+			value.each(ctx, (ctx, v)=>{
+				arr.push( Runtime.rtl.PrimitiveToNative(ctx, v) );
+			});
+			return arr;
+		}
+		if (value instanceof _Dict)
+		{
+			var obj = {};
+			value.each(ctx, (ctx, v, k)=>{
+				obj[k] = Runtime.rtl.PrimitiveToNative(ctx, v);
+			});
+			return obj;
+		}
+		
+		#endswitch
+		
+		return value;
+	}
+	
+	
+	static const int JSON_PRETTY = 1;
+	
+	
+	/**
+	 * Json encode serializable values
+	 * @param serializable value
+	 * @param SerializeContainer container
+	 * @return string 
+	 */
+	static string json_encode(var value, int flags = 0, bool convert = true)
+	{
+		#switch
+		#case ifcode PHP then
+		if ($convert){
+			$value = static::ObjectToNative($ctx, $value);
+		}
+		$json_flags = JSON_UNESCAPED_UNICODE;
+		if ( ($flags & 1) == 1 ) $json_flags = $json_flags | JSON_PRETTY_PRINT;
+		return json_encode($value, $json_flags);
+		
+		#case ifcode JAVASCRIPT then
+		if (flags == undefined) flags = 0;
+		if (convert == undefined) convert = true;
+		
+		var _rtl = use("Runtime.rtl");
+		var _Utils = use("Runtime.RuntimeUtils");
+		var _Collection = use("Runtime.Collection");
+		var _Dict = use("Runtime.Dict");
+		var _Date = use("Runtime.Date");
+		var _DateTime = use("Runtime.DateTime");
+		
+		if (convert) value = _rtl.ObjectToPrimitive(ctx, value);
+		return JSON.stringify(value, (key, value) => {
+			if (value instanceof _Date) value = value.toDict().setIm("__class_name__", "Runtime.Date");
+			if (value instanceof _DateTime) value = value.toDict().setIm("__class_name__", "Runtime.DateTime");
+			if (value instanceof _Collection) return value;
+			if (value instanceof _Dict) return value.toObject();
+			if (_rtl.isScalarValue(value)) return value;
+			return null;
+		});
+		#endswitch
+	}
+	
+	
+	/**
+	 * Json decode to primitive values
+	 * @param string s Encoded string
+	 * @return var 
+	 */
+	static var json_decode(var obj, string allow_class_name = true)
+	{
+		#switch
+		#case ifcode PHP then
+	
+		$res = @json_decode($obj, false);
+		if ($res === null || $res === false)
+			return null;
+		return static::NativeToObject($ctx, $res, $allow_class_name);
+	
+		#case ifcode JAVASCRIPT then
+		try{
+			
+			var _rtl = use("Runtime.rtl");
+			var _Utils = use("Runtime.RuntimeUtils");
+			var _Collection = use("Runtime.Collection");
+			var _Dict = use("Runtime.Dict");
+			var res = null;
+			try
+			{
+				res = JSON.parse(obj, function (key, value){
+					if (value == null) return value;
+					if (Array.isArray(value)){
+						return _Collection.from(value);
+					}
+					if (typeof value == 'object'){
+						return _Dict.from(value);
+					}
+					return value;
+				});
+			}
+			catch (e)
+			{
+				res = null;
+			}
+			return this.PrimitiveToObject(ctx, res, allow_class_name);
+		}
+		catch(e){
+			throw e;
+		}
+		return null;
+		#endswitch
+	}
+}

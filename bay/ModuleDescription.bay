@@ -23,7 +23,6 @@ use Runtime.Entity.Provider;
 
 static class ModuleDescription
 {
-	
 	/**
 	 * Returns module name
 	 * @return string
@@ -31,13 +30,11 @@ static class ModuleDescription
 	pure string getModuleName() => "Runtime";
 	
 	
-	
 	/**
 	 * Returns module name
 	 * @return string
 	 */
-	pure string getModuleVersion() => "0.11.8";
-	
+	pure string getModuleVersion() => "0.12.0";
 	
 	
 	/**
@@ -45,7 +42,6 @@ static class ModuleDescription
 	 * @return Map<string>
 	 */
 	pure Map<string> requiredModules() => null;
-	
 	
 	
 	/**
