@@ -18,6 +18,10 @@
 
 namespace Runtime;
 
+use Runtime.Date;
+use Runtime.DateTime;
+use Runtime.BaseStruct;
+
 
 class Serializer
 {	

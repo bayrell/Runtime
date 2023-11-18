@@ -25,7 +25,7 @@ class ApiException extends RuntimeException
 {
 	var response = null;
 	
-	void constructor(string message = "", int code = -1, var response = null, Object prev = null)
+	void constructor(string message = "", int code = -21, var response = null, Object prev = null)
 	{
 		parent(message, code, prev);
 		this.response = response;

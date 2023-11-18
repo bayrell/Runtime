@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library 
+ *  Bayrell Runtime Library
  *
  *  (c) Copyright 2016-2023 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -19,18 +19,18 @@
 namespace Runtime.Exceptions;
 
 use Runtime.rtl;
+use Runtime.RuntimeConstant;
 use Runtime.Exceptions.RuntimeException;
 
 
-class AssignStructValueError extends RuntimeException
+class ItemNotFound extends RuntimeException
 {
 	
-	void constructor(string name, Object prev = null)
+	void constructor(string name, string object = "Item", string code = -5, Object prev = null)
 	{
-		parent
-		(
-			_("Runtime", "Can not set key '" ~ name ~ "' in immutable struct"), 
-			rtl::ERROR_INDEX_OUT_OF_RANGE, 
+		parent(
+			_("Runtime", "%object% '%name%' not found", {"name": name, "object": object}),
+			code,
 			prev
 		);
 	}

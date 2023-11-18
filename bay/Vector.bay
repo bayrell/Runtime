@@ -25,7 +25,6 @@ use Runtime.Exceptions.IndexOutOfRange;
 
 class Vector<T> extends Collection
 {
-	
 	/**
 	 * Returns new Instance
 	 * @return Object
@@ -36,14 +35,13 @@ class Vector<T> extends Collection
 	}
 	
 	
-	
 	/**
 	 * Returns new Vector
 	 * @param int offset
 	 * @param int lenght
-	 * @return Collection<T>
+	 * @return Vector<T>
 	 */
-	Collection<T> vectorSlice(int offset, int length = null)
+	Vector<T> remove(int offset, int length = null)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -62,19 +60,18 @@ class Vector<T> extends Collection
 		Object.setPrototypeOf(arr, this.constructor.prototype);
 		return arr;
 		#case ifcode PHP then
-		$arr2 = static::Instance($ctx);
+		$arr2 = static::Instance();
 		$arr2->_arr = array_slice($this->_arr, $offset, $length);
 		return $arr2;
 		#endswitch
 	}
 	
 	
-	
 	/**
 	 * Append value to the end of array
 	 * @param T value
 	 */
-	public Vector<T> appendValue(T value)
+	public Vector<T> append(T value)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -85,15 +82,14 @@ class Vector<T> extends Collection
 		return $this;
 		#endswitch
 	}
-	public Collection<T> pushValue(T value) => this.appendValue(value);
-	
+	public Collection<T> push(T value) => this.append(value);
 	
 	
 	/**
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	public Vector<T> prependValue(T value)
+	public Vector<T> prepend(T value)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -104,15 +100,13 @@ class Vector<T> extends Collection
 		return $this;
 		#endswitch
 	}
-	public Collection<T> unshiftValue(T value) => this.prependValue(value);
-	
 	
 	
 	/**
 	 * Extract last value from array
 	 * @return T value
 	 */
-	public T popValue()
+	public T pop()
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -123,12 +117,11 @@ class Vector<T> extends Collection
 	}
 	
 	
-	
 	/**
 	 * Extract first value from array
 	 * @return T value
 	 */
-	public T shiftValue()
+	public T shift()
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -140,13 +133,12 @@ class Vector<T> extends Collection
 	}
 	
 	
-	
 	/**
 	 * Insert value to position
 	 * @param T value
 	 * @param int pos - position
 	 */
-	public Vector<T> insertValue(int pos, T value)
+	public Vector<T> insert(int pos, T value)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -159,24 +151,26 @@ class Vector<T> extends Collection
 	}
 	
 	
-	
 	/**
-	 * Remove value from position
+	 * Set value size_to position
 	 * @param int pos - position
-	 * @param int count - count remove items
+	 * @param T value 
 	 */
-	public Vector<T> removePosition(int pos, int count = 1)
+	public T set(int pos, T value)
 	{
+		pos = pos % this.count();
+		
 		#switch
 		#case ifcode JAVASCRIPT then
-		Array.prototype.splice.call(this, pos, count);
+		
+		this[pos] = value;
 		return this;
 		#case ifcode PHP then
-		array_splice($this->_arr, $pos, $count);
+		
+		$this->_arr[$pos] = $value;
 		return $this;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -190,66 +184,15 @@ class Vector<T> extends Collection
 	}
 	
 	
-	
 	/**
-	 * Remove value
+	 * Find value and remove
 	 */
-	public Vector<T> removeValues(Vector<T> values)
+	Collection<T> findAndRemove(fn f)
 	{
-		for (var i=0; i<values.count(); i++)
-		{
-			this.removeValue( values.item(i) );
-		}
+		var index = this.find(f);
+		if (index != -1) this.remove(index);
 		return this;
 	}
-	
-	
-	
-	/**
-	 * Remove range
-	 * @param int pos_begin - start position
-	 * @param int pos_end - end position
-	 */
-	public Vector<T> removeRangeValues(int pos_begin, int pos_end)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		Array.prototype.splice.call(this, pos_begin, pos_end - pos_begin + 1);
-		return this;
-		#case ifcode PHP then
-		$this->remove($pos_begin, $pos_end - $pos_begin + 1);
-		return $this;
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Set value size_to position
-	 * @param int pos - position
-	 * @param T value 
-	 */
-	public T setValue(int pos, T value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (pos < 0 || pos >= this.length)
-		{
-			var IndexOutOfRange = use ("Runtime.Exceptions.IndexOutOfRange");
-			throw new IndexOutOfRange(pos);
-		}
-		this[pos] = value;
-		return this;
-		#case ifcode PHP then
-		if (!array_key_exists($pos, $this->_arr))
-		{
-			throw new \Runtime\Exceptions\IndexOutOfRange($pos);
-		}
-		$this->_arr[$pos] = $value;
-		return $this;
-		#endswitch
-	}
-	
 	
 	
 	/**
@@ -268,47 +211,32 @@ class Vector<T> extends Collection
 	}
 	
 	
-	
 	/**
 	 * Append vector to the end of the vector
 	 * @param Collection<T> arr
 	 */
-	public Vector<T> appendVector(Collection<T> arr)
+	public Vector<T> appendItems(Collection<T> items)
 	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (!arr) return this;
-		for (var i=0; i<arr.length; i++) Array.prototype.push.call(this, arr[i]);
-		return this;
-		#case ifcode PHP then
-		if (!$arr) return $this;
-		foreach ($arr->_arr as $key => $value)
-		{
-			$this->_arr[] = $value;
-		}
-		return $this;
-		#endswitch
+		items.each(
+			void (var item)
+			{
+				this.push(item);
+			}
+		);
 	}
 	
 	
-	
 	/**
-	 * Prepend vector to the begin of the vector
-	 * @param Vector<T> arr
+	 * Prepend vector to the end of the vector
+	 * @param Collection<T> arr
 	 */
-	public Vector<T> prependVector(Vector<T> arr)
+	public Vector<T> prependItems(Collection<T> items)
 	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		for (var i=0; i<arr.length; i++) Array.prototype.unshift.call(this, arr[i]);
-		return this;
-		#case ifcode PHP then
-		if (!$arr) return $this;
-		foreach ($arr->_arr as $key => $value)
-		{
-			array_unshift($this->_arr, $value);
-		}
-		return $this;
-		#endswitch
+		items.each(
+			void (var item)
+			{
+				this.prepend(item);
+			}
+		);
 	}
 }

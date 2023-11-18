@@ -97,12 +97,12 @@ class DateTime extends BaseObject implements StringInterface
 		if (rs::strlen(s) > 19) tz = rs::substr(s, 19);
 		
 		DateTime dt = new DateTime();
-		dt.y = (int)rs::substr(s, 0, 4),
-		dt.m = (int)rs::substr(s, 5, 2),
-		dt.d = (int)rs::substr(s, 8, 2),
-		dt.h = (int)rs::substr(s, 11, 2),
-		dt.i = (int)rs::substr(s, 14, 2),
-		dt.s = (int)rs::substr(s, 17, 2),
+		dt.y = (int)rs::substr(s, 0, 4);
+		dt.m = (int)rs::substr(s, 5, 2);
+		dt.d = (int)rs::substr(s, 8, 2);
+		dt.h = (int)rs::substr(s, 11, 2);
+		dt.i = (int)rs::substr(s, 14, 2);
+		dt.s = (int)rs::substr(s, 17, 2);
 		dt.tz = tz;
 		
 		return dt;

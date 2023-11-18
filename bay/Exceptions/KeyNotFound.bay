@@ -23,7 +23,8 @@ use Runtime.RuntimeConstant;
 use Runtime.Exceptions.RuntimeException;
 
 
-class KeyNotFound extends RuntimeException{
+class KeyNotFound extends RuntimeException
+{
 	
 	void constructor(string key, Object prev = null)
 	{

@@ -65,13 +65,15 @@ class RuntimeException extends ClassException
 {
 	protected Object prev = null;
 	public string error_message = "";
-	public string error_str = "";
 	public int error_code = 0;
 	public string error_file = "";
 	public string error_line = "";
 	public string error_pos = "";
 	
 	
+	/**
+	 * Constructor
+	 */
 	void constructor(string message = "", int code = -1, Object prev = null)
 	{
 		#switch
@@ -81,32 +83,42 @@ class RuntimeException extends ClassException
 		parent::__construct($ctx, $message, $code, $prev);
 		#endswitch
 		this._init();
-		this.error_str = message;
+		this.error_message = message;
 		this.error_code = code;
 		this.prev = prev;
-		this.updateError();
 	}
 	
+	
+	/**
+	 * Returns previous exception
+	 */
 	public Object getPreviousException()
 	{
 		return this.prev;
 	}
 	
+	
+	/**
+	 * Returns error message
+	 */
 	public string getErrorMessage()
 	{
-		return this.error_str;
+		return this.error_message;
 	}
 	
-	public string getErrorString()
-	{
-		return this.error_str;
-	}
 	
+	/**
+	 * Returns error code
+	 */
 	public int getErrorCode()
 	{
 		return this.error_code;
 	}
 	
+	
+	/**
+	 * Returns error file name
+	 */
 	public string getFileName()
 	{
 		#switch
@@ -119,6 +131,10 @@ class RuntimeException extends ClassException
 		return this.error_file;
 	}
 	
+	
+	/**
+	 * Returns error line
+	 */
 	public string getErrorLine()
 	{
 		#switch
@@ -131,28 +147,22 @@ class RuntimeException extends ClassException
 		return this.error_line;
 	}
 	
+	
+	/**
+	 * Returns error position
+	 */
 	public string getErrorPos()
 	{
 		return this.error_pos;
 	}
 	
+	
+	/**
+	 * Convert exception to string
+	 */
 	public string toString()
 	{
-		return this.buildMessage();
-	}
-
-	public string buildMessage()
-	{
-		return this.error_str;
-	}
-	
-	void updateError()
-	{
-		this.error_message = this.buildMessage();
-		#switch
-		#case ifcode ES6 then
-		this.message = this.error_message;
-		#endswitch
+		return this.error_message;
 	}
 	
 	

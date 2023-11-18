@@ -30,7 +30,7 @@ abstract class _Map{}
 
 if (typeof Runtime == 'undefined') Runtime = {};
 
-Runtime._Map = function(ctx, map)
+Runtime._Map = function(map)
 {
 	this._map = {};
 	if (map != undefined && typeof map == 'object')
@@ -75,8 +75,8 @@ Object.assign(Runtime._Map,
 {
 	from: function(map)
 	{
-		var ctx = null;
-		var res = this.Instance(ctx, map);
+		var  = null;
+		var res = this.Instance(map);
 		return res;
 	},
 	getNamespace: function(){ return "Runtime"; },
@@ -140,7 +140,7 @@ class _Map implements \ArrayAccess, \JsonSerializable
 	/**
 	 * Constructor
 	 */
-	public function __construct($ctx, $map=null)
+	public function __construct($map=null)
 	{
 		$this->_map = [];
 		if ($map == null) {}
@@ -210,10 +210,8 @@ class _Map implements \ArrayAccess, \JsonSerializable
 #endswitch
 
 
-
 class Dict<T> extends _Map
 {
-	
 	/**
 	 * Returns new Instance
 	 * @return Object
@@ -224,7 +222,6 @@ class Dict<T> extends _Map
 	}
 	
 	
-	
 	/**
 	 * Copy instance
 	 */
@@ -232,86 +229,28 @@ class Dict<T> extends _Map
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var new_obj = this.constructor.Instance(ctx);
+		var new_obj = this.constructor.Instance();
 		new_obj._map = Object.assign({}, this._map);
 		return new_obj;
 		#case ifcode PHP then
-		$new_obj = static::Instance($ctx);
+		$new_obj = static::Instance();
 		$new_obj->_map = $this->_map;
 		return $new_obj;
 		#endswitch
 	}
 	
 	
-	
-	
 	/**
-	 * Returns new Instance
-	 * @return Object
-	 */
-	static Dict<T> create(var obj)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		return new (Function.prototype.bind.apply(this, [null, ctx, obj]));
-		#case ifcode PHP then
-		$class_name = static::class;
-		return new $class_name($obj);
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Clone this struct with fields
-	 * @param Collection fields = null
-	 * @return Dict<T>
-	 */
-	public Dict<T> clone(Collection fields = null)
-	{
-		if (fields == null) return this;
-		
-		#switch
-		#case ifcode JAVASCRIPT then
-		var new_obj = this.constructor.Instance(ctx);
-		if (fields != null)
-		{
-			for (var key in fields)
-			{
-				if (typeof obj["|" + key] == undefined)
-					new_obj._map["|" + key] = this._map["|" + key];
-			}
-		}
-		return new_obj;
-		#case ifcode PHP then
-		$new_obj = static::Instance($ctx);
-		if ($fields != null)
-		{
-			foreach ($fields->_map as $key)
-			{
-				if (isset($this->_map[$key]))
-				{
-					$new_obj->_map[$key] = $this->_map[$key];
-				}
-			}
-		}
-		return $new_obj;
-		#endswitch
-	}
-	
-	
-	
-	/**
-	 * Returns copy of Dict
+	 * Clone Dict
 	 * @param int pos - position
 	 */
-	public Dict<T> copy(var obj = null)
+	public Dict<T> clone(var obj = null)
 	{
 		if (obj == null) return this;
 		
 		#switch
 		#case ifcode JAVASCRIPT then
-		var new_obj = this.constructor.Instance(ctx);
+		var new_obj = this.constructor.Instance();
 		new_obj._map = Object.assign({}, this._map);
 		if (obj != null)
 		{
@@ -334,7 +273,7 @@ class Dict<T> extends _Map
 		}
 		return new_obj;
 		#case ifcode PHP then
-		$new_obj = static::Instance($ctx);
+		$new_obj = static::Instance();
 		$new_obj->_map = $this->_map;
 		if ($obj != null)
 		{
@@ -346,7 +285,6 @@ class Dict<T> extends _Map
 	}
 	
 	
-	
 	/**
 	 * Convert to dict
 	 */
@@ -355,12 +293,11 @@ class Dict<T> extends _Map
 		#switch
 		#case ifcode JAVASCRIPT then
 		var Dict = use ("Runtime.Dict");
-		return new Dict(ctx, this);
+		return new Dict(this);
 		#case ifcode PHP then
-		return new \Runtime\Dict($ctx, $this);
+		return new \Runtime\Dict($this);
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -371,12 +308,11 @@ class Dict<T> extends _Map
 		#switch
 		#case ifcode JAVASCRIPT then
 		var Map = use ("Runtime.Map");
-		return new Map(ctx, this);
+		return new Map(this);
 		#case ifcode PHP then
-		return new \Runtime\Map($ctx, $this);
+		return new \Runtime\Map($this);
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -397,7 +333,6 @@ class Dict<T> extends _Map
 	}
 	
 	
-	
 	/**
 	 * Return true if key exists
 	 * @param string key
@@ -407,7 +342,6 @@ class Dict<T> extends _Map
 	{
 		return this.contains(key);
 	}
-	
 	
 	
 	/**
@@ -432,20 +366,6 @@ class Dict<T> extends _Map
 	}
 	
 	
-	
-	/**
-	 * Returns value from position
-	 * @param string key
-	 * @param T default_value
-	 * @return T
-	 */
-	public var attr(Collection items, T default_value)
-	{
-		return rtl::attr(this, items, default_value);
-	}
-	
-	
-	
 	/**
 	 * Returns value from position. Throw exception, if position does not exists
 	 * @param string key - position
@@ -459,7 +379,7 @@ class Dict<T> extends _Map
 		if (typeof this._map["|" + key] == "undefined")
 		{
 			var _KeyNotFound = use("Runtime.Exceptions.KeyNotFound");
-			throw new _KeyNotFound(ctx, key);
+			throw new _KeyNotFound(key);
 		}
 		var val = this._map["|" + key];
 		if (val === null || typeof val == "undefined") return null;
@@ -468,12 +388,11 @@ class Dict<T> extends _Map
 		$key = $this->toStr($key);
 		if (!array_key_exists($key, $this->_map))
 		{
-			throw new \Runtime\Exceptions\KeyNotFound($ctx, $key);
+			throw new \Runtime\Exceptions\KeyNotFound($key);
 		}
 		return $this->_map[$key];
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -486,19 +405,17 @@ class Dict<T> extends _Map
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var res = this.cp(ctx);
+		var res = this.cp();
 		key = this.toStr(key);
 		res._map["|" + key] = value;
 		return res;
 		#case ifcode PHP then
-		$res = $this->cp($ctx);
+		$res = $this->cp();
 		$key = $this->toStr($key);
 		$res->_map[$key] = $value;
 		return $res;
 		#endswitch
 	}
-	public Dict<T> set1(string key, T value) => this.setIm(key, value);
-	
 	
 	
 	/**
@@ -522,42 +439,26 @@ class Dict<T> extends _Map
 		$key = $this->toStr($key);
 		if (array_key_exists($key, $this->_map))
 		{
-			$res = $this->cp($ctx);
+			$res = $this->cp();
 			unset($res->_map[$key]);
 			return $res;
 		}
 		return $this;
 		#endswitch
 	}
-	public Dict<T> remove1(string key) => this.removeIm(key);
-	
-	
-	
-	/**
-	 * Remove value from position
-	 * @param string key
-	 * @return self
-	 */
-	public Dict<T> removeKeys(Collection<string> keys) =>
-		(keys != null) ? keys.reduce
-		(
-			Dict (Dict item, string key) => item.removeIm(key), this
-		) : this
-	;
-	
 	
 	
 	/**
 	 * Returns vector of the keys
 	 * @return Collection<string>
 	 */
-	public Collection<string> keys()
+	public Vector<string> keys()
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var res = new Runtime.Vector(ctx);
-		for (var key in this._map) res.pushValue(ctx, key.substring(1));
-		return res.toCollection();
+		var res = new Runtime.Vector();
+		for (var key in this._map) res.pushValue(key.substring(1));
+		return res;
 		#case ifcode PHP then
 		$keys = array_keys($this->_map);
 		$res = \Runtime\Collection::from($keys);
@@ -566,25 +467,23 @@ class Dict<T> extends _Map
 	}
 	
 	
-	
 	/**
 	 * Returns vector of the values
 	 * @return Collection<T>
 	 */
-	public Collection<T> values()
+	public Vector<T> values()
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var res = new Runtime.Vector(ctx);
+		var res = new Runtime.Vector();
 		for (var key in this._map) res.pushValue( this._map[key] );
-		return res.toCollection();
+		return res;
 		#case ifcode PHP then
 		$values = array_values($this->_map);
 		$res = \Runtime\Collection::from($values);
 		return $res;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -596,25 +495,24 @@ class Dict<T> extends _Map
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var obj = this.constructor.Instance(ctx);
+		var obj = this.constructor.Instance();
 		for (var key in this._map)
 		{
 			var new_key = key.substring(1);
-			var new_val = f(ctx, this._map[key], new_key);
+			var new_val = rtl::apply(f, [this._map[key], new_key]);
 			obj._map[key] = new_val;
 		}
 		return obj;
 		#case ifcode PHP then
-		$map2 = static::Instance($ctx);
+		$map2 = static::Instance();
 		foreach ($this->_map as $key => $value)
 		{
-			$new_val = $f($ctx, $value, $key);
+			$new_val = $f($value, $key);
 			$map2->_map[$key] = $new_val;
 		}
 		return $map2;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -626,26 +524,25 @@ class Dict<T> extends _Map
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var obj = this.constructor.Instance(ctx);
+		var obj = this.constructor.Instance();
 		for (var key in this._map)
 		{
 			var new_key = key.substring(1);
 			var value = this._map[key];
-			var flag = f(ctx, value, new_key);
+			var flag = rtl::apply(f, [value, new_key]);
 			if (flag) obj._map[key] = value;
 		}
 		return obj;
 		#case ifcode PHP then
-		$map2 = static::Instance($ctx);
+		$map2 = static::Instance();
 		foreach ($this->_map as $key => $value)
 		{
-			$flag = $f($ctx, $value, $key);
+			$flag = $f($value, $key);
 			if ($flag) $map2->_map[$key] = $value;
 		}
 		return $map2;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -660,45 +557,43 @@ class Dict<T> extends _Map
 		{
 			var new_key = key.substring(1);
 			var value = this._map[key];
-			f(ctx, value, new_key);
+			f(value, new_key);
 		}
 		#case ifcode PHP then
 		foreach ($this->_map as $key => $value)
 		{
-			$f($ctx, $value, $key);
+			$f($value, $key);
 		}
 		#endswitch
 	}
 	
 	
-	
 	/**
-	 * Transition Dict to Collection
+	 * Transition Dict to Vector
 	 * @param fn f
-	 * @return Collection
+	 * @return Vector
 	 */
-	Collection<T> transition(fn f)
+	Vector<T> transition(fn f)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var Collection = use("Runtime.Collection");
-		var arr = new Collection(ctx);
+		var Vector = use("Runtime.Vector");
+		var arr = new Vector();
 		for (var key in this._map)
 		{
-			var new_value = f(ctx, this._map[key], key.substring(1));
+			var new_value = f(this._map[key], key.substring(1));
 			Array.prototype.push.call(arr, new_value);
 		}
 		return arr;
 		#case ifcode PHP then
-		$arr = new \Runtime\Collection($ctx);
+		$arr = new \Runtime\Vector();
 		foreach ($this->_map as $key => $value)
 		{
-			$arr->_arr[] = $f($ctx, $value, $key);
+			$arr->_arr[] = $f($value, $key);
 		}
 		return $arr;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -713,56 +608,17 @@ class Dict<T> extends _Map
 		#case ifcode JAVASCRIPT then
 		for (var key in this._map)
 		{
-			init_value = f(ctx, init_value, this._map[key], key.substring(1));
+			init_value = rtl::apply(f, [init_value, this._map[key], key.substring(1)]);
 		}
 		return init_value;
 		#case ifcode PHP then
 		foreach ($this->_map as $key => $value)
 		{
-			$init_value = $f($ctx, $init_value, $value, $key);
+			$init_value = $f($init_value, $value, $key);
 		}
 		return $init_value;
 		#endswitch
 	}
-	
-	
-	
-	/**
-	 * Add values from other map
-	 * @param Dict<T> map
-	 * @return self
-	 */
-	public Dict<T> concat(Dict<T> map = null)
-	{
-		if (map == null) return this;
-		#switch
-		#case ifcode JAVASCRIPT then
-		var _map = {};
-		var f = false;
-		var Dict = use("Runtime.Dict");
-		if (map == null) return this;
-		if (map instanceof Dict) _map = map._map;
-		else if (typeof map == "object") { _map = map; f = true; }
-		var res = this.cp(ctx);
-		for (var key in _map)
-		{
-			res._map[(f ? "|" : "") + key] = _map[key];
-		}
-		return res;
-		#case ifcode PHP then
-		$_map = [];
-		if ($map == null) return $this;
-		if ($map instanceof \Runtime\Dict) $_map = $map->_map;
-		else if (gettype($map) == "array") $_map = $map;
-		$res = $this->cp($ctx);
-		foreach ($_map as $key => $value)
-		{
-			$res->_map[$key] = $value;
-		}
-		return $res;
-		#endswitch
-	}
-	
 	
 	
 	/**
@@ -784,9 +640,13 @@ class Dict<T> extends _Map
 			}
 		);
 		
+		if (this instanceof Map)
+		{
+			return obj;
+		}
+		
 		return obj.toDict();
 	}
-	
 	
 	
 	/**

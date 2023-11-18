@@ -89,7 +89,6 @@ class re
 	}
 	
 	
-	
 	/**
 	 * Search regular expression
 	 * @param string r regular expression
@@ -149,7 +148,6 @@ class re
 	}
 	
 	
-	
 	/**
 	 * Replace with regular expression
 	 * @param string r - regular expression
@@ -174,9 +172,4 @@ class re
 		
 		#endswitch
 	}
-	
-	
-	
-	
-	
 }

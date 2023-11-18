@@ -194,7 +194,6 @@ class _Collection implements \ArrayAccess, \JsonSerializable
 
 class Collection<T> extends _Collection
 {
-	
 	/**
 	 * Returns new Instance
 	 * @return Object
@@ -203,7 +202,6 @@ class Collection<T> extends _Collection
 	{
 		return new Collection();
 	}
-	
 	
 	
 	/**
@@ -219,7 +217,6 @@ class Collection<T> extends _Collection
 		return static::from($arr);
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -243,7 +240,6 @@ class Collection<T> extends _Collection
 	}
 	
 	
-	
 	/**
 	 * Convert to collection
 	 */
@@ -260,7 +256,6 @@ class Collection<T> extends _Collection
 	}
 	
 	
-	
 	/**
 	 * Convert to vector
 	 */
@@ -275,7 +270,6 @@ class Collection<T> extends _Collection
 		return \Runtime\Vector::from($this);
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -297,7 +291,6 @@ class Collection<T> extends _Collection
 	}
 	
 	
-	
 	/**
 	 * Returns value from position. Throw exception, if position does not exists
 	 * @param int pos - position
@@ -309,18 +302,17 @@ class Collection<T> extends _Collection
 		if (pos < 0 || pos >= this.length)
 		{
 			var _IndexOutOfRange = use("Runtime.Exceptions.IndexOutOfRange");
-			throw new _IndexOutOfRange(ctx, pos);
+			throw new _IndexOutOfRange(pos);
 		}
 		return this[pos];
 		#case ifcode PHP then
 		if (!array_key_exists($pos, $this->_arr))
 		{
-			throw new \Runtime\Exceptions\IndexOutOfRange($ctx, $pos);
+			throw new \Runtime\Exceptions\IndexOutOfRange($pos);
 		}
 		return $this->_arr[$pos];
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -337,7 +329,6 @@ class Collection<T> extends _Collection
 	}
 	
 	
-	
 	/**
 	 * Find value in array. Returns -1 if value not found.
 	 * @param T value
@@ -347,7 +338,7 @@ class Collection<T> extends _Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		for (var i=0; i<this.count(ctx); i++)
+		for (var i=0; i<this.count(); i++)
 		{
 			if (this[i] == value)
 				return i;
@@ -359,7 +350,6 @@ class Collection<T> extends _Collection
 		return $pos;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -378,13 +368,12 @@ class Collection<T> extends _Collection
 			return -1;
 		return pos;
 		#case ifcode PHP then
-		$pos = $this->indexOf($ctx, $value);
+		$pos = $this->indexOf($value);
 		if ($pos == -1 or $pos > $pos_end or $pos < $pos_begin)
 			return -1;
 		return $pos;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -402,7 +391,6 @@ class Collection<T> extends _Collection
 		return $this->_arr[0];
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -425,17 +413,6 @@ class Collection<T> extends _Collection
 	}
 	
 	
-	
-	/**
-	 * Get last item
-	 */
-	T getLastItem(T default_value = null, int pos = -1)
-	{
-		return this.last(default_value, pos);
-	}
-	
-	
-	
 	/**
 	 * Append value to the end of the Collection and return new Collection
 	 * @param T value
@@ -448,7 +425,7 @@ class Collection<T> extends _Collection
 		Array.prototype.push.call(arr, value);
 		return arr;
 		#case ifcode PHP then
-		$res = $this->cp($ctx);
+		$res = $this->cp();
 		$res->_arr[] = $value;
 		return $res;
 		#endswitch
@@ -457,10 +434,6 @@ class Collection<T> extends _Collection
 	{
 		throw new RuntimeException("Deprecated Collection push");
 	}
-	Collection<T> push1(T value) => this.pushIm(value);
-	Collection<T> append1( T value) => this.push(value);
-	Collection<T> appendIm(T value) => this.pushIm(value);
-	
 	
 	
 	/**
@@ -475,7 +448,7 @@ class Collection<T> extends _Collection
 		Array.prototype.unshift.call(arr, value);
 		return arr;
 		#case ifcode PHP then
-		$res = $this->cp($ctx);
+		$res = $this->cp();
 		array_unshift($res->_arr, $value);
 		return $res;
 		#endswitch
@@ -484,53 +457,6 @@ class Collection<T> extends _Collection
 	{
 		throw new RuntimeException("Deprecated Collection unshift");
 	}
-	Collection<T> unshift1(T value) => this.unshiftIm(value);
-	Collection<T> prepend1(T value) => this.unshift(value);
-	Collection<T> prependIm(T value) => this.unshiftIm(value);
-	Collection<T> prepend(T value) => this.unshiftIm(value);
-	
-	
-	
-	/**
-	 * Extract last value from array
-	 * @return T value
-	 */
-	Collection<T> removeLastIm()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var arr = Array.prototype.slice.call(this, 0, -1);
-		Object.setPrototypeOf(arr, this.constructor.prototype);
-		return arr;
-		#case ifcode PHP then
-		$res = $this->cp($ctx);
-		array_pop($res->_arr);
-		return $res;
-		#endswitch
-	}
-	Collection<T> removeLast(T value) => this.removeLastIm(value);
-	
-	
-	
-	/**
-	 * Extract first value from array
-	 * @return T value
-	 */
-	Collection<T> removeFirstIm()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var arr = Array.prototype.slice.call(this, 1);
-		Object.setPrototypeOf(arr, this.constructor.prototype);
-		return arr;
-		#case ifcode PHP then
-		$res = $this->cp($ctx);
-		array_shift($res->_arr);
-		return $res;
-		#endswitch
-	}
-	Collection<T> removeFirst(T value) => this.removeFirstIm(value);
-	
 	
 	
 	/**
@@ -542,62 +468,19 @@ class Collection<T> extends _Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var arr = this.cp(ctx);
+		var arr = this.cp();
 		arr.splice(pos, 0, value);
 		return arr;
 		#case ifcode PHP then
-		$res = $this->cp($ctx);
+		$res = $this->cp();
 		array_splice($res->_arr, $pos, 0, [$value]);
 		return $res;
 		#endswitch
 	}
-	Collection<T> insert(T value) => this.insertIm(value);
-	
-	
-	
-	/**
-	 * Remove value from position
-	 * @param int pos - position
-	 * @param int count - count remove items
-	 */
-	Collection<T> removeIm(int pos, int count = 1)
+	Collection<T> insert(T value)
 	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (count == undefined) count = 1;
-		var arr = this.cp(ctx);
-		arr.splice(pos, count);
-		return arr;
-		#case ifcode PHP then
-		$res = $this->cp($ctx);
-		array_splice($res->_arr, $pos, $count);
-		return $res;
-		#endswitch
+		throw new RuntimeException("Deprecated Collection insert");
 	}
-	Collection<T> remove1(T value) => this.removeIm(value);
-	
-	
-	
-	/**
-	 * Remove range
-	 * @param int pos_begin - start position
-	 * @param int pos_end - end position
-	 */
-	Collection<T> removeRangeIm(int pos_begin, int pos_end)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var arr = this.cp(ctx);
-		arr.splice(pos_begin, pos_end - pos_begin + 1);
-		return arr;
-		#case ifcode PHP then
-		$res = $this->cp($ctx);
-		$res->removeIm($pos_begin, $pos_end - $pos_begin + 1);
-		return $res;
-		#endswitch
-	}
-	Collection<T> removeRange(T value) => this.removeRangeIm(value);
-	
 	
 	
 	/**
@@ -612,15 +495,15 @@ class Collection<T> extends _Collection
 		if (pos < 0 || pos >= this.length)
 		{
 			var _IndexOutOfRange = use("Runtime.Exceptions.IndexOutOfRange");
-			throw new _IndexOutOfRange(ctx, pos);
+			throw new _IndexOutOfRange(pos);
 		}
-		var arr = this.cp(ctx);
+		var arr = this.cp();
 		arr[pos] = value;
 		return arr;
 		#case ifcode PHP then
 		if (!array_key_exists($pos, $this->_arr))
-			throw new \Runtime\Exceptions\IndexOutOfRange($ctx, $pos);
-		$res = $this->cp($ctx);
+			throw new \Runtime\Exceptions\IndexOutOfRange($pos);
+		$res = $this->cp();
 		$res->_arr[$pos] = $value;
 		return $res;
 		#endswitch
@@ -629,22 +512,20 @@ class Collection<T> extends _Collection
 	{
 		throw new RuntimeException("Deprecated Collection set");
 	}
-	Collection<T> set1(T value) => this.setIm(value);
-	
 	
 	
 	/**
 	 * Append vector to the end of the vector
 	 * @param Collection<T> arr
 	 */
-	Collection<T> concatIm(Collection<T> arr)
+	Collection<T> concat(Collection<T> arr)
 	{
 		if (arr == null) return this;
 		if (not (rtl::isArray(arr))) arr = [ arr ];
 		#switch
 		#case ifcode JAVASCRIPT then
 		if (arr.length == 0) return this;
-		var res = this.cp(ctx);
+		var res = this.cp();
 		for (var i=0; i<arr.length; i++)
 		{
 			Array.prototype.push.call(res, arr[i]);
@@ -653,88 +534,13 @@ class Collection<T> extends _Collection
 		#case ifcode PHP then
 		if (!$arr) return $this;
 		if (count($arr->_arr) == 0) return $this;
-		$res = $this->cp($ctx);
+		$res = $this->cp();
 		foreach ($arr->_arr as $item)
 		{
 			$res->_arr[] = $item;
 		}
 		return $res;
 		#endswitch
-	}
-	Collection<T> appendCollection1(Collection<T> arr) => this.concatIm(arr);
-	Collection<T> concat(Collection<T> arr) => this.concatIm(arr);
-	
-	
-	
-	/**
-	 * Prepend vector to the begin of the vector
-	 * @param Collection<T> arr
-	 */
-	Collection<T> prependCollectionIm(Collection<T> arr)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (arr == null) return this;
-		if (arr.length == 0) return this;
-		var res = this.cp(ctx);
-		for (var i=arr.length-1; i>=0; i--)
-		{
-			Array.prototype.unshift.call(res, arr[i]);
-		}
-		return res;
-		#case ifcode PHP then
-		if (!$arr) return $this;
-		$res = $this->cp($ctx);
-		$sz = count($arr->_arr);
-		for ($i=$sz-1; $i>=0; $i--)
-		{
-			array_unshift($res->_arr, $arr->_arr[$i]);
-		}
-		return $res;
-		#endswitch
-	}
-	Collection<T> prependCollection1(Collection<T> arr) =>
-		this.prependCollectionIm(arr)
-	;
-	
-	
-	
-	/**
-	 * Remove value
-	 */
-	Collection<T> removeItemIm(T value)
-	{
-		var index = this.indexOf(value);
-		if (index != -1) return this.removeIm(index);
-		return this;
-	}
-	Collection<T> removeItem(T value) => this.removeItemIm(value);
-	
-	
-	
-	/**
-	 * Remove value
-	 */
-	Collection<T> removeItemsIm(Collection<T> values)
-	{
-		var res = this;
-		for (var i=0; i<values.count(); i++)
-		{
-			res = res.removeItem( values.item(i) );
-		}
-		return res;
-	}
-	Collection<T> removeItems(Collection<T> values) => this.removeItemsIm(values);
-	
-	
-	/**
-	 * Find value and remove
-	 */
-	Collection<T> findAndRemove(fn f)
-	{
-		var index = this.find(f);
-		if (index != -1) return this.removeIm(index);
-		return this;
 	}
 	
 	
@@ -747,27 +553,22 @@ class Collection<T> extends _Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var arr = this.cp(ctx);
+		var arr = this.cp();
 		var Callback = use("Runtime.Callback");
 		for (var i=0; i<arr.length; i++)
 		{
-			if (f instanceof Callback)
-			{
-				arr[i] = f.call(ctx, [arr[i], i]);
-			}
-			else arr[i] = f(ctx, arr[i], i);
+			arr[i] = rtl::apply(f, [arr[i], i]);
 		}
 		return arr;
 		#case ifcode PHP then
-		$arr2 = $this->cp($ctx);
+		$arr2 = $this->cp();
 		foreach ($this->_arr as $key => $value)
 		{
-			$arr2->_arr[$key] = $f($ctx, $value, $key);
+			$arr2->_arr[$key] = $f($value, $key);
 		}
 		return $arr2;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -779,15 +580,12 @@ class Collection<T> extends _Collection
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var res = this.constructor.Instance(ctx);
+		var res = this.constructor.Instance();
 		var Callback = use("Runtime.Callback");
 		for (var i=0; i<this.length; i++)
 		{
 			var item = this[i];
-			var flag = (f instanceof Callback)
-				? f.call(ctx, [item, i])
-				: f(ctx, item, i)
-			;
+			var flag = rtl::apply(f, [item, i]);
 			if (flag)
 			{
 				Array.prototype.push.call(res, item);
@@ -795,10 +593,10 @@ class Collection<T> extends _Collection
 		}
 		return res;
 		#case ifcode PHP then
-		$arr2 = static::Instance($ctx);
+		$arr2 = static::Instance();
 		foreach ($this->_arr as $key => $value)
 		{
-			if ( $f($ctx, $value, $key) )
+			if ( $f($value, $key) )
 			{
 				$arr2->_arr[] = $value;
 			}
@@ -806,7 +604,6 @@ class Collection<T> extends _Collection
 		return $arr2;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -819,25 +616,24 @@ class Collection<T> extends _Collection
 		#switch
 		#case ifcode JAVASCRIPT then
 		var Dict = use("Runtime.Dict");
-		var d = new Dict(ctx);
+		var d = new Dict();
 		for (var i=0; i<this.length; i++)
 		{
 			var value = this[i];
-			var p = f(ctx, value, i);
+			var p = rtl::apply(f, [value, i]);
 			d[p[1]] = p[0];
 		}
 		return d;
 		#case ifcode PHP then
-		$d = new \Runtime\Dict($ctx);
+		$d = new \Runtime\Dict();
 		foreach ($this->_arr as $key => $value)
 		{
-			$p = $f($ctx, $value, $key);
+			$p = $f($value, $key);
 			$d->_map[$p->_arr[1]] = $p->_arr[0];
 		}
 		return $d;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -853,18 +649,17 @@ class Collection<T> extends _Collection
 		for (var i=0; i<this.length; i++)
 		{
 			var item = this[i];
-			init_value = f(ctx, init_value, item, i);
+			init_value = rtl::apply(f, [init_value, item, i]);
 		}
 		return init_value;
 		#case ifcode PHP then
 		foreach ($this->_arr as $key => $value)
 		{
-			$init_value = $f($ctx, $init_value, $value, $key);
+			$init_value = $f($init_value, $value, $key);
 		}
 		return $init_value;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -878,62 +673,15 @@ class Collection<T> extends _Collection
 		for (var i=0; i<this.length; i++)
 		{
 			var item = this[i];
-			f(ctx, item, i);
+			rtl::apply(f, [item, i]);
 		}
 		#case ifcode PHP then
 		foreach ($this->_arr as $key => $value)
 		{
-			$f($ctx, $value, $key);
+			$f($value, $key);
 		}
 		#endswitch
 	}
-	
-	
-	/**
-	 * flatten Collection
-	 */
-	Collection<T> flatten()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		let res = [];
-		var Callback = use("Runtime.Callback");
-		
-		for (var i=0; i<this.length; i++)
-		{
-			let item = this[i];
-			if (item instanceof Collection)
-			{
-				item = item.flatten();
-				res = res.concat( item );
-			}
-			else
-			{
-				res.push(item);
-			}
-		}
-		
-		Object.setPrototypeOf(res, this.constructor.prototype);
-		return res;
-		
-		#case ifcode PHP then
-		
-		throw new \Exception("Flatten error");
-		
-		#endswitch
-	}
-	
-	
-	/**
-	 * Returns Collection
-	 * @param Collection<T> arr
-	 * @return Collection<T>
-	 */
-	Collection<T> intersect(Collection<T> arr)
-	{
-		return this.filter( bool (var item) use (arr) => arr.indexOf(item) >= 0 );
-	}
-	
 	
 	
 	/**
@@ -964,80 +712,75 @@ class Collection<T> extends _Collection
 		return arr;
 		#case ifcode PHP then
 		if ($offset <= 0) $offset = 0;
-		$arr2 = static::Instance($ctx);
+		$arr2 = static::Instance();
 		$arr2->_arr = array_slice($this->_arr, $offset, $length);
 		return $arr2;
 		#endswitch
 	}
 	
 	
-	
 	/**
 	 * Reverse array
 	 */
-	Collection<T> reverseIm()
+	Collection<T> reverse()
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var arr = this.cp(ctx);
+		var arr = this.cp();
 		Array.prototype.reverse.call(arr);
 		return arr;
 		#case ifcode PHP then
-		$arr2 = $this->cp($ctx);
+		$arr2 = $this->cp();
 		$arr2->_arr = array_reverse($arr2->_arr);
 		return $arr2;
 		#endswitch
 	}
-	Collection<T> reverse() => this.reverseIm();
-	
 	
 	
 	/**
 	 * Sort vector
 	 * @param fn f - Sort user function
 	 */
-	Collection<T> sortIm(fn f = null)
+	Collection<T> sort(fn f = null)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var arr = this.cp(ctx);
+		var arr = this.cp();
 		if (f == undefined) Array.prototype.sort.call(arr);
 		else
 		{
-			var f1 = (a, b) => { return f(ctx, a, b); };
+			var f1 = (a, b) => { return rtl::apply(f, [a, b]); };
 			Array.prototype.sort.call(arr, f1);
 		}
 		return arr;
 		#case ifcode PHP then
-		$res = $this->cp($ctx);
+		$res = $this->cp();
 		if ($f == null)
 		{
 			asort($res->_arr);
 		}
 		else
 		{
-			$f1 = function($a, $b) use ($ctx, $f){ return $f($ctx, $a, $b); };
+			$f1 = function($a, $b) use ($f){ return $f($a, $b); };
 			usort($res->_arr, $f1);
 		}
 		$res->_arr = array_values($res->_arr);
 		return $res;
 		#endswitch
 	}
-	Collection<T> sort(fn f = null) => this.sortIm(f);
-	
 	
 	
 	/**
 	 * Remove dublicate values
 	 */
-	Collection<T> removeDuplicatesIm()
+	Collection<T> removeDuplicates()
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		var res = this.constructor.Instance(ctx);
+		var res = this.constructor.Instance();
 		for (var i=0; i<this.length; i++)
 		{
-			var p = res.indexOf(ctx, this[i]);
+			var p = res.indexOf(this[i]);
 			if (p == -1)
 			{
 				Array.prototype.push.call(res, this[i]);
@@ -1055,13 +798,11 @@ class Collection<T> extends _Collection
 				$arr[] = $value;
 			}
 		}
-		$res = static::Instance($ctx);
+		$res = static::Instance();
 		$res->_arr = $arr;
 		return $res;
 		#endswitch
 	}
-	Collection<T> removeDuplicates() => this.removeDuplicatesIm();
-	
 	
 	
 	/**
@@ -1075,7 +816,7 @@ class Collection<T> extends _Collection
 		#case ifcode JAVASCRIPT then
 		for (var i=0; i<this.length; i++)
 		{
-			var flag = f(ctx, this[i]);
+			var flag = f(this[i]);
 			if (flag) return i;
 		}
 		return -1;
@@ -1084,7 +825,7 @@ class Collection<T> extends _Collection
 		for ($i=0; $i<$sz; $i++)
 		{
 			$elem = $this->_arr[$i];
-			if ( $f($ctx, $elem) )
+			if ( $f($elem) )
 			{
 				return $i;
 			}
@@ -1092,7 +833,6 @@ class Collection<T> extends _Collection
 		return -1;
 		#endswitch
 	}
-	
 	
 	
 	/**
@@ -1107,7 +847,6 @@ class Collection<T> extends _Collection
 		int pos = this.find(f);
 		return this.get(pos, def_value);
 	}
-	
 	
 	
 	/**

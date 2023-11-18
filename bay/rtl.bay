@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.BaseObject;
 use Runtime.BaseStruct;
+use Runtime.Callback;
 use Runtime.Collection;
 use Runtime.Context;
 use Runtime.Date;
@@ -27,6 +28,7 @@ use Runtime.DateTime;
 use Runtime.Dict;
 use Runtime.Map;
 use Runtime.Monad;
+use Runtime.Serializer;
 use Runtime.Vector;
 use Runtime.Exceptions.AssertException;
 
@@ -1242,7 +1244,14 @@ class rtl
 	 */
 	static void setContext(Context context)
 	{
-		static::_global_context = context;
+		#switch
+		#case ifcode PHP then
+		static::$_global_context = $context;
+		#case ifcode JAVASCRIPT then
+		use("Runtime.rtl")._global_context = context;
+		#case ifcode ES6 then
+		window['global_context'] = context;
+		#endswitch
 	}
 	
 	
@@ -1327,7 +1336,7 @@ class rtl
 	}
 	
 	
-	#ifdef PHP then
+	#ifcode PHP then
 	
 	/**
 	 * Register PHP error handler
