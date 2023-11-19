@@ -20,10 +20,10 @@ namespace Runtime.Exceptions;
 
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
-use Runtime.Exceptions.RuntimeException;
+use Runtime.Exceptions.AbstractException;
 
 
-class KeyNotFound extends RuntimeException
+class KeyNotFound extends AbstractException
 {
 	
 	void constructor(string key, Object prev = null)

@@ -23,6 +23,7 @@ use Runtime.BaseObject;
 use Runtime.BaseProvider;
 use Runtime.BaseStruct;
 use Runtime.Callback;
+use Runtime.Entity.Entity;
 use Runtime.Entity.Provider;
 use Runtime.Exceptions.RuntimeException;
 use Runtime.Hooks.RuntimeHook;
@@ -30,19 +31,79 @@ use Runtime.Hooks.RuntimeHook;
 
 class Context extends BaseObject
 {
-	/* Struct data */
 	protected var app = null;
 	protected string base_path = "";
 	protected string entry_point = "";
-	protected Vector<string> start_modules = [];
 	protected Vector<string> cli_args = [];
 	protected Map<string> environments = {};
 	protected Vector<string> modules = [];
 	protected Map<BaseObject> providers = {};
 	protected Vector<BaseStruct> entities = [];
 	protected int start_time = 0;
-	protected string tz = "UTC";
+	public string tz = "UTC";
 	protected bool initialized = false;
+	protected bool started = false;
+	
+	
+	/**
+	 * Returns app
+	 */
+	var getApp() => this.app;
+	
+	
+	/**
+	 * Returns true if is initialized
+	 */
+	bool isInitialized() => this.initialized;
+	
+	
+	/**
+	 * Returns true if is started
+	 */
+	bool isStarted() => this.started;
+	
+	
+	/**
+	 * Returns start time
+	 */
+	int getStartTime() => this.start_time;
+	
+	
+	/**
+	 * Returns base path
+	 */
+	var getBasePath() => this.base_path;
+	
+	
+	/**
+	 * Returns console args
+	 */
+	Vector<string> getConsoleArgs() => this.cli_args.slice();
+	
+	
+	/**
+	 * Returns modules
+	 */
+	Vector<string> getModules() => this.modules.slice();
+	
+	
+	/**
+	 * Returns entities
+	 */
+	Vector<string> getEntities(string class_name = "")
+	{
+		if (class_name == "")
+		{
+			return this.entities.slice();
+		}
+		return this.entities.filter( lib::isInstance(class_name) );
+	}
+	
+	
+	/**
+	 * Returns environments
+	 */
+	Map<string> getEnvironments() => this.environments.clone();
 	
 	
 	/**
@@ -110,11 +171,11 @@ class Context extends BaseObject
 		}
 		if (!d.has("base_path"))
 		{
-			params.set("cli_args", process.cwd());
+			params.set("base_path", process.cwd());
 		}
 		if (!d.has("environments"))
 		{
-			params.set("cli_args", Map.from(process.env));
+			params.set("environments", Map.from(process.env));
 		}
 		
 		#endswitch
@@ -137,7 +198,14 @@ class Context extends BaseObject
 		if (not env.has("LOCALE")) env.set("LOCALE", "en_US");
 		if (not env.has("LOCALE_CODE")) env.set("LOCALE_CODE", "en");
 		
-		Context instance = rtl::newInstance(static::getClassName(), [params]);
+		Context instance = rtl::newInstance(static::getClassName());
+		if (params.has("base_path")) instance.base_path = params.get("base_path");
+		if (params.has("entry_point")) instance.entry_point = params.get("entry_point");
+		if (params.has("cli_args")) instance.cli_args = params.get("cli_args");
+		if (params.has("environments")) instance.environments = params.get("environments");
+		if (params.has("modules")) instance.modules = params.get("modules");
+		if (params.has("start_time")) instance.start_time = params.get("start_time");
+		if (params.has("tz")) instance.tz = params.get("tz");
 		return instance;
 	}
 	
@@ -145,8 +213,42 @@ class Context extends BaseObject
 	/**
 	 * Init
 	 */
-	async Context init()
+	async void init()
 	{
+		if (this.initialized) return;
+		
+		/* Create app */
+		if (this.entry_point != "")
+		{
+			this.app = rtl::newInstance(this.entry_point);
+		}
+		
+		Vector<string> modules = this.modules;
+		if (modules.indexOf("Runtime")) modules.prepend("Runtime");
+		
+		/* Extend modules */
+		this.modules = static::getRequiredModules(modules);
+		
+		/* Get modules entities */
+		this.entities = static::getEntitiesFromModules(this.modules);
+		
+		/* Create providers */
+		this.createProviders();
+		
+		/* Init providers */
+		await this.initProviders();
+		
+		/* Hook init app */
+		await this.callHookAsync(RuntimeHook::INIT);
+		
+		/* Init app */
+		if (this.app != null and rtl::method_exists(this.app, "init"))
+		{
+			await this.app.init();
+		}
+		
+		/* Set initialized */
+		this.initialized = true;
 	}
 	
 	
@@ -155,6 +257,25 @@ class Context extends BaseObject
 	 */
 	async void start()
 	{
+		if (this.started) return;
+		
+		/* Start providers */
+		await this.startProviders();
+		
+		/* Hook start app */
+		await this.callHookAsync(RuntimeHook::START);
+		
+		/* Start app */
+		if (this.app and rtl::method_exists(this.app, "start"))
+		{
+			await this.app.start();
+		}
+		
+		/* Hook launched app */
+		await this.callHookAsync(RuntimeHook::LAUNCHED);
+		
+		/* Set started */
+		this.started = true;
 	}
 	
 	
@@ -173,7 +294,7 @@ class Context extends BaseObject
 		if (rtl::method_exists(this.app, "main"))
 		{
 			/* Hook launched app */
-			await this.callAsyncHook(RuntimeHook::RUN, {});
+			await this.callHookAsync(RuntimeHook::RUN);
 			
 			code = await this.app.main();
 		}
@@ -185,40 +306,44 @@ class Context extends BaseObject
 	/**
 	 * Call hook
 	 */
-	Map callHook(string hook_name, Map d)
+	Map callHook(string hook_name, Map params = null)
 	{
+		if (params == null) params = {};
+		
 		var hook = this.provider("hook");
 		Collection<Callback> methods_list = hook.getMethods(hook_name);
 		
 		for (int i=0; i<methods_list.count(); i++)
 		{
 			Callback f = methods_list[i];
-			d = rtl::apply(f, [d]);
-			if (rtl::isPromise(d))
+			params = rtl::apply(f, [params]);
+			if (rtl::isPromise(params))
 			{
 				throw new RuntimeException("Promise is not allowed");
 			}
 		}
 		
-		return d;
+		return params;
 	}
 	
 	
 	/**
 	 * Call hook
 	 */
-	async Map callHookAsync(string hook_name, Map d)
+	async Map callHookAsync(string hook_name, Map params = null)
 	{
+		if (params == null) params = {};
+		
 		var hook = this.provider("hook");
 		Collection<Callback> methods_list = hook.getMethods(hook_name);
 		
 		for (int i=0; i<methods_list.count(); i++)
 		{
 			Callback f = methods_list[i];
-			d = await rtl::apply(f, [d]);
+			params = await rtl::apply(f, [params]);
 		}
 		
-		return d;
+		return params;
 	}
 	
 	
@@ -229,6 +354,162 @@ class Context extends BaseObject
 	{
 		if (params == null) return s;
 		return this.format(s, params);
+	}
+	
+	
+	/**
+	 * Create providers
+	 */
+	protected void createProviders()
+	{
+		Vector<Provider> providers = this.getEntities(classof Provider);
+		for (int i=0; i<providers.count(); i++)
+		{
+			Provider info = providers.get(i);
+			
+			if (not info.value)
+			{
+				continue;
+			}
+			
+			BaseProvider provider = null;
+			if (info.value instanceof BaseProvider)
+			{
+				provider = info.value;
+			}
+			else if (rtl::isString(info.value))
+			{
+				provider = rtl::newInstance(info.value);
+			}
+			
+			if (not provider)
+			{
+				throw new RuntimeException("Wrong declare provider '" ~ info.name ~ "'");
+			}
+			
+			this.registerProvider(info.name, provider);
+		}
+	}
+	
+	
+	/**
+	 * Init providers
+	 */
+	protected async void initProviders()
+	{
+		Vector<string> providers_names = this.providers.keys();
+		for (int i=0; i<providers_names.count(); i++)
+		{
+			string provider_name = providers_names[i];
+			BaseProvider provider = this.providers.get(provider_name);
+			await provider.init();
+		}
+	}
+	
+	
+	/**
+	 * Start providers
+	 */
+	protected async void startProviders()
+	{
+		Vector<string> providers_names = this.providers.keys();
+		for (int i=0; i<providers_names.count(); i++)
+		{
+			string provider_name = providers_names[i];
+			BaseProvider provider = this.providers.get(provider_name);
+			await provider.start();
+		}
+	}
+	
+	
+	/**
+	 * Register provider
+	 */
+	void registerProvider(string provider_name, BaseProvider provider)
+	{
+		if (this.initialized) return;
+		
+		if (this.providers.has(provider_name))
+		{
+			throw new RuntimeException("Provider + '" + provider_name + "' already registered");
+		}
+		
+		if (not(provider instanceof BaseProvider))
+		{
+			throw new RuntimeException("Provider + '" + provider_name +
+				"' must be intstanceof BaseProvider");
+		}
+		
+		this.providers.set(provider_name, provider);
+	}
+	
+	
+	/**
+	 * Returns all modules
+	 * @param Collection<string> modules
+	 * @return Collection<string>
+	 */
+	pure Vector<string> getRequiredModules(Collection<string> modules)
+	{
+		Vector<string> res = new Vector();
+		Map<string> cache = new Map();
+		static::_getRequiredModules(res, cache, modules);
+		return res.removeDuplicates();
+	}
+	
+	
+	/**
+	 * Returns required modules
+	 * @param string class_name
+	 * @return Collection<string>
+	 */
+	pure void _getRequiredModules
+	(
+		Vector<string> res,
+		Map<string> cache,
+		Collection<string> modules
+	)
+	{
+		if (modules == null) return;
+		for (int i=0; i<modules.count(); i++)
+		{
+			string module_name = modules.item(i);
+			if (not cache.has(module_name))
+			{
+				cache.set(module_name, true);
+				Callback f = new Callback(module_name ~ ".ModuleDescription", "requiredModules");
+				Map<string> sub_modules = rtl::apply(f);
+				if (sub_modules != null)
+				{
+					Vector<string> sub_modules = sub_modules.keys();
+					static::_getRequiredModules(res, cache, sub_modules);
+				}
+				res.push(module_name);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Returns modules entities
+	 */
+	pure Collection<Entity> getEntitiesFromModules(Collection<string> modules)
+	{
+		Vector<Entity> entities = new Vector();
+		for (int i=0; i<modules.count(); i++)
+		{
+			string module_name = modules.item(i);
+			Callback f = new Callback(module_name ~ ".ModuleDescription", "entities");
+			if (f.exists())
+			{
+				Vector<Entity> arr = rtl::apply(f);
+				if (arr)
+				{
+					entities.appendItems(arr);
+				}
+			}
+		}
+		return entities;
 	}
 	
 }

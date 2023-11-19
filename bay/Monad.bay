@@ -19,7 +19,6 @@
 namespace Runtime;
 
 use Runtime.Callback;
-use Runtime.Exceptions.RuntimeException;
 
 
 class Monad
@@ -61,7 +60,7 @@ class Monad
 		{
 			res = rtl::apply(f, [this.val]);
 		}
-		catch (RuntimeException e)
+		catch (var e)
 		{
 			res = null;
 			err = e;
@@ -84,7 +83,7 @@ class Monad
 		{
 			res = await rtl::apply(f, [this.val]);
 		}
-		catch (RuntimeException e)
+		catch (var e)
 		{
 			res = null;
 			err = e;

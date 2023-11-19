@@ -20,10 +20,10 @@ namespace Runtime.Exceptions;
 
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
-use Runtime.Exceptions.RuntimeException;
+use Runtime.Exceptions.AbstractException;
 
 
-class UnknownError extends RuntimeException
+class UnknownError extends AbstractException
 {
 	
 	void constructor(Object prev = null)

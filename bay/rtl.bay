@@ -279,6 +279,17 @@ class rtl
 	 * Returns true if class exists
 	 * @return bool
 	 */
+	static bool get_class_name(var obj)
+	{
+		if (static::isString(obj)) return obj;
+		return obj::getClassName();
+	}
+	
+	
+	/**
+	 * Returns true if class exists
+	 * @return bool
+	 */
 	static bool method_exists(string class_name, string method_name)
 	{
 		#switch
@@ -381,12 +392,22 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$arr = ($args != null) ?
-			(($args instanceof \Runtime\Collection) ? $args->_getArr() : $args) : [];
+		if ($args == null) $args = [];
+		else if ($args instanceof \Runtime\Collection) $args = $args->_arr;
 		
 		if ($f instanceof \Runtime\Callback)
 		{
-			return call_user_func_array([$f->obj, $f->name], $args);
+			if (!$f->exists())
+			{
+				throw new \Runtime\Exceptions\RuntimeException("Method '" .
+					$f->name . "' not found in " .
+					static::get_class_name($f->obj)
+				);
+			}
+			
+			$obj = $f->obj;
+			if (gettype($obj) == "string") $obj = static::find_class($obj);
+			return call_user_func_array([$obj, $f->name], $args);
 		}
 		
 		return call_user_func_array($f, $arr);
@@ -398,7 +419,17 @@ class rtl
 		
 		if (f instanceof Runtime.Callback)
 		{
-			return Runtime.rtl.apply(f.obj[f.name].bind(f.obj), args);
+			let obj = f.obj;
+			let method_name = f.name;
+			if (typeof obj == "string") obj = this.find_class(obj);
+			if (!this.exists(obj) || !this.exists(obj[method_name]))
+			{
+				throw new Runtime.Exceptions.RuntimeException("Method '" +
+					this.name + "' not found in " +
+					this.get_class_name(this.obj)
+				);
+			}
+			return Runtime.rtl.apply(obj[f.name].bind(obj), args);
 		}
 		
 		return f.apply(null, args);
@@ -1237,10 +1268,19 @@ class rtl
 	 * Returns global context
 	 * @return Context
 	 */
-	static Context getContext()
+	static Context @getContext()
 	{
-		if (!static::_global_context) return new Context();
-		return static::_global_context;
+		#switch
+		#case ifcode PHP then
+		if (!static::$_global_context) return new \Runtime\Context();
+		return static::$_global_context;
+		#case ifcode NODEJS then
+		if (!rtl._global_context) return new use("Runtime.Context")();
+		return rtl._global_context;
+		#case ifcode ES6 then
+		if (!Runtime.rtl._global_context) return new Runtime.Context();
+		return Runtime.rtl._global_context;
+		#endswitch
 	}
 	
 	
@@ -1284,13 +1324,13 @@ class rtl
 	 * @param Dict d
 	 */
 	public static async int @runApp
-		(string class_name, Collection<string> modules, Dict params = null)
+	(
+		string class_name,
+		Collection<string> modules,
+		Dict params = null
+	)
 	{
 		if (params == null) params = {};
-		
-		#ifcode NODEJS then
-		let ctx = null;
-		#endif
 		
 		params.set("entry_point", class_name);
 		params.set("modules", modules);
@@ -1298,7 +1338,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$context = static::createContext($d);
+		$context = static::createContext($params);
 		$context->start($context);
 		$code = $context->run($context);
 		
@@ -1308,7 +1348,7 @@ class rtl
 		
 		try
 		{
-			let context = await Runtime.rtl.createContext(d);
+			let context = await Runtime.rtl.createContext(params);
 			await context.start(context);
 			await context.run(context);
 		}
@@ -1323,7 +1363,7 @@ class rtl
 		
 		try
 		{
-			let context = await Runtime.rtl.createContext(d);
+			let context = await Runtime.rtl.createContext(params);
 			await context.start(context);
 			code = await context.run(context);
 		}

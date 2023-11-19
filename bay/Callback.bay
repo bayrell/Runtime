@@ -19,7 +19,6 @@
 namespace Runtime;
 
 use Runtime.BaseStruct;
-use Runtime.Exceptions.RuntimeException;
 
 
 class Callback
@@ -41,24 +40,19 @@ class Callback
 		this.obj = obj;
 		this.name = name;
 		this.tag = tag;
-		
-		/* Check if callback exists */
-		this.checkExists();
 	}
 	
 	
 	/**
 	 * Check if method exists
 	 */
-	void checkExists()
+	bool exists()
 	{
 		if (not rtl::method_exists(this.obj, this.name))
 		{
-			throw new RuntimeException("Method '" ~
-				this.name ~ "' not found in " ~
-				rtl::get_class_name(this.obj)
-			);
+			return false;
 		}
+		return true;
 	}
 	
 	

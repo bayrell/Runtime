@@ -24,15 +24,20 @@ use Runtime.Context;
 
 class BaseProvider extends BaseObject
 {
-	bool started = false;
+	protected bool started = false;
+	
+	
+	/**
+	 * Returns true if started
+	 */
+	bool isStarted() => this.started;
 	
 	
 	/**
 	 * Init provider
 	 */
-	async void init(Context c)
+	async void init()
 	{
-		return c;
 	}
 	
 	
@@ -41,5 +46,6 @@ class BaseProvider extends BaseObject
 	 */
 	async void start()
 	{
+		this.started = true;
 	}
 }

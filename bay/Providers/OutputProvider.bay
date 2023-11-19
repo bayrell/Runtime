@@ -165,7 +165,9 @@ class OutputProvider extends BaseProvider
 	void print(string message, bool new_line = true, string type="")
 	{
 		if (not rtl::isString(message))
+		{
 			throw new RuntimeException("print message must be string");
+		}
 		
 		#switch
 		#case ifcode PHP then

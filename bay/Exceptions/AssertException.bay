@@ -20,13 +20,13 @@ namespace Runtime.Exceptions;
 
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
-use Runtime.Exceptions.RuntimeException;
+use Runtime.Exceptions.AbstractException;
 
 
-class AssertException extends RuntimeException
+class AssertException extends AbstractException
 {
-    void constructor(string message)
+    void constructor(string message, Object prev = null)
 	{
-		parent(message);
+		parent(message, rtl::ERROR_ASSERT, prev);
 	}
 }

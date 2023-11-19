@@ -20,15 +20,19 @@ namespace Runtime.Exceptions;
 
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
-use Runtime.Exceptions.RuntimeException;
+use Runtime.Exceptions.AbstractException;
 
 
-class IndexOutOfRange extends RuntimeException
+class IndexOutOfRange extends AbstractException
 {
 	
 	void constructor(int pos, Object prev = null)
 	{
-		parent( _("Runtime", "Index out of range. Pos: %pos%", {"pos":pos}), rtl::ERROR_INDEX_OUT_OF_RANGE, prev );
+		parent(
+			_("Runtime", "Index out of range. Pos: %pos%", {"pos":pos}),
+			rtl::ERROR_INDEX_OUT_OF_RANGE,
+			prev
+		);
 	}
 
 }

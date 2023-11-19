@@ -44,7 +44,6 @@ class RuntimeHook extends BaseHook
 	}
 	
 	
-	
 	/**
 	 * Init context
 	 */
@@ -52,7 +51,6 @@ class RuntimeHook extends BaseHook
 	{
 		return d;
 	}
-	
 	
 	
 	/**
@@ -89,5 +87,4 @@ class RuntimeHook extends BaseHook
 	{
 		return d;
 	}
-	
 }

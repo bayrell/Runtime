@@ -20,17 +20,17 @@ namespace Runtime.Exceptions;
 
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
-use Runtime.Exceptions.RuntimeException;
+use Runtime.Exceptions.AbstractException;
 
 
-class ItemNotFound extends RuntimeException
+class ItemNotFound extends AbstractException
 {
 	
-	void constructor(string name, string object = "Item", string code = -5, Object prev = null)
+	void constructor(string name, string object = "Item", Object prev = null)
 	{
 		parent(
 			_("Runtime", "%object% '%name%' not found", {"name": name, "object": object}),
-			code,
+			rtl::ERROR_ITEM_NOT_FOUND,
 			prev
 		);
 	}

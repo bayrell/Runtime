@@ -18,16 +18,16 @@
 
 namespace Runtime.Exceptions;
 
-use Runtime.Exceptions.RuntimeException;
+use Runtime.Exceptions.AbstractException;
 
 
-class ApiException extends RuntimeException
+class ApiException extends AbstractException
 {
 	var response = null;
 	
-	void constructor(string message = "", int code = -21, var response = null, Object prev = null)
+	void constructor(string message = "", var response = null, Object prev = null)
 	{
-		parent(message, code, prev);
+		parent(message, rtl::ERROR_API_ERROR, prev);
 		this.response = response;
 	}
 

@@ -23,38 +23,31 @@ use Runtime.BaseHook;
 use Runtime.BaseProvider;
 use Runtime.Context;
 use Runtime.Entity.Hook;
-use Runtime.Exceptions.RuntimeException;
 
 
 class HookProvider extends BaseProvider
 {
-	Collection<BaseHook> base_hooks = [];
-	Map<Map<Vector>> hooks = new Map();
+	protected Vector<BaseHook> base_hooks = [];
+	protected Map<Map<Vector>> hooks = new Map();
 	
 	
 	/**
 	 * Init provider
 	 */
-	async void init(Context c)
+	async void init()
 	{
-		Collection<Hook> hooks = c.entities.filter( lib::isInstance(classof Hook) );
+		Vector<Hook> hooks = @.getEntities(classof Hook);
 		
-		Vector<BaseHook> base_hooks = new Vector();
+		this.base_hooks = new Vector();
 		for (int i=0; i<hooks.count(); i++)
 		{
 			Hook hook = hooks[i];
 			BaseHook base_hook = rtl::newInstance(hook.name);
-			base_hooks.pushValue(base_hook);
 			base_hook.hook = this;
 			base_hook.register_hooks();
-			base_hooks.pushValue(base_hook);
+			this.base_hooks.push(base_hook);
 		}
-		
-		this.base_hooks = base_hooks.toCollection();
-		
-		return c;
 	}
-	
 	
 	
 	/**
@@ -62,8 +55,8 @@ class HookProvider extends BaseProvider
 	 */
 	async void start()
 	{
+		await parent::start();
 	}
-	
 	
 	
 	/**
@@ -71,18 +64,17 @@ class HookProvider extends BaseProvider
 	 */
 	void register(string hook_name, var obj, string method_name, int priority = 0)
 	{
-		if (not this.hooks.has(hook_name)) this.hooks.setValue(hook_name, new Map());
+		if (not this.hooks.has(hook_name)) this.hooks.set(hook_name, new Map());
 		
 		Map priorities = this.hooks[hook_name];
-		if (not priorities.has(priority)) priorities.setValue(priority, new Vector());
+		if (not priorities.has(priority)) priorities.set(priority, new Vector());
 		
 		Vector methods_list = priorities.get(priority);
-		methods_list.pushValue({
+		methods_list.push({
 			"obj": obj,
 			"method_name": method_name,
 		});
 	}
-	
 	
 	
 	/**
@@ -109,7 +101,6 @@ class HookProvider extends BaseProvider
 	}
 	
 	
-	
 	/**
 	 * Returns method list
 	 */
@@ -131,5 +122,4 @@ class HookProvider extends BaseProvider
 		
 		return res.toCollection();
 	}
-	
 }

@@ -246,7 +246,14 @@ class Dict<T> extends _Map
 	 */
 	public Dict<T> clone(var obj = null)
 	{
-		if (obj == null) return this;
+		if (obj == null)
+		{
+			if (this instanceof Map)
+			{
+				return this.cp();
+			}
+			return this;
+		}
 		
 		#switch
 		#case ifcode JAVASCRIPT then
