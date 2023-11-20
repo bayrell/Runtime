@@ -496,7 +496,7 @@ class Collection<T> extends _Collection
 	Collection<T> concat(Collection<T> arr)
 	{
 		if (arr == null) return this;
-		if (not (rtl::isArray(arr))) arr = [ arr ];
+		if (not(arr instanceof Collection)) arr = [ arr ];
 		#switch
 		#case ifcode JAVASCRIPT then
 		if (arr.length == 0) return this;
@@ -665,11 +665,11 @@ class Collection<T> extends _Collection
 	 * @param int lenght
 	 * @return Collection<T>
 	 */
-	Collection<T> slice(int offset, int length = null)
+	Collection<T> slice(int offset = 0, int length = null)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
-		if (offset == undefined) offset = 0;
+		if (offset <= 0) offset = 0;
 		if (length == undefined)
 		{
 			if (offset <= 0) return this;

@@ -21,6 +21,7 @@ namespace Runtime.Providers;
 use Runtime.lib;
 use Runtime.BaseHook;
 use Runtime.BaseProvider;
+use Runtime.Callback;
 use Runtime.Context;
 use Runtime.Entity.Hook;
 
@@ -70,17 +71,14 @@ class HookProvider extends BaseProvider
 		if (not priorities.has(priority)) priorities.set(priority, new Vector());
 		
 		Vector methods_list = priorities.get(priority);
-		methods_list.push({
-			"obj": obj,
-			"method_name": method_name,
-		});
+		methods_list.push(new Callback(obj, method_name));
 	}
 	
 	
 	/**
 	 * Remove hook
 	 */
-	void remove(string hook_name, var obj, string method_name, int priority = 0)
+	void remove(string hook_name, var obj, string method_name, int priority = 100)
 	{
 		if (not this.hooks.has(hook_name)) this.hooks.setValue(hook_name, new Map());
 		
@@ -89,9 +87,9 @@ class HookProvider extends BaseProvider
 		
 		Vector methods_list = priorities.get(priority);
 		int index = methods_list.find(
-			bool (Dict info) use (obj, method_name)
+			bool (Callback info) use (obj, method_name)
 			{
-				return info["obj"] == obj and info["method_name"] == method_name;
+				return info.obj == obj and info.name == method_name;
 			}
 		);
 		if (index > -1)
@@ -117,7 +115,7 @@ class HookProvider extends BaseProvider
 			int priority = priorities_keys[i];
 			Vector methods_list = priorities.get(priority);
 			
-			res.appendVector(methods_list);
+			res.appendItems(methods_list);
 		}
 		
 		return res.toCollection();

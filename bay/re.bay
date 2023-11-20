@@ -29,7 +29,7 @@ class re
 	 * @param string delimiter - regular expression
 	 * @param string s - строка, которую нужно разбить
 	 * @param integer limit - ограничение
-	 * @return Collection<string>
+	 * @return Vector<string>
 	 */
 	pure string split(string delimiter, string s, int limit = -1)
 	{
@@ -37,12 +37,12 @@ class re
 		#case ifcode PHP then
 		
 		$arr = preg_split("/" . $delimiter . "/", $s, $limit);
-		return Collection::from($arr);
+		return Vector::from($arr);
 		
 		#case ifcode JAVASCRIPT then
 		
 		var _rtl = use("Runtime.rtl");
-		var _Collection = use("Runtime.Collection");
+		var _Vector = use("Runtime.Vector");
 		
 		var arr = null;
 		var delimiter = new RegExp(delimiter, "g");
@@ -54,7 +54,7 @@ class re
 		{
 			arr = s.split(delimiter, limit);
 		}
-		return _Collection.from(arr);
+		return _Vector.from(arr);
 		
 		#endswitch
 	}
@@ -95,7 +95,7 @@ class re
 	 * @param string s string
 	 * @return Vector result
 	 */
-	static Collection<string> matchAll(string r, string s, string pattern="")
+	static Vector<string> matchAll(string r, string s, string pattern="")
 	{
 		#switch
 		
@@ -115,10 +115,10 @@ class re
 			}
 			$res = array_map
 			(
-				function ($item) { return Collection::from($item); },
+				function ($item) { return Vector::from($item); },
 				$res
 			);
-			return Collection::from($res);
+			return Vector::from($res);
 		}
 		
 		return null;
@@ -140,7 +140,7 @@ class re
 		else arr = [...s.matchAll(r)];
 		
 		if (arr.length == 0) return null;
-		return Runtime.Collection.from( arr.map( (v) => Runtime.Collection.from(v) ) );
+		return Runtime.Vector.from( arr.map( (v) => Runtime.Vector.from(v) ) );
 		
 		#endswitch
 		

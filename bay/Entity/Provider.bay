@@ -26,11 +26,12 @@ struct Provider extends Entity
 	/* Provider class name */
 	string value = "";
 	
-	void constructor(string name, string value)
+	void constructor(string name, string value, Dict params = null)
 	{
 		parent({
 			"name": name,
 			"value": value,
+			"params": params,
 		});
 	}
 }

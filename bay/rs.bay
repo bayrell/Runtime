@@ -370,8 +370,8 @@ class rs
 	 */
 	static Dict pathinfo(string filepath)
 	{
-		Vector<string> arr1 = static::explode(".", filepath).toVector();
-		Vector<string> arr2 = static::explode("/", filepath).toVector();
+		Vector<string> arr1 = static::split(".", filepath).toVector();
+		Vector<string> arr2 = static::split("/", filepath).toVector();
 		
 		string filepath = filepath;
 		string extension = arr1.popValue();
@@ -644,20 +644,20 @@ class rs
 		int pos;
 		string uri, query, hash;
 		
-		pos = static::strpos(s, "#");
+		pos = static::indexOf(s, "#");
 		s = (pos >= 0) ? static::substr(s, 0, pos) : s;
 		hash = (pos >= 0) ? static::substr(s, pos + 1) : "";
-		pos = static::strpos(s, "?");
+		pos = static::indexOf(s, "?");
 		uri = (pos >= 0) ? static::substr(s, 0, pos) : s;
 		query = (pos >= 0) ? static::substr(s, pos + 1) : "";
-		Collection arr = static::explode("&", query);
+		Collection arr = static::split("&", query);
 		
 		Dict arr2 = arr
 			.filter( bool (string s) => s != "" )
 			.transition(
 				list (string item)
 				{
-					Collection arr = static::explode("=", item);
+					Collection arr = static::split("=", item);
 					return [arr[1], arr[0]];
 				}
 			)
@@ -685,13 +685,13 @@ class rs
 		string s2 = r["query"];
 		bool find = false;
 		
-		Collection arr = static::explode("&", s2);
+		Collection arr = static::split("&", s2);
 		arr = arr
 			.map
 			(
 				string (string s) use (key, value, find)
 				{
-					Collection arr = static::explode("=", s);
+					Collection arr = static::split("=", s);
 					if (arr[0] == key)
 					{
 						find = true;

@@ -41,7 +41,7 @@ class Vector<T> extends Collection
 	 * @param int lenght
 	 * @return Vector<T>
 	 */
-	Vector<T> remove(int offset, int length = null)
+	Vector<T> removeRange(int offset, int length = null)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -56,13 +56,27 @@ class Vector<T> extends Collection
 		{
 			length = offset + length;
 		}
-		var arr = Array.prototype.slice.call(this, offset, length);
-		Object.setPrototypeOf(arr, this.constructor.prototype);
-		return arr;
+		Array.prototype.splice.call(this, offset, length);
+		return this;
 		#case ifcode PHP then
-		$arr2 = static::Instance();
-		$arr2->_arr = array_slice($this->_arr, $offset, $length);
-		return $arr2;
+		array_splice($this->_arr, $offset, $length);
+		return $this;
+		#endswitch
+	}
+	
+	
+	/**
+	 * Remove item
+	 */
+	public Vector<T> removeItem(int pos)
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		Array.prototype.splice.call(this, pos, 1);
+		return this;
+		#case ifcode PHP then
+		array_splice($this->_arr, $pos, 1);
+		return $this;
 		#endswitch
 	}
 	

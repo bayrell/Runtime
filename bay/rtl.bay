@@ -410,7 +410,7 @@ class rtl
 			return call_user_func_array([$obj, $f->name], $args);
 		}
 		
-		return call_user_func_array($f, $arr);
+		return call_user_func_array($f, $args);
 		
 		#case ifcode JAVASCRIPT then
 		
@@ -547,51 +547,52 @@ class rtl
 	 * Update current item
 	 * @return var
 	 */
-	static var setAttr(var item, Collection attrs, var new_value)
+	static var setAttr(var item, Vector attrs, var new_value)
 	{
 		if (attrs == null) return item;
 		#switch
 		#case ifcode PHP then
-		if (gettype($attrs) == "string") $attrs = \Runtime\Collection::from([$attrs]);
-		else if (gettype($attrs) == "array") $attrs = \Runtime\Collection::from($attrs);
+		if (gettype($attrs) == "string") $attrs = \Runtime\Vector::from([$attrs]);
+		else if (gettype($attrs) == "array") $attrs = \Runtime\Vector::from($attrs);
 		#case ifcode JAVASCRIPT then
-		var Collection = use("Runtime.Collection");
-		if (typeof attrs == "string") attrs = Collection.from([attrs]);
-		else if (Array.isArray(attrs) && attrs.count == undefined) attrs = Collection.from(attrs);
+		var Vector = use("Runtime.Vector");
+		if (typeof attrs == "string") attrs = Vector.from([attrs]);
+		else if (Array.isArray(attrs) && attrs.count == undefined) attrs = Vector.from(attrs);
 		#endswitch
 		
-		fn f = var (Collection attrs, var data, var new_value, var f)
+		fn f = var (Vector attrs, var data, var new_value, var f)
 		{
 			if (attrs.count() == 0) return new_value;
 			if (data == null) data = {};
 			
 			var new_data = null;
 			var attr_name = attrs.first();
+			attrs.removeItem(0);
 			
 			if (data instanceof BaseStruct)
 			{
 				var attr_data = data.get(attr_name, null);
-				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);
-				var d = (new Map()).setValue(attr_name, res);
+				var res = f(attrs, attr_data, new_value, f);
+				var d = (new Map()).set(attr_name, res);
 				new_data = data.copy(d);
 			}
 			else if (data instanceof BaseObject)
 			{
 				var attr_data = data.takeValue(attr_name, null);
-				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);
+				var res = f(attrs, attr_data, new_value, f);
 				new_data = data;
 				new_data.assignValue(attr_name, res);
 			}
 			else if (data instanceof Dict)
 			{
 				var attr_data = data.get(attr_name, null);
-				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);			
+				var res = f(attrs, attr_data, new_value, f);
 				new_data = data.setIm( attr_name, res );
 			}
 			else if (data instanceof Collection)
 			{
 				var attr_data = data.get(attr_name, null);
-				var res = f(attrs.removeFirstIm(), attr_data, new_value, f);			
+				var res = f(attrs, attr_data, new_value, f);
 				new_data = data.setIm( attr_name, res );
 			}
 			
@@ -988,6 +989,52 @@ class rtl
 		#endswitch
 		return 0;
 	}
+	
+	
+	/* ============================= Instrospection ============================= */
+	
+	
+	/**
+	 * Returns parents class names
+	 * @return Vector<string>
+	 */
+	pure memorize Collection<string> getParents(string class_name)
+	{
+		Vector<string> res = new Vector();
+		while (class_name != "")
+		{
+			Callback getParentClassName = new Callback(class_name, "getParentClassName");
+			if (not getParentClassName.exists()) break;
+			
+			class_name = static::apply(getParentClassName);
+			res.push(class_name);
+		}
+		return res.toCollection();
+	}
+	
+	
+	/**
+	 * Returns fields of class
+	 */
+	pure memorize Collection getFields(string class_name, int flag = 255)
+	{
+		Vector<string> names = new Vector();
+		Collection<string> parents = static::getParents(class_name);
+		for (int i=0; i<parents.count(); i++)
+		{
+			string parent_class_name = parents[i];
+			
+			Callback getFieldsList = new Callback(parent_class_name, "getFieldsList");
+			if (not getFieldsList.exists()) continue;
+			
+			Collection<string> item_fields = static::apply(getFieldsList, [flag]);
+			if (not item_fields) continue;
+			
+			names.appendItems(item_fields);
+		}
+		return names.removeDuplicates().toCollection();
+	}
+	
 	
 	
 	/* ====================== Assert ====================== */

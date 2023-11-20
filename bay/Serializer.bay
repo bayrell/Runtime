@@ -92,12 +92,12 @@ class Serializer
 				string variable_name = names.item(i);
 				var value = obj.get(variable_name, null);
 				var value = static::ObjectToPrimitive( value, force_class_name );
-				values.setValue(variable_name, value);
+				values.set(variable_name, value);
 			}
 			
 			if (force_class_name)
 			{
-				values.setValue("__class_name__", obj::getClassName());
+				values.set("__class_name__", obj::getClassName());
 			}
 			delete names;
 			
@@ -125,7 +125,7 @@ class Serializer
 			{
 				var value = obj.item(i);
 				value = static::PrimitiveToObject(value, allow_class_name);
-				res.pushValue(value);
+				res.push(value);
 			}
 			return res.toCollection();
 		}
@@ -140,7 +140,7 @@ class Serializer
 				string key = keys.item(i);
 				var value = obj.item(key);
 				value = static::PrimitiveToObject(value, allow_class_name);
-				res.setValue(key, value);
+				res.set(key, value);
 			}
 			
 			delete keys;
@@ -175,7 +175,7 @@ class Serializer
 				if (variable_name != "__class_name__") 
 				{
 					var value = res.get(variable_name, null);
-					obj.setValue(variable_name, value);
+					obj.set(variable_name, value);
 				}
 			}
 			

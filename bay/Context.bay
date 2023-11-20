@@ -316,8 +316,8 @@ class Context extends BaseObject
 		for (int i=0; i<methods_list.count(); i++)
 		{
 			Callback f = methods_list[i];
-			params = rtl::apply(f, [params]);
-			if (rtl::isPromise(params))
+			var res = rtl::apply(f, [params]);
+			if (rtl::isPromise(res))
 			{
 				throw new RuntimeException("Promise is not allowed");
 			}
@@ -340,7 +340,7 @@ class Context extends BaseObject
 		for (int i=0; i<methods_list.count(); i++)
 		{
 			Callback f = methods_list[i];
-			params = await rtl::apply(f, [params]);
+			await rtl::apply(f, [params]);
 		}
 		
 		return params;
@@ -379,7 +379,7 @@ class Context extends BaseObject
 			}
 			else if (rtl::isString(info.value))
 			{
-				provider = rtl::newInstance(info.value);
+				provider = rtl::newInstance(info.value, [info.params]);
 			}
 			
 			if (not provider)

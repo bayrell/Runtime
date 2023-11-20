@@ -60,7 +60,9 @@ class Callback
 	
 	function __invoke()
 	{
-		return call_user_func_array([$this->obj, $this->name], func_get_args());
+		$obj = $this->obj;
+		if (gettype($obj) == "string") $obj = rtl::find_class($obj);
+		return call_user_func_array([$obj, $this->name], func_get_args());
 	}
 	
 	#endif

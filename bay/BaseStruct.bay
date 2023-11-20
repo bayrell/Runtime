@@ -49,7 +49,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 	/**
 	 * Init struct data
 	 */
-	protected Dict _init_changes(Dict changes) => changes;
+	protected void _changes(Map changes){}
 	
 	
 	/**
@@ -61,19 +61,24 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		#case ifcode PHP then
 		if (gettype($changes) == "array")
 		{
-			$changes = new \Runtime\Dict($changes);
+			$changes = new \Runtime\Map($changes);
 		}
 		#case ifcode JAVASCRIPT then
-		if (typeof changes == 'changesect' && !(changes instanceof Runtime.Dict))
+		if (typeof changes == 'object' && !(changes instanceof Runtime.Dict))
 		{
-			changes = new Runtime.Dict(changes);
+			changes = new Runtime.Map(changes);
 		}
 		#endswitch
 		
 		if (changes == null) return;
 		if (changes.keys().count() == 0) return;
 		
-		changes = this._init_changes(changes);
+		if (not (changes instanceof Map))
+		{
+			changes = changes.toMap();
+		}
+		
+		this._changes(changes);
 		
 		#switch
 		#case ifcode PHP then
