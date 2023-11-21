@@ -520,12 +520,10 @@ class rs
 		#switch
 		#case ifcode PHP then
 		
-		if ($s instanceof \Runtime\Collection) return $s;
 		return htmlspecialchars($s, ENT_QUOTES | ENT_HTML401);
 		
 		#case ifcode JAVASCRIPT then
 		
-		if (s instanceof Runtime.Collection) return s;
 		var obj = {
 			"<":"&lt;",
 			">": "&gt;", 

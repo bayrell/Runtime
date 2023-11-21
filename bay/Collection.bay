@@ -532,7 +532,7 @@ class Collection<T> extends _Collection
 		var Callback = use("Runtime.Callback");
 		for (var i=0; i<arr.length; i++)
 		{
-			arr[i] = rtl::apply(f, [arr[i], i]);
+			arr[i] = Runtime.rtl.apply(f, [arr[i], i]);
 		}
 		return arr;
 		#case ifcode PHP then
@@ -560,7 +560,7 @@ class Collection<T> extends _Collection
 		for (var i=0; i<this.length; i++)
 		{
 			var item = this[i];
-			var flag = rtl::apply(f, [item, i]);
+			var flag = Runtime.rtl.apply(f, [item, i]);
 			if (flag)
 			{
 				Array.prototype.push.call(res, item);
@@ -595,7 +595,7 @@ class Collection<T> extends _Collection
 		for (var i=0; i<this.length; i++)
 		{
 			var value = this[i];
-			var p = rtl::apply(f, [value, i]);
+			var p = Runtime.rtl.apply(f, [value, i]);
 			d[p[1]] = p[0];
 		}
 		return d;
@@ -624,7 +624,7 @@ class Collection<T> extends _Collection
 		for (var i=0; i<this.length; i++)
 		{
 			var item = this[i];
-			init_value = rtl::apply(f, [init_value, item, i]);
+			init_value = Runtime.rtl.apply(f, [init_value, item, i]);
 		}
 		return init_value;
 		#case ifcode PHP then
@@ -648,7 +648,7 @@ class Collection<T> extends _Collection
 		for (var i=0; i<this.length; i++)
 		{
 			var item = this[i];
-			rtl::apply(f, [item, i]);
+			Runtime.rtl.apply(f, [item, i]);
 		}
 		#case ifcode PHP then
 		foreach ($this->_arr as $key => $value)
@@ -724,7 +724,7 @@ class Collection<T> extends _Collection
 		if (f == undefined) Array.prototype.sort.call(arr);
 		else
 		{
-			var f1 = (a, b) => { return rtl::apply(f, [a, b]); };
+			var f1 = (a, b) => { return Runtime.rtl.apply(f, [a, b]); };
 			Array.prototype.sort.call(arr, f1);
 		}
 		return arr;

@@ -19,7 +19,7 @@
 namespace Runtime.Entity;
 
 use Runtime.rtl;
-use Runtime.Entity;
+use Runtime.Entity.Entity;
 
 
 struct Hook extends Entity

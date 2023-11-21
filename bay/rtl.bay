@@ -250,7 +250,7 @@ class rtl
 		);
 		return \Runtime\Vector::from($arr);
 		#case ifcode JAVASCRIPT then
-		return \Runtime\Vector::from(this.find_class(class_name).__implements__);
+		return Runtime.Vector.from(this.find_class(class_name).__implements__);
 		#endswitch
 	}
 	
@@ -449,7 +449,7 @@ class rtl
 		(async () => {
 			try
 			{
-				await rtl::apply(f, args);
+				await Runtime.rtl.apply(f, args);
 			}
 			catch (e)
 			{

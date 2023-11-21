@@ -75,7 +75,6 @@ Object.assign(Runtime._Map,
 {
 	from: function(map)
 	{
-		var  = null;
 		var res = this.Instance(map);
 		return res;
 	},
@@ -506,7 +505,7 @@ class Dict<T> extends _Map
 		for (var key in this._map)
 		{
 			var new_key = key.substring(1);
-			var new_val = rtl::apply(f, [this._map[key], new_key]);
+			var new_val = Runtime.rtl.apply(f, [this._map[key], new_key]);
 			obj._map[key] = new_val;
 		}
 		return obj;
@@ -536,7 +535,7 @@ class Dict<T> extends _Map
 		{
 			var new_key = key.substring(1);
 			var value = this._map[key];
-			var flag = rtl::apply(f, [value, new_key]);
+			var flag = Runtime/rtl.apply(f, [value, new_key]);
 			if (flag) obj._map[key] = value;
 		}
 		return obj;
@@ -615,7 +614,7 @@ class Dict<T> extends _Map
 		#case ifcode JAVASCRIPT then
 		for (var key in this._map)
 		{
-			init_value = rtl::apply(f, [init_value, this._map[key], key.substring(1)]);
+			init_value = Runtime.rtl.apply(f, [init_value, this._map[key], key.substring(1)]);
 		}
 		return init_value;
 		#case ifcode PHP then

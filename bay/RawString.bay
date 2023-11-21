@@ -1,5 +1,3 @@
-<?php
-
 /*!
  *  Bayrell Runtime Library
  *
@@ -25,15 +23,18 @@ use Runtime.StringInterface;
 
 class RawString implements StringInterface
 {
-	protected $s;
+	protected string s;
 	
 	/**
 	 * Constructor
 	 */
 	public void constructor(var s)
 	{
-		s = static::normalize(s);
-		this.s = s;
+		this.s = "";
+		if (rtl::isString(s))
+		{
+			this.s = s;
+		}
 	}
 	
 	
@@ -42,40 +43,35 @@ class RawString implements StringInterface
 	 */
 	string toString()
 	{
-		if (this.s instanceof Vector)
-		{
-			return rs::join("", this.s);
-		}
-				
 		return this.s;
 	}
 	
-	#ifdef PHP then
+	
+	#ifcode PHP then
 	function __toString(){ return $this->toString(); }
 	#endif
 	
-	/*
-	static string normalize($s)
-	{
-		if (gettype($s) == "array")
-		{
-			$arr1 = [];
-			foreach ($s as $v)
-			{
-				if ($v instanceof RawString && gettype($v->s) == "array") $v = $v->s;
-				if (gettype($v) == "array")
-				{
-					$v = static::normalize($v);
-					foreach ($v as $v2)
-					{
-						$arr1[] = $v2;
-					}
-				}
-				else $arr1[] = $v;
-			}
-			return $arr1;
-		}
-		return $s;
-	}*/
 	
+	/**
+	 * Normalize array
+	 */
+	static string normalize(var item)
+	{
+		if (rtl::isString(item))
+		{
+			return item;
+		}
+		else if (item instanceof RawString)
+		{
+			return item.s;
+		}
+		else if (item instanceof Collection)
+		{
+			item = item.map(
+				string (var item) => static::normalize(item)
+			);
+			return rs::join("", item);
+		}
+		return "";
+	}
 }
