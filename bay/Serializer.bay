@@ -159,11 +159,11 @@ class Serializer
 			string class_name = res.item("__class_name__");
 			if (not rtl::class_exists(class_name))
 			{
-				return null;
+				return res.toDict();
 			}
 			if (not rtl::class_implements(class_name, "Runtime.SerializeInterface"))
 			{
-				return null;
+				return res.toDict();
 			}
 			
 			/* Assign values */
@@ -225,7 +225,7 @@ class Serializer
 			}
 			else
 			{
-				$res = \Runtime\Dict::from($value);
+				$res = \Runtime\Map::from($value);
 				$res = $res->map($ctx, function ($ctx, $val, $key){
 					return static::NativeToPrimitive($ctx, $val);
 				});
@@ -249,7 +249,7 @@ class Serializer
 				}
 				else
 				{
-					$res = \Runtime\Dict::from($value);
+					$res = \Runtime\Map::from($value);
 					$res = $res->map($ctx, function ($ctx, $val, $key){
 						return static::NativeToPrimitive($ctx, $val);
 					});
@@ -257,7 +257,7 @@ class Serializer
 				}
 			}
 			$arr = array_values($value);
-			$res = \Runtime\Collection::from($arr);
+			$res = \Runtime\Vector::from($arr);
 			$res = $res->map($ctx, function ($ctx, $item){
 				return static::NativeToPrimitive($ctx, $item);
 			});
@@ -270,17 +270,17 @@ class Serializer
 		
 		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
-		var _Collection = use("Runtime.Collection");
+		var _Vector = use("Runtime.Vector");
 		var _Date = use("Runtime.Date");
 		var _DateTime = use("Runtime.DateTime");
-		var _Dict = use("Runtime.Dict");
+		var _Map = use("Runtime.Map");
 		
 		if (value === null)
 			return null;
 		
 		if (Array.isArray(value))
 		{
-			var new_value = _Collection.from(value);
+			var new_value = _Vector.from(value);
 			new_value = new_value.map(ctx, (ctx, val)=>{
 				return Runtime.Serializer.NativeToPrimitive(ctx, val);
 			});
@@ -298,7 +298,7 @@ class Serializer
 				var new_value = new _DateTime(value);
 				return new_value;
 			}
-			var new_value = _Dict.from(value);
+			var new_value = _Map.from(value);
 			new_value = new_value.map(ctx, (ctx, val, key)=>{
 				return Runtime.Serializer.NativeToPrimitive(ctx, val);
 			});
@@ -376,7 +376,7 @@ class Serializer
 		{
 			var arr = [];
 			value.each(ctx, (ctx, v)=>{
-				arr.push( RRuntime.Serializer.PrimitiveToNative(ctx, v) );
+				arr.push( Runtime.Serializer.PrimitiveToNative(ctx, v) );
 			});
 			return arr;
 		}
