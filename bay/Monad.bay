@@ -54,19 +54,17 @@ class Monad
 	{
 		if (this.val === null or this.err != null) return this;
 		
-		var res = null;
-		var err = null;
 		try
 		{
-			res = rtl::apply(f, [this.val]);
+			this.val = rtl::apply(f, [this.val]);
 		}
 		catch (var e)
 		{
-			res = null;
-			err = e;
+			this.res = null;
+			this.err = e;
 		}
 		
-		return new Monad( res, err );
+		return this;
 	}
 	
 	
@@ -77,19 +75,17 @@ class Monad
 	{
 		if (this.val === null or this.err != null) return this;
 		
-		var res = null;
-		var err = null;
 		try
 		{
-			res = await rtl::apply(f, [this.val]);
+			this.val = await rtl::apply(f, [this.val]);
 		}
 		catch (var e)
 		{
-			res = null;
-			err = e;
+			this.val = null;
+			this.err = e;
 		}
 		
-		return new Monad( res, err );
+		return this;
 	}
 	
 	
@@ -99,7 +95,19 @@ class Monad
 	public Monad callMethod(string method_name, Collection args = null)
 	{
 		if (this.val === null or this.err != null) return this;
-		return this.call(new Callback(this.val, method_name));
+		
+		try
+		{
+			Callback f = new Callback(this.val, method_name);
+			this.val = rtl::apply(f, args);
+		}
+		catch (var e)
+		{
+			this.val = null;
+			this.err = e;
+		}
+		
+		return this;
 	}
 	
 	
@@ -109,7 +117,19 @@ class Monad
 	public async Monad callMethodAsync(string method_name, Collection args = null)
 	{
 		if (this.val === null or this.err != null) return this;
-		return await this.callAsync(new Callback(this.val, method_name));
+		
+		try
+		{
+			Callback f = new Callback(this.val, method_name);
+			this.val = await rtl::apply(f, args);
+		}
+		catch (var e)
+		{
+			this.val = null;
+			this.err = e;
+		}
+		
+		return this;
 	}
 	
 	

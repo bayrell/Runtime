@@ -282,7 +282,7 @@ class Serializer
 		{
 			var new_value = _Collection.from(value);
 			new_value = new_value.map(ctx, (ctx, val)=>{
-				return Runtime.rtl.NativeToPrimitive(ctx, val);
+				return Runtime.Serializer.NativeToPrimitive(ctx, val);
 			});
 			return new_value;
 		}
@@ -300,7 +300,7 @@ class Serializer
 			}
 			var new_value = _Dict.from(value);
 			new_value = new_value.map(ctx, (ctx, val, key)=>{
-				return Runtime.rtl.NativeToPrimitive(ctx, val);
+				return Runtime.Serializer.NativeToPrimitive(ctx, val);
 			});
 			return new_value;
 		}
@@ -376,7 +376,7 @@ class Serializer
 		{
 			var arr = [];
 			value.each(ctx, (ctx, v)=>{
-				arr.push( Runtime.rtl.PrimitiveToNative(ctx, v) );
+				arr.push( RRuntime.Serializer.PrimitiveToNative(ctx, v) );
 			});
 			return arr;
 		}
@@ -384,7 +384,7 @@ class Serializer
 		{
 			var obj = {};
 			value.each(ctx, (ctx, v, k)=>{
-				obj[k] = Runtime.rtl.PrimitiveToNative(ctx, v);
+				obj[k] = Runtime.Serializer.PrimitiveToNative(ctx, v);
 			});
 			return obj;
 		}

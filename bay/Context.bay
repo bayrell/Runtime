@@ -353,7 +353,7 @@ class Context extends BaseObject
 	string translate(string module, string s, Dict params = null)
 	{
 		if (params == null) return s;
-		return this.format(s, params);
+		return rs::format(s, params);
 	}
 	
 	

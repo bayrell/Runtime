@@ -361,7 +361,7 @@ class rtl
 		var obj = this.find_class(class_name);
 		if (!this.exists(obj) || !(obj instanceof Function))
 		{
-			throw new Runtime.Exceptions.FileNotFound(class_name, "class name");
+			throw new Runtime.Exceptions.ItemNotFound(class_name, "class name");
 		}
 		if (args == undefined || args == null){ args = []; } else { args = args.toArray(); }
 		args = args.slice(); 
@@ -881,8 +881,10 @@ class rtl
 		
 		if (value === null) return "";
 		if (typeof value == 'string') return value;
-		if (value instanceof String) return "" + value;
-		if (this.is_implements(null, value, _StringInterface)) return value.toString();
+		if (typeof value == 'number') return ""+value;
+		if (value instanceof String) return ""+value;
+		if (typeof value == 'object' && this.is_implements(value, _StringInterface))
+			return value.toString();
 		return ""+value;
 		
 		#endswitch

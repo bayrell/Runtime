@@ -463,7 +463,7 @@ class Dict<T> extends _Map
 		#switch
 		#case ifcode JAVASCRIPT then
 		var res = new Runtime.Vector();
-		for (var key in this._map) res.pushValue(key.substring(1));
+		for (var key in this._map) res.push(key.substring(1));
 		return res;
 		#case ifcode PHP then
 		$keys = array_keys($this->_map);
@@ -482,7 +482,7 @@ class Dict<T> extends _Map
 		#switch
 		#case ifcode JAVASCRIPT then
 		var res = new Runtime.Vector();
-		for (var key in this._map) res.pushValue( this._map[key] );
+		for (var key in this._map) res.push( this._map[key] );
 		return res;
 		#case ifcode PHP then
 		$values = array_values($this->_map);

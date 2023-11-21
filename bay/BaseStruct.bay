@@ -100,7 +100,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		
 		var _Dict = use("Runtime.Dict");
 		var rtl = use("Runtime.rtl");
-		if (changes instanceof _Dict) changes = changes._map;
+		if (changes instanceof _Dict) changes = changes.toObject();
 		for (var key in changes)
 		{
 			var value = changes[key];

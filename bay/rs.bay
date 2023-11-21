@@ -865,7 +865,7 @@ class rs
 	/**
 	 * Format string
 	 */
-	string format(string s, Dict params = null)
+	static string format(string s, Dict params = null)
 	{
 		if (params == null) return s;
 		
