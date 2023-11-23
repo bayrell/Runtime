@@ -62,14 +62,12 @@ class Serializer
 		
 		if (obj instanceof Dict)
 		{
-			
 			obj = obj.map(
 				var (var value, string key) use (force_class_name)
 				{
 					return static::ObjectToPrimitive( value, force_class_name );
 				}
 			);
-			
 			return obj.toDict();
 		}
 		
