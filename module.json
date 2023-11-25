@@ -31,6 +31,7 @@
 		"Date.bay",
 		"DateTime.bay",
 		"Math.bay",
+		"Money.bay",
 		"RawString.bay",
 		"Reference.bay",
 		"Serializer.bay",
