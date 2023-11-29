@@ -162,7 +162,7 @@ class AbstractException extends ClassException
 	 */
 	public string toString()
 	{
-		return this.error_message;
+		return this.getErrorMessage();
 	}
 	
 	
