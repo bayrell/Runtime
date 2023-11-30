@@ -425,8 +425,8 @@ class rtl
 			if (!this.exists(obj) || !this.exists(obj[method_name]))
 			{
 				throw new Runtime.Exceptions.RuntimeException("Method '" +
-					this.name + "' not found in " +
-					this.get_class_name(this.obj)
+					f.name + "' not found in " +
+					this.get_class_name(f.obj)
 				);
 			}
 			return Runtime.rtl.apply(obj[f.name].bind(obj), args);

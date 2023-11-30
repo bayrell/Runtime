@@ -656,6 +656,43 @@ class Dict<T> extends _Map
 	
 	
 	/**
+	 * Add values from other map
+	 * @param Dict<T> map
+	 * @return self
+	 */
+	public Dict<T> concat(Dict<T> map = null)
+	{
+		if (map == null) return this;
+		#switch
+		#case ifcode JAVASCRIPT then
+		var _map = {};
+		var f = false;
+		var Dict = use("Runtime.Dict");
+		if (map == null) return this.cp();
+		if (map instanceof Dict) _map = map._map;
+		else if (typeof map == "object") { _map = map; f = true; }
+		var res = this.cp(ctx);
+		for (var key in _map)
+		{
+			res._map[(f ? "|" : "") + key] = _map[key];
+		}
+		return res;
+		#case ifcode PHP then
+		$_map = [];
+		if ($map == null) return $this->cp();
+		if ($map instanceof \Runtime\Dict) $_map = $map->_map;
+		else if (gettype($map) == "array") $_map = $map;
+		$res = $this->cp($ctx);
+		foreach ($_map as $key => $value)
+		{
+			$res->_map[$key] = $value;
+		}
+		return $res;
+		#endswitch
+	}
+	
+	
+	/**
 	 * Check equal
 	 */
 	public bool equal(Dict item)
