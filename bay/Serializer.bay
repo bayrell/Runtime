@@ -242,6 +242,7 @@ class Serializer
 				}
 				else if ($value['__class_name__'] == "Runtime.DateTime")
 				{
+					$value = \Runtime\Dict::from($value);
 					$res = \Runtime\DateTime::from($value);
 					return $res;
 				}
@@ -288,11 +289,13 @@ class Serializer
 		{
 			if (value["__class_name__"] == "Runtime.Date")
 			{
+				value = Runtime.Dict.from(value);
 				var new_value = new _Date(value);
 				return new_value;
 			}
 			if (value["__class_name__"] == "Runtime.DateTime")
 			{
+				value = Runtime.Dict.from(value);
 				var new_value = new _DateTime(value);
 				return new_value;
 			}

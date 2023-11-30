@@ -36,6 +36,41 @@ class DateTime extends BaseObject implements StringInterface
 	public string tz = "UTC";
 	
 	
+	/**
+	 * Constructor
+	 */
+	void constructor(Dict data = null)
+	{
+		parent();
+		if (data != null)
+		{
+			if (data.has("y")) this.y = data.get("y");
+			if (data.has("m")) this.m = data.get("m");
+			if (data.has("d")) this.d = data.get("d");
+			if (data.has("h")) this.h = data.get("h");
+			if (data.has("i")) this.i = data.get("i");
+			if (data.has("s")) this.s = data.get("s");
+			if (data.has("ms")) this.ms = data.get("ms");
+			if (data.has("tz")) this.tz = data.get("tz");
+		}
+	}
+	
+	
+	/**
+	 * ToDict
+	 */
+	Dict toDict() => {
+		"y": this.y,
+		"m": this.m,
+		"d": this.d,
+		"h": this.h,
+		"i": this.i,
+		"s": this.s,
+		"ms": this.ms,
+		"tz": this.tz,
+	};
+	
+	
 	#ifcode PHP then
 	
 	private function toObject($ctx)

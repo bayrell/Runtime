@@ -32,6 +32,31 @@ class Date extends BaseObject implements StringInterface
 	
 	
 	/**
+	 * Constructor
+	 */
+	void constructor(Dict data = null)
+	{
+		parent();
+		if (data != null)
+		{
+			if (data.has("y")) this.y = data.get("y");
+			if (data.has("m")) this.m = data.get("m");
+			if (data.has("d")) this.d = data.get("d");
+		}
+	}
+	
+	
+	/**
+	 * ToDict
+	 */
+	Dict toDict() => {
+		"y": this.y,
+		"m": this.m,
+		"d": this.d,
+	};
+	
+	
+	/**
 	 * Return date
 	 * @return string
 	 */

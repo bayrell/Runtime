@@ -642,7 +642,7 @@ class Dict<T> extends _Map
 			void (string field_name) use (skip_empty, obj)
 			{
 				if (not this.has(field_name) and skip_empty) return;
-				obj.setValue(field_name, this.get(field_name, null));
+				obj.set(field_name, this.get(field_name, null));
 			}
 		);
 		
