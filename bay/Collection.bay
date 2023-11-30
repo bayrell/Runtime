@@ -33,9 +33,7 @@ Runtime._Collection = function()
 	Array.call(this);
 	if (arguments.length > 0)
 	{
-		var start=1;
-		if (!Runtime.rtl.is_context()) start=0;
-		for (var i=start; i<arguments.length; i++)
+		for (var i=0; i<arguments.length; i++)
 		{
 			Array.prototype.push.call(this, arguments[i]);
 		}

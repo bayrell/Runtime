@@ -57,9 +57,9 @@ class DateTime extends BaseObject implements StringInterface
 	
 	
 	/**
-	 * ToDict
+	 * toMap
 	 */
-	Dict toDict() => {
+	Dict toMap() => {
 		"y": this.y,
 		"m": this.m,
 		"d": this.d,

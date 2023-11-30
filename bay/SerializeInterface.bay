@@ -25,13 +25,14 @@ use Runtime.Vector;
 
 interface SerializeInterface
 {
+	/**
+	 * Import data
+	 */
+	void importData(Dict import_data);
+	
 	
 	/**
-	 * Returns instance of the value by variable name
-	 * @param string variable_name
-	 * @return var
+	 * Export data
 	 */
-	public var get(string variable_name, var default_value = null);
-	
-	
+	Map exportData();
 }

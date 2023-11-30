@@ -164,6 +164,14 @@ class rtl
 	{
 		if (obj == null) return false;
 		
+		if (static::isString(obj))
+		{
+			if (obj == class_name) return true;
+			Collection<string> parents = static::getParents(obj);
+			if (parents.indexOf(class_name) >= 0) return true;
+			return false;
+		}
+		
 		#switch
 		#case ifcode PHP then
 		

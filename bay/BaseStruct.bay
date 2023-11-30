@@ -27,7 +27,7 @@ use Runtime.Vector;
 use Runtime.SerializeInterface;
 
 
-class BaseStruct extends BaseObject implements SerializeInterface
+class BaseStruct extends BaseObject
 {
 	/** 
 	 * Constructor
@@ -189,7 +189,7 @@ class BaseStruct extends BaseObject implements SerializeInterface
 		{
 			string variable_name = names.item(i);
 			var value = this.get(variable_name, null);
-			values.setValue(variable_name, value);
+			values.set(variable_name, value);
 		}
 		
 		delete names;
