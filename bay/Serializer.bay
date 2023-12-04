@@ -32,7 +32,7 @@ class Serializer
 	 */
 	static var toNative(var value, bool allow_class_name = true)
 	{
-		if (value == null) return null;
+		if (rtl::isScalarValue(value)) return value;
 		
 		#switch
 		#case ifcode PHP then
@@ -128,7 +128,7 @@ class Serializer
 	 */
 	static var toPrimitive(var value, bool allow_class_name = true)
 	{
-		if (value == null) return null;
+		if (rtl::isScalarValue(value)) return value;
 		
 		#switch
 		#case ifcode PHP then
@@ -249,29 +249,26 @@ class Serializer
 	 * @param SerializeContainer container
 	 * @return string 
 	 */
-	static string json_encode(var value, int flags = 0, bool convert = true)
+	static string json_encode(var value, int flags = 0, string allow_class_name = true)
 	{
 		#switch
 		#case ifcode PHP then
-		if ($convert){
-			$value = static::toNative($ctx, $value);
-		}
+		$value = static::toNative($value, $allow_class_name);
 		$json_flags = JSON_UNESCAPED_UNICODE;
 		if ( ($flags & 1) == 1 ) $json_flags = $json_flags | JSON_PRETTY_PRINT;
 		return json_encode($value, $json_flags);
 		
 		#case ifcode JAVASCRIPT then
 		if (flags == undefined) flags = 0;
-		if (convert == undefined) convert = true;
+		if (allow_class_name == undefined) convert = true;
 		
-		var _rtl = use("Runtime.rtl");
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
 		var _Dict = use("Runtime.Dict");
 		var _Date = use("Runtime.Date");
 		var _DateTime = use("Runtime.DateTime");
 		
-		if (convert) value = _rtl.toNative(value);
+		value = this.toNative(value, allow_class_name);
 		return JSON.stringify(value, (key, value) => {
 			return value;
 		});

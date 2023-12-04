@@ -26,13 +26,19 @@ use Runtime.Exceptions.AbstractException;
 class ItemNotFound extends AbstractException
 {
 	
-	void constructor(string name, string object = "Item", Object prev = null)
+	void constructor(string name = "", string object = "Item", Object prev = null)
 	{
-		parent(
-			_("Runtime", "%object% '%name%' not found", {"name": name, "object": object}),
-			rtl::ERROR_ITEM_NOT_FOUND,
-			prev
-		);
+		string message = "";
+		if (name != "")
+		{
+			message = _("Runtime", "%object% '%name%' not found", {"name": name, "object": object})
+		}
+		else
+		{
+			message = _("Runtime", "%object% not found", {"object": object})
+		}
+		
+		parent(message, rtl::ERROR_ITEM_NOT_FOUND, prev);
 	}
 
 }

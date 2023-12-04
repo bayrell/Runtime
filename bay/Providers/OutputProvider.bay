@@ -263,7 +263,7 @@ class OutputProvider extends BaseProvider
 	 */
 	string getColor(string color)
 	{
-		string color = rs::strtolower(color);
+		string color = rs::lower(color);
 		
 		if (this.color_table.has(color)) return this.color_table[color];
 		if (rs::strlen(color) > 5) return "0";

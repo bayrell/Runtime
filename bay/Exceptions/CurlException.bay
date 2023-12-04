@@ -1,5 +1,5 @@
 /*!
- *  Bayrell Runtime Library 
+ *  Bayrell Runtime Library
  *
  *  (c) Copyright 2016-2023 "Ildar Bikmamatov" <support@bayrell.org>
  *
@@ -18,17 +18,24 @@
 
 namespace Runtime.Exceptions;
 
+use Runtime.rtl;
+use Runtime.RuntimeConstant;
 use Runtime.Exceptions.AbstractException;
 
 
-class ApiException extends AbstractException
+class CurlException extends AbstractException
 {
-	var response = null;
-	
-	void constructor(string message = "", var response = null, Object prev = null)
+    int http_code = -1;
+    string http_content = "";
+    
+	void constructor(int http_code, string http_content, Object prev = null)
 	{
-		parent(message, rtl::ERROR_API_ERROR, prev);
-		this.response = response;
+		parent(
+			"HTTP error code: " ~ http_code,
+			rtl::ERROR_CURL_ERROR,
+			prev
+		);
+        this.http_code = http_code;
+        this.http_content = http_content;
 	}
-
 }
