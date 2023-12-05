@@ -26,13 +26,20 @@ use Runtime.SerializeInterface;
 
 class Serializer
 {	
+	static const int JSON_PRETTY = 1;
+	static const int ALLOW_CLASS_NAME = 1;
+	static const int ALLOW_OBJECT = 2;
+	
 	
 	/**
 	 * Convert primitive data to native
 	 */
-	static var toNative(var value, bool allow_class_name = true)
+	static var toNative(var value, int flags = 3)
 	{
 		if (rtl::isScalarValue(value)) return value;
+		
+		bool allow_class_name = flags & static::ALLOW_CLASS_NAME == static::ALLOW_CLASS_NAME;
+		bool allow_object = flags & static::ALLOW_OBJECT == static::ALLOW_OBJECT;
 		
 		#switch
 		#case ifcode PHP then
@@ -51,6 +58,12 @@ class Serializer
 		{
 			$class_name = $value::getClassName();
 			$value = $value->toMap();
+			if ($allow_class_name) $value->set("__class_name__", $class_name);
+		}
+		if ($allow_serialize && \Runtime\rtl::is_implements($value, "Runtime.SerializeInterface"))
+		{
+			$class_name = $value::getClassName();
+			$value = $value->exportData();
 			if ($allow_class_name) $value->set("__class_name__", $class_name);
 		}
 		if ($value instanceof \Runtime\Collection)
@@ -76,6 +89,7 @@ class Serializer
 		
 		var _rtl = use("Runtime.rtl");
 		var _BaseStruct = use("Runtime.BaseStruct");
+		var _SerializeInterface = use("Runtime.SerializeInterface");
 		var _Collection = use("Runtime.Collection");
 		var _Date = use("Runtime.Date");
 		var _DateTime = use("Runtime.DateTime");
@@ -95,6 +109,17 @@ class Serializer
 		{
 			let class_name = value.constructor.getClassName();
 			value = value.toMap();
+			if (allow_class_name) value.set("__class_name__", class_name);
+		}
+		if (
+			allow_object &&
+			typeof value == "object" &&
+			value.constructor.getClassName != undefined &&
+			_rtl.is_implements(value, _SerializeInterface)
+		)
+		{
+			class_name = value.constructor.getClassName();
+			value = value.exportData();
 			if (allow_class_name) value.set("__class_name__", class_name);
 		}
 		if (value instanceof _Collection)
@@ -126,9 +151,12 @@ class Serializer
 	/**
 	 * Convert native data to primitive
 	 */
-	static var toPrimitive(var value, bool allow_class_name = true)
+	static var toPrimitive(var value, int flags = 3)
 	{
 		if (rtl::isScalarValue(value)) return value;
+		
+		bool allow_class_name = flags & static::ALLOW_CLASS_NAME == static::ALLOW_CLASS_NAME;
+		bool allow_object = flags & static::ALLOW_OBJECT == static::ALLOW_OBJECT;
 		
 		#switch
 		#case ifcode PHP then
@@ -175,6 +203,17 @@ class Serializer
 			)
 			{
 				return rtl::newInstance($class_name, [$value]);
+			}
+			
+			/* Is SerializeInterface */
+			else if (
+				$allow_object &&
+				\Runtime\rtl::class_implements($class_name, "Runtime.SerializeInterface")
+			)
+			{
+				$obj = rtl::newInstance($class_name);
+				$obj->importData($value);
+				return $obj;
 			}
 			
 			return $value;
@@ -232,6 +271,17 @@ class Serializer
 				return _rtl.newInstance(class_name, new _Vector(value));
 			}
 			
+			/* Is SerializeInterface */
+			else if (
+				allow_object &&
+				_rtl.class_implements(class_name, "Runtime.SerializeInterface")
+			)
+			{
+				let obj = _rtl.newInstance(class_name);
+				obj.importData(value);
+				return obj;
+			}
+			
 			return value;
 		}
 		
@@ -240,8 +290,6 @@ class Serializer
 		return value;
 	}
 	
-	
-	static const int JSON_PRETTY = 1;
 	
 	/**
 	 * Json encode serializable values
