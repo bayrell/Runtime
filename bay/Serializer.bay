@@ -363,4 +363,10 @@ class Serializer
 		return null;
 		#endswitch
 	}
+	
+	
+	/**
+	 * Copy object
+	 */
+	static var copy(var obj) => static::toPrimitive( static::toNative(obj) );
 }
