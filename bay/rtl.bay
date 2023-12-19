@@ -1310,9 +1310,11 @@ class rtl
 	 * @param SerializeContainer container
 	 * @return string 
 	 */
-	static string json_encode(var value, int flags = 0, bool convert = true)
+	static string json_encode(var value)
 	{
-		return Serializer::json_encode(value, flags, convert);
+		Serializer serializer = new Serializer();
+		serializer.setFlag(Serializer::ALLOW_CLASS_NAME);
+		return serializer.json_encode(value);
 	}
 	
 	
@@ -1321,9 +1323,11 @@ class rtl
 	 * @param string s Encoded string
 	 * @return var 
 	 */
-	static var json_decode(var obj, string allow_class_name = true)
+	static var json_decode(var obj)
 	{
-		return Serializer::json_decode(obj, allow_class_name);
+		Serializer serializer = new Serializer();
+		serializer.removeFlag(Serializer::ALLOW_CLASS_NAME);
+		return serializer.json_decode(obj);
 	}
 	
 	

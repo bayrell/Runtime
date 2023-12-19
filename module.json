@@ -21,7 +21,6 @@
 		"Exceptions/KeyNotFound.bay",
 		"Exceptions/RuntimeException.bay",
 		"Exceptions/UnknownError.bay",
-		"SerializeInterface.bay",
 		"StringInterface.bay",
 		"BaseObject.bay",
 		"BaseHook.bay",

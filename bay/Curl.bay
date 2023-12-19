@@ -100,7 +100,9 @@ Object.assign(Runtime.Curl.prototype,
 			}
 			else
 			{
-				val = Runtime.Serializer.json_encode(val, false);
+				var serializer = new Runtime.Serializer();
+				serializer.removeFlag(Runtime.Serializer.ALLOW_CLASS_NAME);
+				val = serializer.json_encode(val);
 				result.append(key, val);
 			}
 		}

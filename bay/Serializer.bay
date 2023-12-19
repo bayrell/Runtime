@@ -18,28 +18,266 @@
 
 namespace Runtime;
 
+use Runtime.BaseObject;
+use Runtime.BaseStruct;
+use Runtime.Callback;
 use Runtime.Date;
 use Runtime.DateTime;
-use Runtime.BaseStruct;
 use Runtime.SerializeInterface;
 
 
-class Serializer
+class Serializer extends BaseObject
 {	
-	static const int JSON_PRETTY = 1;
 	static const int ALLOW_CLASS_NAME = 1;
-	static const int ALLOW_OBJECT = 2;
+	static const int EXPORT = 2;
+	static const int IMPORT = 4;
+	static const int JSON_PRETTY = 8;
+	
+	var flags = 1;
+	string callback_name = "";
+	
+	bool isImport() => this.flags & static::IMPORT == static::IMPORT;
+	bool isExport() => this.flags & static::EXPORT == static::EXPORT;
+	bool allowClassName() => this.flags & static::ALLOW_CLASS_NAME == static::ALLOW_CLASS_NAME;
+	
+	
+	/**
+	 * Set flag
+	 */
+	void setFlag(int flag)
+	{
+		this.flags = this.flags | flag;
+	}
+	
+	
+	/**
+	 * Remove flag
+	 */
+	void removeFlag(int flag)
+	{
+		this.flags = this.flags & !flag;
+	}
+	
+	
+	/**
+	 * Check flag
+	 */
+	bool hasFlag(int flag) => this.flags & flag == flag;
+	
+	
+	/**
+	 * Set callback
+	 */
+	void setCallback(string value)
+	{
+		this.callback_name = value;
+	}
+	
+	
+	/**
+	 * Process data
+	 */
+	void process(BaseObject object, string field_name, Map data)
+	{
+		if (this.isImport()) this.import(object, field_name, data);
+		if (this.isExport()) this.export(object, field_name, data);
+	}
+	
+	
+	/**
+	 * Get attr
+	 */
+	static var getAttr(BaseObject object, string field_name)
+	{
+		if (object == null) return null;
+		
+		#switch
+		#case ifcode PHP then
+		return $object->$field_name;
+		#case ifcode JAVASCRIPT then
+		return object[field_name];
+		#endswitch
+		
+		return null;
+	}
+	
+	
+	/**
+	 * Set attr
+	 */
+	static var setAttr(BaseObject object, string field_name, var value)
+	{
+		#switch
+		#case ifcode PHP then
+		$object->$field_name = $value;
+		#case ifcode JAVASCRIPT then
+		object[field_name] = value;
+		#endswitch
+	}
+	
+	
+	/**
+	 * Import data
+	 */
+	void import(BaseObject object, string field_name, Map data)
+	{
+		var value = data.get(field_name);
+		var old_value = static::getAttr(object, field_name);
+		var new_value = this.importItem(old_value, value);
+		static::setAttr(object, field_name, new_value);
+	}
+	
+	
+	/**
+	 * New instance
+	 */
+	BaseObject newInstance(string class_name, Dict value)
+	{
+		return rtl::newInstance(class_name);
+	}
+	
+	
+	/**
+	 * Import item
+	 */
+	void importItem(var old_value, var value)
+	{
+		if (rtl::isScalarValue(value)) return value;
+		if (value instanceof BaseStruct) return value;
+		
+		if (
+			value instanceof Dict and
+			value.has("__class_name__")
+		)
+		{
+			string class_name = value.get("__class_name__");
+			if (
+				this.allowClassName() and
+				rtl::exists(rtl::find_class(class_name)) and
+				rtl::is_instanceof(class_name, "Runtime.BaseObject")
+			)
+			{
+				BaseObject instance = null;
+				if (rtl::is_instanceof(old_value, class_name))
+				{
+					instance = old_value;
+				}
+				else
+				{
+					instance = this.newInstance(class_name, value);
+				}
+				Callback callback = new Callback(instance, this.callback_name)
+				if (callback.exists())
+				{
+					rtl::apply(callback, [this, value]);
+				}
+				return instance;
+			}
+			return null;
+		}
+		
+		if (value instanceof Dict)
+		{
+			Map new_value = {};
+			value.each(
+				void (var item, string key) use (old_value, new_value)
+				{
+					var old_item = static::getAttr(old_value, key);
+					var new_item = this.importItem(old_item, item);
+					new_value.set(key, new_item);
+				}
+			);
+			return new_value;
+		}
+		
+		if (value instanceof Collection)
+		{
+			Map new_value = [];
+			for (int i=0; i<value.count(); i++)
+			{
+				var item = value.get(i);
+				var old_item = (old_value instanceof Collection) ? old_value.get(i) : null;
+				var new_item = this.importItem(old_item, item);
+				new_value.push(new_item);
+			}
+			return new_value;
+		}
+		
+		return null;
+	}
+	
+	
+	/**
+	 * Export data
+	 */
+	void export(BaseObject object, string field_name, Map data)
+	{
+		var old_value = static::getAttr(object, field_name);
+		var new_value = this.exportItem(old_value);
+		data.set(field_name, new_value);
+	}
+	
+	
+	/**
+	 * Export item
+	 */
+	void exportItem(var value)
+	{
+		if (rtl::isScalarValue(value)) return value;
+		if (value instanceof BaseStruct) return value;
+		
+		if (value instanceof Dict)
+		{
+			Map new_value = {};
+			value.each(
+				void (var item, string key) use (new_value)
+				{
+					var new_item = this.exportItem(item);
+					new_value.set(key, new_item);
+				}
+			);
+			return new_value;
+		}
+		
+		if (value instanceof Collection)
+		{
+			Map new_value = [];
+			for (int i=0; i<value.count(); i++)
+			{
+				var item = value.get(i);
+				var new_item = this.exportItem(item);
+				new_value.push(new_item);
+			}
+			return new_value;
+		}
+		
+		if (value instanceof BaseObject)
+		{
+			Map new_value = {};
+			if (this.allowClassName())
+			{
+				new_value.set("__class_name__", value::getClassName());
+			}
+			Callback callback = new Callback(value, this.callback_name)
+			if (callback.exists())
+			{
+				rtl::apply(callback, [this, new_value]);
+			}
+			return new_value;
+		}
+		
+		return null;
+	}
 	
 	
 	/**
 	 * Convert primitive data to native
 	 */
-	static var toNative(var value, int flags = 3)
+	var toNative(var value)
 	{
 		if (rtl::isScalarValue(value)) return value;
 		
-		bool allow_class_name = flags & static::ALLOW_CLASS_NAME == static::ALLOW_CLASS_NAME;
-		bool allow_object = flags & static::ALLOW_OBJECT == static::ALLOW_OBJECT;
+		bool allow_class_name = this.allowClassName();
 		
 		#switch
 		#case ifcode PHP then
@@ -58,12 +296,6 @@ class Serializer
 		{
 			$class_name = $value::getClassName();
 			$value = $value->toMap();
-			if ($allow_class_name) $value->set("__class_name__", $class_name);
-		}
-		if ($allow_serialize && \Runtime\rtl::is_implements($value, "Runtime.SerializeInterface"))
-		{
-			$class_name = $value::getClassName();
-			$value = $value->exportData();
 			if ($allow_class_name) $value->set("__class_name__", $class_name);
 		}
 		if ($value instanceof \Runtime\Collection)
@@ -111,17 +343,6 @@ class Serializer
 			value = value.toMap();
 			if (allow_class_name) value.set("__class_name__", class_name);
 		}
-		if (
-			allow_object &&
-			typeof value == "object" &&
-			value.constructor.getClassName != undefined &&
-			_rtl.is_implements(value, _SerializeInterface)
-		)
-		{
-			class_name = value.constructor.getClassName();
-			value = value.exportData();
-			if (allow_class_name) value.set("__class_name__", class_name);
-		}
 		if (value instanceof _Collection)
 		{
 			value = value.cp();
@@ -151,12 +372,11 @@ class Serializer
 	/**
 	 * Convert native data to primitive
 	 */
-	static var toPrimitive(var value, int flags = 3)
+	var toPrimitive(var value)
 	{
 		if (rtl::isScalarValue(value)) return value;
 		
-		bool allow_class_name = flags & static::ALLOW_CLASS_NAME == static::ALLOW_CLASS_NAME;
-		bool allow_object = flags & static::ALLOW_OBJECT == static::ALLOW_OBJECT;
+		bool allow_class_name = this.allowClassName();
 		
 		#switch
 		#case ifcode PHP then
@@ -172,16 +392,16 @@ class Serializer
 			{
 				$arr = array_values($value);
 				$res = \Runtime\Vector::from($arr);
-				$res = $res->map(function ($item) use ($allow_class_name){
-					return static::toPrimitive($item, $allow_class_name);
+				$res = $res->map(function ($item){
+					return $this->toPrimitive($item);
 				});
 				return $res;
 			}
 			
 			/* Convert value items */
 			$value = \Runtime\Map::from($value);
-			$value = $value->map(function ($item, $key) use ($allow_class_name){
-				return static::toPrimitive($item, $allow_class_name);
+			$value = $value->map(function ($item, $key){
+				return $this->toPrimitive($item);
 			});
 			
 			/* Is date */
@@ -205,17 +425,6 @@ class Serializer
 				return rtl::newInstance($class_name, [$value]);
 			}
 			
-			/* Is SerializeInterface */
-			else if (
-				$allow_object &&
-				\Runtime\rtl::class_implements($class_name, "Runtime.SerializeInterface")
-			)
-			{
-				$obj = rtl::newInstance($class_name);
-				$obj->importData($value);
-				return $obj;
-			}
-			
 			return $value;
 		}
 		
@@ -233,7 +442,7 @@ class Serializer
 		{
 			var new_value = _Vector.from(value);
 			new_value = new_value.map((val)=>{
-				return Runtime.Serializer.toPrimitive(val, allow_class_name);
+				return this.toPrimitive(val);
 			});
 			return new_value;
 		}
@@ -245,7 +454,7 @@ class Serializer
 			/* Convert value items */
 			value = _Map.from(value);
 			value = value.map((val, key)=>{
-				return Runtime.Serializer.toPrimitive(val, allow_class_name);
+				return this.toPrimitive(val);
 			});
 			
 			/* Is date */
@@ -271,17 +480,6 @@ class Serializer
 				return _rtl.newInstance(class_name, new _Vector(value));
 			}
 			
-			/* Is SerializeInterface */
-			else if (
-				allow_object &&
-				_rtl.class_implements(class_name, "Runtime.SerializeInterface")
-			)
-			{
-				let obj = _rtl.newInstance(class_name);
-				obj.importData(value);
-				return obj;
-			}
-			
 			return value;
 		}
 		
@@ -297,26 +495,26 @@ class Serializer
 	 * @param SerializeContainer container
 	 * @return string 
 	 */
-	static string json_encode(var value, int flags = 0, string allow_class_name = true)
+	string json_encode(var value)
 	{
 		#switch
 		#case ifcode PHP then
-		$value = static::toNative($value, $allow_class_name);
+		$value = $this->toNative($value);
 		$json_flags = JSON_UNESCAPED_UNICODE;
-		if ( ($flags & 1) == 1 ) $json_flags = $json_flags | JSON_PRETTY_PRINT;
+		if ($this->hasFlag(static::JSON_PRETTY))
+		{
+			$json_flags = $json_flags | JSON_PRETTY_PRINT;
+		}
 		return json_encode($value, $json_flags);
 		
 		#case ifcode JAVASCRIPT then
-		if (flags == undefined) flags = 0;
-		if (allow_class_name == undefined) convert = true;
-		
 		var _Utils = use("Runtime.RuntimeUtils");
 		var _Collection = use("Runtime.Collection");
 		var _Dict = use("Runtime.Dict");
 		var _Date = use("Runtime.Date");
 		var _DateTime = use("Runtime.DateTime");
 		
-		value = this.toNative(value, allow_class_name);
+		value = this.toNative(value);
 		return JSON.stringify(value, (key, value) => {
 			return value;
 		});
@@ -329,7 +527,7 @@ class Serializer
 	 * @param string s Encoded string
 	 * @return var 
 	 */
-	static var json_decode(var obj, string allow_class_name = true)
+	var json_decode(var obj)
 	{
 		#switch
 		#case ifcode PHP then
@@ -337,18 +535,17 @@ class Serializer
 		$res = @json_decode($obj, false);
 		if ($res === null || $res === false)
 			return null;
-		return static::toPrimitive($res, $allow_class_name);
+		return $this->toPrimitive($res);
 	
 		#case ifcode JAVASCRIPT then
 		try{
-			
 			var _Serializer = use("Runtime.Serializer");
 			var res = null;
 			try
 			{
 				res = JSON.parse(obj, (key, value) => {
 					if (value == null) return value;
-					return _Serializer.toPrimitive(value, allow_class_name);
+					return this.toPrimitive(value);
 				});
 			}
 			catch (e)
@@ -368,5 +565,9 @@ class Serializer
 	/**
 	 * Copy object
 	 */
-	static var copy(var obj) => static::toPrimitive( static::toNative(obj) );
+	static var copy(var obj)
+	{
+		Serializer serializer = rtl::newInstance( static::getClassName() );
+		return serializer.toPrimitive( serializer.toNative(obj) );
+	}
 }
