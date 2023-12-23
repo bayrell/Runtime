@@ -144,6 +144,8 @@ class Serializer extends BaseObject
 	{
 		if (rtl::isScalarValue(value)) return value;
 		if (value instanceof BaseStruct) return value;
+		if (value instanceof Date) return value;
+		if (value instanceof DateTime) return value;
 		
 		if (
 			value instanceof Dict and
@@ -225,6 +227,8 @@ class Serializer extends BaseObject
 	{
 		if (rtl::isScalarValue(value)) return value;
 		if (value instanceof BaseStruct) return value;
+		if (value instanceof Date) return value;
+		if (value instanceof DateTime) return value;
 		
 		if (value instanceof Dict)
 		{
