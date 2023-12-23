@@ -590,13 +590,33 @@ class rtl
 				var attr_data = data.takeValue(attr_name, null);
 				var res = f(attrs, attr_data, new_value, f);
 				new_data = data;
-				new_data.assignValue(attr_name, res);
+				
+				#switch
+				#case ifcode PHP then
+				$data->$attr_name = $value;
+				#case ifcode JAVASCRIPT then
+				data[attr_name] = res;
+				#endswitch
+			}
+			else if (data instanceof Map)
+			{
+				var attr_data = data.get(attr_name, null);
+				var res = f(attrs, attr_data, new_value, f);
+				data.set( attr_name, res );
+				new_data = data;
 			}
 			else if (data instanceof Dict)
 			{
 				var attr_data = data.get(attr_name, null);
 				var res = f(attrs, attr_data, new_value, f);
 				new_data = data.setIm( attr_name, res );
+			}
+			else if (data instanceof Vector)
+			{
+				var attr_data = data.get(attr_name, null);
+				var res = f(attrs, attr_data, new_value, f);
+				data.set( attr_name, res );
+				new_data = data;
 			}
 			else if (data instanceof Collection)
 			{

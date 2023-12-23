@@ -68,7 +68,7 @@ class Vector<T> extends Collection
 	/**
 	 * Remove item
 	 */
-	public Vector<T> removeItem(int pos)
+	public Vector<T> remove(int pos)
 	{
 		#switch
 		#case ifcode JAVASCRIPT then
@@ -79,6 +79,7 @@ class Vector<T> extends Collection
 		return $this;
 		#endswitch
 	}
+	public Vector<T> removeItem(int pos) => this.remove(pos);
 	
 	
 	/**
@@ -193,7 +194,7 @@ class Vector<T> extends Collection
 	public Vector<T> removeValue(T value)
 	{
 		var index = this.indexOf(value);
-		if (index != -1) this.removePosition(index, 1);
+		if (index != -1) this.remove(index, 1);
 		return this;
 	}
 	
