@@ -235,18 +235,18 @@ class rs
 		$arr = [];
 		if ($limit < 0) $arr = explode($delimiter, $s);
 		else $arr = explode($delimiter, $s, $limit);
-		return Collection::from($arr);
+		return Vector::from($arr);
 		
 		#case ifcode JAVASCRIPT then
 		
 		var _rtl = use("Runtime.rtl");
-		var _Collection = use("Runtime.Collection");
+		var _Vector = use("Runtime.Vector");
 		
 		var arr = null;
 		if (!_rtl.exists(limit))
 			arr = s.split(delimiter);
 		arr = s.split(delimiter, limit);
-		return _Collection.from(arr);
+		return _Vector.from(arr);
 		
 		#endswitch
 	}
@@ -704,7 +704,7 @@ class rs
 		
 		if (not find and value != "")
 		{
-			arr = arr.appendIm(key ~ "=" ~ static::htmlEscape(value));
+			arr.push(key ~ "=" ~ static::htmlEscape(value));
 		}
 		
 		s = s1;
