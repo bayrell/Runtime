@@ -29,7 +29,7 @@ class ApiError extends AbstractException
 	void constructor(Object prev = null)
 	{
 		parent(
-			_("Runtime", "Api error"),
+			prev.getErrorMessage(),
 			rtl::ERROR_API_ERROR,
 			prev
 		);
