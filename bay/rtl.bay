@@ -690,7 +690,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		$e = $o["e"];
-		#case ifcode JAVSCRIPT then
+		#case ifcode JAVASCRIPT then
 		e = o.e;
 		#endswitch
 		

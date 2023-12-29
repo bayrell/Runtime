@@ -234,6 +234,7 @@ class Collection<T> extends _Collection
 		return $arr2;
 		#endswitch
 	}
+	Collection<T> copy() => this.cp();
 	
 	
 	/**

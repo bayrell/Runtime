@@ -237,6 +237,7 @@ class Dict<T> extends _Map
 		return $new_obj;
 		#endswitch
 	}
+	Collection<T> copy() => this.cp();
 	
 	
 	/**
