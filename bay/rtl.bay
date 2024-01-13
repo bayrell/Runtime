@@ -129,6 +129,48 @@ class rtl
 	
 	
 	/**
+	 * Register module
+	 */
+	static bool @defModule(var f)
+	{
+		#switch
+		#case ifcode ES6 then
+		var res = f(this.require);
+		var exports = res["exports"];
+		var module_name = res["module_name"];
+		if (module_name != null)
+		{
+			Runtime.rtl._modules[module_name] = exports;
+		}
+		#endswitch
+	}
+	
+	
+	/**
+	 * Require js module by name
+	 * @return module
+	 */
+	static var @require(string module_name)
+	{
+		#switch
+		#case ifcode PHP then
+		return null;
+		
+		#case ifcode ES6 then
+		if (Runtime.rtl._modules[module_name] == undefined)
+		{
+			throw new Runtime.Exceptions.ItemNotFound(module_name, "Module");
+		}
+		return Runtime.rtl._modules[module_name];
+		
+		#case ifcode NODEJS then
+		return require(module_name);
+		
+		#endswitch
+	}
+	
+	
+	/**
 	 * Find class instance by name. If class does not exists return null.
 	 * @return var - class instance
 	 */
@@ -1520,7 +1562,11 @@ var use = function(s){return Runtime.rtl.find_class(s);}
 
 #case ifcode JAVASCRIPT then
 if (typeof Runtime != 'undefined' && typeof Runtime.rtl != 'undefined')
+{
+	Runtime.rtl._classes = {};
+	Runtime.rtl._modules = {};
 	Runtime.rtl._memorize_not_found = {'s':'memorize_key_not_found','id':Symbol()};
+}
 
 #case ifcode NODEJS then
 
