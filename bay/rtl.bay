@@ -1521,7 +1521,7 @@ class rtl
 	/**
 	 * Register PHP error handler
 	 */
-	function set_default_exception_handler()
+	static function set_default_exception_handler()
 	{
 		set_exception_handler( function ($e){
 		
