@@ -49,9 +49,9 @@ static class ModuleDescription
 	 */
 	pure Collection<Dict> entities() => 
 	[
-		new Provider("input", null),
+		/*new Provider("input", null),*/
 		new Provider("output", "Runtime.Providers.OutputProvider"),
-		new Provider("log", null),
+		/*new Provider("log", null),*/
 		new Provider("hook", "Runtime.Providers.HookProvider"),
 	];
 	

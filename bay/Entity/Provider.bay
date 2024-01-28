@@ -18,20 +18,56 @@
 
 namespace Runtime.Entity;
 
+use Runtime.BaseObject;
+use Runtime.BaseProvider;
 use Runtime.Entity.Entity;
 
 
 struct Provider extends Entity
 {
 	/* Provider class name */
-	string value = "";
+	string value = null;
 	
-	void constructor(string name, string value, Dict params = null)
+	/* Factory params */
+	Dict params = null;
+	
+	
+	/**
+	 * Constructor
+	 */
+	void constructor(string name, string value = null, Dict params = null)
 	{
+		if (value instanceof Dict)
+		{
+			params = value;
+			value = null;
+		}
 		parent({
 			"name": name,
 			"value": value,
 			"params": params,
 		});
+	}
+	
+	
+	/**
+	 * Create provider
+	 */
+	BaseProvider createProvider()
+	{
+		BaseProvider provider = null;
+		var class_name = this.value;
+		
+		if (class_name == null) class_name = this.name;
+		if (class_name instanceof BaseProvider)
+		{
+			provider = class_name;
+		}
+		else if (rtl::isString(class_name))
+		{
+			provider = rtl::newInstance(class_name, [this.params]);
+		}
+		
+		return provider;
 	}
 }

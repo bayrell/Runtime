@@ -19,6 +19,7 @@
 namespace Runtime.Entity;
 
 use Runtime.rtl;
+use Runtime.BaseObject;
 use Runtime.BaseStruct;
 
 

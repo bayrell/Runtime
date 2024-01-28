@@ -206,6 +206,7 @@ class Context extends BaseObject
 		if (params.has("modules")) instance.modules = params.get("modules");
 		if (params.has("start_time")) instance.start_time = params.get("start_time");
 		if (params.has("tz")) instance.tz = params.get("tz");
+		instance.start_modules = instance.modules.copy();
 		return instance;
 	}
 	
@@ -365,29 +366,17 @@ class Context extends BaseObject
 		Vector<Provider> providers = this.getEntities(classof Provider);
 		for (int i=0; i<providers.count(); i++)
 		{
-			Provider info = providers.get(i);
+			Provider factory = providers.get(i);
 			
-			if (not info.value)
-			{
-				continue;
-			}
-			
-			BaseProvider provider = null;
-			if (info.value instanceof BaseProvider)
-			{
-				provider = info.value;
-			}
-			else if (rtl::isString(info.value))
-			{
-				provider = rtl::newInstance(info.value, [info.params]);
-			}
-			
+			/* Create provider */
+			BaseProvider provider = factory.createProvider();
 			if (not provider)
 			{
-				throw new RuntimeException("Wrong declare provider '" ~ info.name ~ "'");
+				throw new RuntimeException("Wrong declare provider '" ~ factory.name ~ "'");
 			}
 			
-			this.registerProvider(info.name, provider);
+			/* Add provider */
+			this.registerProvider(factory.name, provider);
 		}
 	}
 	
@@ -428,11 +417,6 @@ class Context extends BaseObject
 	void registerProvider(string provider_name, BaseProvider provider)
 	{
 		if (this.initialized) return;
-		
-		if (this.providers.has(provider_name))
-		{
-			throw new RuntimeException("Provider + '" + provider_name + "' already registered");
-		}
 		
 		if (not(provider instanceof BaseProvider))
 		{
@@ -511,5 +495,4 @@ class Context extends BaseObject
 		}
 		return entities;
 	}
-	
 }
