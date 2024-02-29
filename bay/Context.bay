@@ -219,7 +219,7 @@ class Context extends BaseObject
 		if (this.initialized) return;
 		
 		/* Create app */
-		if (this.entry_point != "")
+		if (this.entry_point)
 		{
 			this.app = rtl::newInstance(this.entry_point);
 		}
