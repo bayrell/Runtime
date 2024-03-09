@@ -495,7 +495,7 @@ class Collection<T> extends _Collection
 	Collection<T> concat(Collection<T> arr)
 	{
 		if (arr == null) return this;
-		if (not(arr instanceof Collection)) arr = [ arr ];
+		if (not(rtl::is_instanceof(arr, classof Collection))) arr = [ arr ];
 		#switch
 		#case ifcode JAVASCRIPT then
 		if (arr.length == 0) return this;

@@ -207,6 +207,11 @@ class rtl
 	{
 		if (obj == null) return false;
 		
+		if (not static::isString(obj))
+		{
+			obj = obj::getClassName();
+		}
+		
 		if (static::isString(obj))
 		{
 			if (obj == class_name) return true;
@@ -215,21 +220,7 @@ class rtl
 			return false;
 		}
 		
-		#switch
-		#case ifcode PHP then
-		
-		$class_name = static::find_class($class_name);
-		if (gettype($obj) != "object") return false;
-		if (is_subclass_of($obj, $class_name)){ return true;}
-		return is_a($obj, $class_name);
-	
-		#case ifcode JAVASCRIPT then
-		
-		var c = this.find_class(class_name);
-		if (c == null) return false;
-		return c.prototype.isPrototypeOf(obj);
-	
-		#endswitch
+		return false;
 	}
 	
 	
