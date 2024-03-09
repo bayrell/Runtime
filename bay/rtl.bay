@@ -619,7 +619,7 @@ class rtl
 			
 			var new_data = null;
 			var attr_name = attrs.first();
-			attrs.removeItem(0);
+			attrs.remove(0);
 			
 			if (data instanceof BaseStruct)
 			{

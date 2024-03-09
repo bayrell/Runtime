@@ -70,6 +70,7 @@ class Vector<T> extends Collection
 	 */
 	public Vector<T> remove(int pos)
 	{
+		if (pos == -1) return this;
 		#switch
 		#case ifcode JAVASCRIPT then
 		Array.prototype.splice.call(this, pos, 1);
@@ -79,7 +80,7 @@ class Vector<T> extends Collection
 		return $this;
 		#endswitch
 	}
-	public Vector<T> removeItem(int pos) => this.remove(pos);
+	/*public Vector<T> removeItem(int pos) => this.remove(pos);*/
 	
 	
 	/**
