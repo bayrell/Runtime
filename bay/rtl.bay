@@ -480,7 +480,8 @@ class rtl
 					this.get_class_name(f.obj)
 				);
 			}
-			return Runtime.rtl.apply(obj[f.name].bind(obj), args);
+			return obj[f.name].bind(obj).apply(null, args);
+			/*return Runtime.rtl.apply(obj[f.name].bind(obj), args);*/
 		}
 		
 		return f.apply(null, args);
@@ -899,7 +900,11 @@ class rtl
 	 */
 	static bool isCallable(var value)
 	{
-		if (value instanceof Callback) return true;
+		if (value instanceof Callback)
+		{
+			if (value.exists(value)) return true;
+			return false;
+		}
 		
 		#switch
 		#case ifcode PHP then
