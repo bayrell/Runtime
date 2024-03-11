@@ -83,6 +83,16 @@ class Math
 	
 	
 	/**
+	 * Returns abs
+	 */
+	pure var abs(var a)
+	{
+		if (a < 0) return 0 - a;
+		else return a;
+	}
+	
+	
+	/**
 	 * Returns max
 	 */
 	pure var max(var a, var b)
