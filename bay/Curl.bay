@@ -76,6 +76,7 @@ Object.assign(Runtime.Curl.prototype,
 	 */
 	buildPostData: function(post_data, result)
 	{
+		if (post_data instanceof FormData) return post_data;
 		if (result == undefined)
 		{
 			result = new FormData();
@@ -100,9 +101,6 @@ Object.assign(Runtime.Curl.prototype,
 			}
 			else
 			{
-				var serializer = new Runtime.Serializer();
-				serializer.removeFlag(Runtime.Serializer.ALLOW_CLASS_NAME);
-				val = serializer.json_encode(val);
 				result.append(key, val);
 			}
 		}
@@ -123,10 +121,10 @@ Object.assign(Runtime.Curl.prototype,
 		return await new Promise((resolve, reject) =>{
 			try
 			{
-				let post_data = this.buildPostData(this.post);
+				var post = this.buildPostData(this.post);
 				let xhr = new XMLHttpRequest();
 				xhr.open('POST', this.url, true);
-				xhr.send(post_data);
+				xhr.send(post);
 				xhr.onreadystatechange = (function(curl, xhr, resolve, reject) {
 					return function()
 					{
