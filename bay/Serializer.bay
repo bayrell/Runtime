@@ -388,8 +388,12 @@ class Serializer extends BaseObject
 		if (is_object($value) || is_array($value))
 		{
 			$class_name = null;
-			if (is_object($value)) $class_name = $value->__class_name__;
-			if (is_array($value)) $class_name = $value['__class_name__'];
+			if (is_object($value))
+				if (property_exists($value, "__class_name__"))
+					$class_name = $value->__class_name__;
+			if (is_array($value))
+				if (isset($value["__class_name__"]))
+					$class_name = $value["__class_name__"];
 			
 			/* Is vector */
 			if (is_array($value) && $class_name == null)
