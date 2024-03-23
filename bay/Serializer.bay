@@ -445,7 +445,7 @@ class Serializer extends BaseObject
 		var _DateTime = use("Runtime.DateTime");
 		var _Map = use("Runtime.Map");
 		
-		/* Is vector */
+		/* Is native array */
 		if (Array.isArray(value))
 		{
 			var new_value = _Vector.from(value);
@@ -455,7 +455,12 @@ class Serializer extends BaseObject
 			return new_value;
 		}
 		
-		if (typeof value == 'object')
+		/* Is native object */
+		if (
+			typeof value == 'object' &&
+			!_rtl.is_instanceof(value, "Runtime.Map") &&
+			!_rtl.is_instanceof(value, "Runtime.BaseObject")
+		)
 		{
 			let class_name = value["__class_name__"];
 			

@@ -207,7 +207,12 @@ class rtl
 	{
 		if (obj == null) return false;
 		
-		if (not static::isString(obj))
+		string t = static::getType(obj);
+		if (
+			t == "object" or
+			t == "collection" or
+			t == "dict"
+		)
 		{
 			obj = obj::getClassName();
 		}
