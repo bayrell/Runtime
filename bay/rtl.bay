@@ -235,6 +235,9 @@ class rtl
 	 */
 	static bool is_implements(var obj, string interface_name)
 	{
+		if (obj == null) return false;
+		string t = static::getType(obj);
+		if (t != "object" and t != "collection" and t != "dict") return false;
 		return static::class_implements(obj::getClassName(), interface_name);
 	}
 	
@@ -533,7 +536,8 @@ class rtl
 		if (
 			$item instanceof \Runtime\Dict or
 			$item instanceof \Runtime\Collection or
-			$item instanceof \Runtime\BaseStruct
+			$item instanceof \Runtime\BaseStruct or
+			$item instanceof \Runtime\MapInterface
 		)
 		{
 			$item = $item->get($key, $def_val);
@@ -552,8 +556,9 @@ class rtl
 		#case ifcode JAVASCRIPT then
 		var Collection = use("Runtime.Collection");
 		var Dict = use("Runtime.Dict");
-		var BaseStruct = use("Runtime.BaseStruct");
 		var BaseObject = use("Runtime.BaseObject");
+		var BaseStruct = use("Runtime.BaseStruct");
+		var MapInterface = use("Runtime.MapInterface");
 		
 		if (def_val == undefined) def_val = null;
 		if (item === null) return def_val;
@@ -572,7 +577,8 @@ class rtl
 		if (
 			item instanceof Dict ||
 			item instanceof Collection ||
-			item instanceof BaseStruct
+			item instanceof BaseStruct ||
+			this.is_implements(item, MapInterface)
 		)
 		{
 			var new_item = item.get(key, def_val);

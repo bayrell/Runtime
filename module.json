@@ -10,6 +10,7 @@
 		"Collection.bay",
 		"Dict.bay",
 		"Map.bay",
+		"MapInterface.bay",
 		"Monad.bay",
 		"Vector.bay",
 		"Exceptions/AbstractException.bay",
