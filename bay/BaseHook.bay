@@ -28,6 +28,27 @@ class BaseHook extends BaseObject
 	
 	
 	/**
+	 * Create hook
+	 */
+	void constructor(Dict params = null)
+	{
+		parent();
+		
+		/* Setup hook params */
+		this.setup(params);
+	}
+	
+	
+	/**
+	 * Setup hook params
+	 */
+	void setup(Dict params)
+	{
+		if (params == null) return;
+	}
+	
+	
+	/**
 	 * Returns method name by hook name
 	 */
 	string getMethodName(string hook_name) => "";
@@ -36,20 +57,15 @@ class BaseHook extends BaseObject
 	/**
 	 * Register hook
 	 */
-	void register(string hook_name, int priority = 100)
+	void register(string hook_name, var method_name = "", int priority = 100)
 	{
-		string method_name = this.getMethodName(hook_name);
+		if (rtl::isInt(method_name))
+		{
+			priority = method_name;
+			method_name = "";
+		}
+		if (method_name == "") method_name = this.getMethodName(hook_name);
 		if (method_name == "") return;
-		
-		this.hook.register(hook_name, this, method_name, priority);
-	}
-	
-	
-	/**
-	 * Register hook
-	 */
-	void registerMethod(string hook_name, string method_name, int priority = 100)
-	{
 		this.hook.register(hook_name, this, method_name, priority);
 	}
 	

@@ -43,7 +43,7 @@ class HookProvider extends BaseProvider
 		for (int i=0; i<hooks.count(); i++)
 		{
 			Hook hook = hooks[i];
-			BaseHook base_hook = rtl::newInstance(hook.name);
+			BaseHook base_hook = rtl::newInstance(hook.name, [hook.params]);
 			base_hook.hook = this;
 			base_hook.register_hooks();
 			this.base_hooks.push(base_hook);

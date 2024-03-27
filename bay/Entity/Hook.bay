@@ -24,10 +24,13 @@ use Runtime.Entity.Entity;
 
 struct Hook extends Entity
 {
-	void constructor(string name)
+	Dict params = null;
+	
+	void constructor(string name, Map params = null)
 	{
 		parent({
 			"name": name,
+			"params": params,
 		});
 	}
 }
