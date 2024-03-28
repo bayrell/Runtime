@@ -194,9 +194,11 @@ class Context extends BaseObject
 		if (not params.has("environments")) params.set("environments", new Map());
 		
 		Map env = params["environments"];
+		if (not env.has("CLOUD_ENV")) env.set("CLOUD_ENV", false);
 		if (not env.has("DEBUG")) env.set("DEBUG", false);
 		if (not env.has("LOCALE")) env.set("LOCALE", "en_US");
-		if (not env.has("LOCALE_CODE")) env.set("LOCALE_CODE", "en");
+		if (not env.has("TZ")) env.set("TZ", "UTC");
+		if (not env.has("TZ_OFFSET")) env.set("TZ_OFFSET", 0);
 		
 		Context instance = rtl::newInstance(static::getClassName());
 		if (params.has("base_path")) instance.base_path = params.get("base_path");
