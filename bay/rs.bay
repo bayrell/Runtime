@@ -461,6 +461,18 @@ class rs
 	
 	
 	/**
+	 * Remove spaces
+	 */
+	static string spaceless(string s)
+	{
+		s = re::replace("\s+", " ", s);
+		s = re::replace("\t", "", s);
+		s = re::replace("\n", "", s);
+		return s;
+	}
+	
+	
+	/**
 	 * Ищет позицию первого вхождения подстроки search в строке s.
 	 * @param {string} s - строка, в которой производится поиск 
 	 * @param {string} search - строка, которую ищем 
@@ -712,6 +724,43 @@ class rs
 		if (s2 != "") s = s ~ "?" ~ s2;
 		
 		return s;
+	}
+	
+	
+	/**
+	 * Strip tags
+	 */
+	pure string strip_tags(string content, Collection<string> allowed_tags = null)
+	{
+		if (allowed_tags == null)
+		{
+			content = re::replace("<[^>]+>", "", content);
+			content = rs::trim(rs::spaceless(content));
+			return content;
+		}
+		
+		Collection matches = re::matchAll("<[^>]+>", content, "i");
+		if (matches)
+		{
+			for (int i=0; i<matches.count(); i++)
+			{
+				Collection match = matches[i];
+				string tag_str = match[0];
+				
+				Collection tag_match = re::matchAll("<(\/|)([a-zA-Z]+)(|[^>]*)>", tag_str, "i");
+				if (tag_match)
+				{
+					string tag_name = static::lower(tag_match[0][2]);
+					if (allowed_tags.indexOf(tag_name) == -1)
+					{
+						content = static::replace(tag_str, "", content);
+					}
+				}
+			}
+		}
+		
+		content = rs::trim(rs::spaceless(content));
+		return content;
 	}
 	
 	
