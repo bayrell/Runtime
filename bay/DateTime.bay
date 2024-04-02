@@ -218,6 +218,18 @@ class DateTime extends BaseObject implements StringInterface
 	
 	
 	/**
+	 * Shift tz
+	 */
+	DateTime shift(int seconds)
+	{
+		int timestamp = this.getTimestamp();
+		DateTime dt = static::create(timestamp + seconds);
+		dt.shiftOffset(this.o);
+		return dt;
+	}
+	
+	
+	/**
 	 * Shift offset
 	 */
 	DateTime shiftOffset(double offset)
