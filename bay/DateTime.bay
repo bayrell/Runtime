@@ -187,6 +187,16 @@ class DateTime extends BaseObject implements StringInterface
 		dt.i = (int)rs::substr(s, 14, 2);
 		dt.s = (int)rs::substr(s, 17, 2);
 		dt.o = 0;
+		
+		if (rs::strlen(s) > 19)
+		{
+			string sign = rs::substr(s, 19, 1);
+			int tz_h = (int)rs::substr(s, 20, 2);
+			int tz_m = (int)rs::substr(s, 23, 2);
+			dt.o = (tz_h * 60 + tz_m) / 60;
+			if (sign == "-") dt.o = 0 - dt.o;
+		}
+		
 		return dt;
 	}
 	
