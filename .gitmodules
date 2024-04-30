@@ -1,3 +1,0 @@
-[submodule "nodejs"]
-	path = nodejs
-	url = https://github.com/bayrell/bayrell-runtime-nodejs

@@ -1,3 +1,11 @@
+/es6
+/php
+!/nodejs/
+/nodejs/*
+!/nodejs/LICENSE
+!/nodejs/index.js
+!/nodejs/package.json
+
 # bower and nodejs modules dir
 /bower_components
 /node_modules
