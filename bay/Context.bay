@@ -169,11 +169,11 @@ class Context extends BaseObject
 		{
 			params.set("cli_args", Collection.from(process.argv.slice(1)));
 		}
-		if (!d.has("base_path"))
+		if (!params.has("base_path"))
 		{
 			params.set("base_path", process.cwd());
 		}
-		if (!d.has("environments"))
+		if (!params.has("environments"))
 		{
 			params.set("environments", Map.from(process.env));
 		}
@@ -194,6 +194,7 @@ class Context extends BaseObject
 		if (not params.has("environments")) params.set("environments", new Map());
 		
 		Map env = params["environments"];
+		if (not env) env = {};
 		if (not env.has("CLOUD_ENV")) env.set("CLOUD_ENV", false);
 		if (not env.has("DEBUG")) env.set("DEBUG", false);
 		if (not env.has("LOCALE")) env.set("LOCALE", "en_US");
@@ -391,7 +392,7 @@ class Context extends BaseObject
 		Vector<string> providers_names = this.providers.keys();
 		for (int i=0; i<providers_names.count(); i++)
 		{
-			string provider_name = providers_names[i];
+			string provider_name = providers_names.get(i);
 			BaseProvider provider = this.providers.get(provider_name);
 			await provider.init();
 		}
@@ -406,7 +407,7 @@ class Context extends BaseObject
 		Vector<string> providers_names = this.providers.keys();
 		for (int i=0; i<providers_names.count(); i++)
 		{
-			string provider_name = providers_names[i];
+			string provider_name = providers_names.get(i);
 			BaseProvider provider = this.providers.get(provider_name);
 			await provider.start();
 		}

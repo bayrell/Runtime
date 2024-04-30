@@ -318,7 +318,7 @@ class rtl
 		
 		#case ifcode JAVASCRIPT then
 		var obj = this.find_class(class_name);
-		if (!this.exists(obj)) return false;
+		if (!this.exists(ctx, obj)) return false;
 		return true;
 		
 		#endswitch
@@ -382,8 +382,8 @@ class rtl
 		}
 		
 		var obj = this.find_class(class_name);
-		if (!this.exists(obj)) return false;
-		if (this.exists(obj[method_name])) return true;
+		if (!this.exists(ctx, obj)) return false;
+		if (this.exists(ctx, obj[method_name])) return true;
 		return false;
 	
 		#endswitch
@@ -409,9 +409,9 @@ class rtl
 		#case ifcode JAVASCRIPT then
 		
 		var obj = this.find_class(class_name);
-		if (!this.exists(obj) || !(obj instanceof Function))
+		if (!this.exists(ctx, obj) || !(obj instanceof Function))
 		{
-			throw new Runtime.Exceptions.ItemNotFound(class_name, "class name");
+			throw new Runtime.Exceptions.ItemNotFound(ctx, class_name, "class name");
 		}
 		if (args == undefined || args == null){ args = []; } else { args = args.toArray(); }
 		args = args.slice(); 
@@ -467,16 +467,18 @@ class rtl
 		if (args == null) args = [];
 		else args = Array.prototype.slice.call(args);
 		
+		if (typeof ctx != "undefined") args.unshift(ctx);
+		
 		if (f instanceof Runtime.Callback)
 		{
 			let obj = f.obj;
 			let method_name = f.name;
 			if (typeof obj == "string") obj = this.find_class(obj);
-			if (!this.exists(obj) || !this.exists(obj[method_name]))
+			if (!this.exists(ctx, obj) || !this.exists(ctx, obj[method_name]))
 			{
-				throw new Runtime.Exceptions.RuntimeException("Method '" +
+				throw new Runtime.Exceptions.RuntimeException(ctx, "Method '" +
 					f.name + "' not found in " +
-					this.get_class_name(f.obj)
+					this.get_class_name(ctx, f.obj)
 				);
 			}
 			return obj[f.name].bind(obj).apply(null, args);
@@ -940,6 +942,17 @@ class rtl
 	 */
 	static string toString(var value)
 	{
+		return static::@toStr(value);
+	}
+	
+	
+	/**
+	 * Convert value to string
+	 * @param var value
+	 * @return string
+	 */
+	static string @toStr(var value)
+	{
 		#switch
 		#case ifcode PHP then
 		
@@ -966,17 +979,6 @@ class rtl
 		return ""+value;
 		
 		#endswitch
-	}
-	
-	
-	/**
-	 * Convert value to string
-	 * @param var value
-	 * @return string
-	 */
-	static string @toStr(var value)
-	{
-		return static::toString(value);
 	}
 	
 	
@@ -1453,6 +1455,10 @@ class rtl
 		/* Setup global context */
 		static::setContext(context);
 		
+		#ifcode NODEJS then
+		ctx = context;
+		#endif
+		
 		/* Init context */
 		await context.init();
 		
@@ -1464,7 +1470,7 @@ class rtl
 	 * Run application
 	 * @param Dict d
 	 */
-	public static async int @runApp
+	public static async int runApp
 	(
 		string class_name,
 		Collection<string> modules,
@@ -1504,9 +1510,9 @@ class rtl
 		
 		try
 		{
-			let context = await Runtime.rtl.createContext(params);
-			await context.start(context);
-			code = await context.run(context);
+			let context = await Runtime.rtl.createContext(null, params);
+			await context.start(context, context);
+			code = await context.run(context, context);
 		}
 		catch (e)
 		{

@@ -31,11 +31,11 @@ class ItemNotFound extends AbstractException
 		string message = "";
 		if (name != "")
 		{
-			message = _("Runtime", "%object% '%name%' not found", {"name": name, "object": object})
+			message = rs::format("%object% '%name%' not found", {"name": name, "object": object});
 		}
 		else
 		{
-			message = _("Runtime", "%object% not found", {"object": object})
+			message = rs::format("%object% not found", {"object": object});
 		}
 		
 		parent(message, rtl::ERROR_ITEM_NOT_FOUND, prev);

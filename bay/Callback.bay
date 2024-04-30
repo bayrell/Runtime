@@ -56,6 +56,12 @@ class Callback
 	}
 	
 	
+	/**
+	 * Apply
+	 */
+	var apply(Collection args) => rtl::apply(this, args);
+	
+	
 	#ifcode PHP then
 	
 	function __invoke()
