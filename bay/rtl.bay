@@ -566,15 +566,15 @@ class rtl
 		if (item === null) return def_val;
 		if (item === undefined) return def_val;
 		if (Array.isArray(path) && path.count == undefined) path = Collection.from(path);
-		if (this.isScalarValue(path)) path = Collection.from([path]);
+		if (this.isScalarValue(ctx, path)) path = Collection.from([path]);
 		if (!(path instanceof Collection)) return def_val;
 		if (path.count() == 0)
 		{
 			return item;
 		}
 		if (typeof item == "string") return item.charAt(path[0]);
-		var key = path.first();
-		var path = path.slice(1);
+		var key = path.first(ctx);
+		var path = path.slice(ctx, 1);
 		var val = def_val;
 		if (
 			item instanceof Dict ||
@@ -583,14 +583,14 @@ class rtl
 			this.is_implements(item, MapInterface)
 		)
 		{
-			var new_item = item.get(key, def_val);
-			val = this.attr(new_item, path, def_val);
+			var new_item = item.get(ctx, key, def_val);
+			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
 		else
 		{
 			var new_item = item[key] || def_val;
-			val = this.attr(new_item, path, def_val);
+			val = this.attr(ctx, new_item, path, def_val);
 			return val;
 		}
 		return def_val;
@@ -623,7 +623,7 @@ class rtl
 			
 			var new_data = null;
 			var attr_name = attrs.first();
-			attrs.remove(0);
+			attrs = attrs.slice(1);
 			
 			if (data instanceof BaseStruct)
 			{

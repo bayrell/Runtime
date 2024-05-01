@@ -333,35 +333,35 @@ class Serializer extends BaseObject
 		
 		if (value instanceof _Date)
 		{
-			value = value.toMap();
-			if (allow_class_name) value.set("__class_name__", "Runtime.Date");
+			value = value.toMap(ctx);
+			if (allow_class_name) value.set(ctx, "__class_name__", "Runtime.Date");
 		}
 		else if (value instanceof _DateTime)
 		{
-			value = value.toMap();
-			if (allow_class_name) value.set("__class_name__", "Runtime.DateTime");
+			value = value.toMap(ctx);
+			if (allow_class_name) value.set(ctx, "__class_name__", "Runtime.DateTime");
 		}
 		else if (value instanceof _BaseStruct)
 		{
 			let class_name = value.constructor.getClassName();
-			value = value.toMap();
-			if (allow_class_name) value.set("__class_name__", class_name);
+			value = value.toMap(ctx);
+			if (allow_class_name) value.set(ctx, "__class_name__", class_name);
 		}
 		if (value instanceof _Collection)
 		{
-			value = value.cp();
+			value = value.cp(ctx);
 			for(let i=0; i<value.length; i++)
 			{
-				value[i] = this.toNative(value[i], allow_class_name);
+				value[i] = this.toNative(ctx, value[i], allow_class_name);
 			}
-			return value.cp();
+			return value.cp(ctx);
 		}
 		if (value instanceof _Dict)
 		{
 			let res = {};
 			value.each(
-				(v, k) => {
-					res[k] = this.toNative(v, allow_class_name);
+				(ctx, v, k) => {
+					res[k] = this.toNative(ctx, v, allow_class_name);
 				}
 			);
 			return res;
@@ -449,8 +449,8 @@ class Serializer extends BaseObject
 		if (Array.isArray(value))
 		{
 			var new_value = _Vector.from(value);
-			new_value = new_value.map((val)=>{
-				return this.toPrimitive(val);
+			new_value = new_value.map(ctx, (ctx, val)=>{
+				return this.toPrimitive(ctx, val);
 			});
 			return new_value;
 		}
@@ -458,39 +458,39 @@ class Serializer extends BaseObject
 		/* Is native object */
 		if (
 			typeof value == 'object' &&
-			!_rtl.is_instanceof(value, "Runtime.Map") &&
-			!_rtl.is_instanceof(value, "Runtime.BaseObject")
+			!_rtl.is_instanceof(ctx, value, "Runtime.Map") &&
+			!_rtl.is_instanceof(ctx, value, "Runtime.BaseObject")
 		)
 		{
 			let class_name = value["__class_name__"];
 			
 			/* Convert value items */
 			value = _Map.from(value);
-			value = value.map((val, key)=>{
-				return this.toPrimitive(val);
+			value = value.map(ctx, (ctx, val, key)=>{
+				return this.toPrimitive(ctx, val);
 			});
 			
 			/* Is date */
 			if (class_name == "Runtime.Date")
 			{
-				return new _Date(value);
+				return new _Date(ctx, value);
 			}
 			
 			/* Is datetime */
 			if (class_name == "Runtime.DateTime")
 			{
-				return new _DateTime(value);
+				return new _DateTime(ctx, value);
 			}
 			
 			/* Is struct */
 			else if (
 				allow_class_name &&
-				_rtl.exists(_rtl.find_class(class_name)) &&
-				_rtl.is_instanceof(class_name, "Runtime.BaseStruct")
+				_rtl.exists(ctx, _rtl.find_class(class_name)) &&
+				_rtl.is_instanceof(ctx, class_name, "Runtime.BaseStruct")
 			)
 			{
-				value.remove("__class_name__");
-				return _rtl.newInstance(class_name, new _Vector(value));
+				value.remove(ctx, "__class_name__");
+				return _rtl.newInstance(ctx, class_name, new _Vector(ctx, value));
 			}
 			
 			return value;
@@ -527,7 +527,7 @@ class Serializer extends BaseObject
 		var _Date = use("Runtime.Date");
 		var _DateTime = use("Runtime.DateTime");
 		
-		value = this.toNative(value);
+		value = this.toNative(ctx, value);
 		return JSON.stringify(value, (key, value) => {
 			return value;
 		});
@@ -558,7 +558,7 @@ class Serializer extends BaseObject
 			{
 				res = JSON.parse(obj, (key, value) => {
 					if (value == null) return value;
-					return this.toPrimitive(value);
+					return this.toPrimitive(ctx, value);
 				});
 			}
 			catch (e)

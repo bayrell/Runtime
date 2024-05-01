@@ -24,7 +24,6 @@ use Runtime.Exceptions.RuntimeException;
 
 class OutputProvider extends BaseProvider
 {
-		
 	void constructor()
 	{
 		parent();
@@ -242,7 +241,6 @@ class OutputProvider extends BaseProvider
 		}
 		
 		#endswitch
-		
 	}
 	
 	
@@ -265,7 +263,7 @@ class OutputProvider extends BaseProvider
 	{
 		string color = rs::lower(color);
 		
-		if (this.color_table.has(color)) return this.color_table[color];
+		if (this.color_table.has(color)) return this.color_table.get(color);
 		if (rs::strlen(color) > 5) return "0";
 		
 		return color;

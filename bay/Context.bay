@@ -165,17 +165,17 @@ class Context extends BaseObject
 		let Dict = use("Runtime.Dict");
 		let Map = use("Runtime.Map");
 		
-		if (!params.has("cli_args"))
+		if (!params.has(ctx, "cli_args"))
 		{
-			params.set("cli_args", Collection.from(process.argv.slice(1)));
+			params.set(ctx, "cli_args", Collection.from(process.argv.slice(1)));
 		}
-		if (!params.has("base_path"))
+		if (!params.has(ctx, "base_path"))
 		{
-			params.set("base_path", process.cwd());
+			params.set(ctx, "base_path", process.cwd());
 		}
-		if (!params.has("environments"))
+		if (!params.has(ctx, "environments"))
 		{
-			params.set("environments", Map.from(process.env));
+			params.set(ctx, "environments", Map.from(process.env));
 		}
 		
 		#endswitch
@@ -423,7 +423,7 @@ class Context extends BaseObject
 		
 		if (not(provider instanceof BaseProvider))
 		{
-			throw new RuntimeException("Provider + '" + provider_name +
+			throw new RuntimeException("Provider '" + provider_name +
 				"' must be intstanceof BaseProvider");
 		}
 		

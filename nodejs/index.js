@@ -55,6 +55,7 @@ add("Runtime.Context");
 add("Runtime.Date");
 add("Runtime.DateTime");
 add("Runtime.Reference");
+add("Runtime.Serializer");
 add("Runtime.Entity.Entity");
 add("Runtime.Entity.Hook");
 add("Runtime.Entity.Provider");

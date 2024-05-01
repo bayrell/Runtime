@@ -21,7 +21,6 @@ namespace Runtime;
 
 class io
 {
-	
 	/**
 	 * Print message to output
 	 */

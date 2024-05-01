@@ -202,7 +202,7 @@ class fs
 			
 			if (item_name == "." or item_name == "..") continue;
 			item_name2 = static::removeFirstSlash(item_name2);
-			res.pushValue( item_name2 );
+			res.push( item_name2 );
 			
 			bool is_dir = await static::isDir(item_path);
 			if (is_dir)
@@ -211,7 +211,7 @@ class fs
 				(
 					item_path, item_name2
 				);
-				res.appendVector(sub_items);
+				res.appendItems(sub_items);
 			}
 		}
 		
