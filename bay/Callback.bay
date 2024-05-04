@@ -59,7 +59,7 @@ class Callback
 	/**
 	 * Apply
 	 */
-	var apply(Collection args) => rtl::apply(this, args);
+	var apply(Collection args = null) => rtl::apply(this, args);
 	
 	
 	#ifcode PHP then
