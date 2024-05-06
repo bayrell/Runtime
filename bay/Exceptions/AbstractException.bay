@@ -99,6 +99,15 @@ class AbstractException extends ClassException
 	
 	
 	/**
+	 * Build error message
+	 */
+	public string buildErrorMessage()
+	{
+		return this.error_message;
+	}
+	
+	
+	/**
 	 * Returns error message
 	 */
 	public string getErrorMessage()
@@ -162,7 +171,7 @@ class AbstractException extends ClassException
 	 */
 	public string toString()
 	{
-		return this.getErrorMessage();
+		return this.buildErrorMessage();
 	}
 	
 	
