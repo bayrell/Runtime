@@ -272,7 +272,7 @@ class Dict<T> extends _Map
 		return $new_obj;
 		#endswitch
 	}
-	Collection<T> copy() => this.cp();
+	Collection<T> copy(var obj = null) => (obj == null) ? this.cp() : this.clone(obj);
 	
 	
 	/**

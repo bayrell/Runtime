@@ -114,6 +114,12 @@ class rtl
 	static const int ERROR_HTTP_BAD_GATEWAY = -502;
 	static const int ERROR_USER = -10000;
 	
+	/* Serializer */
+	static const int ALLOW_CLASS_NAME = 1;
+	static const int EXPORT = 2;
+	static const int IMPORT = 4;
+	static const int JSON_PRETTY = 8;
+	
 	
 	/**
 	 * Define class
@@ -1381,10 +1387,10 @@ class rtl
 	 * @param SerializeContainer container
 	 * @return string 
 	 */
-	static string json_encode(var value)
+	static string json_encode(var value, int flags = 0)
 	{
 		Serializer serializer = new Serializer();
-		serializer.setFlag(Serializer::ALLOW_CLASS_NAME);
+		serializer.flags = flags;
 		return serializer.json_encode(value);
 	}
 	
@@ -1394,10 +1400,10 @@ class rtl
 	 * @param string s Encoded string
 	 * @return var 
 	 */
-	static var json_decode(var obj)
+	static var json_decode(var obj, int flags = 0)
 	{
 		Serializer serializer = new Serializer();
-		serializer.removeFlag(Serializer::ALLOW_CLASS_NAME);
+		serializer.flags = flags;
 		return serializer.json_decode(obj);
 	}
 	

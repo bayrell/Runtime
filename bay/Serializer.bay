@@ -33,7 +33,7 @@ class Serializer extends BaseObject
 	static const int IMPORT = 4;
 	static const int JSON_PRETTY = 8;
 	
-	var flags = 1;
+	int flags = 0;
 	string callback_name = "";
 	
 	bool isImport() => this.flags & static::IMPORT == static::IMPORT;
