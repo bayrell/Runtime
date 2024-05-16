@@ -45,6 +45,9 @@
 		"Providers/HookProvider.bay",
 		"Providers/OutputProvider.bay"
 	],
+	"groups": [
+		"runtime"
+	],
 	"src": "./bay",
 	"dest":
 	{
