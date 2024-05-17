@@ -176,6 +176,26 @@ class rs
 	
 	
 	/**
+	 * Compare strings
+	 */
+	static int compare(string a, string b)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return strcmp($a, $b);
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (a == b) return 0;
+		if (a < b) return -1;
+		if (a > b) return 1;
+		
+		#endswitch
+	}
+	
+	
+	/**
 	 * Заменяет одну строку на другую
 	 */
 	static int replace(string search, string item, string s)

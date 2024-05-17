@@ -85,9 +85,32 @@ class fs
 	}
 	
 	
-	
 	/**
 	 * Return true if path is folder
+	 * @param string path
+	 * @param boolean
+	 */
+	static async bool isFolder(string filepath)
+	{
+		#switch
+		#case ifcode PHP then
+		return file_exists($filepath) && is_dir($filepath);
+		
+		#case ifcode JAVASCRIPT then
+		
+		var is_exists = await fileExists(filepath);
+		if (!is_exists) return Promise.resolve( false );
+		
+		filepath = resolve(filepath);
+		var stat = await lstat(filepath);
+		return Promise.resolve( stat.isDirectory() );
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Return true if path is file
 	 * @param string path
 	 * @param boolean
 	 */
@@ -167,15 +190,15 @@ class fs
 		#case ifcode JAVASCRIPT then
 		
 		dirpath = resolve(dirpath);
-		var Collection = use("Runtime.Collection");
+		var Vector = use("Runtime.Vector");
 		var arr = await readdir(dirpath);
 		arr = arr.filter( (s) => s != "." && s != ".." ).sort();
-		arr = Collection.from(arr);
+		arr = Vector.from(arr);
 		return Promise.resolve(arr);
 		
 		#case ifcode PHP then
 		
-		return \Runtime\Collection::from( scandir($dirpath) );
+		return \Runtime\Vector::from( scandir($dirpath) );
 		
 		#endswitch
 		
@@ -215,7 +238,7 @@ class fs
 			}
 		}
 		
-		return res.toCollection();
+		return res;
 	}
 	
 	
