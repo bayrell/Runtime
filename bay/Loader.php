@@ -3,9 +3,20 @@
 class Loader
 {
 	var $entry_point = "";
-	var $env = [];
 	var $modules = [];
+	var $params = [
+		"environments" => [],
+	];
 	var $search_path = [];
+	
+	
+	/**
+	 * Set env
+	 */
+	function setEnv($key, $value)
+	{
+		$this->params["environments"]->set($key, $value);
+	}
 	
 	
 	/**
@@ -16,8 +27,11 @@ class Loader
 		/* Setup load files */
 		spl_autoload_register([ $this, 'load' ]);
 		
-		/* Setup default handler */
-		\Runtime\rtl::set_default_exception_handler();
+		/* Setup PHP error handler */
+		set_exception_handler([ $this, 'exception' ]);
+		
+		/* Init values */
+		$this->params["environments"] = new \Runtime\Map();
 	}
 	
 	
@@ -35,15 +49,15 @@ class Loader
 			$this->modules,
 			
 			/* Context parameters */
-			\Runtime\Map::from($this->env)
+			\Runtime\Map::from($this->params)
 		);
 	}
 	
 	
 	/**
-	 * Include plugins
+	 * Include modules
 	 */
-	function includePlugins($file_name)
+	function include($file_name)
 	{
 		if (file_exists($file_name))
 		{
@@ -70,7 +84,7 @@ class Loader
 	 */
 	function loadModule($module_name, $file_path)
 	{
-		$module_name = implode("\\", $module_name) . "\\";
+		$module_name = implode(".", $module_name);
 		$module_name_sz = mb_strlen($module_name);
 		$file_name = array_pop($file_path);
 		$file_path = implode("/", $file_path);
@@ -118,5 +132,33 @@ class Loader
 		}
 		
 		return false;
+	}
+	
+	
+	/**
+	 * PHP exception
+	 */
+	function exception($e)
+	{
+		if (!$e) return;
+		
+		http_response_code(500);
+		
+		$message = "Fatal Error:\n";
+		$message .= $e->getMessage() . "\n";
+		$message .= "in file " . $e->getFile() . ":" . $e->getLine() . "\n";
+		$message .= $e->getTraceAsString() . "\n";
+		
+		if (php_sapi_name() === 'cli')
+		{
+			$color = "0;91";
+			echo chr(27) . "[" . $color . "m" . $message . chr(27) . "[0m";
+		}
+		else
+		{
+			echo nl2br($message);
+		}
+		
+		exit (1);
 	}
 }

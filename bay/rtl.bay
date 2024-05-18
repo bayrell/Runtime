@@ -1533,42 +1533,6 @@ class rtl
 		
 		return 0;
 	}
-	
-	
-	#ifcode PHP then
-	
-	/**
-	 * Register PHP error handler
-	 */
-	static function set_default_exception_handler()
-	{
-		set_exception_handler( function ($e){
-		
-			if (!$e) return;
-			
-			http_response_code(500);
-			
-			$message = "Fatal Error:\n";
-			$message .= $e->getMessage() . "\n";
-			$message .= "in file " . $e->getFile() . ":" . $e->getLine() . "\n";
-			$message .= $e->getTraceAsString() . "\n";
-			
-			if (php_sapi_name() === 'cli')
-			{
-				$color = "0;91";
-				echo chr(27) . "[" . $color . "m" . $message . chr(27) . "[0m";
-			}
-			else
-			{
-				echo nl2br($message);
-			}
-			
-			exit (1);
-		} );
-	}
-	
-	#endif
-	
 }
 
 

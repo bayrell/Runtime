@@ -19,12 +19,14 @@
 namespace Runtime;
 
 use Runtime.BaseObject;
+use Runtime.Entity.Hook;
 use Runtime.Providers.HookProvider;
 
 
 class BaseHook extends BaseObject
 {
-	HookProvider hook = null;
+	Hook hook = null;
+	HookProvider provider = null;
 	
 	
 	/**
@@ -66,7 +68,7 @@ class BaseHook extends BaseObject
 		}
 		if (method_name == "") method_name = this.getMethodName(hook_name);
 		if (method_name == "") return;
-		this.hook.register(hook_name, this, method_name, priority);
+		this.provider.register(hook_name, this, method_name, priority);
 	}
 	
 	

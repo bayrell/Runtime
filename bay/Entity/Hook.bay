@@ -20,17 +20,31 @@ namespace Runtime.Entity;
 
 use Runtime.rtl;
 use Runtime.Entity.Entity;
+use Runtime.BaseHook;
 
 
 struct Hook extends Entity
 {
 	Dict params = null;
 	
+	
+	/**
+	 * Constructor
+	 */
 	void constructor(string name, Map params = null)
 	{
 		parent({
 			"name": name,
 			"params": params,
 		});
+	}
+	
+	
+	/**
+	 * Create hook instance
+	 */
+	BaseHook createHook()
+	{
+		return rtl::newInstance(this.name, [this.params]);
 	}
 }
