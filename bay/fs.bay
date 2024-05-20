@@ -43,10 +43,6 @@ class fs
 	static const string DIRECTORY_SEPARATOR = "/";
 	
 	
-	static string removeFirstSlash(string path) => re::replace("^/+", "", path);
-	static string removeLastSlash(string path) => re::replace("/+$", "", path);
-	
-	
 	/**
 	 * Join
 	 */

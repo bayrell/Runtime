@@ -378,6 +378,29 @@ class rs
 	}
 	
 	
+	/**
+	 * Remove first slash
+	 */
+	static string removeFirstSlash(string path)
+	{
+		int i = 0;
+		int sz = static::strlen(path);
+		while (i < sz and static::substr(path, i, 1) == "/") i++;
+		return static::substr(path, i);
+	}
+	
+	
+	/**
+	 * Remove last slash
+	 */
+	static string removeLastSlash(string path)
+	{
+		int i = 0;
+		int sz = static::strlen(path);
+		while (i >= 0 and static::substr(path, i, 1) == "/") i--;
+		return static::substr(path, 0, i);
+	}
+	
 	
 	/**
 	 * Разбивает путь файла на составляющие

@@ -23,7 +23,6 @@ use Runtime.Vector;
 
 class re
 {
-	
 	/**
 	 * Разбивает строку на подстроки
 	 * @param string delimiter - regular expression
