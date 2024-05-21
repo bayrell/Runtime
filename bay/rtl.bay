@@ -116,8 +116,6 @@ class rtl
 	
 	/* Serializer */
 	static const int ALLOW_CLASS_NAME = 1;
-	static const int EXPORT = 2;
-	static const int IMPORT = 4;
 	static const int JSON_PRETTY = 8;
 	
 	

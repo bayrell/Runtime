@@ -79,8 +79,40 @@ class Serializer extends BaseObject
 	 */
 	void process(BaseObject object, string field_name, Map data)
 	{
-		if (this.isImport()) this.import(object, field_name, data);
-		if (this.isExport()) this.export(object, field_name, data);
+		if (this.isImport())
+		{
+			var value = data.get(field_name);
+			var old_value = static::getAttr(object, field_name);
+			var new_value = this.importItem(old_value, value);
+			static::setAttr(object, field_name, new_value);
+		}
+		if (this.isExport())
+		{
+			var old_value = static::getAttr(object, field_name);
+			var new_value = this.exportItem(old_value);
+			data.set(field_name, new_value);
+		}
+	}
+	
+	
+	/**
+	 * Process items
+	 */
+	void processItems(BaseObject object, string field_name, Map data, fn create = null)
+	{
+		if (this.isImport())
+		{
+			var value = data.get(field_name);
+			var old_value = static::getAttr(object, field_name);
+			var new_value = this.importItems(old_value, value, create);
+			static::setAttr(object, field_name, new_value);
+		}
+		if (this.isExport())
+		{
+			var old_value = static::getAttr(object, field_name);
+			var new_value = this.exportItems(old_value);
+			data.set(field_name, new_value);
+		}
 	}
 	
 	
@@ -117,18 +149,6 @@ class Serializer extends BaseObject
 	
 	
 	/**
-	 * Import data
-	 */
-	void import(BaseObject object, string field_name, Map data)
-	{
-		var value = data.get(field_name);
-		var old_value = static::getAttr(object, field_name);
-		var new_value = this.importItem(old_value, value);
-		static::setAttr(object, field_name, new_value);
-	}
-	
-	
-	/**
 	 * New instance
 	 */
 	BaseObject newInstance(string class_name, Dict value)
@@ -138,10 +158,60 @@ class Serializer extends BaseObject
 	
 	
 	/**
+	 * Create object
+	 */
+	BaseObject newObject(var old_value, Dict value, fn create = null)
+	{
+		if (not(value instanceof Dict)) return null;
+		if (not this.allowClassName()) return null;
+		
+		/* Check if class name is exists */
+		string class_name = value.get("__class_name__");
+		if (create == null and not(
+			rtl::exists(rtl::find_class(class_name)) and
+			rtl::is_instanceof(class_name, "Runtime.BaseObject"))
+		)
+		{
+			return null;
+		}
+		
+		/* Create instance */
+		BaseObject instance = null;
+		if (rtl::is_instanceof(old_value, class_name))
+		{
+			instance = old_value;
+		}
+		else if (create != null)
+		{
+			instance = rtl::apply(create, [value]);
+		}
+		else
+		{
+			instance = this.newInstance(class_name, value);
+		}
+		
+		/* Process instance */
+		Callback callback = new Callback(instance, this.callback_name)
+		if (callback.exists())
+		{
+			rtl::apply(callback, [this, value]);
+		}
+		
+		/* Return instance */
+		return instance;
+	}
+	
+	
+	/**
 	 * Import item
 	 */
-	void importItem(var old_value, var value)
+	void importItem(var old_value, var value, fn create = null)
 	{
+		if (create)
+		{
+			return this.newObject(old_value, value, create);
+		}
+		
 		if (rtl::isScalarValue(value)) return value;
 		if (value instanceof BaseStruct) return value;
 		if (value instanceof Date) return value;
@@ -149,43 +219,29 @@ class Serializer extends BaseObject
 		
 		if (
 			value instanceof Dict and
-			value.has("__class_name__")
+			(value.has("__class_name__") or create != null)
 		)
 		{
-			string class_name = value.get("__class_name__");
-			if (
-				this.allowClassName() and
-				rtl::exists(rtl::find_class(class_name)) and
-				rtl::is_instanceof(class_name, "Runtime.BaseObject")
-			)
-			{
-				BaseObject instance = null;
-				if (rtl::is_instanceof(old_value, class_name))
-				{
-					instance = old_value;
-				}
-				else
-				{
-					instance = this.newInstance(class_name, value);
-				}
-				Callback callback = new Callback(instance, this.callback_name)
-				if (callback.exists())
-				{
-					rtl::apply(callback, [this, value]);
-				}
-				return instance;
-			}
-			return null;
+			return this.newObject(old_value, value, create);
 		}
 		
+		return this.importItems(old_value, value);
+	}
+	
+	
+	/**
+	 * Import items
+	 */
+	void importItems(var old_value, var value, fn create = null)
+	{
 		if (value instanceof Dict)
 		{
 			Map new_value = {};
 			value.each(
-				void (var item, string key) use (old_value, new_value)
+				void (var item, string key) use (old_value, new_value, create)
 				{
 					var old_item = static::getAttr(old_value, key);
-					var new_item = this.importItem(old_item, item);
+					var new_item = this.importItem(old_item, item, create);
 					new_value.set(key, new_item);
 				}
 			);
@@ -199,24 +255,13 @@ class Serializer extends BaseObject
 			{
 				var item = value.get(i);
 				var old_item = (old_value instanceof Collection) ? old_value.get(i) : null;
-				var new_item = this.importItem(old_item, item);
+				var new_item = this.importItem(old_item, item, create);
 				new_value.push(new_item);
 			}
 			return new_value;
 		}
 		
 		return null;
-	}
-	
-	
-	/**
-	 * Export data
-	 */
-	void export(BaseObject object, string field_name, Map data)
-	{
-		var old_value = static::getAttr(object, field_name);
-		var new_value = this.exportItem(old_value);
-		data.set(field_name, new_value);
 	}
 	
 	
@@ -230,6 +275,15 @@ class Serializer extends BaseObject
 		if (value instanceof Date) return value;
 		if (value instanceof DateTime) return value;
 		
+		return this.exportItems(value);
+	}
+	
+	
+	/**
+	 * Export items
+	 */
+	void exportItems(var value)
+	{
 		if (value instanceof Dict)
 		{
 			Map new_value = {};
@@ -549,7 +603,7 @@ class Serializer extends BaseObject
 		if ($res === null || $res === false)
 			return null;
 		return $this->toPrimitive($res);
-	
+		
 		#case ifcode JAVASCRIPT then
 		try{
 			var _Serializer = use("Runtime.Serializer");
