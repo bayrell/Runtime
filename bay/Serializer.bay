@@ -191,10 +191,17 @@ class Serializer extends BaseObject
 		}
 		
 		/* Process instance */
-		Callback callback = new Callback(instance, this.callback_name)
-		if (callback.exists())
+		if (instance implements SerializeInterface)
 		{
-			rtl::apply(callback, [this, value]);
+			instance.serialize(this, value);
+		}
+		else
+		{
+			Callback callback = new Callback(instance, this.callback_name)
+			if (callback.exists())
+			{
+				rtl::apply(callback, [this, value]);
+			}
 		}
 		
 		/* Return instance */
@@ -316,10 +323,17 @@ class Serializer extends BaseObject
 			{
 				new_value.set("__class_name__", value::getClassName());
 			}
-			Callback callback = new Callback(value, this.callback_name)
-			if (callback.exists())
+			if (value implements SerializeInterface)
 			{
-				rtl::apply(callback, [this, new_value]);
+				value.serialize(this, new_value);
+			}
+			else
+			{
+				Callback callback = new Callback(value, this.callback_name)
+				if (callback.exists())
+				{
+					rtl::apply(callback, [this, new_value]);
+				}
 			}
 			return new_value;
 		}
@@ -354,6 +368,7 @@ class Serializer extends BaseObject
 		{
 			$class_name = $value::getClassName();
 			$value = $value->toMap();
+			$value = $this->exportItems($value);
 			if ($allow_class_name) $value->set("__class_name__", $class_name);
 		}
 		if ($value instanceof \Runtime\Collection)
@@ -423,6 +438,11 @@ class Serializer extends BaseObject
 		
 		#endswitch
 		
+		if (value instanceof BaseObject)
+		{
+			return null;
+		}
+		
 		return value;
 	}
 	
@@ -484,6 +504,7 @@ class Serializer extends BaseObject
 				\Runtime\rtl::is_instanceof($class_name, "Runtime.BaseStruct")
 			)
 			{
+				$value = $this->importItems(null, $value);
 				return rtl::newInstance($class_name, [$value]);
 			}
 			
@@ -544,6 +565,7 @@ class Serializer extends BaseObject
 			)
 			{
 				value.remove(ctx, "__class_name__");
+				value = this.importItems(null, value);
 				return _rtl.newInstance(ctx, class_name, new _Vector(ctx, value));
 			}
 			
@@ -617,7 +639,14 @@ class Serializer extends BaseObject
 			}
 			catch (e)
 			{
-				res = null;
+				if (e instanceof SyntaxError)
+				{
+					res = null;
+				}
+				else
+				{
+					throw e;
+				}
 			}
 			return res;
 		}

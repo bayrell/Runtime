@@ -626,6 +626,18 @@ class Collection<T> extends _Collection
 	
 	
 	/**
+	 * Flatten Collection
+	 */
+	Collection flatten()
+	{
+		Vector res = [];
+		for (int i=0; i<this.count(); i++)
+			res.appendItems(this.get(i));
+		return res;
+	}
+	
+	
+	/**
 	 * Reduce
 	 * @param fn f
 	 * @param var init_value

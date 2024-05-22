@@ -36,6 +36,7 @@
 		"Money.bay",
 		"RawString.bay",
 		"Reference.bay",
+		"SerializeInterface.bay",
 		"Serializer.bay",
 		"ModuleDescription.bay",
 		"Entity/Entity.bay",

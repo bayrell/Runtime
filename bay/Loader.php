@@ -30,6 +30,9 @@ class Loader
 		/* Setup PHP error handler */
 		set_exception_handler([ $this, 'exception' ]);
 		
+		/* Shutdown */
+		register_shutdown_function([ $this, 'shutdown' ]);
+		
 		/* Init values */
 		$this->params["environments"] = new \Runtime\Map();
 	}
@@ -142,8 +145,6 @@ class Loader
 	{
 		if (!$e) return;
 		
-		http_response_code(500);
-		
 		$message = "Fatal Error:\n";
 		$message .= $e->getMessage() . "\n";
 		$message .= "in file " . $e->getFile() . ":" . $e->getLine() . "\n";
@@ -153,12 +154,31 @@ class Loader
 		{
 			$color = "0;91";
 			echo chr(27) . "[" . $color . "m" . $message . chr(27) . "[0m";
+			exit (1);
 		}
 		else
 		{
+			http_response_code(500);
 			echo nl2br($message);
 		}
+	}
+	
+	
+	/**
+	 * PHP shutdown
+	 */
+	function shutdown()
+	{
+		$error = error_get_last();
+		if (!$error) return;
 		
-		exit (1);
+		if (php_sapi_name() === 'cli')
+		{
+			exit (1);
+		}
+		else
+		{
+			http_response_code(500);
+		}
 	}
 }

@@ -1389,7 +1389,9 @@ class rtl
 	{
 		Serializer serializer = new Serializer();
 		serializer.flags = flags;
-		return serializer.json_encode(value);
+		serializer.setFlag(Serializer::EXPORT);
+		var data = serializer.exportItem(value);
+		return serializer.json_encode(data);
 	}
 	
 	
@@ -1402,6 +1404,8 @@ class rtl
 	{
 		Serializer serializer = new Serializer();
 		serializer.flags = flags;
+		serializer.setFlag(Serializer::IMPORT);
+		/*var data = serializer.importItem(null, obj);*/
 		return serializer.json_decode(obj);
 	}
 	
