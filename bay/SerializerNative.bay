@@ -29,7 +29,8 @@ class SerializerNative extends Serializer
 	 */
 	void decodeItem(var value, var object_value = null, fn create = null)
 	{
-		if (value == null) return null;
+		if (value === null) return null;
+		if (value instanceof BaseObject) return value;
 		
 		#switch
 		#case ifcode PHP then
@@ -83,7 +84,7 @@ class SerializerNative extends Serializer
 	 */
 	var encodeItem(var encode_value)
 	{
-		if (encode_value == null) return null;
+		if (encode_value === null) return null;
 		
 		var value = parent(encode_value);
 		

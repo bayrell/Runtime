@@ -72,7 +72,8 @@ class SerializerJson extends SerializerNative
 			{
 				res = JSON.parse(s, (key, value) => {
 					if (value == null) return value;
-					return this.decodeItem(ctx, value);
+					var object = this.decodeItem(ctx, value);
+					return object;
 				});
 			}
 			catch (e)

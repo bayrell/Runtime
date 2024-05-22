@@ -263,8 +263,10 @@ class Serializer extends BaseObject
 		/* Struct */
 		if (rtl::is_instanceof(class_name, "Runtime.BaseStruct"))
 		{
+			value.remove("__class_name__");
 			value = this.decodeDict(value);
-			return rtl::newInstance(class_name, [value]);
+			var object = rtl::newInstance(class_name, [value]);
+			return object;
 		}
 		
 		/* Create object by class name */
@@ -285,8 +287,9 @@ class Serializer extends BaseObject
 	 */
 	void decodeItem(var value, var object_value = null, fn create = null)
 	{
-		if (value == null) return null;
+		if (value === null) return null;
 		if (rtl::isScalarValue(value)) return value;
+		if (value instanceof BaseObject) return value;
 		
 		/* Decode object */
 		if (
@@ -422,7 +425,7 @@ class Serializer extends BaseObject
 	 */
 	void encodeItem(var value)
 	{
-		if (value == null) return null;
+		if (value === null) return null;
 		if (rtl::isScalarValue(value)) return value;
 		
 		/* Encode Collection */
