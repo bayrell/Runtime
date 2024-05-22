@@ -17,3 +17,81 @@
  */
 
 namespace Runtime;
+
+use Runtime.SerializerNative;
+
+
+class SerializerJson extends SerializerNative
+{
+	/**
+	 * Export object to data
+	 */
+	string encode(var object)
+	{
+		this.setFlag(static::ENCODE);
+		
+		#switch
+		#case ifcode PHP then
+		$value = $this->encodeItem($object);
+		$json_flags = JSON_UNESCAPED_UNICODE;
+		if ($this->hasFlag(static::JSON_PRETTY))
+		{
+			$json_flags = $json_flags | JSON_PRETTY_PRINT;
+		}
+		return json_encode($value, $json_flags);
+		
+		#case ifcode JAVASCRIPT then
+		
+		value = this.encodeItem(ctx, object);
+		return JSON.stringify(value, (key, value) => {
+			return value;
+		});
+		#endswitch
+	}
+	
+	
+	/**
+	 * Import from string
+	 */
+	var decode(string s)
+	{
+		this.setFlag(static::DECODE);
+		
+		#switch
+		#case ifcode PHP then
+		
+		$res = @json_decode($s, false);
+		if ($res === null || $res === false)
+			return null;
+		return $this->decodeItem($res);
+		
+		#case ifcode JAVASCRIPT then
+		try{
+			var res = null;
+			try
+			{
+				res = JSON.parse(s, (key, value) => {
+					if (value == null) return value;
+					return this.decodeItem(ctx, value);
+				});
+			}
+			catch (e)
+			{
+				if (e instanceof SyntaxError)
+				{
+					res = null;
+				}
+				else
+				{
+					throw e;
+				}
+			}
+			return res;
+		}
+		catch(e){
+			throw e;
+		}
+		return null;
+		#endswitch
+	}
+}

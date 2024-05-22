@@ -137,7 +137,9 @@ Object.assign(Runtime.Curl.prototype,
 						}
 						else
 						{
-							reject( new Runtime.Exceptions.CurlException(xhr.status, xhr.responseText) );
+							reject( new Runtime.Exceptions.CurlException(
+								xhr.status, xhr.responseText
+							) );
 						}
 					}
 				})(this, xhr, resolve, reject);

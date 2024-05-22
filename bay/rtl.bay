@@ -28,7 +28,7 @@ use Runtime.DateTime;
 use Runtime.Dict;
 use Runtime.Map;
 use Runtime.Monad;
-use Runtime.Serializer;
+use Runtime.SerializerJson;
 use Runtime.Vector;
 use Runtime.Exceptions.AssertException;
 
@@ -115,7 +115,7 @@ class rtl
 	static const int ERROR_USER = -10000;
 	
 	/* Serializer */
-	static const int ALLOW_CLASS_NAME = 1;
+	static const int ALLOW_OBJECTS = 1;
 	static const int JSON_PRETTY = 8;
 	
 	
@@ -1387,11 +1387,9 @@ class rtl
 	 */
 	static string json_encode(var value, int flags = 0)
 	{
-		Serializer serializer = new Serializer();
+		SerializerJson serializer = new SerializerJson();
 		serializer.flags = flags;
-		serializer.setFlag(Serializer::EXPORT);
-		var data = serializer.exportItem(value);
-		return serializer.json_encode(data);
+		return serializer.encode(value);
 	}
 	
 	
@@ -1402,11 +1400,9 @@ class rtl
 	 */
 	static var json_decode(var obj, int flags = 0)
 	{
-		Serializer serializer = new Serializer();
+		SerializerJson serializer = new SerializerJson();
 		serializer.flags = flags;
-		serializer.setFlag(Serializer::IMPORT);
-		/*var data = serializer.importItem(null, obj);*/
-		return serializer.json_decode(obj);
+		return serializer.decode(obj);
 	}
 	
 	

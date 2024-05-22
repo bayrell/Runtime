@@ -38,6 +38,8 @@
 		"Reference.bay",
 		"SerializeInterface.bay",
 		"Serializer.bay",
+		"SerializerNative.bay",
+		"SerializerJson.bay",
 		"ModuleDescription.bay",
 		"Entity/Entity.bay",
 		"Entity/Hook.bay",
