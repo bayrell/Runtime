@@ -406,7 +406,7 @@ class Serializer extends BaseObject
 	/**
 	 * Encode dict
 	 */
-	Map encodeDict(Date value)
+	Map encodeDict(Dict value)
 	{
 		Map new_value = {};
 		value.each(
@@ -428,16 +428,15 @@ class Serializer extends BaseObject
 		if (value === null) return null;
 		if (rtl::isScalarValue(value)) return value;
 		
-		/* Encode Collection */
+		/* Encode Collection or Dict */
 		if (value instanceof Collection) return this.encodeCollection(value);
+		if (value instanceof Dict) return this.encodeDict(value);
 		
 		/* Encode Object */
-		if (value instanceof Date) value = this.encodeDate(value);
-		else if (value instanceof DateTime) value = this.encodeDateTime(value);
-		else if (value instanceof BaseObject) value = this.encodeObject(value);
+		if (value instanceof Date) return this.encodeDate(value);
+		else if (value instanceof DateTime) return this.encodeDateTime(value);
+		else if (value instanceof BaseObject) return this.encodeObject(value);
 		
-		/* Encode Dict */
-		if (value instanceof Dict) return this.encodeDict(value);
 		return null;
 	}
 	

@@ -638,13 +638,13 @@ class rtl
 			}
 			else if (data instanceof BaseObject)
 			{
-				var attr_data = data.takeValue(attr_name, null);
+				var attr_data = static::attr(data, attr_name, null);
 				var res = f(attrs, attr_data, new_value, f);
 				new_data = data;
 				
 				#switch
 				#case ifcode PHP then
-				$data->$attr_name = $value;
+				$data->$attr_name = $res;
 				#case ifcode JAVASCRIPT then
 				data[attr_name] = res;
 				#endswitch
@@ -1312,6 +1312,44 @@ class rtl
 	
 	
 	/* ================ Dirty functions ================ */
+	
+	/**
+	 * Trace
+	 */
+	static Collection getTrace()
+	{
+		Vector res = [];
+		#ifcode PHP then
+		$pos = 1;
+		$arr = debug_backtrace();
+		foreach ($arr as $item)
+		{
+			$s = "internal";
+			if (isset($item["file"])) $s = $item["file"] . "(" . $item["line"] . ")";
+			if (isset($item["class"])) $s .= ": " . $item["class"] . "::" . $item["function"];
+			else $s .= ": " . $item["function"];
+			$res->push($pos . ") " . $s);
+			$pos++;
+		}
+		#endif
+		return res;
+	}
+	
+	
+	/**
+	 * Print trace
+	 */
+	static void printTrace(string ch = "\n")
+	{
+		string s = rs::join(ch, rtl::getTrace());
+		#switch
+		#case ifcode PHP then
+		echo $s;
+		#case ifcode JAVASCRIPT then
+		console.log(s);
+		#endswitch
+	}
+	
 	
 	/**
 	 * Sleep in ms
