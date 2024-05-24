@@ -32,7 +32,6 @@ use Runtime.Vector;
 /* Lambda Functions */
 class lib
 {
-	
 	/**
 	 * Check object is istance
 	 */

@@ -36,4 +36,19 @@ class Reference<T> extends BaseObject
 		parent();
 		this.ref = ref;
 	}
+	
+	
+	/**
+	 * Returns value
+	 */
+	var setValue(var new_value)
+	{
+		this.ref = new_value;
+	}
+	
+	
+	/**
+	 * Returns value
+	 */
+	var value() => this.ref;
 }
