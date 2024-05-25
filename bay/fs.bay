@@ -220,7 +220,7 @@ class fs
 			string item_name2 = static::join([ parent_name, item_name ]);
 			
 			if (item_name == "." or item_name == "..") continue;
-			item_name2 = static::removeFirstSlash(item_name2);
+			item_name2 = rs::removeFirstSlash(item_name2);
 			res.push( item_name2 );
 			
 			bool is_dir = await static::isDir(item_path);
