@@ -817,7 +817,7 @@ class Collection<T> extends _Collection
 		#case ifcode JAVASCRIPT then
 		for (var i=0; i<this.length; i++)
 		{
-			var flag = f(this[i]);
+			var flag = f(ctx, this[i]);
 			if (flag) return i;
 		}
 		return -1;
