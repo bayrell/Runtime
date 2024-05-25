@@ -211,15 +211,8 @@ class rtl
 	{
 		if (obj == null) return false;
 		
-		string t = static::getType(obj);
-		if (
-			t == "object" or
-			t == "collection" or
-			t == "dict"
-		)
-		{
-			obj = obj::getClassName();
-		}
+		string obj_class_name = static::get_class_name(obj);
+		if (obj_class_name != "") obj = obj_class_name;
 		
 		if (static::isString(obj))
 		{
@@ -240,9 +233,7 @@ class rtl
 	static bool is_implements(var obj, string interface_name)
 	{
 		if (obj == null) return false;
-		string t = static::getType(obj);
-		if (t != "object" and t != "collection" and t != "dict") return false;
-		return static::class_implements(obj::getClassName(), interface_name);
+		return static::class_implements(static::get_class_name(obj), interface_name);
 	}
 	
 	
@@ -336,6 +327,11 @@ class rtl
 	static bool get_class_name(var obj)
 	{
 		if (static::isString(obj)) return obj;
+		string t = static::getType(obj);
+		if (t != "object" and t != "collection" and t != "dict") return "";
+		#ifcode JAVASCRIPT then
+		if (obj.constructor.getClassName == undefined) return "";
+		#endif
 		return obj::getClassName();
 	}
 	
@@ -798,6 +794,9 @@ class rtl
 		if (value instanceof Collection) return "collection";
 		if (value instanceof Dict) return "dict";
 		if (value instanceof BaseObject) return "object";
+		#ifcode JAVASCRIPT then
+		if (typeof value == "object") return "object";
+		#endif
 		return "unknown";
 	}
 	
