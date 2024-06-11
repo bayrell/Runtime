@@ -55,7 +55,12 @@ class Serializer extends BaseObject
 	 */
 	void removeFlag(int flag)
 	{
-		this.flags = this.flags & !flag;
+		#switch
+		#case ifcode PHP then
+		$this->flags = $this->flags & ~$flag;
+		#case ifcode JAVASCRIPT then
+		this.flags = this.flags & ~flag;
+		#endswitch
 	}
 	
 	
@@ -86,7 +91,7 @@ class Serializer extends BaseObject
 			var new_value = this.decodeItem(value, object_value, create);
 			static::setAttr(object, field_name, new_value);
 		}
-		if (this.isEncode())
+		else if (this.isEncode())
 		{
 			var value = static::getAttr(object, field_name);
 			var new_value = this.encodeItem(value);
@@ -447,17 +452,21 @@ class Serializer extends BaseObject
 	var encode(var object)
 	{
 		this.setFlag(static::ENCODE);
-		return this.encodeItem(object);
+		var res = this.encodeItem(object);
+		this.removeFlag(static::ENCODE);
+		return res;
 	}
 	
 	
 	/**
-	 * Import from string
+	 * Import from object
 	 */
-	var decode(var s)
+	var decode(var object)
 	{
 		this.setFlag(static::DECODE);
-		return this.decodeItem(s);
+		var res = this.decodeItem(object);
+		this.removeFlag(static::DECODE);
+		return res;
 	}
 	
 	
@@ -467,6 +476,8 @@ class Serializer extends BaseObject
 	static var copy(var obj)
 	{
 		Serializer serializer = rtl::newInstance( static::getClassName() );
-		return serializer.decode( serializer.encode(obj) );
+		serializer.setFlag(static::ALLOW_OBJECTS);
+		var encoded = serializer.encode(obj);
+		return serializer.decode(encoded);
 	}
 }

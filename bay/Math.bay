@@ -148,7 +148,7 @@ class Math
 	 */
 	static int random(int a, int b)
 	{
-		return static::round(static::urandom() * (b - a + 1) + a);
+		return static::round(static::urandom() * (b - a) + a);
 	}
 	
 }

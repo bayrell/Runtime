@@ -89,7 +89,8 @@ class SerializerJson extends SerializerNative
 			}
 			return res;
 		}
-		catch(e){
+		catch(e)
+		{
 			throw e;
 		}
 		return null;
