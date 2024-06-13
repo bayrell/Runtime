@@ -207,7 +207,7 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		return s.replace(new RegExp(search, "g"), item);
+		return s.replaceAll(search, item);
 		
 		#endswitch
 	}
@@ -398,6 +398,26 @@ class rs
 		int i = static::strlen(path) - 1;
 		while (i >= 0 and static::substr(path, i, 1) == "/") i--;
 		return static::substr(path, 0, i + 1);
+	}
+	
+	
+	/**
+	 * Add first slash
+	 */
+	static string addFirstSlash(string path)
+	{
+		if (rs::substr(path, 0, 1) == "/") return path;
+		return "/" ~ path;
+	}
+	
+	
+	/**
+	 * Add last slash
+	 */
+	static string addLastSlash(string path)
+	{
+		if (rs::substr(path, rs::strlen(path) - 1, 1) == "/") return path;
+		return path ~ "/";
 	}
 	
 	
