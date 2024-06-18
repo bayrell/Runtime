@@ -80,7 +80,7 @@ class Vector<T> extends Collection
 		return $this;
 		#endswitch
 	}
-	/*public Vector<T> removeItem(int pos) => this.remove(pos);*/
+	public Vector<T> removeItem(T item) => this.remove(this.indexOf(item));
 	
 	
 	/**
@@ -151,8 +151,8 @@ class Vector<T> extends Collection
 	
 	/**
 	 * Insert value to position
-	 * @param T value
 	 * @param int pos - position
+	 * @param T value
 	 */
 	public Vector<T> insert(int pos, T value)
 	{
@@ -164,6 +164,46 @@ class Vector<T> extends Collection
 		array_splice($this->_arr, $pos, 0, [$value]);
 		return $this;
 		#endswitch
+	}
+	
+	
+	/**
+	 * Add value to position
+	 * @param int pos - position
+	 * @param T value
+	 * @param string kind - after or before
+	 */
+	public int add(T value, int pos, string kind = "before")
+	{
+		if (pos == -1)
+		{
+			if (kind == "before")
+			{
+				this.prepend(value);
+				return 0;
+			}
+			else
+			{
+				this.append(value);
+				return this.count();
+			}
+		}
+		if (kind == "after") pos = pos + 1;
+		this.insert(pos, value, kind);
+		return pos;
+	}
+	
+	
+	/**
+	 * Add value to position
+	 * @param int pos - position
+	 * @param T value
+	 * @param string kind - after or before
+	 */
+	public int addItem(T value, T dest_item, string kind = "before")
+	{
+		int pos = this.indexOf(dest_item);
+		return this.add(value, pos, kind);
 	}
 	
 	
