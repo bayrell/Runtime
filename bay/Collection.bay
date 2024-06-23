@@ -698,12 +698,12 @@ class Collection<T> extends _Collection
 		if (offset <= 0) offset = 0;
 		if (length == undefined)
 		{
-			if (offset <= 0) return this;
+			if (offset <= 0) return this.cp();
 			var arr = Array.prototype.slice.call(this, offset);
 			Object.setPrototypeOf(arr, this.constructor.prototype);
 			return arr;
 		}
-		if (offset <= 0 && length == this.length) return this;
+		if (offset <= 0 && length == this.length) return this.cp();
 		if (length >= 0)
 		{
 			length = offset + length;
