@@ -173,7 +173,7 @@ class Vector<T> extends Collection
 	 * @param T value
 	 * @param string kind - after or before
 	 */
-	public int add(T value, int pos, string kind = "before")
+	public int add(T value, int pos = -1, string kind = "after")
 	{
 		if (pos == -1)
 		{
@@ -200,7 +200,7 @@ class Vector<T> extends Collection
 	 * @param T value
 	 * @param string kind - after or before
 	 */
-	public int addItem(T value, T dest_item, string kind = "before")
+	public int addItem(T value, T dest_item, string kind = "after")
 	{
 		int pos = this.indexOf(dest_item);
 		return this.add(value, pos, kind);

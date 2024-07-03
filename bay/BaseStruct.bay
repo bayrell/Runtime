@@ -134,14 +134,15 @@ class BaseStruct extends BaseObject
 	
 	#switch
 	#case ifcode PHP then
+	function assignError($k){throw new \Runtime\Exceptions\RuntimeException("Assign key '" . $k . "' failed");}
 	function get($ctx,$k,$v = null){$k="__".$k;return isset($this->$k)?$this->$k:$v;}
 	function __get($k){$k="__".$k;return isset($this->$k)?$this->$k:null;}
 	function __getKey($k){return "__".$k;}
-	function __set($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
+	function __set($k,$v){$this->assignError($k);}
 	function offsetExists($k){$k="__".$k;return isset($this->$k);}
 	function offsetGet($k){$k="__".$k;return isset($this->$k)?$this->$k:null;}
-	function offsetSet($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
-	function offsetUnset($k){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
+	function offsetSet($k,$v){$this->assignError($k);}
+	function offsetUnset($k){$this->assignError($k);}
 	#endswitch
 	
 }
