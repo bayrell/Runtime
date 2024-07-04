@@ -42,6 +42,7 @@
 		"SerializerJson.bay",
 		"ModuleDescription.bay",
 		"Entity/Entity.bay",
+		"Entity/Factory.bay",
 		"Entity/Hook.bay",
 		"Entity/Provider.bay",
 		"Hooks/RuntimeHook.bay",
