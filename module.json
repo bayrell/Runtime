@@ -9,6 +9,7 @@
 		"rs.bay",
 		"Collection.bay",
 		"Dict.bay",
+		"HashMap.bay",
 		"Map.bay",
 		"MapInterface.bay",
 		"Monad.bay",
