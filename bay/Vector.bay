@@ -185,7 +185,7 @@ class Vector<T> extends Collection
 			else
 			{
 				this.append(value);
-				return this.count();
+				return this.count() - 1;
 			}
 		}
 		if (kind == "after") pos = pos + 1;
