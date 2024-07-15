@@ -22,15 +22,19 @@ use Runtime.BaseObject;
 use Runtime.Entity.Entity;
 
 
-class Factory extends Entity
+struct Factory extends Entity
 {
+	Dict params = null;
+	
+	
 	/**
 	 * Create factory
 	 */
-	void constructor(string api_name)
+	void constructor(string name, Dict params = null)
 	{
 		parent({
-			"name": api_name,
+			"name": name,
+			"params": params,
 		});
 	}
 	
@@ -38,5 +42,5 @@ class Factory extends Entity
 	/**
 	 * Factory
 	 */
-	BaseObject factory() => rtl::newInstance(this.name);
+	BaseObject factory() => rtl::newInstance(this.name, [this.params]);
 }
