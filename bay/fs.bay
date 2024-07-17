@@ -56,29 +56,33 @@ class fs
 	}
 	
 	
+	/**
+	 * Return true if path is exists
+	 * @param string path
+	 * @param boolean
+	 */
+	static async bool exists(string filepath)
+	{
+		#switch
+		#case ifcode PHP then
+		return file_exists($filepath);
+		
+		#case ifcode JAVASCRIPT then
+		
+		var is_exists = await fileExists(filepath);
+		if (!is_exists) return Promise.resolve( false );
+		return Promise.resolve( true );
+		
+		#endswitch
+	}
+	
 	
 	/**
 	 * Return true if path is folder
 	 * @param string path
 	 * @param boolean
 	 */
-	static async bool isDir(string dirpath)
-	{
-		#switch
-		#case ifcode PHP then
-		return file_exists($dirpath) && is_dir($dirpath);
-		
-		#case ifcode JAVASCRIPT then
-		
-		var is_exists = await fileExists(dirpath);
-		if (!is_exists) return Promise.resolve( false );
-		
-		dirpath = resolve(dirpath);
-		var stat = await lstat(dirpath);
-		return Promise.resolve( stat.isDirectory() );
-
-		#endswitch
-	}
+	static async bool isDir(string filepath) => await static::isFolder(filepath);
 	
 	
 	/**
@@ -129,7 +133,6 @@ class fs
 	}
 	
 	
-	
 	/**
 	 * Read local file
 	 */
@@ -153,7 +156,6 @@ class fs
 		
 		return "";
 	}
-	
 	
 	
 	/**
@@ -194,13 +196,14 @@ class fs
 		
 		#case ifcode PHP then
 		
-		return \Runtime\Vector::from( scandir($dirpath) );
+		$arr = scandir($dirpath);
+		$arr = array_filter($arr, function($s){ return $s != "." && $s != ".."; });
+		return \Runtime\Vector::from(array_values($arr));
 		
 		#endswitch
 		
 		return null;
 	}
-	
 	
 	
 	/**
@@ -263,5 +266,4 @@ class fs
 		
 		return "";
 	}
-	
 }

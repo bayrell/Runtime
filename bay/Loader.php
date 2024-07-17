@@ -11,6 +11,15 @@ class Loader
 	
 	
 	/**
+	 * Set base path
+	 */
+	function setBasePath($base_path)
+	{
+		$this->params["base_path"] = $base_path;
+	}
+	
+	
+	/**
 	 * Set env
 	 */
 	function setEnv($key, $value)
