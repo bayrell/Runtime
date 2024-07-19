@@ -180,6 +180,20 @@ class fs
 	
 	
 	/**
+	 * Remove file
+	 */
+	static async void unlink(string file_path)
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		await unlink(file_path);
+		#case ifcode PHP then
+		unlink($file_path);
+		#endswitch
+	}
+	
+	
+	/**
 	 * Scan directory
 	 */
 	static async Collection<string> listDir(string dirpath)
