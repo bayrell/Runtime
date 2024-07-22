@@ -30,6 +30,7 @@ const { resolve } = require('path');
 const fileExists = promisify(fs.exists);
 const readFile = promisify(fs.readFile);
 const writeFile = promisify(fs.writeFile);
+const rename = promisify(fs.rename);
 const symlink = promisify(fs.symlink);
 const unlink = promisify(fs.unlink);
 const lstat = promisify(fs.lstat);
@@ -176,6 +177,20 @@ class fs
 		
 		#endswitch
 		return "";
+	}
+	
+	
+	/**
+	 * Rename file
+	 */
+	static async void rename(string file_path, string file_new_path)
+	{
+		#switch
+		#case ifcode JAVASCRIPT then
+		await rename(file_path, file_new_path);
+		#case ifcode PHP then
+		rename($file_path, $file_new_path);
+		#endswitch
 	}
 	
 	
