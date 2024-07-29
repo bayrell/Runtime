@@ -314,6 +314,7 @@ class Context extends BaseObject
 	{
 		if (params == null) params = {};
 		
+		if (not this.providers.has("hook")) return params;
 		var hook = this.provider("hook");
 		Collection<Callback> methods_list = hook.getMethods(hook_name);
 		
