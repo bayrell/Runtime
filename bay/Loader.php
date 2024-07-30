@@ -27,6 +27,34 @@ class Loader
 		$this->params["environments"]->set($key, $value);
 	}
 	
+
+	/**
+	 * Returns request uri
+	 */
+	function getRequestUri()
+	{
+		$request_url = "";
+		if (isset($_SERVER["HTTP_X_FORWARDED_PREFIX"]))
+		{
+			$request_url .= $_SERVER["HTTP_X_FORWARDED_PREFIX"];
+		}
+		$request_url .= $_SERVER["REQUEST_URI"];
+		return $request_url;
+	}
+	
+	
+	/**
+	 * Create loader
+	 */
+	static function create(string $base_path)
+	{
+		$loader = new Loader();
+		$loader->include(BASE_PATH . "/plugins/plugins.php");
+		$loader->init();
+		$loader->include(BASE_PATH . "/init.php");
+		return $loader;
+	}
+	
 	
 	/**
 	 * Init loader
