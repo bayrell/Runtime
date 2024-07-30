@@ -466,13 +466,16 @@ class Context extends BaseObject
 			{
 				cache.set(module_name, true);
 				Callback f = new Callback(module_name ~ ".ModuleDescription", "requiredModules");
-				Map<string> sub_modules = rtl::apply(f);
-				if (sub_modules != null)
+				if (f.exists())
 				{
-					Vector<string> sub_modules = sub_modules.keys();
-					static::_getRequiredModules(res, cache, sub_modules);
+					Map<string> sub_modules = rtl::apply(f);
+					if (sub_modules != null)
+					{
+						Vector<string> sub_modules = sub_modules.keys();
+						static::_getRequiredModules(res, cache, sub_modules);
+					}
+					res.push(module_name);
 				}
-				res.push(module_name);
 			}
 		}
 	}
