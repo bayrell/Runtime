@@ -34,7 +34,7 @@ class DateTime extends BaseObject implements StringInterface
 	public int i = 0;
 	public int s = 0;
 	public int ms = 0;
-	public double o = 0;
+	public int o = 0;
 	
 	
 	/**
@@ -255,12 +255,54 @@ class DateTime extends BaseObject implements StringInterface
 		#endswitch
 		
 		/* Modify offset */
-		double delta = offset * 60 * 60 - dt_offset;
+		double delta = offset - dt_offset;
 		dt = static::modify(dt, delta);
 		
 		DateTime obj = static::fromObject(dt);
 		obj.o = offset;
 		return obj;
+	}
+	
+	
+	/**
+	 * Get tz offset
+	 */
+	static int getOffset(string tz)
+	{
+		#switch
+		#case ifcode PHP then
+		$utc = new \DateTimeZone("UTC");
+		$current = new \DateTimeZone($tz);
+		$offset = $current->getOffset(new \DateTime("now", $utc));
+		return $offset;
+		#endswitch
+	}
+	
+	
+	/**
+	 * Add seconds
+	 */
+	protected static var modify(var dt, double seconds)
+	{
+		if (seconds == 0) return dt;
+		
+		#switch
+		
+		#case ifcode PHP then
+		
+		$dt->modify($seconds . ' seconds');
+		return $dt;
+		
+		#case ifcode JAVASCRIPT then
+		
+		var offset = Math.floor(seconds / 60);
+		var h = Math.floor(offset / 60);
+		var m = offset % 60;
+		dt.setMinutes(dt.getMinutes() + m);
+		dt.setHours(dt.getHours() + h);
+		return dt;
+		
+		#endswitch
 	}
 	
 	
@@ -292,33 +334,9 @@ class DateTime extends BaseObject implements StringInterface
 	
 	
 	/**
-	 * Add seconds
+	 * Create from native object
 	 */
-	static var modify(var dt, double seconds)
-	{
-		if (seconds == 0) return dt;
-		
-		#switch
-		
-		#case ifcode PHP then
-		
-		$dt->modify($seconds . ' seconds');
-		return $dt;
-		
-		#case ifcode JAVASCRIPT then
-		
-		var offset = Math.floor(seconds / 60);
-		var h = Math.floor(offset / 60);
-		var m = offset % 60;
-		dt.setMinutes(dt.getMinutes() + m);
-		dt.setHours(dt.getHours() + h);
-		return dt;
-		
-		#endswitch
-	}
-	
-	
-	public static var fromObject(var dt)
+	protected static var fromObject(var dt)
 	{
 		#switch
 		
