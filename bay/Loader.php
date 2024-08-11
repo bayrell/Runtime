@@ -208,6 +208,7 @@ class Loader
 	{
 		$error = error_get_last();
 		if (!$error) return;
+		if (in_array($error['type'], [E_WARNING, E_NOTICE])) return;
 		
 		if (php_sapi_name() === 'cli')
 		{
