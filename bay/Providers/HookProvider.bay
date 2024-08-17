@@ -64,7 +64,7 @@ class HookProvider extends BaseProvider
 	/**
 	 * Register hook
 	 */
-	void register(string hook_name, var obj, string method_name, int priority = 0)
+	void register(string hook_name, var obj, string method_name, int priority = 100)
 	{
 		if (not this.hooks.has(hook_name)) this.hooks.set(hook_name, new Map());
 		

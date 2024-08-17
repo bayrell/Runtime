@@ -514,6 +514,38 @@ class rtl
 	
 	
 	/**
+	 * Apply async
+	 */
+	static async void applyChain(Collection<Callback> arr, Collection args)
+	{
+		for (int i=0; i<arr.count(); i++)
+		{
+			Callback f = arr.get(i);
+			rtl::apply(f, args);
+		}
+	}
+	
+	
+	/**
+	 * Apply async chain
+	 */
+	static async void applyChainAsync(Collection<Callback> arr, Collection args)
+	{
+		for (int i=0; i<arr.count(); i++)
+		{
+			Callback f = arr.get(i);
+			var res = rtl::apply(f, args);
+			if (static::isPromise(res))
+			{
+				#ifcode JAVASCRIPT then
+				await res;
+				#endif
+			}
+		}
+	}
+	
+	
+	/**
 	 * Returns callback
 	 * @return var
 	 */
@@ -1488,7 +1520,7 @@ class rtl
 	/**
 	 * Create context
 	 */
-	static static async Context createContext(Map params)
+	static async Context createContext(Map params)
 	{
 		/* Create contenxt */
 		var context = Context::create(params);
