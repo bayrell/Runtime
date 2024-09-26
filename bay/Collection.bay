@@ -75,7 +75,7 @@ Object.assign(Runtime._Collection,
 		var res = this.Instance();
 		if (arr == undefined && arr == null) return this.Instance();
 		
-		if (arr instanceof Array)
+		if (Array.isArray(arr))
 		{
 			var new_arr = arr.slice();
 			Object.setPrototypeOf(new_arr, this.prototype);
