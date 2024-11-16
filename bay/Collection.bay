@@ -109,7 +109,7 @@ Object.assign(Runtime._Collection,
 #case ifcode NODEJS then
 use.add(Runtime._Collection);
 #case ifcode PHP then
-class _Collection implements \ArrayAccess, \JsonSerializable
+class _Collection
 {
 	var $_arr = [];
 	
@@ -176,6 +176,7 @@ class _Collection implements \ArrayAccess, \JsonSerializable
 	/**
 	 * Get and set methods
 	 */
+	/*
 	function __isset($k){return isset($this->_arr[$k]);}
 	function __get($k){return $this->item(\Runtime\rtl::getContext(), $k);}
 	function __set($k,$v){
@@ -192,7 +193,7 @@ class _Collection implements \ArrayAccess, \JsonSerializable
 	function offsetUnset($k){
 		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
 	}
-	
+	*/
 	
 	/* Class name */
 	static function getClassName(){return "Runtime._Collection";}

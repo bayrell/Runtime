@@ -39,6 +39,7 @@ class Context extends BaseObject
 	protected Vector<string> modules = [];
 	protected Map<BaseObject> providers = {};
 	protected Vector<BaseStruct> entities = [];
+	protected Vector<string> start_modules = [];
 	protected int start_time = 0;
 	public string tz = "UTC";
 	protected bool initialized = false;

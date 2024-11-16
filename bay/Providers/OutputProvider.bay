@@ -24,6 +24,12 @@ use Runtime.Exceptions.RuntimeException;
 
 class OutputProvider extends BaseProvider
 {
+	Dict color_table = {};
+	
+	
+	/**
+	 * Constructor
+	 */
 	void constructor()
 	{
 		parent();

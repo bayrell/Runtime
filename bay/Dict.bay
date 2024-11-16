@@ -120,7 +120,7 @@ Runtime._Map.from = function(map)
 };
 use.add(Runtime._Map);
 #case ifcode PHP then
-class _Map implements \ArrayAccess, \JsonSerializable
+class _Map
 {
 	public $_map = [];
 	
@@ -227,6 +227,7 @@ class _Map implements \ArrayAccess, \JsonSerializable
 	/**
 	 * Get and set methods
 	 */
+	 /*
 	function __isset($k){return $this->has(null, $k);}
 	function __get($k){return $this->get(null, $k, null);}
 	function __set($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
@@ -235,6 +236,7 @@ class _Map implements \ArrayAccess, \JsonSerializable
 	public function offsetGet($k){return $this->get(null, $k, "");}
 	public function offsetSet($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
 	public function offsetUnset($k){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
+	*/
 	
 	/* Class name */
 	public static function getClassName(){return "Runtime._Map";}

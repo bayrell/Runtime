@@ -222,7 +222,7 @@ class DateTime extends BaseObject implements StringInterface
 	{
 		DateTime dt = this;
 		double offset = @.env("TZ_OFFSET");
-		if (offset) dt = dt.shiftOffset(offset);
+		if (offset) dt = dt.setOffset(offset);
 		return dt;
 	}
 	
@@ -234,15 +234,15 @@ class DateTime extends BaseObject implements StringInterface
 	{
 		int timestamp = this.getTimestamp();
 		DateTime dt = static::create(timestamp + seconds);
-		dt.shiftOffset(this.o);
+		dt.setOffset(this.o);
 		return dt;
 	}
 	
 	
 	/**
-	 * Shift offset
+	 * Set offset
 	 */
-	DateTime shiftOffset(double offset)
+	DateTime setOffset(double offset)
 	{
 		var dt = this.toObject();
 		double dt_offset;
