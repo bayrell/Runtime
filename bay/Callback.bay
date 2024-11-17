@@ -19,6 +19,7 @@
 namespace Runtime;
 
 use Runtime.BaseStruct;
+use Runtime.Exceptions.RuntimeException;
 
 
 class Callback
@@ -57,18 +58,54 @@ class Callback
 	
 	
 	/**
+	 * Check callback
+	 */
+	void check()
+	{
+		if (not this.exists())
+		{
+			throw RuntimeException(
+				"Method '" ~ this.name ~ "' not found in " ~ rtl::get_class_name(this.obj)
+			);
+		}
+	}
+	
+	
+	/**
 	 * Apply
 	 */
-	var apply(Collection args = null) => rtl::apply(this, args);
+	var apply(Collection args = null)
+	{
+		this.check();
+		
+		#switch
+		#case ifcode PHP then
+		
+		if ($args == null) $args = [];
+		else if ($args instanceof \Runtime\Collection) $args = $args->_arr;
+		
+		$obj = $this->obj;
+		if (gettype($obj) == "string") $obj = rtl::find_class($obj);
+		return call_user_func_array([$obj, $this->name], $args);
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (args == null) args = [];
+		else args = Array.prototype.slice.call(args);
+		
+		var obj = this.obj;
+		if (typeof obj == "string") obj = Runtime.rtl.find_class(obj);
+		return obj[this.name].bind(obj).apply(null, args);
+		
+		#endswitch
+	}
 	
 	
 	#ifcode PHP then
 	
 	function __invoke()
 	{
-		$obj = $this->obj;
-		if (gettype($obj) == "string") $obj = rtl::find_class($obj);
-		return call_user_func_array([$obj, $this->name], func_get_args());
+		return $this->apply(func_get_args());
 	}
 	
 	#endif

@@ -447,17 +447,7 @@ class rtl
 		
 		if ($f instanceof \Runtime\Callback)
 		{
-			if (!$f->exists())
-			{
-				throw new \Runtime\Exceptions\RuntimeException("Method '" .
-					$f->name . "' not found in " .
-					static::get_class_name($f->obj)
-				);
-			}
-			
-			$obj = $f->obj;
-			if (gettype($obj) == "string") $obj = static::find_class($obj);
-			return call_user_func_array([$obj, $f->name], $args);
+			return $f->apply($args);
 		}
 		
 		return call_user_func_array($f, $args);
@@ -471,18 +461,7 @@ class rtl
 		
 		if (f instanceof Runtime.Callback)
 		{
-			let obj = f.obj;
-			let method_name = f.name;
-			if (typeof obj == "string") obj = this.find_class(obj);
-			if (!this.exists(ctx, obj) || !this.exists(ctx, obj[method_name]))
-			{
-				throw new Runtime.Exceptions.RuntimeException(ctx, "Method '" +
-					f.name + "' not found in " +
-					this.get_class_name(ctx, f.obj)
-				);
-			}
-			return obj[f.name].bind(obj).apply(null, args);
-			/*return Runtime.rtl.apply(obj[f.name].bind(obj), args);*/
+			return f.apply(args);
 		}
 		
 		return f.apply(null, args);
@@ -510,38 +489,6 @@ class rtl
 			}
 		})()
 		#endswitch
-	}
-	
-	
-	/**
-	 * Apply async
-	 */
-	static async void applyChain(Collection<Callback> arr, Collection args)
-	{
-		for (int i=0; i<arr.count(); i++)
-		{
-			Callback f = arr.get(i);
-			rtl::apply(f, args);
-		}
-	}
-	
-	
-	/**
-	 * Apply async chain
-	 */
-	static async void applyChainAsync(Collection<Callback> arr, Collection args)
-	{
-		for (int i=0; i<arr.count(); i++)
-		{
-			Callback f = arr.get(i);
-			var res = rtl::apply(f, args);
-			if (static::isPromise(res))
-			{
-				#ifcode JAVASCRIPT then
-				await res;
-				#endif
-			}
-		}
 	}
 	
 	

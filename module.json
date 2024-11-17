@@ -29,6 +29,7 @@
 		"BaseProvider.bay",
 		"BaseStruct.bay",
 		"Callback.bay",
+		"Chain.bay",
 		"Context.bay",
 		"Curl.bay",
 		"Date.bay",

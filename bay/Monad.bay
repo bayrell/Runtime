@@ -50,13 +50,17 @@ class Monad
 	/**
 	 * Call function on value
 	 */
-	public Monad call(fn f)
+	public Monad call(fn f, bool is_return_value = true)
 	{
 		if (this.val === null or this.err != null) return this;
 		
 		try
 		{
-			this.val = rtl::apply(f, [this.val]);
+			var value = rtl::apply(f, [this.val]);
+			if (is_return_value)
+			{
+				this.val = value;
+			}
 		}
 		catch (var e)
 		{
@@ -71,13 +75,21 @@ class Monad
 	/**
 	 * Call async function on value
 	 */
-	public async Monad callAsync(fn f)
+	public async Monad callAsync(fn f, bool is_return_value = true)
 	{
 		if (this.val === null or this.err != null) return this;
 		
 		try
 		{
-			this.val = await rtl::apply(f, [this.val]);
+			var value = rtl::apply(f, [this.val]);
+			if (rtl::isPromise(res))
+			{
+				await value;
+			}
+			if (is_return_value)
+			{
+				this.val = value;
+			}
 		}
 		catch (var e)
 		{
@@ -86,6 +98,24 @@ class Monad
 		}
 		
 		return this;
+	}
+	
+	
+	/**
+	 * Call function on value
+	 */
+	public Monad map(fn f, bool is_return = true)
+	{
+		return this.call(f, is_return);
+	}
+	
+	
+	/**
+	 * Call function on value
+	 */
+	public async Monad mapAsync(fn f, bool is_return = true)
+	{
+		return await this.callAsync(f, is_return);
 	}
 	
 	

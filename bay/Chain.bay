@@ -1,0 +1,194 @@
+/*!
+ *  BayLang Technology
+ *
+ *  (c) Copyright 2016-2020 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.lib;
+use Runtime.Callback;
+use Runtime.Monad;
+
+
+class Chain extends Callback
+{
+	public Collection<Dict> chain = [];
+	bool is_async = false;
+	bool is_return_value = true;
+	
+	
+	/**
+	 * Constructor
+	 */
+	public void constructor()
+	{
+		parent(null, null);
+	}
+	
+	
+	/**
+	 * Check if method exists
+	 */
+	bool exists() => true;
+	
+	
+	
+	/**
+	 * Check callback
+	 */
+	void check()
+	{
+	}
+	
+	
+	/**
+	 * Returns true if async
+	 */
+	bool isAsync() => this.is_async;
+	
+	
+	/**
+	 * Returns true if chain functions must returns value
+	 */
+	bool isReturnValue() => this.is_return_value;
+	
+	
+	/**
+	 * Setting the behavior, the chain functions should return a value or not
+	 */
+	Chain setReturnValue(bool value)
+	{
+		this.is_return_value = value;
+	}
+	
+	
+	/**
+	 * Returns true if async
+	 */
+	bool getChain() => this.chain.slice();
+	
+	
+	/**
+	 * Add function to chain
+	 */
+	public Chain add(fn f, int priority = 100)
+	{
+		this.chain.push({
+			"async": false,
+			"callback": f,
+			"priority": priority,
+		});
+		return this;
+	}
+	
+	
+	/**
+	 * Add async function to chain
+	 */
+	public Chain addAsync(fn f, int priority = 100)
+	{
+		this.is_async = true;
+		this.chain.push({
+			"async": true,
+			"callback": f,
+			"priority": priority,
+		});
+		return this;
+	}
+	
+	
+	/**
+	 * Sort chain
+	 */
+	public void sort()
+	{
+		this.chain = this.chain.sort(lib::sortAttr("priority", "asc"));
+	}
+	
+	
+	/**
+	 * Apply chain
+	 */
+	var apply(var value = null)
+	{
+		Monad monada = new Monad(value);
+		if (not this.is_async)
+		{
+			this.applyChain(monada);
+			return monada.value();
+		}
+		else
+		{
+			fn f = async var (Monad monada)
+			{
+				await this.applyChainAsync(monada);
+				return monada.value();
+			};
+			return f(monada);
+		}
+	}
+	
+	
+	/**
+	 * Apply async chain
+	 */
+	async var applyAsync(var value)
+	{
+		Monad monada = new Monad(value);
+		await this.applyChainAsync(monada);
+		return monada.value();
+	}
+	
+	
+	/**
+	 * Apply chain
+	 */
+	Monad applyChain(Monad monada)
+	{
+		for (int i=0; i<this.chain.count(); i++)
+		{
+			Dict item = this.chain.get(i);
+			Callback f = item.get("callback");
+			monada.map(f, this.is_return_value);
+		}
+		return monada;
+	}
+	
+	
+	/**
+	 * Apply async chain
+	 */
+	async Monad applyChainAsync(Monad monada)
+	{
+		for (int i=0; i<this.chain.count(); i++)
+		{
+			Dict item = this.chain.get(i);
+			Callback f = item.get("callback");
+			await monada.mapAsync(f, this.is_return_value);
+		}
+		return monada;
+	}
+	
+	
+	#ifcode PHP then
+	
+	function __invoke()
+	{
+		return $this->apply(func_get_args());
+	}
+	
+	#endif
+}

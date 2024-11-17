@@ -18,6 +18,7 @@
 
 namespace Runtime;
 
+use Runtime.Chain;
 use Runtime.Collection;
 use Runtime.Context;
 use Runtime.BaseStruct;
@@ -40,14 +41,12 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Check object is implements interface
 	 */	
 	pure fn isImplements(string class_name) =>
 		bool (var item) use (class_name) => rtl::is_implements(item, class_name)
 	;
-	
 	
 	
 	/**
@@ -58,14 +57,12 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Create struct
 	 */
 	pure fn createStruct(string class_name) =>
 		BaseStruct(Dict data) use (class_name) => rtl::newInstance(class_name, [data])
 	;
-	
 	
 	
 	/**
@@ -77,7 +74,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Equal two struct by key
 	 */
@@ -85,7 +81,6 @@ class lib
 		=> bool (var item) use (value)
 			=> item != value
 	;
-	
 	
 	
 	/**
@@ -97,7 +92,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Equal two struct by key
 	 */
@@ -106,7 +100,6 @@ class lib
 			=> (item1 != null) ? rtl::attr(item1, key) != value : false
 	;
 	pure fn equalAttrNot(string key, var value) => static::equalNotAttr(key, value);
-	
 	
 	
 	/**
@@ -126,7 +119,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Equal two struct by key
 	 */
@@ -140,7 +132,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Returns key value of obj
 	 */
@@ -148,7 +139,6 @@ class lib
 		var (var obj) use (key, def_value) =>
 			rtl::attr(obj, [key], def_value)
 	;
-	
 	
 	
 	/**
@@ -160,7 +150,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Returns attr of item
 	 */
@@ -170,7 +159,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Set dict attr
 	 */
@@ -178,7 +166,6 @@ class lib
 		var (var obj) use (path, value) =>
 			rtl::setAttr(obj, path, value)
 	;
-	
 	
 	
 	/**
@@ -193,14 +180,12 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Copy object
 	 */
 	pure fn copy(Dict d) =>
 		bool (var item) use (d) => item.copy(d)
 	;
-	
 	
 	
 	/**
@@ -211,14 +196,12 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Map
 	 */
 	pure fn map(fn f) =>
 		var (var m) use (f) => m.map(f)
 	;
-	
 	
 	
 	/**
@@ -229,14 +212,12 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Intersect
 	 */
 	pure fn intersect(Collection arr) =>
 		bool (var m) use (arr) => m.intersect(arr)
 	;
-	
 	
 	
 	/**
@@ -247,14 +228,12 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Transition
 	 */
 	pure fn transition(fn f) =>
 		var (var m) use (f) => m.transition(f)
 	;
-	
 	
 	
 	/**
@@ -265,19 +244,16 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Sort asc
 	 */
 	pure int sortAsc(var a, var b) => (a > b) ? 1 : (a < b) ? -1 : 0;
 	
 	
-	
 	/**
 	 * Sort desc
 	 */
 	pure int sortDesc(var a, var b) => (a > b) ? -1 : (a < b) ? 1 : 0;
-	
 	
 	
 	/**
@@ -295,7 +271,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Convert monad by type
 	 */
@@ -308,7 +283,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Convert monad by type
 	 */
@@ -316,7 +290,6 @@ class lib
 		bool (Monad m) use (def_value) =>
 			(m.err != null or m.val === null) ? new Monad(def_value) : m
 	;
-	
 	
 	
 	/**
@@ -328,7 +301,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Clear error
 	 */
@@ -336,12 +308,10 @@ class lib
 		Monad (Monad m) => new Monad(m.val);
 	
 	
-	
 	/**
 	 * Returns monad
 	 */
 	pure Monad monad(Monad m) => m;
-	
 	
 	
 	/**
@@ -352,7 +322,6 @@ class lib
 		fn (string class_name) use (method_name) =>
 			rtl::method(class_name, method_name)
 	;
-	
 	
 	
 	/**
@@ -368,7 +337,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Apply async function
 	 * @return fn
@@ -382,7 +350,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Apply function
 	 * @return fn
@@ -391,7 +358,6 @@ class lib
 		var (var value) use (f) =>
 			f(value)
 	;
-	
 	
 	
 	/**
@@ -403,6 +369,38 @@ class lib
 			await f(value)
 	;
 	
+	
+	/**
+	 * Create pipe
+	 */
+	pure Chain pipe()
+	{
+		return new Chain();
+	}
+	
+	
+	/**
+	 * Value for pipe
+	 */
+	pure fn value()
+	{
+		return var (var value)
+		{
+			return value;
+		};
+	}
+	
+	
+	/**
+	 * Normalize date time
+	 */
+	pure fn normalizeDateTime()
+	{
+		return string (DateTime date_time)
+		{
+			return date_time.normalize().getDateTimeString();
+		};
+	}
 	
 	
 	/**
@@ -425,7 +423,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Function or
 	 */
@@ -443,7 +440,6 @@ class lib
 	;
 	
 	
-	
 	/**
 	 * Function and
 	 */
@@ -459,7 +455,6 @@ class lib
 			return true;
 		}
 	;
-	
 	
 	
 	/**
