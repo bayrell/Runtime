@@ -398,6 +398,7 @@ class lib
 	{
 		return string (DateTime date_time)
 		{
+			if (not date_time) return "";
 			return date_time.normalize().getDateTimeString();
 		};
 	}

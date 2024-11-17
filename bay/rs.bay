@@ -591,6 +591,8 @@ class rs
 	 */
 	pure string htmlEscape(string s)
 	{
+		if (s == null) return "";
+		
 		#switch
 		#case ifcode PHP then
 		
