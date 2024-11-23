@@ -130,7 +130,10 @@ class Serializer extends BaseObject
 		
 		#switch
 		#case ifcode PHP then
-		return $object->$field_name;
+		if (property_exists($object, $field_name))
+		{
+			return $object->$field_name;
+		}
 		#case ifcode JAVASCRIPT then
 		return field_name in object ? object[field_name] : null;
 		#endswitch
