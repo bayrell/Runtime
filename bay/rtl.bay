@@ -470,6 +470,17 @@ class rtl
 	
 	
 	/**
+	 * Await promise
+	 */
+	static async void resolvePromise(var value)
+	{
+		#ifcode JAVASCRIPT then
+		return await value;
+		#endif
+	}
+	
+	
+	/**
 	 * Run async function
 	 * @return fn
 	 */
