@@ -68,44 +68,43 @@ class Curl extends BaseObject
 
 Object.assign(Runtime.Curl.prototype,
 {
+	/**
+	 * Returns FormData get
+	 */
+	getKey: function(key, index)
+	{
+		if (key == "") return index;
+		return key + "[" + index + "]";
+	},
+	
 	
 	/**
 	 * Returns FormData
 	 * @params data - json object
 	 * @return FormData
 	 */
-	buildPostData: function(post_data, result)
+	buildPostData: function(result, key, value)
 	{
-		if (post_data instanceof FormData) return post_data;
-		if (result == undefined)
+		if (value instanceof Array)
 		{
-			result = new FormData();
-		}
-		let keys = post_data.keys();
-		
-		/* Add data to post data */
-		for (let i=0; i<keys.length; i++)
-		{
-			let key = keys[i];
-			let val = post_data.get(key);
-			if (val instanceof FileList)
+			for (var i=0; i<value.length; i++)
 			{
-				for (let j=0; i<val.length; j++)
-				{
-					result.append(key + "[]", val.item(j), val.item(j).name);
-				}
-			}
-			else if (val instanceof File)
-			{
-				result.append(key, val, val.name);
-			}
-			else
-			{
-				result.append(key, val);
+				this.buildPostData(result, this.getKey(key, i), value[i]);
 			}
 		}
-		
-		return result;
+		else if (value instanceof Runtime.Dict)
+		{
+			var keys = value.keys();
+			for (var i=0; i<keys.length; i++)
+			{
+				var name = keys.get(i);
+				this.buildPostData(result, this.getKey(key, name), value.get(name));
+			}
+		}
+		else
+		{
+			result.append(key, value);
+		}
 	},
 	
 	
@@ -121,10 +120,11 @@ Object.assign(Runtime.Curl.prototype,
 		return await new Promise((resolve, reject) =>{
 			try
 			{
-				var post = this.buildPostData(this.post);
+				var data = new FormData();
+				this.buildPostData(data, "", this.post);
 				let xhr = new XMLHttpRequest();
 				xhr.open('POST', this.url, true);
-				xhr.send(post);
+				xhr.send(data);
 				xhr.onreadystatechange = (function(curl, xhr, resolve, reject) {
 					return function()
 					{
