@@ -122,9 +122,9 @@ class Chain extends Callback
 	/**
 	 * Apply chain
 	 */
-	var apply(var value = null)
+	var apply(Collection args = null)
 	{
-		Monad monada = new Monad(value);
+		Monad monada = new Monad(args.get(0));
 		if (not this.is_async)
 		{
 			this.applyChain(monada);
@@ -145,9 +145,9 @@ class Chain extends Callback
 	/**
 	 * Apply async chain
 	 */
-	async var applyAsync(var value)
+	async var applyAsync(Collection args = null)
 	{
-		Monad monada = new Monad(value);
+		Monad monada = new Monad(args.get(0));
 		await this.applyChainAsync(monada);
 		return monada.value();
 	}

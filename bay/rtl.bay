@@ -442,27 +442,26 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		if ($args == null) $args = [];
-		else if ($args instanceof \Runtime\Collection) $args = $args->_arr;
-		
 		if ($f instanceof \Runtime\Callback)
 		{
 			return $f->apply($args);
 		}
 		
+		if ($args == null) $args = [];
+		else if ($args instanceof \Runtime\Collection) $args = $args->_arr;
 		return call_user_func_array($f, $args);
 		
 		#case ifcode JAVASCRIPT then
 		
-		if (args == null) args = [];
-		else args = Array.prototype.slice.call(args);
-		
-		if (typeof ctx != "undefined") args.unshift(ctx);
+		if (typeof ctx != "undefined") args.prepend(ctx);
 		
 		if (f instanceof Runtime.Callback)
 		{
 			return f.apply(args);
 		}
+		
+		if (args == null) args = [];
+		else args = Array.prototype.slice.call(args);
 		
 		return f.apply(null, args);
 		#endswitch
