@@ -254,6 +254,15 @@ class lib
 	
 	
 	/**
+	 * Compare int
+	 */
+	pure fn compareInt(string order = "asc") =>
+		int (int a, int b) use (order) =>
+			order == "asc" ? a - b : "desc"
+	;
+	
+	
+	/**
 	 * Sort asc
 	 */
 	pure int sortAsc(var a, var b) => (a > b) ? 1 : (a < b) ? -1 : 0;

@@ -110,7 +110,7 @@ class HookProvider extends BaseProvider
 		Vector res = new Vector();
 		
 		Map priorities = this.hooks[hook_name];
-		Collection priorities_keys = priorities.keys().sort();
+		Collection priorities_keys = priorities.keys().sort(lib::compareInt());
 		for (int i=0; i<priorities_keys.count(); i++)
 		{
 			int priority = priorities_keys[i];
