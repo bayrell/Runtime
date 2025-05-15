@@ -16,23 +16,31 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Exceptions;
+namespace Runtime;
 
-use Runtime.rtl;
-use Runtime.RuntimeConstant;
-use Runtime.Exceptions.AbstractException;
+use Runtime.BaseObject;
+use Runtime.FactoryInterface;
 
 
-class UnknownError extends AbstractException
+class Factory extends BaseObject implements FactoryInterface
 {
+	Collection args = null;
 	
-	void constructor(Object prev = null)
+	
+	/**
+	 * Create factory
+	 */
+	void constructor(string name, Dict args = null)
 	{
-		parent(
-			_("Runtime", "Unknown error"),
-			rtl::ERROR_UNKNOWN, 
-			prev
-		);
+		parent({
+			"name": name,
+			"args": args,
+		});
 	}
-
+	
+	
+	/**
+	 * Create new object
+	 */
+	BaseObject createInstance() => rtl::newInstance(this.name, this.args);
 }

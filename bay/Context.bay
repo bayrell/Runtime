@@ -39,9 +39,7 @@ class Context extends BaseObject
 	protected Vector<string> modules = [];
 	protected Map<BaseObject> providers = {};
 	protected Vector<BaseStruct> entities = [];
-	protected Vector<string> start_modules = [];
 	protected int start_time = 0;
-	public string tz = "UTC";
 	protected bool initialized = false;
 	protected bool started = false;
 	
@@ -97,14 +95,14 @@ class Context extends BaseObject
 		{
 			return this.entities.slice();
 		}
-		return this.entities.filter( lib::isInstance(class_name) );
+		return this.entities.filter(lib::isInstance(class_name));
 	}
 	
 	
 	/**
 	 * Returns environments
 	 */
-	Map<string> getEnvironments() => this.environments.clone();
+	Map<string> getEnvironments() => this.environments.copy();
 	
 	
 	/**
@@ -162,13 +160,12 @@ class Context extends BaseObject
 		
 		#case ifcode NODEJS then
 		
-		let Collection = use("Runtime.Collection");
-		let Dict = use("Runtime.Dict");
 		let Map = use("Runtime.Map");
+		let Vector = use("Runtime.Vector");
 		
 		if (!params.has(ctx, "cli_args"))
 		{
-			params.set(ctx, "cli_args", Collection.from(process.argv.slice(1)));
+			params.set(ctx, "cli_args", Vector.from(process.argv.slice(1)));
 		}
 		if (!params.has(ctx, "base_path"))
 		{
@@ -184,9 +181,9 @@ class Context extends BaseObject
 		if (params.has("modules"))
 		{
 			var modules = params.get("modules");
-			if (not(modules instanceof Collection))
+			if (not(modules instanceof Vector))
 			{
-				modules = Collection::@from(modules);
+				modules = Vector::@from(modules);
 			}
 			params.set("modules", modules.toVector());
 		}
@@ -194,7 +191,7 @@ class Context extends BaseObject
 		/* Setup default environments */
 		if (not params.has("environments")) params.set("environments", new Map());
 		
-		Map env = params["environments"];
+		Map env = params.get("environments");
 		if (not env) env = {};
 		if (not env.has("CLOUD_ENV")) env.set("CLOUD_ENV", false);
 		if (not env.has("DEBUG")) env.set("DEBUG", false);
@@ -210,7 +207,6 @@ class Context extends BaseObject
 		if (params.has("modules")) instance.modules = params.get("modules");
 		if (params.has("start_time")) instance.start_time = params.get("start_time");
 		if (params.has("tz")) instance.tz = params.get("tz");
-		instance.start_modules = instance.modules.copy();
 		return instance;
 	}
 	
@@ -374,7 +370,7 @@ class Context extends BaseObject
 			Provider factory = providers.get(i);
 			
 			/* Create provider */
-			BaseProvider provider = factory.createProvider();
+			BaseProvider provider = factory.createInstance();
 			if (not provider)
 			{
 				throw new RuntimeException("Wrong declare provider '" ~ factory.name ~ "'");
@@ -494,7 +490,7 @@ class Context extends BaseObject
 			Callback f = new Callback(module_name ~ ".ModuleDescription", "entities");
 			if (f.exists())
 			{
-				Vector<Entity> arr = rtl::apply(f);
+				Vector<Entity> arr = f.apply();
 				if (arr)
 				{
 					entities.appendItems(arr);

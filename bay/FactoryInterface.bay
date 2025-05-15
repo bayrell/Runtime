@@ -16,31 +16,15 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Entity;
+namespace Runtime;
 
 use Runtime.BaseObject;
-use Runtime.Entity.Entity;
 
 
-struct Factory extends Entity
+interface FactoryInterface
 {
-	Dict params = null;
-	
-	
-	/**
-	 * Create factory
+    /**
+	 * Create new object
 	 */
-	void constructor(string name, Dict params = null)
-	{
-		parent({
-			"name": name,
-			"params": params,
-		});
-	}
-	
-	
-	/**
-	 * Factory
-	 */
-	BaseObject factory() => rtl::newInstance(this.name, [this.params]);
+	BaseObject createInstance();
 }

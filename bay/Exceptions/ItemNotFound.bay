@@ -25,8 +25,7 @@ use Runtime.Exceptions.AbstractException;
 
 class ItemNotFound extends AbstractException
 {
-	
-	void constructor(string name = "", string object = "Item", Object prev = null)
+	void constructor(string object = "Item", string name = "", Object prev = null)
 	{
 		string message = "";
 		if (name != "")
@@ -40,5 +39,4 @@ class ItemNotFound extends AbstractException
 		
 		parent(message, rtl::ERROR_ITEM_NOT_FOUND, prev);
 	}
-
 }

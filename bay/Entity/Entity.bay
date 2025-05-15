@@ -23,8 +23,18 @@ use Runtime.BaseObject;
 use Runtime.BaseStruct;
 
 
-struct Entity extends BaseStruct
+class Entity extends BaseObject
 {
 	/* Entity name */
 	string name = "";
+	
+	
+	/**
+	 * Constructor
+	 */
+	void constructor(Map obj)
+	{
+		parent();
+		this._assign_values(obj);
+	}
 }

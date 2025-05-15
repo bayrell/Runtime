@@ -22,10 +22,8 @@
 		"Exceptions/ItemNotFound.bay",
 		"Exceptions/KeyNotFound.bay",
 		"Exceptions/RuntimeException.bay",
-		"Exceptions/UnknownError.bay",
 		"StringInterface.bay",
 		"BaseObject.bay",
-		"BaseHook.bay",
 		"BaseProvider.bay",
 		"BaseStruct.bay",
 		"Callback.bay",
@@ -48,6 +46,7 @@
 		"Entity/Factory.bay",
 		"Entity/Hook.bay",
 		"Entity/Provider.bay",
+		"Hooks/BaseHook.bay",
 		"Hooks/RuntimeHook.bay",
 		"Providers/HookProvider.bay",
 		"Providers/OutputProvider.bay"
