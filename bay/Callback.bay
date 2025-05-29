@@ -92,6 +92,7 @@ class Callback
 		
 		if (args == null) args = [];
 		else args = Array.prototype.slice.call(args);
+		if (typeof ctx != "undefined") args.unshift(ctx);
 		
 		var obj = this.obj;
 		if (typeof obj == "string") obj = Runtime.rtl.find_class(obj);

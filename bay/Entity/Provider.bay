@@ -55,7 +55,7 @@ struct Provider extends Entity implements FactoryInterface
 	/**
 	 * Create provider
 	 */
-	BaseProvider factory()
+	BaseProvider createInstance()
 	{
 		BaseProvider provider = null;
 		var class_name = this.value;

@@ -450,15 +450,14 @@ class rtl
 		
 		#case ifcode JAVASCRIPT then
 		
-		if (typeof ctx != "undefined") args.prepend(ctx);
+		if (args == null) args = [];
+		else args = Array.prototype.slice.call(args);
+		if (typeof ctx != "undefined") args.unshift(ctx);
 		
 		if (f instanceof Runtime.Callback)
 		{
 			return f.apply(args);
 		}
-		
-		if (args == null) args = [];
-		else args = Array.prototype.slice.call(args);
 		
 		return f.apply(null, args);
 		#endswitch
