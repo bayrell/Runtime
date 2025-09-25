@@ -20,12 +20,11 @@ namespace Runtime.Exceptions;
 
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
-use Runtime.Exceptions.AbstractException;
+use Runtime.Exceptions.RuntimeException;
 
 
-class ApiError extends AbstractException
+class ApiError extends RuntimeException
 {
-	
 	void constructor(Object prev = null)
 	{
 		parent(
@@ -79,5 +78,4 @@ class ApiError extends AbstractException
 	{
 		return this.prev.getErrorPos();
 	}
-	
 }

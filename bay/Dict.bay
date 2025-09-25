@@ -23,443 +23,32 @@ use Runtime.Collection;
 use Runtime.Exceptions.KeyNotFound;
 
 
-abstract class _Map{}
-
-#switch
-#case ifcode NODEJS then
-
-if (typeof Runtime == 'undefined') Runtime = {};
-
-Runtime._Map = function(ctx, map)
+interface Dict<T>
 {
-	this._map = {};
-	if (map != undefined && typeof map == 'object')
-	{
-		if (map instanceof Runtime.Dict)
-		{
-			for (var i in map._map)
-			{
-				this._map[i] = map._map[i];
-			}
-		}
-		else if (typeof map == "object" && !(map instanceof Runtime._Collection))
-		{
-			for (var i in map)
-			{
-				this._map["|" + i] = map[i];
-			}
-		}
-	}
-	this.__uq__ = Symbol();
-	return this;
-}
-
-#case ifcode ES6 then
-
-if (typeof Runtime == 'undefined') Runtime = {};
-
-Runtime._Map = function(map)
-{
-	this._map = {};
-	if (map != undefined && typeof map == 'object')
-	{
-		if (map instanceof Runtime.Dict)
-		{
-			for (var i in map._map)
-			{
-				this._map[i] = map._map[i];
-			}
-		}
-		else if (typeof map == "object" && !(map instanceof Runtime._Collection))
-		{
-			for (var i in map)
-			{
-				this._map["|" + i] = map[i];
-			}
-		}
-	}
-	this.__uq__ = Symbol();
-	return this;
-}
-
-#case ifcode JAVASCRIPT then
-/*Runtime._Map.prototype = Object.create(Map.prototype);
-Runtime._Map.prototype.constructor = Runtime._Map;*/
-Object.assign(Runtime._Map.prototype,
-{
-	toStr: function(value)
-	{ 
-		return use("Runtime.rtl").toStr(value);
-	},
-	toObject: function()
-	{
-		var obj = {};
-		for (var key in this._map)
-		{
-			obj[key.substring(1)] = this._map[key];
-		}
-		return obj;
-	},
-});
-Object.assign(Runtime._Map,
-{
-	from: function(map)
-	{
-		var res = this.Instance(map);
-		return res;
-	},
-	getNamespace: function(){ return "Runtime"; },
-	getClassName: function(){ return "Runtime._Map"; },
-	getParentClassName: function(){ return ""; },
-});
-#case ifcode NODEJS then
-Runtime._Map.from = function(map)
-{
-	var res = this.Instance(null, map);
-	return res;
-};
-use.add(Runtime._Map);
-#case ifcode PHP then
-class _Map
-{
-	public $_map = [];
-	
-	
-	/**
-	 * From
-	 */
-	static function from($map)
-	{
-		$class_name = static::class;
-		$res = new $class_name(null);
-		if ($map != null && is_array($map))
-		{
-			foreach ($map as $key => $value)
-			{
-				$key = $res->toStr($key);
-				$res->_map[$key] = $value;
-			}
-		}
-		else if (is_object($map))
-		{
-			$values = get_object_vars($map);
-			foreach ($values as $key => $value)
-			{
-				$key = $res->toStr($key);
-				$res->_map[$key] = $value;
-			}
-		}
-		return $res;	
-	}
-	
-	
-	/**
-	 * JsonSerializable
-	 */
-	public function toStr($value)
-	{
-		return rtl::toStr($value);
-	}
-	
-	
-	/**
-	 * JsonSerializable
-	 */
-	public function jsonSerialize()
-	{
-		return (object) $this->_map;
-	}
-	
-	
-	/**
-	 * Constructor
-	 */
-	public function __construct($map=null)
-	{
-		$this->_map = [];
-		if ($map == null) {}
-		else if ($map instanceof Dict)
-		{
-			foreach ($map->_map as $key => $value)
-			{
-				$key = $this->toStr($key);
-				$this->_map[$key] = $value;
-			}		
-		}
-		else if (is_array($map))
-		{
-			foreach ($map as $key => $value)
-			{
-				$key = $this->toStr($key);
-				$this->_map[$key] = $value;
-			}
-		}
-		else if (is_object($map))
-		{
-			$values = get_object_vars($map);
-			foreach ($values as $key => $value)
-			{
-				$key = $this->toStr($key);
-				$this->_map[$key] = $value;
-			}
-		}
-	}
-	
-	
-	/**
-	 * Destructor
-	 */
-	public function __destruct()
-	{
-		unset($this->_map);
-	}
-	
-	
-	/**
-	 * Get array
-	 */
-	public function _getArr()
-	{
-		return $this->_map;
-	}
-	
-	
-	/**
-	 * Get and set methods
-	 */
-	 /*
-	function __isset($k){return $this->has(null, $k);}
-	function __get($k){return $this->get(null, $k, null);}
-	function __set($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
-	function __unset($k){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
-	public function offsetExists($k){return $this->has(null, $k);}
-	public function offsetGet($k){return $this->get(null, $k, "");}
-	public function offsetSet($k,$v){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
-	public function offsetUnset($k){throw new \Runtime\Exceptions\AssignStructValueError(null, $k);}
-	*/
-	
-	/* Class name */
-	public static function getClassName(){return "Runtime._Map";}
-	public static function getParentClassName(){return "";}
-}
-
-#endswitch
-
-
-class Dict<T> extends _Map
-{
-	/**
-	 * Returns new Instance
-	 * @return Object
-	 */
-	static Dict<T> Instance(var val = null)
-	{
-		return new Dict(val);
-	}
-	
-	
-	/**
-	 * Copy instance
-	 */
-	protected Dict<T> cp()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var new_obj = this.constructor.Instance();
-		new_obj._map = Object.assign({}, this._map);
-		return new_obj;
-		#case ifcode PHP then
-		$new_obj = static::Instance();
-		$new_obj->_map = $this->_map;
-		return $new_obj;
-		#endswitch
-	}
-	Collection<T> copy(var obj = null) => (obj == null) ? this.cp() : this.clone(obj);
-	
-	
-	/**
-	 * Clone Dict
-	 * @param int pos - position
-	 */
-	public Dict<T> clone(var obj = null)
-	{
-		if (obj == null)
-		{
-			if (this instanceof Map)
-			{
-				return this.cp();
-			}
-			return this;
-		}
-		
-		#switch
-		#case ifcode JAVASCRIPT then
-		var new_obj = this.constructor.Instance();
-		new_obj._map = Object.assign({}, this._map);
-		if (obj != null)
-		{
-			var _Dict = use("Runtime.Dict");
-			if (obj instanceof _Dict) 
-			{
-				obj = obj._map;
-				for (var key in obj)
-				{
-					new_obj._map[key] = obj[key];
-				}
-			}
-			else
-			{
-				for (var key in obj)
-				{
-					new_obj._map["|" + key] = obj[key];
-				}
-			}
-		}
-		return new_obj;
-		#case ifcode PHP then
-		$new_obj = static::Instance();
-		$new_obj->_map = $this->_map;
-		if ($obj != null)
-		{
-			if ($obj instanceof \Runtime\Dict) $obj = $obj->_map;
-			$new_obj->_map = array_merge($new_obj->_map, $obj);
-		}
-		return $new_obj;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Convert to dict
-	 */
-	Dict<T> toDict()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var Dict = use ("Runtime.Dict");
-		return new Dict(ctx, this);
-		#case ifcode PHP then
-		return new \Runtime\Dict($this);
-		#endswitch
-	}
-	
-	
-	/**
-	 * Convert to dict
-	 */
-	Dict<T> toMap()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var Map = use ("Runtime.Map");
-		return new Map(ctx, this);
-		#case ifcode PHP then
-		return new \Runtime\Map($this);
-		#endswitch
-	}
-	
-	
-	/**
-	 * Return true if key exists
-	 * @param string key
-	 * @return bool var
-	 */
-	public bool contains(string key)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		key = this.toStr(key);
-		return typeof this._map["|" + key] != "undefined";
-		#case ifcode PHP then
-		$key = $this->toStr($key);
-		return array_key_exists($key, $this->_map);
-		#endswitch
-	}
-	
-	
-	/**
-	 * Return true if key exists
-	 * @param string key
-	 * @return bool var
-	 */
-	public bool has(string key)
-	{
-		return this.contains(key);
-	}
-	
-	
 	/**
 	 * Returns value from position
 	 * @param string key
 	 * @param T default_value
 	 * @return T
 	 */
-	public T get(string key, T default_value = null)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		key = this.toStr(key);
-		var val = this._map["|" + key];
-		if (typeof val == "undefined") return default_value;
-		return val;
-		#case ifcode PHP then
-		$key = $this->toStr($key);
-		$val = isset($this->_map[$key]) ? $this->_map[$key] : $default_value;
-		return $val;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Returns value from position. Throw exception, if position does not exists
-	 * @param string key - position
-	 * @return T
-	 */
-	public T item( string key)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		key = this.toStr(key);
-		if (typeof this._map["|" + key] == "undefined")
-		{
-			var _KeyNotFound = use("Runtime.Exceptions.KeyNotFound");
-			throw new _KeyNotFound(key);
-		}
-		var val = this._map["|" + key];
-		if (val === null || typeof val == "undefined") return null;
-		return val;
-		#case ifcode PHP then
-		$key = $this->toStr($key);
-		if (!array_key_exists($key, $this->_map))
-		{
-			throw new \Runtime\Exceptions\KeyNotFound($key);
-		}
-		return $this->_map[$key];
-		#endswitch
-	}
+	T get(string key, T default_value = null);
 	
 	
 	/**
 	 * Set value size_to position
 	 * @param string key - position
-	 * @param T value 
+	 * @param T value
 	 * @return self
 	 */
-	public Dict<T> setIm(string key, T value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var res = this.cp();
-		key = this.toStr(key);
-		res._map["|" + key] = value;
-		return res;
-		#case ifcode PHP then
-		$res = $this->cp();
-		$key = $this->toStr($key);
-		$res->_map[$key] = $value;
-		return $res;
-		#endswitch
-	}
+	Dict<T> set(string key, T value);
+	
+	
+	/**
+	 * Return true if key exists
+	 * @param string key
+	 * @return bool var
+	 */
+	bool has(string key);
 	
 	
 	/**
@@ -467,230 +56,14 @@ class Dict<T> extends _Map
 	 * @param string key
 	 * @return self
 	 */
-	public Dict<T> removeIm(string key)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		key = this.toStr(key);
-		if (typeof this._map["|" + key] != "undefined")
-		{
-			var res = this.cp();
-			delete res._map["|" + key];
-			return res;
-		}
-		return this;
-		#case ifcode PHP then
-		$key = $this->toStr($key);
-		if (array_key_exists($key, $this->_map))
-		{
-			$res = $this->cp();
-			unset($res->_map[$key]);
-			return $res;
-		}
-		return $this;
-		#endswitch
-	}
+	Dict<T> remove(string key);
 	
 	
 	/**
-	 * Returns vector of the keys
-	 * @return Collection<string>
+	 * Clear all values from vector
+	 * @return self
 	 */
-	public Vector<string> keys()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var res = new Runtime.Vector();
-		for (var key in this._map) res.push(ctx, key.substring(1));
-		return res;
-		#case ifcode PHP then
-		$keys = array_keys($this->_map);
-		$res = \Runtime\Collection::from($keys);
-		return $res;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Returns vector of the values
-	 * @return Collection<T>
-	 */
-	public Vector<T> values()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var res = new Runtime.Vector();
-		for (var key in this._map) res.push(ctx, this._map[key]);
-		return res;
-		#case ifcode PHP then
-		$values = array_values($this->_map);
-		$res = \Runtime\Collection::from($values);
-		return $res;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Call function map
-	 * @param fn f
-	 * @return Dict
-	 */
-	Dict map(fn f)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var obj = this.constructor.Instance();
-		for (var key in this._map)
-		{
-			var new_key = key.substring(1);
-			var new_val = Runtime.rtl.apply(ctx, f, [this._map[key], new_key]);
-			obj._map[key] = new_val;
-		}
-		return obj;
-		#case ifcode PHP then
-		$map2 = static::Instance();
-		foreach ($this->_map as $key => $value)
-		{
-			$new_val = $f($value, $key);
-			$map2->_map[$key] = $new_val;
-		}
-		return $map2;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Filter items
-	 * @param fn f
-	 * @return Collection
-	 */
-	Dict<T> filter(fn f)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var obj = this.constructor.Instance();
-		for (var key in this._map)
-		{
-			var new_key = key.substring(1);
-			var value = this._map[key];
-			var flag = Runtime.rtl.apply(ctx, f, [value, new_key]);
-			if (flag) obj._map[key] = value;
-		}
-		return obj;
-		#case ifcode PHP then
-		$map2 = static::Instance();
-		foreach ($this->_map as $key => $value)
-		{
-			$flag = $f($value, $key);
-			if ($flag) $map2->_map[$key] = $value;
-		}
-		return $map2;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Call function for each item
-	 * @param fn f
-	 */
-	void each(fn f)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		for (var key in this._map)
-		{
-			var new_key = key.substring(1);
-			var value = this._map[key];
-			f(ctx, value, new_key);
-		}
-		#case ifcode PHP then
-		foreach ($this->_map as $key => $value)
-		{
-			$f($value, $key);
-		}
-		#endswitch
-	}
-	
-	
-	/**
-	 * Transition Dict to Vector
-	 * @param fn f
-	 * @return Vector
-	 */
-	Vector<T> transition(fn f)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var Vector = use("Runtime.Vector");
-		var arr = new Vector();
-		for (var key in this._map)
-		{
-			var new_value = f(ctx, this._map[key], key.substring(1));
-			Array.prototype.push.call(arr, new_value);
-		}
-		return arr;
-		#case ifcode PHP then
-		$arr = new \Runtime\Vector();
-		foreach ($this->_map as $key => $value)
-		{
-			$arr->_arr[] = $f($value, $key);
-		}
-		return $arr;
-		#endswitch
-	}
-	
-	
-	/**
-	 * 	
-	 * @param fn f
-	 * @param var init_value
-	 * @return init_value
-	 */
-	var reduce(fn f, var init_value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		for (var key in this._map)
-		{
-			init_value = Runtime.rtl.apply(ctx, f, [init_value, this._map[key], key.substring(1)]);
-		}
-		return init_value;
-		#case ifcode PHP then
-		foreach ($this->_map as $key => $value)
-		{
-			$init_value = $f($init_value, $value, $key);
-		}
-		return $init_value;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Clone this struct with fields
-	 * @param Collection fields = null
-	 * @return BaseStruct
-	 */
-	public Dict intersect(Collection fields = null, bool skip_empty = true)
-	{
-		if (fields == null) return {};
-		
-		Map obj = new Map();
-		fields.each
-		(
-			void (string field_name) use (skip_empty, obj)
-			{
-				if (not this.has(field_name) and skip_empty) return;
-				obj.set(field_name, this.get(field_name, null));
-			}
-		);
-		
-		if (this instanceof Map)
-		{
-			return obj;
-		}
-		
-		return obj.toDict();
-	}
+	Dict<T> clear();
 	
 	
 	/**
@@ -698,58 +71,59 @@ class Dict<T> extends _Map
 	 * @param Dict<T> map
 	 * @return self
 	 */
-	public Dict<T> concat(Dict<T> map = null)
-	{
-		if (map == null) return this;
-		#switch
-		#case ifcode JAVASCRIPT then
-		var _map = {};
-		var f = false;
-		var Dict = use("Runtime.Dict");
-		if (map == null) return this.cp();
-		if (map instanceof Dict) _map = map._map;
-		else if (typeof map == "object") { _map = map; f = true; }
-		var res = this.cp(ctx);
-		for (var key in _map)
-		{
-			res._map[(f ? "|" : "") + key] = _map[key];
-		}
-		return res;
-		#case ifcode PHP then
-		$_map = [];
-		if ($map == null) return $this->cp();
-		if ($map instanceof \Runtime\Dict) $_map = $map->_map;
-		else if (gettype($map) == "array") $_map = $map;
-		$res = $this->cp($ctx);
-		foreach ($_map as $key => $value)
-		{
-			$res->_map[$key] = $value;
-		}
-		return $res;
-		#endswitch
-	}
+	Dict<T> concat(Dict<T> map = null);
 	
 	
 	/**
-	 * Check equal
+	 * Returns vector of the keys
+	 * @return Collection<string>
 	 */
-	public bool equal(Dict item)
-	{
-		if (item == null) return false;
-		
-		Collection keys = (new Collection)
-			.concat(this.keys())
-			.concat(item.keys())
-			.removeDuplicatesIm()
-		;
-		for (int i=0; i<keys.count(); i++)
-		{
-			string key = keys[i];
-			if (not this.has(key)) return false;
-			if (not item.has(key)) return false;
-			if (this.get(key) != item.get(key)) return false;
-		}
-		
-		return true;
-	}
+	Collection<string> keys();
+	
+	
+	/**
+	 * Returns vector of the values
+	 * @return Collection<T>
+	 */
+	Collection<T> values();
+	
+	
+	/**
+	 * Call function map
+	 * @param fn f
+	 * @return Dict
+	 */
+	Dict map(fn f);
+	
+	
+	/**
+	 * Reduce
+	 * @param fn f
+	 * @param var init_value
+	 * @return init_value
+	 */
+	var reduce(fn f, var init_value);
+	
+	
+	/**
+	 * Filter items
+	 * @param fn f
+	 * @return Collection
+	 */
+	Dict<T> filter(fn f);
+	
+	
+	/**
+	 * Call function for each item
+	 * @param fn f
+	 */
+	void each(fn f);
+	
+	
+	/**
+	 * Transition Dict to Vector
+	 * @param fn f
+	 * @return Vector
+	 */
+	Vector<T> transition(fn f);
 }

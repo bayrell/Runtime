@@ -16,25 +16,30 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Entity;
+namespace Runtime;
 
-use Runtime.rtl;
-use Runtime.BaseObject;
-use Runtime.BaseStruct;
-
-
-class Entity extends BaseObject
+class ChainAsync extends Chain
 {
-	/* Entity name */
-	string name = "";
-	
-	
 	/**
-	 * Constructor
+	 * Apply chain
 	 */
-	void constructor(Map obj)
+	void apply(Collection args = null)
 	{
-		parent();
-		this.assign(obj);
+		fn f = async void () use (args, applyItem)
+		{
+			for (int i=0; i<this.chain.count(); i++)
+			{
+				Dict item = this.chain.get(i);
+				Callback f = item.get("callback");
+				#switch
+				#case ifcode PHP then
+				call_user_func_array([$obj, $this->name], $args);
+				#case ifcode JAVASCRIPT then
+				var res = obj[this.name].bind(obj).apply(null, args);
+				if (res instanceof Promise) await res;
+				#endswitch
+			}
+		};
+		return f();
 	}
 }

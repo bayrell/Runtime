@@ -49,7 +49,7 @@ class Callback
 	 */
 	bool exists()
 	{
-		if (not rtl::method_exists(this.obj, this.name))
+		if (not rtl::methodExists(this.obj, this.name))
 		{
 			return false;
 		}
@@ -82,20 +82,18 @@ class Callback
 		#case ifcode PHP then
 		
 		if ($args == null) $args = [];
-		else if ($args instanceof \Runtime\Collection) $args = $args->_arr;
+		else if ($args implements \Runtime\Collection) $args = $args->toArray();
 		
 		$obj = $this->obj;
-		if (gettype($obj) == "string") $obj = rtl::find_class($obj);
+		if (gettype($obj) == "string") $obj = rtl::findClass($obj);
 		return call_user_func_array([$obj, $this->name], $args);
 		
 		#case ifcode JAVASCRIPT then
 		
 		if (args == null) args = [];
-		else args = Array.prototype.slice.call(args);
-		if (typeof ctx != "undefined") args.unshift(ctx);
 		
 		var obj = this.obj;
-		if (typeof obj == "string") obj = Runtime.rtl.find_class(obj);
+		if (typeof obj == "string") obj = Runtime.rtl.findClass(obj);
 		return obj[this.name].bind(obj).apply(null, args);
 		
 		#endswitch

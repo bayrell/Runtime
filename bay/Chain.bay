@@ -26,8 +26,6 @@ use Runtime.Monad;
 class Chain extends Callback
 {
 	public Collection<Dict> chain = [];
-	bool is_async = false;
-	bool is_return_value = true;
 	
 	
 	/**
@@ -45,33 +43,11 @@ class Chain extends Callback
 	bool exists() => true;
 	
 	
-	
 	/**
 	 * Check callback
 	 */
 	void check()
 	{
-	}
-	
-	
-	/**
-	 * Returns true if async
-	 */
-	bool isAsync() => this.is_async;
-	
-	
-	/**
-	 * Returns true if chain functions must returns value
-	 */
-	bool isReturnValue() => this.is_return_value;
-	
-	
-	/**
-	 * Setting the behavior, the chain functions should return a value or not
-	 */
-	Chain setReturnValue(bool value)
-	{
-		this.is_return_value = value;
 	}
 	
 	
@@ -87,22 +63,6 @@ class Chain extends Callback
 	public Chain add(fn f, int priority = 100)
 	{
 		this.chain.push({
-			"async": false,
-			"callback": f,
-			"priority": priority,
-		});
-		return this;
-	}
-	
-	
-	/**
-	 * Add async function to chain
-	 */
-	public Chain addAsync(fn f, int priority = 100)
-	{
-		this.is_async = true;
-		this.chain.push({
-			"async": true,
 			"callback": f,
 			"priority": priority,
 		});
@@ -122,64 +82,19 @@ class Chain extends Callback
 	/**
 	 * Apply chain
 	 */
-	var apply(Collection args = null)
-	{
-		Monad monada = new Monad(args.get(0));
-		if (not this.is_async)
-		{
-			this.applyChain(monada);
-			return monada.value();
-		}
-		else
-		{
-			fn f = async var (Monad monada)
-			{
-				await this.applyChainAsync(monada);
-				return monada.value();
-			};
-			return f(monada);
-		}
-	}
-	
-	
-	/**
-	 * Apply async chain
-	 */
-	async var applyAsync(Collection args = null)
-	{
-		Monad monada = new Monad(args.get(0));
-		await this.applyChainAsync(monada);
-		return monada.value();
-	}
-	
-	
-	/**
-	 * Apply chain
-	 */
-	Monad applyChain(Monad monada)
+	void apply(Collection args = null)
 	{
 		for (int i=0; i<this.chain.count(); i++)
 		{
 			Dict item = this.chain.get(i);
 			Callback f = item.get("callback");
-			monada.map(f, this.is_return_value);
+			#switch
+			#case ifcode PHP then
+			call_user_func_array([$obj, $this->name], $args);
+			#case ifcode JAVASCRIPT then
+			obj[this.name].bind(obj).apply(null, args);
+			#endswitch
 		}
-		return monada;
-	}
-	
-	
-	/**
-	 * Apply async chain
-	 */
-	async Monad applyChainAsync(Monad monada)
-	{
-		for (int i=0; i<this.chain.count(); i++)
-		{
-			Dict item = this.chain.get(i);
-			Callback f = item.get("callback");
-			await monada.mapAsync(f, this.is_return_value);
-		}
-		return monada;
 	}
 	
 	

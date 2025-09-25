@@ -39,9 +39,9 @@ class BaseProvider extends BaseObject
 	 */
 	string getParam(string param_name, var def_value)
 	{
-		if (this.param == null) return def_value;
-		if (this.param.has(param_name)) return def_value;
-		return this.param.get(param_name);
+		if (this.params == null) return def_value;
+		if (this.params.has(param_name)) return def_value;
+		return this.params.get(param_name);
 	}
 	
 	

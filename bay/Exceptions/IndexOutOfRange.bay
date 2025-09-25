@@ -20,12 +20,11 @@ namespace Runtime.Exceptions;
 
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
-use Runtime.Exceptions.AbstractException;
+use Runtime.Exceptions.RuntimeException;
 
 
-class IndexOutOfRange extends AbstractException
+class IndexOutOfRange extends RuntimeException
 {
-	
 	void constructor(int pos, Object prev = null)
 	{
 		parent(
@@ -34,5 +33,4 @@ class IndexOutOfRange extends AbstractException
 			prev
 		);
 	}
-
 }

@@ -121,4 +121,12 @@ class HookProvider extends BaseProvider
 		
 		return res.toCollection();
 	}
+	
+	
+	/**
+	 * Apply hook
+	 */
+	void apply(string hook_name, Map params = null)
+	{
+	}
 }

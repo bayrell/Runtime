@@ -23,16 +23,67 @@ use Runtime.Vector;
 use Runtime.Exceptions.KeyNotFound;
 
 
-class Map<T> extends Dict<T>
+abstract class Map{}
+
+
+#switch
+
+#case ifcode JAVASCRIPT then
+
+Runtime.Map = class extends Map
+{
+	static getNamespace(){ return "Runtime.Map"; }
+};
+
+Object.assign(Map, {
+
+/**
+ * Create map from Object
+ */
+create(obj)
+{
+	return new Map(Object.entries(obj));
+},
+
+
+/**
+ * Create map from Object
+ */
+from(obj)
+{
+	return new Map(Object.entries(obj));
+}
+
+});
+
+Object.assign(Map.prototype, {
+
+/**
+ * Call function for each item
+ * @param fn f
+ */
+each: function(f)
+{
+	for (var key of this.keys())
+	{
+		var value = this.get(key);
+		f(value, key, this);
+	}
+}
+
+});
+
+#case ifcode PHP then
+
+class Map
 {
 	/**
-	 * Returns new Instance
-	 * @return Object
+	 * Returns value from position
+	 * @param string key
+	 * @param T default_value
+	 * @return T
 	 */
-	static Collection<T> Instance(var val = null)
-	{
-		return new Map(val);
-	}
+	T get(string key, T default_value = null);
 	
 	
 	/**
@@ -41,19 +92,15 @@ class Map<T> extends Dict<T>
 	 * @param T value 
 	 * @return self
 	 */
-	public Map<T> set(string key, T value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		key = this.toStr(key);
-		this._map["|" + key] = value;
-		return this;
-		#case ifcode PHP then
-		$key = rtl::toStr($key);
-		$this->_map[$key] = $value;
-		return $this;
-		#endswitch
-	}
+	Dict<T> set(string key, T value);
+	
+	
+	/**
+	 * Return true if key exists
+	 * @param string key
+	 * @return bool var
+	 */
+	bool has(string key);
 	
 	
 	/**
@@ -61,39 +108,76 @@ class Map<T> extends Dict<T>
 	 * @param string key
 	 * @return self
 	 */
-	public Map<T> remove(string key)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		key = this.toStr(key);
-		if (typeof this._map["|" + key] != "undefined")
-		{
-			delete this._map["|" + key];
-		}
-		return this;
-		#case ifcode PHP then
-		$key = rtl::toStr($key);
-		if (isset($this->_map[$key]))
-			unset($this->_map[$key]);
-		return $this;
-		#endswitch
-	}
+	Dict<T> remove(string key);
 	
 	
 	/**
 	 * Clear all values from vector
 	 * @return self
 	 */
-	public Map<T> clear()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		this._map = {};
-		return this;
-		#case ifcode PHP then
-		$this->_map = [];
-		return $this;
-		#endswitch
-	}
+	Dict<T> clear();
+	
+	
+	/**
+	 * Add values from other map
+	 * @param Dict<T> map
+	 * @return self
+	 */
+	Dict<T> concat(Dict<T> map = null);
+	
+	
+	/**
+	 * Returns vector of the keys
+	 * @return Collection<string>
+	 */
+	Collection<string> keys();
+	
+	
+	/**
+	 * Returns vector of the values
+	 * @return Collection<T>
+	 */
+	Collection<T> values();
+	
+	
+	/**
+	 * Call function map
+	 * @param fn f
+	 * @return Dict
+	 */
+	Dict map(fn f);
+	
+	
+	/**
+	 * Reduce
+	 * @param fn f
+	 * @param var init_value
+	 * @return init_value
+	 */
+	var reduce(fn f, var init_value);
+	
+	
+	/**
+	 * Filter items
+	 * @param fn f
+	 * @return Collection
+	 */
+	Dict<T> filter(fn f);
+	
+	
+	/**
+	 * Call function for each item
+	 * @param fn f
+	 */
+	void each(fn f);
+	
+	
+	/**
+	 * Transition Dict to Vector
+	 * @param fn f
+	 * @return Vector
+	 */
+	Vector<T> transition(fn f);
 }
 
+#endswitch

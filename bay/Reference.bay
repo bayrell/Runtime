@@ -24,7 +24,6 @@ use Runtime.rtl;
 
 class Reference<T> extends BaseObject
 {
-	string uq = rtl::unique();
 	T ref = null;
 	
 	

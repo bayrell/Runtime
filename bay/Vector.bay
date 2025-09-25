@@ -23,247 +23,406 @@ use Runtime.Collection;
 use Runtime.Exceptions.IndexOutOfRange;
 
 
-class Vector<T> extends Collection
+abstract class Vector{}
+
+#switch
+#case ifcode JAVASCRIPT then
+
+Runtime.Vector = function(){ Array.call(this, arguments); };
+Runtime.Vector.prototype = Object.create(Array.prototype);
+Runtime.Vector.prototype.constructor = Runtime.Vector;
+
+Object.assign(Runtime.Vector, {
+	getNamespace: function(){ return "Runtime.Vector"; },
+	from: function(arr){ return arr; }
+});
+
+
+Object.assign(Array.prototype, {
+
+/**
+ * Returns value from position
+ * @param int pos - position
+ */
+get: function(pos, defaultValue = null)
 {
-	/**
-	 * Returns new Instance
-	 * @return Object
-	 */
-	static Collection<T> Instance()
+	return (pos >= 0 && pos < this.length) ? this[pos] : defaultValue;
+},
+
+
+/**
+ * Set value to position
+ * @param int pos - position
+ * @param T value
+ */
+set: function(pos, value)
+{
+	if (pos >= 0 && pos < this.length)
 	{
-		return new Vector();
+		this[pos] = value;
 	}
-	
-	
-	/**
-	 * Returns new Vector
-	 * @param int offset
-	 * @param int lenght
-	 * @return Vector<T>
-	 */
-	Vector<T> removeRange(int offset, int length = null)
+},
+
+
+/**
+ * Insert value into array
+ * @param int pos - position
+ * @param T value
+ */
+insert: function(pos, value)
+{
+	this.splice(pos, 0, value);
+},
+
+
+/**
+ * Remove item from array
+ */
+remove: function(pos)
+{
+	this.splice(pos, 1);
+},
+
+
+/**
+ * Flatten Array
+ */
+flatten: function()
+{
+	var res = [];
+	for (var i=0; i<this.length; i++)
 	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (offset == undefined) offset = 0;
-		if (length == undefined)
+		if (Array.isArray(this[i]))
+			res = res.concat(this[i]);
+		else res.push(this[i]);
+	}
+	return res;
+},
+
+
+/**
+ * Find item
+ */
+find: function(f)
+{
+	var index = this.findIndex(f);
+	if (index == -1) return null;
+	return this[index];
+},
+
+
+/**
+ * Get first item
+ */
+first: function(value)
+{
+	return (this.length > 0) ? this[0] : (value ? value : null);
+},
+
+
+/**
+ * Get last item
+ */
+last: function(value)
+{
+	return (this.length > 0) ? this[this.length - 1] : (value ? value : null);
+},
+
+
+/**
+ * Each
+ */
+each: Array.prototype.forEach,
+
+
+/**
+ * Transition
+ */
+transition: function(f)
+{
+	return this.reduce(function(map, value, key){
+		if (f) res = f(value, key, this);
+		else res = [value, key];
+		map.set(res[1], res[0]);
+	}, new Map());
+},
+
+
+/**
+ * Append items
+ */
+appendItems: function(arr)
+{
+	for (var item of arr) this.push(item);
+},
+
+
+/**
+ * Returns count items in Array
+ */
+count: function(){ return this.length; },
+
+
+/**
+ * Remove dublicate values
+ */
+removeDuplicates: function()
+{
+	var res = [];
+	for (var i=0; i<this.length; i++)
+	{
+		var p = res.indexOf(this[i]);
+		if (p == -1)
 		{
-			var arr = Array.prototype.slice.call(this, offset);
-			Object.setPrototypeOf(arr, this.constructor.prototype);
-			return arr;
+			res.push(this[i]);
 		}
-		if (length >= 0)
+	}
+	return res;
+},
+
+});
+
+
+#case ifcode PHP then
+
+class Vector implements ArrayAccess
+{
+	var $_arr = [];
+	
+	
+	/**
+	 * Returns namespace
+	 */
+	static function getNamespace(){ return "Runtime.Vector"; }
+	
+	
+	/**
+	 * Create vector
+	 */
+	static create($arr)
+	{
+		$res = new static();
+		$res->_arr = $arr;
+		return $res;
+	}
+	
+	
+	/**
+	 * Constructor
+	 */
+	function __construct()
+	{
+		$this->_arr = func_get_args();
+	}
+	
+	
+	/**
+	 * Returns value from position
+	 * @param int pos - position
+	 */
+	function get($pos, $default_value = null)
+	{
+		return ($pos >= 0 && $pos < count($this->_arr)) ? $this->_arr[$pos] : $default_value;
+	}
+	
+	
+	/**
+	 * Set value to position
+	 * @param int pos - position
+	 * @param T value 
+	 */
+	function set($pos, $value)
+	{
+		if ($pos >= 0 && $pos < count($this->_arr))
 		{
-			length = offset + length;
+			$this->_arr[$pos] = $value;
 		}
-		Array.prototype.splice.call(this, offset, length);
-		return this;
-		#case ifcode PHP then
-		array_splice($this->_arr, $offset, $length);
-		return $this;
-		#endswitch
 	}
-	
-	
-	/**
-	 * Remove item
-	 */
-	public Vector<T> remove(int pos)
-	{
-		if (pos == -1) return this;
-		#switch
-		#case ifcode JAVASCRIPT then
-		Array.prototype.splice.call(this, pos, 1);
-		return this;
-		#case ifcode PHP then
-		array_splice($this->_arr, $pos, 1);
-		return $this;
-		#endswitch
-	}
-	public Vector<T> removeItem(T item) => this.remove(this.indexOf(item));
-	
-	
-	/**
-	 * Append value to the end of array
-	 * @param T value
-	 */
-	public Vector<T> append(T value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		Array.prototype.push.call(this, value);
-		return this;
-		#case ifcode PHP then
-		$this->_arr[] = $value;
-		return $this;
-		#endswitch
-	}
-	public Collection<T> push(T value) => this.append(value);
 	
 	
 	/**
 	 * Insert first value size_to array
 	 * @return T value
 	 */
-	public Vector<T> prepend(T value)
+	function insert($pos, $value)
 	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		Array.prototype.unshift.call(this, value);
-		return this;
-		#case ifcode PHP then
-		array_unshift($this->_arr, $value);
-		return $this;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Extract last value from array
-	 * @return T value
-	 */
-	public T pop()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		return Array.prototype.pop.call(this);
-		#case ifcode PHP then
-		return array_pop($this->_arr);
-		#endswitch
-	}
-	
-	
-	/**
-	 * Extract first value from array
-	 * @return T value
-	 */
-	public T shift()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		return Array.prototype.shift.call(this);
-		#case ifcode PHP then
-		array_shift($this->_arr);
-		return $this;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Insert value to position
-	 * @param int pos - position
-	 * @param T value
-	 */
-	public Vector<T> insert(int pos, T value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		Array.prototype.splice.call(this, pos, 0, value);
-		return this;
-		#case ifcode PHP then
 		array_splice($this->_arr, $pos, 0, [$value]);
-		return $this;
-		#endswitch
 	}
 	
 	
 	/**
-	 * Add value to position
-	 * @param int pos - position
-	 * @param T value
-	 * @param string kind - after or before
+	 * Remove item from array
 	 */
-	public int add(T value, int pos = -1, string kind = "after")
+	function remove($pos)
 	{
-		if (pos == -1)
+		array_splice($this->_arr, $pos, 1);
+	}
+	
+	
+	/**
+	 * Append value to the end of array
+	 * @param T value
+	 */
+	function push($value)
+	{
+		array_push($this->_arr, $value);
+	}
+	
+	
+	/**
+	 * Flatten Vector
+	 */
+	function flatten()
+	{
+		$res = new Vector();
+		foreach ($this->_arr as $item)
 		{
-			if (kind == "before")
+			if ($item instanceof Vector)
 			{
-				this.prepend(value);
-				return 0;
+				array_splice($res->_arr, $res->count(), 0, $item->_arr);
 			}
 			else
 			{
-				this.append(value);
-				return this.count() - 1;
+				$res->push($item);
 			}
 		}
-		if (kind == "after") pos = pos + 1;
-		this.insert(pos, value, kind);
-		return pos;
+		return $res;
 	}
 	
 	
 	/**
-	 * Add value to position
-	 * @param int pos - position
+	 * Find value in array. Returns -1 if value not found.
 	 * @param T value
-	 * @param string kind - after or before
+	 * @return  int
 	 */
-	public int addItem(T value, T dest_item, string kind = "after")
+	function indexOf($value)
 	{
-		int pos = this.indexOf(dest_item);
-		return this.add(value, pos, kind);
+		$pos = array_search($value, $this->_arr, true);
+		if ($pos === false) return -1;
+		return $pos;
 	}
 	
 	
 	/**
-	 * Set value size_to position
-	 * @param int pos - position
-	 * @param T value 
+	 * Find item
+	 * @param fn f - Find function
+	 * @return item
 	 */
-	public T set(int pos, T value)
+	function find($f)
 	{
-		pos = pos % this.count();
-		
-		#switch
-		#case ifcode JAVASCRIPT then
-		
-		this[pos] = value;
-		return this;
-		#case ifcode PHP then
-		
-		$this->_arr[$pos] = $value;
-		return $this;
-		#endswitch
+		$index = $this->findIndex($f);
+		if (!$index) return null;
+		return $this[$index];
 	}
 	
 	
 	/**
-	 * Remove value
+	 * Find item pos
+	 * @param fn f - Find function
+	 * @return int - position
 	 */
-	public Vector<T> removeValue(T value)
+	function findIndex($f)
 	{
-		var index = this.indexOf(value);
-		if (index != -1) this.remove(index, 1);
-		return this;
+		$index = array_find_key($this->_arr, function($value, $key) use ($f){
+			return $f($value, $key, $this);
+		});
+		if (!$index) return null;
+		return $index;
 	}
 	
 	
 	/**
-	 * Find value and remove
+	 * Get first item
 	 */
-	Collection<T> findAndRemove(fn f)
+	function first($default_value = null)
 	{
-		var index = this.find(f);
-		if (index != -1) this.remove(index);
-		return this;
+		if ($this->count() == 0) return $default_value;
+		return $this->_arr[0];
 	}
 	
 	
 	/**
-	 * Clear all values from vector
+	 * Get last item
 	 */
-	public Vector<T> clear()
+	function last($default_value = null)
 	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		Array.prototype.splice.call(this, 0, this.length);
-		return this;
-		#case ifcode PHP then
-		$this->_arr = [];
-		return $this;
-		#endswitch
+		$count = $this->count();
+		if ($count == 0) return $default_value;
+		return $this->_arr[$count - 1];
+	}
+	
+	
+	/**
+	 * Map
+	 * @param fn f
+	 * @return Vector
+	 */
+	function map($f)
+	{
+		$res = new static();
+		$res->_arr = array_map(function($item, $index) use ($f){
+			return $f($item, $index, $this);
+		}, $this->_arr, array_keys($this->_arr));
+		return $res;
+	}
+	
+	
+	/**
+	 * Reduce
+	 * @param fn f
+	 * @param var value
+	 * @return value
+	 */
+	function reduce(fn f, var value)
+	{
+		foreach ($this->_arr as $key => $item)
+		{
+			$value = $f($value, $item, $key, $this);
+		}
+		return $value;
+	}
+	
+	
+	/**
+	 * Filter items
+	 * @param fn f
+	 * @return Vector
+	 */
+	function filter($f)
+	{
+		$res = new static();
+		$res->_arr = array_filter($this->_arr, function($value, $key) use ($f){
+			return $f($value, $key, $this);
+		}, ARRAY_FILTER_USE_BOTH);
+		return $res;
+	}
+	
+	
+	/**
+	 * Call function for each item
+	 * @param fn f
+	 */
+	function each($f)
+	{
+		foreach ($this->_arr as $key => $value)
+		{
+			$f($value, $key, $this);
+		}
+	}
+	
+	
+	/**
+	 * Transition Collection to Dict
+	 * @param fn f
+	 * @return Dict
+	 */
+	function transition($f = null)
+	{
+		return $this->reduce(function($map, $value, $key){
+			if ($f) $res = $f($value, $key, $this);
+			else $res = [$value, $key];
+			$map->set($res[1], $res[0]);
+		}, new \Runtime\Map());
 	}
 	
 	
@@ -271,28 +430,94 @@ class Vector<T> extends Collection
 	 * Append vector to the end of the vector
 	 * @param Collection<T> arr
 	 */
-	public Vector<T> appendItems(Collection<T> items)
+	function concat($arr)
 	{
-		items.each(
-			void (var item)
-			{
-				this.push(item);
-			}
-		);
+		$res = new static();
+		$res->_arr = array_merge($this->_arr, $arr->_arr);
+		return $res;
 	}
 	
 	
 	/**
-	 * Prepend vector to the end of the vector
-	 * @param Collection<T> arr
+	 * Append items
 	 */
-	public Vector<T> prependItems(Collection<T> items)
+	function appendItems($arr)
 	{
-		items.each(
-			void (var item)
+		$this->_arr = array_merge($this->_arr, $arr->_arr);
+	}
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	function count()
+	{
+		return count($this->_arr);
+	}
+	
+	
+	/**
+	 * Returns new Collection
+	 * @param int offset
+	 * @param int length
+	 * @return Collection<T>
+	 */
+	function slice($offset = 0, $length = null)
+	{
+		if ($length == null) $length = $this->count() - $offset;
+		$res = new static();
+		$res->_arr = array_slice($this->_arr, $offset, $length);
+		return $res;
+	}
+	
+	
+	/**
+	 * Sort Collection
+	 * @param fn f - Sort user function
+	 */
+	sort($f = null)
+	{
+		if ($f) usort($this->_arr, $f);
+		else sort($this->_arr);
+	}
+	
+	
+	/**
+	 * Reverse Collection
+	 */
+	reverse()
+	{
+		$this->_arr = array_reverse($this->_arr);
+	}
+	
+	
+	/**
+	 * Remove dublicate values
+	 */
+	function removeDuplicates()
+	{
+		$res = new static();
+		for ($i=0; $i<$this->count(); $i++)
+		{
+			$pos = array_search($value, $res->_arr, true);
+			if ($pos === false)
 			{
-				this.prepend(item);
+				$res->_arr[] = $this[$i];
 			}
-		);
+		}
+		return $res;
+	}
+	
+	
+	/**
+	 * Get and set methods
+	 */
+	function offsetExists($k){return isset($this->_arr[$k]);}
+	function offsetGet($k){return $this->get($k);}
+	function offsetSet($k, $v){$this->set($k, $v);}
+	function offsetUnset($k){
+		throw new \Runtime\Exceptions\RuntimeException("Can't to remove item");
 	}
 }
+
+#endswitch

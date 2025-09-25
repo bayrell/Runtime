@@ -25,29 +25,21 @@ use Runtime.BaseStruct;
 use Runtime.Callback;
 use Runtime.Entity.Entity;
 use Runtime.Entity.Provider;
+use Runtime.Exceptions.ItemNotFound;
 use Runtime.Exceptions.RuntimeException;
 use Runtime.Hooks.RuntimeHook;
 
 
 class Context extends BaseObject
 {
-	protected var app = null;
+	protected Dict<string> environments = {};
+	protected Dict<BaseObject> providers = {};
+	protected Collection<string> modules = [];
+	protected Collection<BaseStruct> entities = [];
 	protected string base_path = "";
-	protected string entry_point = "";
-	protected Vector<string> cli_args = [];
-	protected Map<string> environments = {};
-	protected Vector<string> modules = [];
-	protected Map<BaseObject> providers = {};
-	protected Vector<BaseStruct> entities = [];
 	protected int start_time = 0;
 	protected bool initialized = false;
 	protected bool started = false;
-	
-	
-	/**
-	 * Returns app
-	 */
-	var getApp() => this.app;
 	
 	
 	/**
@@ -75,18 +67,6 @@ class Context extends BaseObject
 	
 	
 	/**
-	 * Returns console args
-	 */
-	Vector<string> getConsoleArgs() => this.cli_args.slice();
-	
-	
-	/**
-	 * Returns modules
-	 */
-	Vector<string> getModules() => this.modules.slice();
-	
-	
-	/**
 	 * Returns entities
 	 */
 	Vector<string> getEntities(string class_name = "")
@@ -95,14 +75,16 @@ class Context extends BaseObject
 		{
 			return this.entities.slice();
 		}
-		return this.entities.filter(lib::isInstance(class_name));
+		return this.entities.filter(
+			bool (string entity_name) use (class_name) => rtl::isInstanceOf(entity_name, class_name)
+		);
 	}
 	
 	
 	/**
 	 * Returns environments
 	 */
-	Map<string> getEnvironments() => this.environments.copy();
+	Dict<string> getEnvironments() => this.environments.copy();
 	
 	
 	/**
@@ -112,7 +94,7 @@ class Context extends BaseObject
 	{
 		if (not this.providers.has(provider_name))
 		{
-			throw new RuntimeException("Provider '" ~ provider_name ~ "' not found");
+			throw new ItemNotFound(provider_name, "Provider");
 		}
 		return this.providers.get(provider_name);
 	}
@@ -123,34 +105,20 @@ class Context extends BaseObject
 	 */
 	var env(string name)
 	{
-		var value = this.environments[name];
-		
-		Map hook_res = this.callHook(RuntimeHook::ENV, {
-			"name": name,
-			"value": value,
-		});
-		
-		return hook_res["value"];
+		var value = this.environments.get(name);
+		Dict res = { "name": name, "value": value };
+		this.hook(RuntimeHook::ENV, res);
+		return res.get("value");
 	}
 	
 	
 	/**
-	 * Create context
+	 * Init params
 	 */
-	static Context create(Dict params)
+	static void initParams(Dict params)
 	{
-		if (not (params instanceof Dict))
-		{
-			params = Dict::@from(params);
-		}
-		
-		params = params.toMap();
-		
 		#switch
-		
 		#case ifcode PHP then
-		
-		
 		#case ifcode JAVASCRIPT then
 		
 		if (!params.has("start_time"))
@@ -163,51 +131,47 @@ class Context extends BaseObject
 		let Map = use("Runtime.Map");
 		let Vector = use("Runtime.Vector");
 		
-		if (!params.has(ctx, "cli_args"))
+		if (!params.has("cli_args"))
 		{
-			params.set(ctx, "cli_args", Vector.from(process.argv.slice(1)));
+			params.set("cli_args", Vector.from(process.argv.slice(1)));
 		}
-		if (!params.has(ctx, "base_path"))
+		if (!params.has("base_path"))
 		{
-			params.set(ctx, "base_path", process.cwd());
+			params.set("base_path", process.cwd());
 		}
-		if (!params.has(ctx, "environments"))
+		if (!params.has("environments"))
 		{
-			params.set(ctx, "environments", Map.from(process.env));
+			params.set("environments", Map.from(process.env));
 		}
 		
 		#endswitch
 		
-		if (params.has("modules"))
-		{
-			var modules = params.get("modules");
-			if (not(modules instanceof Vector))
-			{
-				modules = Vector::@from(modules);
-			}
-			params.set("modules", modules.toVector());
-		}
-		
 		/* Setup default environments */
 		if (not params.has("environments")) params.set("environments", new Map());
 		
-		Map env = params.get("environments");
-		if (not env) env = {};
+		Dict env = params.get("environments");
 		if (not env.has("CLOUD_ENV")) env.set("CLOUD_ENV", false);
 		if (not env.has("DEBUG")) env.set("DEBUG", false);
 		if (not env.has("LOCALE")) env.set("LOCALE", "en_US");
 		if (not env.has("TZ")) env.set("TZ", "UTC");
 		if (not env.has("TZ_OFFSET")) env.set("TZ_OFFSET", 0);
 		
-		Context instance = rtl::newInstance(static::getClassName());
-		if (params.has("base_path")) instance.base_path = params.get("base_path");
-		if (params.has("entry_point")) instance.entry_point = params.get("entry_point");
-		if (params.has("cli_args")) instance.cli_args = params.get("cli_args");
-		if (params.has("environments")) instance.environments = params.get("environments");
-		if (params.has("modules")) instance.modules = params.get("modules");
-		if (params.has("start_time")) instance.start_time = params.get("start_time");
-		if (params.has("tz")) instance.tz = params.get("tz");
-		return instance;
+		return params;
+	}
+	
+	
+	/**
+	 * Constructor
+	 */
+	void constructor(Dict params)
+	{
+		parent();
+		if (params.has("base_path")) this.base_path = params.get("base_path");
+		if (params.has("entry_point")) this.entry_point = params.get("entry_point");
+		if (params.has("cli_args")) this.cli_args = params.get("cli_args");
+		if (params.has("environments")) this.environments = params.get("environments");
+		if (params.has("modules")) this.modules = params.get("modules");
+		if (params.has("start_time")) this.start_time = params.get("start_time");
 	}
 	
 	
@@ -218,17 +182,8 @@ class Context extends BaseObject
 	{
 		if (this.initialized) return;
 		
-		/* Create app */
-		if (this.entry_point)
-		{
-			this.app = rtl::newInstance(this.entry_point);
-		}
-		
-		Vector<string> modules = this.modules;
-		if (modules.indexOf("Runtime")) modules.prepend("Runtime");
-		
 		/* Extend modules */
-		this.modules = static::getRequiredModules(modules);
+		this.modules = static::getRequiredModules(this.modules);
 		
 		/* Get modules entities */
 		this.entities = static::getEntitiesFromModules(this.modules);
@@ -240,13 +195,7 @@ class Context extends BaseObject
 		await this.initProviders();
 		
 		/* Hook init app */
-		await this.callHookAsync(RuntimeHook::INIT);
-		
-		/* Init app */
-		if (this.app != null and rtl::method_exists(this.app, "init"))
-		{
-			await this.app.init();
-		}
+		await this.hook(RuntimeHook::INIT);
 		
 		/* Set initialized */
 		this.initialized = true;
@@ -264,16 +213,7 @@ class Context extends BaseObject
 		await this.startProviders();
 		
 		/* Hook start app */
-		await this.callHookAsync(RuntimeHook::START);
-		
-		/* Start app */
-		if (this.app and rtl::method_exists(this.app, "start"))
-		{
-			await this.app.start();
-		}
-		
-		/* Hook launched app */
-		await this.callHookAsync(RuntimeHook::LAUNCHED);
+		await this.hook(RuntimeHook::START);
 		
 		/* Set started */
 		this.started = true;
@@ -285,77 +225,7 @@ class Context extends BaseObject
 	 */
 	async int run()
 	{
-		int code = 0;
-		
-		/* Run app */
-		if (this.app == null)
-			return;
-		
-		/* Run entry_point */
-		if (rtl::method_exists(this.app, "main"))
-		{
-			/* Hook launched app */
-			await this.callHookAsync(RuntimeHook::RUN);
-			
-			code = await this.app.main();
-		}
-		
-		return code;
-	}
-	
-	
-	/**
-	 * Call hook
-	 */
-	Map callHook(string hook_name, Map params = null)
-	{
-		if (params == null) params = {};
-		
-		if (not this.providers.has("hook")) return params;
-		var hook = this.provider("hook");
-		Collection<Callback> methods_list = hook.getMethods(hook_name);
-		
-		for (int i=0; i<methods_list.count(); i++)
-		{
-			Callback f = methods_list[i];
-			var res = rtl::apply(f, [params]);
-			if (rtl::isPromise(res))
-			{
-				throw new RuntimeException("Promise is not allowed");
-			}
-		}
-		
-		return params;
-	}
-	
-	
-	/**
-	 * Call hook
-	 */
-	async Map callHookAsync(string hook_name, Map params = null)
-	{
-		if (params == null) params = {};
-		
-		var hook = this.provider("hook");
-		Collection<Callback> methods_list = hook.getMethods(hook_name);
-		
-		for (int i=0; i<methods_list.count(); i++)
-		{
-			Callback f = methods_list[i];
-			await rtl::apply(f, [params]);
-		}
-		
-		return params;
-	}
-	
-	
-	/**
-	 * Translate message
-	 */
-	string translate(string module, string s, Dict params = null)
-	{
-		if (params == null) return s;
-		return rs::format(s, params);
+		return 0;
 	}
 	
 	
@@ -373,41 +243,11 @@ class Context extends BaseObject
 			BaseProvider provider = factory.createInstance();
 			if (not provider)
 			{
-				throw new RuntimeException("Wrong declare provider '" ~ factory.name ~ "'");
+				throw new RuntimeException("Can't to create provider '" ~ factory.name ~ "'");
 			}
 			
 			/* Add provider */
 			this.registerProvider(factory.name, provider);
-		}
-	}
-	
-	
-	/**
-	 * Init providers
-	 */
-	protected async void initProviders()
-	{
-		Vector<string> providers_names = this.providers.keys();
-		for (int i=0; i<providers_names.count(); i++)
-		{
-			string provider_name = providers_names.get(i);
-			BaseProvider provider = this.providers.get(provider_name);
-			await provider.init();
-		}
-	}
-	
-	
-	/**
-	 * Start providers
-	 */
-	protected async void startProviders()
-	{
-		Vector<string> providers_names = this.providers.keys();
-		for (int i=0; i<providers_names.count(); i++)
-		{
-			string provider_name = providers_names.get(i);
-			BaseProvider provider = this.providers.get(provider_name);
-			await provider.start();
 		}
 	}
 	
@@ -430,11 +270,61 @@ class Context extends BaseObject
 	
 	
 	/**
+	 * Init providers
+	 */
+	protected async void initProviders()
+	{
+		Vector<string> providers_names = rtl::list(this.providers.keys());
+		for (int i=0; i<providers_names.count(); i++)
+		{
+			string provider_name = providers_names.get(i);
+			BaseProvider provider = this.providers.get(provider_name);
+			await provider.init();
+		}
+	}
+	
+	
+	/**
+	 * Start providers
+	 */
+	protected async void startProviders()
+	{
+		Vector<string> providers_names = rtl::list(this.providers.keys());
+		for (int i=0; i<providers_names.count(); i++)
+		{
+			string provider_name = providers_names.get(i);
+			BaseProvider provider = this.providers.get(provider_name);
+			await provider.start();
+		}
+	}
+	
+	
+	/**
+	 * Call hook
+	 */
+	Map hook(string hook_name, Map params = null)
+	{
+		var hook = this.provider("hook");
+		return hook.apply(hook_name, params);
+	}
+	
+	
+	/**
+	 * Translate message
+	 */
+	string translate(string module, string s, Dict params = null)
+	{
+		if (params == null) return s;
+		return rs::format(s, params);
+	}
+	
+	
+	/**
 	 * Returns all modules
 	 * @param Collection<string> modules
 	 * @return Collection<string>
 	 */
-	pure Vector<string> getRequiredModules(Collection<string> modules)
+	static Vector<string> getRequiredModules(Collection<string> modules)
 	{
 		Vector<string> res = new Vector();
 		Map<string> cache = new Map();
@@ -448,7 +338,7 @@ class Context extends BaseObject
 	 * @param string class_name
 	 * @return Collection<string>
 	 */
-	pure void _getRequiredModules
+	static void _getRequiredModules
 	(
 		Vector<string> res,
 		Map<string> cache,
@@ -458,7 +348,7 @@ class Context extends BaseObject
 		if (modules == null) return;
 		for (int i=0; i<modules.count(); i++)
 		{
-			string module_name = modules.item(i);
+			string module_name = modules.get(i);
 			if (not cache.has(module_name))
 			{
 				cache.set(module_name, true);
@@ -481,22 +371,18 @@ class Context extends BaseObject
 	/**
 	 * Returns modules entities
 	 */
-	pure Collection<Entity> getEntitiesFromModules(Collection<string> modules)
+	static Collection<Entity> getEntitiesFromModules(Collection<string> modules)
 	{
-		Vector<Entity> entities = new Vector();
-		for (int i=0; i<modules.count(); i++)
-		{
-			string module_name = modules.item(i);
-			Callback f = new Callback(module_name ~ ".ModuleDescription", "entities");
-			if (f.exists())
+		return modules.reduce(
+			void (Collection entities, string module_name)
 			{
+				Callback f = new Callback(module_name ~ ".ModuleDescription", "entities");
+				if (!f.exists()) return entities;
 				Vector<Entity> arr = f.apply();
-				if (arr)
-				{
-					entities.appendItems(arr);
-				}
-			}
-		}
-		return entities;
+				if (!arr) return entities;
+				return entities.concat(arr);
+			},
+			new Vector()
+		);
 	}
 }

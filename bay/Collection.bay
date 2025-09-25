@@ -23,323 +23,41 @@ use Runtime.Exceptions.IndexOutOfRange;
 use Runtime.Exceptions.RuntimeException;
 
 
-abstract class _Collection{}
-
-#switch
-#case ifcode NODEJS then
-if (typeof Runtime == 'undefined') Runtime = {};
-Runtime._Collection = function()
+interface Collection<T>
 {
-	Array.call(this);
-	if (arguments.length > 0)
-	{
-		for (var i=1; i<arguments.length; i++)
-		{
-			Array.prototype.push.call(this, arguments[i]);
-		}
-	}
-	this.__uq__ = Symbol();
-}
-#case ifcode ES6 then
-if (typeof Runtime == 'undefined') Runtime = {};
-Runtime._Collection = function()
-{
-	Array.call(this);
-	if (arguments.length > 0)
-	{
-		for (var i=0; i<arguments.length; i++)
-		{
-			Array.prototype.push.call(this, arguments[i]);
-		}
-	}
-	this.__uq__ = Symbol();
-}
-#case ifcode JAVASCRIPT then
-Runtime._Collection.prototype = Object.create(Array.prototype);
-Runtime._Collection.prototype.constructor = Runtime._Collection;
-Object.assign(Runtime._Collection.prototype,
-{
-	toArray: function()
-	{
-		return Array.prototype.slice.call(this);
-	},
-	toStr: function(value)
-	{
-		return use("Runtime.rtl").toStr(value);
-	}
-});
-Object.assign(Runtime._Collection,
-{
-	from: function(arr)
-	{
-		var res = this.Instance();
-		if (arr == undefined && arr == null) return this.Instance();
-		
-		if (Array.isArray(arr))
-		{
-			var new_arr = arr.slice();
-			Object.setPrototypeOf(new_arr, this.prototype);
-			return new_arr;
-		}
-		
-		var res = this.Instance();
-		if (
-			arr instanceof Int8Array ||
-			arr instanceof Uint8Array ||
-			arr instanceof Int16Array ||
-			arr instanceof Uint16Array ||
-			arr instanceof Int32Array ||
-			arr instanceof Uint32Array ||
-			arr instanceof Float32Array ||
-			arr instanceof Float64Array
-		)
-		{
-			for (var i=0; i<arr.length; i++)
-			{
-				Array.prototype.push.call(res, arr[i]);
-			}
-		}
-		
-		return res;	
-	},
-	getNamespace: function(){ return "Runtime"; },
-	getClassName: function(){ return "Runtime._Collection"; },
-	getParentClassName: function(){ return ""; },
-});
-#case ifcode NODEJS then
-use.add(Runtime._Collection);
-#case ifcode PHP then
-class _Collection
-{
-	var $_arr = [];
-	
-	
-	/**
-	 * From
-	 */
-	static function from($arr)
-	{
-		$class_name = static::class;
-		$res = new $class_name();
-		if ($arr != null)
-		{
-			if ($arr instanceof \Runtime\Collection)
-			{
-				$res->_arr = $arr->_arr;
-			}
-			else if (gettype($arr) == 'array') $res->_arr = $arr;
-		}
-		return $res;	
-	}
-	
-	
-	/**
-	 * JsonSerializable
-	 */
-	function jsonSerialize()
-	{
-		return $this->_arr;
-	}
-	
-	
-	/**
-	 * Constructor
-	 */
-	function __construct()
-	{
-		$count = func_get_args();
-		if ($count > 0)
-		{
-			$this->_arr = array_slice($count, 0);
-		}
-	}
-	
-	
-	/**
-	 * Destructor
-	 */
-	function __destruct()
-	{
-		unset($this->_arr);
-	}
-	
-	
-	/**
-	 * Get array
-	 */
-	function _getArr()
-	{
-		return $this->_arr;
-	}
-	
-	
-	/**
-	 * Get and set methods
-	 */
-	/*
-	function __isset($k){return isset($this->_arr[$k]);}
-	function __get($k){return $this->item(\Runtime\rtl::getContext(), $k);}
-	function __set($k,$v){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
-	}
-	function __unset($k){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
-	}
-	function offsetExists($k){return isset($this->_arr[$k]);}
-	function offsetGet($k){return $this->item(\Runtime\rtl::getContext(), $k);}
-	function offsetSet($k,$v){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
-	}
-	function offsetUnset($k){
-		throw new \Runtime\Exceptions\AssignStructValueError(\Runtime\rtl::getContext(), $k);
-	}
-	*/
-	
-	/* Class name */
-	static function getClassName(){return "Runtime._Collection";}
-	static function getParentClassName(){return "";}
-	
-}
-
-#endswitch
-
-
-class Collection<T> extends _Collection
-{
-	/**
-	 * Returns new Instance
-	 * @return Object
-	 */
-	static Collection<T> Instance()
-	{
-		return new Collection();
-	}
-	
-	
-	/**
-	 * Returns new Instance
-	 * @return Object
-	 */
-	static Collection<T> create(var arr)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		return this.from(arr);
-		#case ifcode PHP then
-		return static::from($arr);
-		#endswitch
-	}
-	
-	
-	/**
-	 * Returns copy of Collection
-	 * @param int pos - position
-	 */
-	Collection<T> cp()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var arr = Array.prototype.slice.call(this);
-		Object.setPrototypeOf(arr, this.constructor.prototype);
-		return arr;
-		#case ifcode PHP then
-		$class_name = static::class;
-		$arr2 = new $class_name();
-		if ($this->_arr == null) $arr2->_arr = [];
-		else $arr2->_arr = array_slice($this->_arr, 0);
-		return $arr2;
-		#endswitch
-	}
-	Collection<T> copy() => this.cp();
-	
-	
-	/**
-	 * Convert to collection
-	 */
-	Collection<T> toCollection()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var obj = Array.prototype.slice.call(this);
-		Object.setPrototypeOf(obj, Runtime.Collection.prototype);
-		return obj;
-		#case ifcode PHP then
-		return \Runtime\Collection::from($this);
-		#endswitch
-	}
-	
-	
-	/**
-	 * Convert to vector
-	 */
-	Vector<T> toVector()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var obj = Array.prototype.slice.call(this);
-		Object.setPrototypeOf(obj, use("Runtime.Vector").prototype);
-		return obj;
-		#case ifcode PHP then
-		return \Runtime\Vector::from($this);
-		#endswitch
-	}
-	
-	
 	/**
 	 * Returns value from position
 	 * @param int pos - position
 	 */
-	T get(int pos, T default_value = null)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (pos < 0 || pos >= this.length) return default_value;
-		var val = this[pos];
-		return val;
-		#case ifcode PHP then
-		if ($pos < 0 || $pos >= count($this->_arr)) return $default_value;
-		$val = isset($this->_arr[$pos]) ? $this->_arr[$pos] : $default_value;
-		return $val;
-		#endswitch
-	}
+	T get(int pos, T default_value = null);
 	
 	
 	/**
-	 * Returns value from position. Throw exception, if position does not exists
+	 * Set value to position
 	 * @param int pos - position
+	 * @param T value
 	 */
-	T item(int pos)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (pos < 0 || pos >= this.length)
-		{
-			var _IndexOutOfRange = use("Runtime.Exceptions.IndexOutOfRange");
-			throw new _IndexOutOfRange(pos);
-		}
-		return this[pos];
-		#case ifcode PHP then
-		if (!array_key_exists($pos, $this->_arr))
-		{
-			throw new \Runtime\Exceptions\IndexOutOfRange($pos);
-		}
-		return $this->_arr[$pos];
-		#endswitch
-	}
+	public T set(int pos, T value);
 	
 	
 	/**
-	 * Returns count items in vector
+	 * Insert first value to array
+	 * @return T value
 	 */
-	int count()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		return this.length;
-		#case ifcode PHP then
-		return count($this->_arr);
-		#endswitch
-	}
+	public Vector<T> insert(int pos, T value);
+	
+	
+	/**
+	 * Append value to the end of array
+	 * @param T value
+	 */
+	public Vector<T> push(T value);
+	
+	
+	/**
+	 * Flatten Collection
+	 */
+	Collection flatten();
 	
 	
 	/**
@@ -347,191 +65,35 @@ class Collection<T> extends _Collection
 	 * @param T value
 	 * @return  int
 	 */
-	int indexOf(T value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		for (var i=0; i<this.count(); i++)
-		{
-			if (this[i] == value)
-				return i;
-		}
-		return -1;
-		#case ifcode PHP then
-		$pos = array_search($value, $this->_arr, true);
-		if ($pos === false) return -1;
-		return $pos;
-		#endswitch
-	}
+	int indexOf(T value);
 	
 	
 	/**
-	 * Find value in array, and returns position. Returns -1 if value not found.
-	 * @param T value
-	 * @param int pos_begin - begin position
-	 * @param int pos_end - end position
-	 * @return  int
+	 * Find item
+	 * @param fn f - Find function
+	 * @return int - position
 	 */
-	int indexOfRange(T value, int pos_begin, int pos_end)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var pos = Array.prototype.indexOf.call(this, value, pos_begin);
-		if (pos == -1 || pos > pos_end)
-			return -1;
-		return pos;
-		#case ifcode PHP then
-		$pos = $this->indexOf($value);
-		if ($pos == -1 or $pos > $pos_end or $pos < $pos_begin)
-			return -1;
-		return $pos;
-		#endswitch
-	}
+	int find(fn f);
+	
+	
+	/**
+	 * Find item pos
+	 * @param fn f - Find function
+	 * @return int - position
+	 */
+	int findIndex(fn f);
 	
 	
 	/**
 	 * Get first item
 	 */
-	T first(T default_value = null)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (this.length == 0) return default_value;
-		return this[0];
-		#case ifcode PHP then
-		$c = count($this->_arr);
-		if ($c == 0) return $default_value;	
-		return $this->_arr[0];
-		#endswitch
-	}
+	T first(T default_value = null);
 	
 	
 	/**
 	 * Get last item
 	 */
-	T last(T default_value = null, int pos = -1)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (pos == undefined) pos = -1;
-		if (this.length == 0) return default_value;
-		if (this.length + pos + 1 == 0) return default_value;
-		return this[this.length + pos];
-		#case ifcode PHP then
-		$c = count($this->_arr);
-		if ($c == 0) return $default_value;
-		if ($c + $pos + 1 == 0) return $default_value;
-		return isset( $this->_arr[$c+$pos] ) ? $this->_arr[$c+$pos] : $default_value;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Append value to the end of the Collection and return new Collection
-	 * @param T value
-	 */
-	Collection<T> pushIm(T value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var arr = this.cp();
-		Array.prototype.push.call(arr, value);
-		return arr;
-		#case ifcode PHP then
-		$res = $this->cp();
-		$res->_arr[] = $value;
-		return $res;
-		#endswitch
-	}
-	Collection<T> push(T value)
-	{
-		throw new RuntimeException("Deprecated Collection push");
-	}
-	
-	
-	/**
-	 * Insert value to position
-	 * @param T value
-	 * @param int pos - position
-	 */
-	Collection<T> insertIm(int pos, T value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var arr = this.cp();
-		arr.splice(pos, 0, value);
-		return arr;
-		#case ifcode PHP then
-		$res = $this->cp();
-		array_splice($res->_arr, $pos, 0, [$value]);
-		return $res;
-		#endswitch
-	}
-	Collection<T> insert(int pos, T value)
-	{
-		throw new RuntimeException("Deprecated Collection insert");
-	}
-	
-	
-	/**
-	 * Set value size_to position
-	 * @param int pos - position
-	 * @param T value 
-	 */
-	Collection<T> setIm(int pos, T value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (pos < 0 || pos >= this.length)
-		{
-			var _IndexOutOfRange = use("Runtime.Exceptions.IndexOutOfRange");
-			throw new _IndexOutOfRange(pos);
-		}
-		var arr = this.cp();
-		arr[pos] = value;
-		return arr;
-		#case ifcode PHP then
-		if (!array_key_exists($pos, $this->_arr))
-			throw new \Runtime\Exceptions\IndexOutOfRange($pos);
-		$res = $this->cp();
-		$res->_arr[$pos] = $value;
-		return $res;
-		#endswitch
-	}
-	Collection<T> set(int pos, T value)
-	{
-		throw new RuntimeException("Deprecated Collection set");
-	}
-	
-	
-	/**
-	 * Append vector to the end of the vector
-	 * @param Collection<T> arr
-	 */
-	Collection<T> concat(Collection<T> arr)
-	{
-		if (arr == null) return this;
-		if (not(rtl::is_instanceof(arr, classof Collection))) arr = [ arr ];
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (arr.length == 0) return this;
-		var res = this.cp();
-		for (var i=0; i<arr.length; i++)
-		{
-			Array.prototype.push.call(res, arr[i]);
-		}
-		return res;
-		#case ifcode PHP then
-		if (!$arr) return $this;
-		if (count($arr->_arr) == 0) return $this;
-		$res = $this->cp();
-		foreach ($arr->_arr as $item)
-		{
-			$res->_arr[] = $item;
-		}
-		return $res;
-		#endswitch
-	}
+	T last(T default_value = null, int pos = -1);
 	
 	
 	/**
@@ -539,103 +101,7 @@ class Collection<T> extends _Collection
 	 * @param fn f
 	 * @return Collection
 	 */
-	Collection<T> map(fn f)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var arr = this.cp();
-		var Callback = use("Runtime.Callback");
-		for (var i=0; i<arr.length; i++)
-		{
-			arr[i] = Runtime.rtl.apply(ctx, f, [arr[i], i]);
-		}
-		return arr;
-		#case ifcode PHP then
-		$arr2 = $this->cp();
-		foreach ($this->_arr as $key => $value)
-		{
-			$arr2->_arr[$key] = $f($value, $key);
-		}
-		return $arr2;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Filter items
-	 * @param fn f
-	 * @return Collection
-	 */
-	Collection<T> filter(fn f)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var res = this.constructor.Instance();
-		var Callback = use("Runtime.Callback");
-		for (var i=0; i<this.length; i++)
-		{
-			var item = this[i];
-			var flag = Runtime.rtl.apply(ctx, f, [item, i]);
-			if (flag)
-			{
-				Array.prototype.push.call(res, item);
-			}
-		}
-		return res;
-		#case ifcode PHP then
-		$arr2 = static::Instance();
-		foreach ($this->_arr as $key => $value)
-		{
-			if ( $f($value, $key) )
-			{
-				$arr2->_arr[] = $value;
-			}
-		}
-		return $arr2;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Transition Collection to Dict
-	 * @param fn f
-	 * @return Dict
-	 */
-	Collection<T> transition(fn f)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var Dict = use("Runtime.Dict");
-		var d = new Dict();
-		for (var i=0; i<this.length; i++)
-		{
-			var value = this[i];
-			var p = Runtime.rtl.apply(ctx, f, [value, i]);
-			d[p[1]] = p[0];
-		}
-		return d;
-		#case ifcode PHP then
-		$d = new \Runtime\Dict();
-		foreach ($this->_arr as $key => $value)
-		{
-			$p = $f($value, $key);
-			$d->_map[$p->_arr[1]] = $p->_arr[0];
-		}
-		return $d;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Flatten Collection
-	 */
-	Collection flatten()
-	{
-		Vector res = [];
-		for (int i=0; i<this.count(); i++)
-			res.appendItems(this.get(i));
-		return res;
-	}
+	Collection<T> map(fn f);
 	
 	
 	/**
@@ -644,46 +110,43 @@ class Collection<T> extends _Collection
 	 * @param var init_value
 	 * @return init_value
 	 */
-	var reduce(fn f, var init_value)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		for (var i=0; i<this.length; i++)
-		{
-			var item = this[i];
-			init_value = Runtime.rtl.apply(ctx, f, [init_value, item, i]);
-		}
-		return init_value;
-		#case ifcode PHP then
-		foreach ($this->_arr as $key => $value)
-		{
-			$init_value = $f($init_value, $value, $key);
-		}
-		return $init_value;
-		#endswitch
-	}
+	var reduce(fn f, var init_value);
+	
+	
+	/**
+	 * Filter items
+	 * @param fn f
+	 * @return Collection
+	 */
+	Collection<T> filter(fn f);
 	
 	
 	/**
 	 * Call function for each item
 	 * @param fn f
 	 */
-	Collection<T> each(fn f)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		for (var i=0; i<this.length; i++)
-		{
-			var item = this[i];
-			Runtime.rtl.apply(ctx, f, [item, i]);
-		}
-		#case ifcode PHP then
-		foreach ($this->_arr as $key => $value)
-		{
-			$f($value, $key);
-		}
-		#endswitch
-	}
+	Collection<T> each(fn f);
+	
+	
+	/**
+	 * Transition Collection to Dict
+	 * @param fn f
+	 * @return Dict
+	 */
+	Collection<T> transition(fn f);
+	
+	
+	/**
+	 * Append vector to the end of the vector
+	 * @param Collection<T> arr
+	 */
+	Collection<T> concat(Collection<T> arr);
+	
+	
+	/**
+	 * Returns count items in vector
+	 */
+	int count();
 	
 	
 	/**
@@ -692,170 +155,18 @@ class Collection<T> extends _Collection
 	 * @param int lenght
 	 * @return Collection<T>
 	 */
-	Collection<T> slice(int offset = 0, int length = null)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		if (offset <= 0) offset = 0;
-		if (length == undefined)
-		{
-			if (offset <= 0) return this.cp();
-			var arr = Array.prototype.slice.call(this, offset);
-			Object.setPrototypeOf(arr, this.constructor.prototype);
-			return arr;
-		}
-		if (offset <= 0 && length == this.length) return this.cp();
-		if (length >= 0)
-		{
-			length = offset + length;
-		}
-		var arr = Array.prototype.slice.call(this, offset, length);
-		Object.setPrototypeOf(arr, this.constructor.prototype);
-		return arr;
-		#case ifcode PHP then
-		if ($offset <= 0) $offset = 0;
-		$arr2 = static::Instance();
-		$arr2->_arr = array_slice($this->_arr, $offset, $length);
-		return $arr2;
-		#endswitch
-	}
+	Collection<T> slice(int offset = 0, int length = null);
 	
 	
 	/**
-	 * Reverse array
-	 */
-	Collection<T> reverse()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var arr = this.cp();
-		Array.prototype.reverse.call(arr);
-		return arr;
-		#case ifcode PHP then
-		$arr2 = $this->cp();
-		$arr2->_arr = array_reverse($arr2->_arr);
-		return $arr2;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Sort vector
+	 * Sort Collection
 	 * @param fn f - Sort user function
 	 */
-	Collection<T> sort(fn f = null)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var arr = this.cp();
-		if (f == undefined) Array.prototype.sort.call(arr);
-		else
-		{
-			var f1 = (a, b) => { return Runtime.rtl.apply(ctx, f, [a, b]); };
-			Array.prototype.sort.call(arr, f1);
-		}
-		return arr;
-		#case ifcode PHP then
-		$res = $this->cp();
-		if ($f == null)
-		{
-			asort($res->_arr);
-		}
-		else
-		{
-			$f1 = function($a, $b) use ($f){ return $f($a, $b); };
-			usort($res->_arr, $f1);
-		}
-		$res->_arr = array_values($res->_arr);
-		return $res;
-		#endswitch
-	}
+	var sort(fn f = null);
 	
 	
 	/**
-	 * Remove dublicate values
+	 * Reverse Collection
 	 */
-	Collection<T> removeDuplicates()
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		var res = this.constructor.Instance();
-		for (var i=0; i<this.length; i++)
-		{
-			var p = res.indexOf(this[i]);
-			if (p == -1)
-			{
-				Array.prototype.push.call(res, this[i]);
-			}
-		}
-		return res;
-		#case ifcode PHP then
-		$arr = []; $sz = count($this->_arr);
-		for ($i=0; $i<$sz; $i++)
-		{			
-			$value = $this->_arr[$i];
-			$pos = array_search($value, $arr, true);
-			if ($pos === false)
-			{
-				$arr[] = $value;
-			}
-		}
-		$res = static::Instance();
-		$res->_arr = $arr;
-		return $res;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Find item pos
-	 * @param fn f - Find function
-	 * @return int - position
-	 */
-	int find(fn f)
-	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		for (var i=0; i<this.length; i++)
-		{
-			var flag = f(ctx, this[i]);
-			if (flag) return i;
-		}
-		return -1;
-		#case ifcode PHP then
-		$sz = count($this->_arr);
-		for ($i=0; $i<$sz; $i++)
-		{
-			$elem = $this->_arr[$i];
-			if ( $f($elem) )
-			{
-				return $i;
-			}
-		}
-		return -1;
-		#endswitch
-	}
-	
-	
-	/**
-	 * Find item
-	 * @param var item - Find function
-	 * @param fn f - Find function
-	 * @param T def_value - Find function
-	 * @return item
-	 */
-	T findItem(fn f, T def_value = null)
-	{
-		int pos = this.find(f);
-		return this.get(pos, def_value);
-	}
-	
-	
-	/**
-	 * Join collection to string
-	 */
-	string join(string ch)
-	{
-		return rs::join(ch, this);
-	}
+	var reverse();
 }

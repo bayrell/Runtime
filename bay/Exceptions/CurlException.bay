@@ -20,10 +20,10 @@ namespace Runtime.Exceptions;
 
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
-use Runtime.Exceptions.AbstractException;
+use Runtime.Exceptions.RuntimeException;
 
 
-class CurlException extends AbstractException
+class CurlException extends RuntimeException
 {
     int http_code = -1;
     string http_content = "";

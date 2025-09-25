@@ -20,12 +20,12 @@ namespace Runtime.Exceptions;
 
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
-use Runtime.Exceptions.AbstractException;
+use Runtime.Exceptions.RuntimeException;
 
 
-class ItemNotFound extends AbstractException
+class ItemNotFound extends RuntimeException
 {
-	void constructor(string object = "Item", string name = "", Object prev = null)
+	void constructor(string name = "", string object = "Item", Object prev = null)
 	{
 		string message = "";
 		if (name != "")

@@ -44,46 +44,16 @@ class BaseObject
 	
 	
 	/**
-	 * Init struct data
-	 */
-	protected void _changes(Map changes){}
-	
-	
-	/**
 	 * Assign new values
 	 */
-	protected void _assign_values(Dict changes = null)
+	void assign(Dict changes = null)
 	{
 		#switch
 		#case ifcode PHP then
-		if (gettype($changes) == "array")
+		
+		if ($changes instanceof \Runtime\Dict)
 		{
-			$changes = new \Runtime\Map($changes);
-		}
-		#case ifcode JAVASCRIPT then
-		if (typeof changes == 'object' && !(changes instanceof Runtime.Dict))
-		{
-			changes = new Runtime.Map(ctx, changes);
-		}
-		#endswitch
-		
-		if (changes == null) return;
-		if (changes.keys().count() == 0) return;
-		
-		if (not (changes instanceof Map))
-		{
-			changes = changes.toMap();
-		}
-		
-		this._changes(changes);
-		
-		#switch
-		#case ifcode PHP then
-		
-		if ($changes instanceof \Runtime\Dict) $changes = $changes->_map;
-		if (gettype($changes) == "array")
-		{
-			foreach ($changes as $key => $value)
+			foreach ($changes->_map as $key => $value)
 			{
 				$k = $this->__getKey($key);
 				if (property_exists($this, $k))
@@ -95,13 +65,13 @@ class BaseObject
 		
 		#case ifcode JAVASCRIPT then
 		
-		var _Dict = use("Runtime.Dict");
-		var rtl = use("Runtime.rtl");
-		if (changes instanceof _Dict) changes = changes.toObject();
-		for (var key in changes)
+		if (changes instanceof Map)
 		{
-			var value = changes[key];
-			this[key] = value;
+			for (var key of changes.keys())
+			{
+				var value = changes.get(key);
+				this[key] = value;
+			}
 		}
 		
 		#endswitch

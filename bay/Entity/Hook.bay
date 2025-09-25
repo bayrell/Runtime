@@ -21,9 +21,10 @@ namespace Runtime.Entity;
 use Runtime.rtl;
 use Runtime.Entity.Entity;
 use Runtime.BaseHook;
+use Runtime.FactoryInterface;
 
 
-struct Hook extends Entity
+struct Hook extends Entity implements FactoryInterface
 {
 	Dict params = null;
 	
@@ -43,7 +44,7 @@ struct Hook extends Entity
 	/**
 	 * Create hook instance
 	 */
-	BaseHook createHook()
+	BaseHook createInstance()
 	{
 		return rtl::newInstance(this.name, [this.params]);
 	}

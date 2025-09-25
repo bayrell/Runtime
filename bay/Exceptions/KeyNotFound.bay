@@ -20,12 +20,11 @@ namespace Runtime.Exceptions;
 
 use Runtime.rtl;
 use Runtime.RuntimeConstant;
-use Runtime.Exceptions.AbstractException;
+use Runtime.Exceptions.RuntimeException;
 
 
-class KeyNotFound extends AbstractException
+class KeyNotFound extends RuntimeException
 {
-	
 	void constructor(string key, Object prev = null)
 	{
 		parent(
@@ -34,5 +33,4 @@ class KeyNotFound extends AbstractException
 			prev
 		);
 	}
-
 }
