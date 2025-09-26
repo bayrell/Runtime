@@ -58,6 +58,16 @@ from(obj)
 
 Object.assign(Map.prototype, {
 
+
+/**
+ * Copy map
+ */
+copy: function()
+{
+	return new Map(this);
+},
+
+
 /**
  * Call function for each item
  * @param fn f
@@ -116,6 +126,12 @@ class Map
 	 * @return self
 	 */
 	Dict<T> clear();
+	
+	
+	/**
+	 * Copy map
+	 */
+	Dict<T> copy();
 	
 	
 	/**

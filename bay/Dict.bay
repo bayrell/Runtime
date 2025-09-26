@@ -67,6 +67,12 @@ interface Dict<T>
 	
 	
 	/**
+	 * Copy map
+	 */
+	Dict<T> copy();
+	
+	
+	/**
 	 * Add values from other map
 	 * @param Dict<T> map
 	 * @return self

@@ -187,17 +187,32 @@ class rtl
 		if (obj == null) return false;
 		
 		obj = static::className(obj);
-		if (static::isString(obj))
-		{
-			if (obj == class_name) return true;
-			string parent_class_name = static::parentClassName();
-			while (parent_class_name != "")
-			{
-				if (parent_class_name == class_name) return true;
-			}
-		}
+		if (not static::isString(obj)) return false;
 		
-		return false;
+		string parent_class_name = obj;
+		while (parent_class_name != "")
+		{
+			if (parent_class_name == class_name) return true;
+			string parent_class_name = static::parentClassName(obj);
+		}
+	}
+	
+	
+	/**
+	 * Returns true if class implements interface
+	 */
+	static bool isImplements(var obj, string interface_name)
+	{
+		if (obj == null) return false;
+		
+		obj = static::findClass(obj);
+		if (not obj) return false;
+		
+		while (obj != null)
+		{
+			if (obj.getInterfaces and obj.getInterfaces().indexOf(interface_name) >= 0) return true;
+			obj = static::findClass(static::parentClassName(obj));
+		}
 	}
 	
 	
@@ -378,13 +393,13 @@ class rtl
 		
 		#case ifcode JAVASCRIPT then
 		
-		var _StringInterface = use("Runtime.StringInterface");
+		var StringInterface = use("Runtime.StringInterface");
 		
 		if (value === null) return "";
 		if (typeof value == 'string') return value;
 		if (typeof value == 'number') return ""+value;
 		if (value instanceof String) return ""+value;
-		if (typeof value == 'object' && this.is_implements(value, _StringInterface))
+		if (typeof value == 'object' && this.isImplements(value, StringInterface))
 			return value.toString();
 		return ""+value;
 		
