@@ -197,7 +197,7 @@ class rtl
 		if (class_name instanceof Function)
 			return class_name;
 		
-		return use(class_name);
+		return class_name ? use(class_name) : null;
 		
 		#endswitch
 	}
@@ -1548,7 +1548,7 @@ class rtl
 		
 		try
 		{
-			let context = await Runtime.rtl.createContext(null, params);
+			let context = await Runtime.rtl.createContext(params, params);
 			await context.start(context, context);
 			code = await context.run(context, context);
 		}
