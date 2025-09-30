@@ -28,12 +28,11 @@ abstract class Vector{}
 #switch
 #case ifcode JAVASCRIPT then
 
-Runtime.Vector = function(){ Array.call(this, arguments); };
-Runtime.Vector.prototype = Object.create(Array.prototype);
-Runtime.Vector.prototype.constructor = Runtime.Vector;
+Runtime.Vector = Array;
 
-Object.assign(Runtime.Vector, {
-	getNamespace: function(){ return "Runtime.Vector"; },
+Object.assign(Array, {
+	getNamespace: function(){ return "Runtime"; },
+	getClassName: function(){ return "Runtime.Vector"; },
 	from: function(arr){ return arr; }
 });
 
@@ -182,6 +181,8 @@ removeDuplicates: function()
 
 });
 
+#case ifcode NODEJS then
+use.add(Runtime.Vector);
 
 #case ifcode PHP then
 

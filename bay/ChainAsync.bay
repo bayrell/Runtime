@@ -18,6 +18,10 @@
 
 namespace Runtime;
 
+use Runtime.Callback;
+use Runtime.Chain;
+
+
 class ChainAsync extends Chain
 {
 	/**
@@ -25,7 +29,7 @@ class ChainAsync extends Chain
 	 */
 	void apply(Collection args = null)
 	{
-		fn f = async void () use (args, applyItem)
+		fn f = async void () use (args)
 		{
 			for (int i=0; i<this.chain.count(); i++)
 			{

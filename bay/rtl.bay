@@ -19,17 +19,12 @@
 namespace Runtime;
 
 use Runtime.BaseObject;
-use Runtime.BaseStruct;
 use Runtime.Callback;
-use Runtime.Collection;
 use Runtime.Context;
 use Runtime.Date;
 use Runtime.DateTime;
-use Runtime.Dict;
-use Runtime.Map;
-use Runtime.Monad;
 use Runtime.SerializerJson;
-use Runtime.Vector;
+use Runtime.Entity.Provider;
 use Runtime.Exceptions.AssertException;
 
 
@@ -139,19 +134,16 @@ class rtl
 		#case ifcode PHP then
 		return "\\" . preg_replace("/\\./", "\\", $class_name);
 		
-		#case ifcode ES6 then
+		#case ifcode JAVASCRIPT then
 		
-		if (typeof class_name == "string") class_name = window[class_name];
+		if (typeof class_name == "string")
+		{
+			class_name = typeof window != "undefined" ? window[class_name] : use(class_name);
+		}
 		if (class_name == undefined || class_name == null) return null;
 		if (!(class_name instanceof Function)) class_name = class_name.constructor;
 		
 		return class_name instanceof Function ? class_name : null;
-		
-		#case ifcode NODEJS then
-		if (class_name instanceof Function)
-			return class_name;
-		
-		return use(class_name);
 		
 		#endswitch
 	}
@@ -554,13 +546,41 @@ class rtl
 		/* Setup global context */
 		static::setContext(context);
 		
-		#ifcode NODEJS then
-		ctx = context;
-		#endif
-		
 		/* Init context */
-		await context.init();
-		
+		await context.init(params);
 		return context;
+	}
+	
+	
+	/**
+	 * Run app
+	 */
+	static async int runApp(string app, Collection modules)
+	{
+		try
+		{
+			Dict params = {
+				"providers": [
+					new Provider("app", app),
+				],
+				"modules": modules,
+			};
+			Context context = await this.createContext(params);
+			var app = context.provider("app");
+			return await app.main();
+		}
+		catch (var e)
+		{
+			#switch
+			#case ifcode PHP then
+			throw $e;
+			#case ifcode ES6 then
+			console.log("\x1B[0;31m" + e.stack + "\x1B[0m\n");
+			#case NODEJS then
+			process.stderr.write("\x1B[0;91m");
+			process.stderr.write(e.stack);
+			process.stderr.write("\x1B[0m\n");
+			#endswitch
+		}
 	}
 }

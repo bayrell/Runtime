@@ -32,7 +32,7 @@ function add(name)
 	;
 	
 	var path = __dirname + "/" + name + ".js";
-	var obj = require(path);
+	require(path);
 }
 
 add("Runtime.lib");
@@ -44,7 +44,6 @@ add("Runtime.fs");
 add("Runtime.Collection");
 add("Runtime.Dict");
 add("Runtime.Map");
-add("Runtime.Monad");
 add("Runtime.Vector");
 add("Runtime.BaseObject");
 add("Runtime.BaseProvider");
@@ -54,10 +53,6 @@ add("Runtime.Context");
 add("Runtime.Date");
 add("Runtime.DateTime");
 add("Runtime.Reference");
-add("Runtime.SerializeInterface");
-add("Runtime.Serializer");
-add("Runtime.SerializerNative");
-add("Runtime.SerializerJson");
 add("Runtime.Entity.Entity");
 add("Runtime.Entity.Hook");
 add("Runtime.Entity.Provider");
@@ -73,6 +68,10 @@ add("Runtime.Hooks.BaseHook");
 add("Runtime.Hooks.RuntimeHook");
 add("Runtime.Providers.HookProvider");
 add("Runtime.Providers.OutputProvider");
+add("Runtime.Serialize.SerializeInterface");
+add("Runtime.Serialize.Serializer");
+add("Runtime.Serialize.SerializerNative");
+add("Runtime.Serialize.SerializerJson");
 add("Runtime.ModuleDescription");
 
 module.exports = exports;

@@ -167,7 +167,6 @@ class Context extends BaseObject
 	{
 		parent();
 		if (params.has("base_path")) this.base_path = params.get("base_path");
-		if (params.has("entry_point")) this.entry_point = params.get("entry_point");
 		if (params.has("cli_args")) this.cli_args = params.get("cli_args");
 		if (params.has("environments")) this.environments = params.get("environments");
 		if (params.has("modules")) this.modules = params.get("modules");
@@ -178,7 +177,7 @@ class Context extends BaseObject
 	/**
 	 * Init
 	 */
-	async void init()
+	async void init(Dict params)
 	{
 		if (this.initialized) return;
 		
@@ -189,7 +188,14 @@ class Context extends BaseObject
 		this.entities = static::getEntitiesFromModules(this.modules);
 		
 		/* Create providers */
-		this.createProviders();
+		Collection<Provider> providers = this.getEntities(classof Provider);
+		this.createProviders(providers);
+		
+		/* Create providers from params */
+		if (params.has("providers"))
+		{
+			this.createProviders(params.get("providers"));
+		}
 		
 		/* Init providers */
 		await this.initProviders();
@@ -232,9 +238,8 @@ class Context extends BaseObject
 	/**
 	 * Create providers
 	 */
-	protected void createProviders()
+	protected void createProviders(Collection<Provider> providers)
 	{
-		Vector<Provider> providers = this.getEntities(classof Provider);
 		for (int i=0; i<providers.count(); i++)
 		{
 			Provider factory = providers.get(i);
