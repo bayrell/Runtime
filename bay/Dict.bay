@@ -115,7 +115,7 @@ Object.assign(Runtime._Map,
 #case ifcode NODEJS then
 Runtime._Map.from = function(map)
 {
-	var res = this.Instance(null, map);
+	var res = this.Instance(map, map);
 	return res;
 };
 use.add(Runtime._Map);
