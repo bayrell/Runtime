@@ -24,7 +24,7 @@ use Runtime.BaseHook;
 use Runtime.FactoryInterface;
 
 
-struct Hook extends Entity implements FactoryInterface
+class Hook extends Entity implements FactoryInterface
 {
 	Dict params = null;
 	

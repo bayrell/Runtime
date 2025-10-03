@@ -28,7 +28,7 @@ class KeyNotFound extends RuntimeException
 	void constructor(string key, Object prev = null)
 	{
 		parent(
-			_("Runtime", "Key '%key%' not found", {"key": key}),
+			rtl::translate("Key '%key%' not found", {"key": key}),
 			rtl::ERROR_KEY_NOT_FOUND,
 			prev
 		);

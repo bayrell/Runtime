@@ -199,7 +199,7 @@ class OutputProvider extends BaseProvider
 	/**
 	 * Print error
 	 */
-	void print_error(string message)
+	void error(string message)
 	{
 		#switch
 		#case ifcode PHP then

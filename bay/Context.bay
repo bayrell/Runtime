@@ -317,7 +317,7 @@ class Context extends BaseObject
 	/**
 	 * Translate message
 	 */
-	string translate(string module, string s, Dict params = null)
+	string translate(string s, Dict params = null)
 	{
 		if (params == null) return s;
 		return rs::format(s, params);
@@ -360,10 +360,10 @@ class Context extends BaseObject
 				Callback f = new Callback(module_name ~ ".ModuleDescription", "requiredModules");
 				if (f.exists())
 				{
-					Map<string> sub_modules = rtl::apply(f);
+					Map<string> sub_modules = f.apply();
 					if (sub_modules != null)
 					{
-						Vector<string> sub_modules = sub_modules.keys();
+						Vector<string> sub_modules = rtl::list(sub_modules.keys());
 						static::_getRequiredModules(res, cache, sub_modules);
 					}
 					res.push(module_name);

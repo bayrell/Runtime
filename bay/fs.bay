@@ -247,7 +247,7 @@ class fs
 		
 		for (int i=0; i<items.count(); i++)
 		{
-			string item_name = items.item(i);
+			string item_name = items.get(i);
 			string item_path = static::join([ dirpath, item_name ]);
 			string item_name2 = static::join([ parent_name, item_name ]);
 			

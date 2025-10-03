@@ -35,8 +35,6 @@ function add(name)
 	require(path);
 }
 
-add("Runtime.lib");
-add("Runtime.io");
 add("Runtime.re");
 add("Runtime.rtl");
 add("Runtime.rs");

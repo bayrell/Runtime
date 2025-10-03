@@ -24,7 +24,7 @@ use Runtime.FactoryInterface;
 use Runtime.Entity.Entity;
 
 
-struct Provider extends Entity implements FactoryInterface
+class Provider extends Entity implements FactoryInterface
 {
 	/* Provider class name */
 	string value = null;

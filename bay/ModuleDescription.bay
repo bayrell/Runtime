@@ -21,7 +21,7 @@ namespace Runtime;
 use Runtime.Entity.Provider;
 
 
-static class ModuleDescription
+class ModuleDescription
 {
 	/**
 	 * Returns module name
@@ -34,7 +34,7 @@ static class ModuleDescription
 	 * Returns module name
 	 * @return string
 	 */
-	pure string getModuleVersion() => "0.12.1";
+	pure string getModuleVersion() => "1.0";
 	
 	
 	/**

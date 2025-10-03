@@ -430,8 +430,8 @@ class rs
 	 */
 	static Dict pathinfo(string filepath)
 	{
-		Vector<string> arr1 = static::split(".", filepath).toVector();
-		Vector<string> arr2 = static::split("/", filepath).toVector();
+		Vector<string> arr1 = static::split(".", filepath);
+		Vector<string> arr2 = static::split("/", filepath);
 		
 		string filepath = filepath;
 		string extension = arr1.pop();
@@ -461,8 +461,8 @@ class rs
 	static string filename(string filepath)
 	{
 		Dict ret = static::pathinfo(filepath);
-		string res = ret["basename"];
-		string ext = ret["extension"];
+		string res = ret.get("basename");
+		string ext = ret.get("extension");
 		if (ext != "")
 		{
 			int sz = 0 - rs::strlen(ext) - 1;
@@ -480,7 +480,7 @@ class rs
 	static string basename(string filepath)
 	{
 		Dict ret = static::pathinfo(filepath);
-		string res = ret["basename"];
+		string res = ret.get("basename");
 		return res;
 	}
 	
@@ -493,7 +493,7 @@ class rs
 	static string extname(string filepath)
 	{
 		Dict ret = static::pathinfo(filepath);
-		string res = ret["extension"];
+		string res = ret.get("extension");
 		return res;
 	}
 	
@@ -506,7 +506,7 @@ class rs
 	static string dirname(string filepath)
 	{
 		Dict ret = static::pathinfo(filepath);
-		string res = ret["dirname"];
+		string res = ret.get("dirname");
 		return res;
 	}
 	
@@ -753,8 +753,8 @@ class rs
 	{
 		Dict r = static::parse_url(s);
 		
-		string s1 = r["uri"];
-		string s2 = r["query"];
+		string s1 = r.get("uri");
+		string s2 = r.get("query");
 		bool find = false;
 		
 		Collection arr = static::split("&", s2);

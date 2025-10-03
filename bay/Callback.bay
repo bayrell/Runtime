@@ -65,7 +65,7 @@ class Callback
 		if (not this.exists())
 		{
 			throw new RuntimeException(
-				"Method '" ~ this.name ~ "' not found in " ~ rtl::get_class_name(this.obj)
+				"Method '" ~ this.name ~ "' not found in " ~ rtl::className(this.obj)
 			);
 		}
 	}

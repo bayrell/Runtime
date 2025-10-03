@@ -28,7 +28,7 @@ class IndexOutOfRange extends RuntimeException
 	void constructor(int pos, Object prev = null)
 	{
 		parent(
-			_("Runtime", "Index out of range. Pos: %pos%", {"pos":pos}),
+			rtl::translate("Index out of range. Pos: %pos%", {"pos":pos}),
 			rtl::ERROR_INDEX_OUT_OF_RANGE,
 			prev
 		);

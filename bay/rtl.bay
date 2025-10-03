@@ -154,6 +154,8 @@ class rtl
 	 */
 	static var className(var class_name)
 	{
+		if (static::isString(class_name)) return class_name;
+		
 		var obj = this.findClass(class_name);
 		return obj and obj.getClassName ? obj.getClassName() : "";
 	}
@@ -164,9 +166,15 @@ class rtl
 	 */
 	static var parentClassName(var class_name)
 	{
+		#switch
+		#case ifcode PHP then
+		$class_name = get_parent_class($class_name);
+		return str_replace("\\", ".", $class_name);
+		#case ifcode JAVASCRIPT then
 		var obj = this.findClass(class_name);
 		var parentObj = obj ? Object.getPrototypeOf(obj) : null;
-		return parentObj and parentObj.getClassName ? parentObj.getClassName() : "";
+		return parentObj && parentObj.getClassName ? parentObj.getClassName() : "";
+		#endswitch
 	}
 	
 	
@@ -205,6 +213,16 @@ class rtl
 			if (obj.getInterfaces and obj.getInterfaces().indexOf(interface_name) >= 0) return true;
 			obj = static::findClass(static::parentClassName(obj));
 		}
+	}
+	
+	
+	/**
+	 * Class exists
+	 */
+	static bool classExists(string class_name)
+	{
+		var obj = this.findClass(class_name);
+		return obj != null;
 	}
 	
 	
@@ -328,7 +346,7 @@ class rtl
 	
 	
 	/**
-	 * Return true if value is string
+	 * Returns true if value is string
 	 * @param var value
 	 * @return bool
 	 */
@@ -346,6 +364,33 @@ class rtl
 		return false;
 		
 		#endswitch
+	}
+	
+	
+	/**
+	 * Returns true if value is collection
+	 */
+	static bool isCollection(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return $value instanceof \Runtime\Collection;
+		
+		#case ifcode JAVASCRIPT then
+		
+		return Array.isArray(value);
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Translate
+	 */
+	string translate(string s, Dict params)
+	{
+		return @.translate(s, params);
 	}
 	
 	
@@ -399,6 +444,38 @@ class rtl
 	}
 	
 	
+	/**
+	 * Json Decode
+	 */
+	static var jsonDecode(var obj)
+	{
+		#ifcode JAVASCRIPT then
+		try
+		{
+			obj = JSON.parse(obj, (key, value) => {
+				if (value === null) return null;
+				if (Array.isArray(value)) return value;
+				if (typeof value == "object") return Map.create(value);
+				return value;
+			});
+		}
+		catch (e){}
+		return obj;
+		#endif
+	}
+	
+	
+	/**
+	 * Json encode
+	 */
+	static var jsonEncode(var obj)
+	{
+		#ifcode JAVASCRIPT then
+		return JSON.stringify(obj);
+		#endif
+	}
+	
+	
 	/* ================================== IO Functions =================================== */
 	
 	/**
@@ -414,10 +491,10 @@ class rtl
 	/**
 	 * Print error message to output
 	 */
-	static void print_error(string message)
+	static void error(string message)
 	{
 		var output = @.provider("output");
-		output.print_error(message);
+		output.error(message);
 	}
 	
 	
@@ -502,16 +579,13 @@ class rtl
 	 * Returns global context
 	 * @return Context
 	 */
-	static Context @getContext()
+	static Context getContext()
 	{
 		#switch
 		#case ifcode PHP then
 		if (!static::$_global_context) return null;
 		return static::$_global_context;
-		#case ifcode NODEJS then
-		if (!rtl._global_context) return null;
-		return rtl._global_context;
-		#case ifcode ES6 then
+		#case ifcode JAVASCRIPT then
 		if (!Runtime.rtl._global_context) return null;
 		return Runtime.rtl._global_context;
 		#endswitch
@@ -566,6 +640,7 @@ class rtl
 				"modules": modules,
 			};
 			Context context = await this.createContext(params);
+			await context.start();
 			var app = context.provider("app");
 			return await app.main();
 		}
@@ -576,7 +651,7 @@ class rtl
 			throw $e;
 			#case ifcode ES6 then
 			console.log("\x1B[0;31m" + e.stack + "\x1B[0m\n");
-			#case NODEJS then
+			#case ifcode NODEJS then
 			process.stderr.write("\x1B[0;91m");
 			process.stderr.write(e.stack);
 			process.stderr.write("\x1B[0m\n");
