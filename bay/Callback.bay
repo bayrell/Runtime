@@ -18,11 +18,11 @@
 
 namespace Runtime;
 
-use Runtime.BaseStruct;
+use Runtime.BaseObject;
 use Runtime.Exceptions.RuntimeException;
 
 
-class Callback
+class Callback extends BaseObject
 {
 	var obj;
 	string name;
@@ -34,6 +34,8 @@ class Callback
 	 */
 	public void constructor(var obj, string name, var tag = null)
 	{
+		parent();
+		
 		/* Init object */
 		this._init();
 		

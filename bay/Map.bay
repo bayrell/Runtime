@@ -82,7 +82,22 @@ each: function(f)
 		var value = this.get(key);
 		f(value, key, this);
 	}
-}
+},
+
+
+/**
+ * Transition
+ */
+transition: function(f)
+{
+	var arr = [];
+	for (var key of this.keys())
+	{
+		var value = this.get(key);
+		arr.push(f(value, key, this));
+	}
+	return arr;
+},
 
 });
 

@@ -193,7 +193,7 @@ class rtl
 		while (parent_class_name != "")
 		{
 			if (parent_class_name == class_name) return true;
-			string parent_class_name = static::parentClassName(obj);
+			string parent_class_name = static::parentClassName(parent_class_name);
 		}
 	}
 	

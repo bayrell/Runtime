@@ -38,12 +38,6 @@ class Provider extends Entity implements FactoryInterface
 	 */
 	void constructor(string name, string value = null, Dict params = null)
 	{
-		if (value instanceof Dict)
-		{
-			params = value;
-			value = null;
-		}
-		if (value == null) value = name;
 		parent({
 			"name": name,
 			"value": value,

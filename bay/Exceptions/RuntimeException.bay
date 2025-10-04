@@ -76,12 +76,7 @@ class RuntimeException extends ClassException
 	 */
 	void constructor(string message = "", int code = -1, Object prev = null)
 	{
-		#switch
-		#case ifcode JAVASCRIPT then
-		Runtime.Exceptions.ClassException.call(this, message, code, prev);
-		#case ifcode PHP then
-		parent::__construct($ctx, $message, $code, $prev);
-		#endswitch
+		parent(message, code, prev);
 		this._init();
 		this.error_message = message;
 		this.error_code = code;
