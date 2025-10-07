@@ -18,13 +18,17 @@
 
 namespace Runtime;
 
-use Runtime.Serializer;
-
 
 interface SerializeInterface
 {
 	/**
-	 * Serialize object
+	 * Assign object
 	 */
-	void serialize(Serializer serializer, Map data);
+	void assign(Dict data);
+	
+	
+	/**
+	 * Returns object data
+	 */
+	void getData();
 }

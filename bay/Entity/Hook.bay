@@ -18,7 +18,6 @@
 
 namespace Runtime.Entity;
 
-use Runtime.rtl;
 use Runtime.Entity.Entity;
 use Runtime.BaseHook;
 use Runtime.FactoryInterface;

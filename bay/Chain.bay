@@ -18,9 +18,7 @@
 
 namespace Runtime;
 
-use Runtime.lib;
 use Runtime.Callback;
-use Runtime.Monad;
 
 
 class Chain extends Callback
@@ -75,7 +73,9 @@ class Chain extends Callback
 	 */
 	public void sort()
 	{
-		this.chain = this.chain.sort(lib::sortAttr("priority", "asc"));
+		this.chain = this.chain.sort(rtl::compare(
+			string (Dict item) => item.get("priority")
+		));
 	}
 	
 	

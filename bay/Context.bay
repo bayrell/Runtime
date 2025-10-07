@@ -21,7 +21,6 @@ namespace Runtime;
 use Runtime.lib;
 use Runtime.BaseObject;
 use Runtime.BaseProvider;
-use Runtime.BaseStruct;
 use Runtime.Callback;
 use Runtime.Entity.Entity;
 use Runtime.Entity.Provider;
@@ -35,7 +34,7 @@ class Context extends BaseObject
 	protected Dict<string> environments = {};
 	protected Dict<BaseObject> providers = {};
 	protected Collection<string> modules = [];
-	protected Collection<BaseStruct> entities = [];
+	protected Collection<BaseObject> entities = [];
 	protected string base_path = "";
 	protected int start_time = 0;
 	protected bool initialized = false;
@@ -128,12 +127,9 @@ class Context extends BaseObject
 		
 		#case ifcode NODEJS then
 		
-		let Map = use("Runtime.Map");
-		let Vector = use("Runtime.Vector");
-		
 		if (!params.has("cli_args"))
 		{
-			params.set("cli_args", Vector.from(process.argv.slice(1)));
+			params.set("cli_args", process.argv.slice(1));
 		}
 		if (!params.has("base_path"))
 		{

@@ -206,11 +206,11 @@ class OutputProvider extends BaseProvider
 		
 		if (php_sapi_name() == "cli")
 		{
-			$this->print($ctx, $this->color($ctx, "red", $message), true, "err");
+			$this->print($this->color("red", $message), true, "err");
 		}
 		else
 		{
-			$this->print($ctx, nl2br($message), true, "err");
+			$this->print(nl2br($message), true, "err");
 		}
 		
 		#case ifcode ES6 then
@@ -225,25 +225,25 @@ class OutputProvider extends BaseProvider
 		
 		if (message instanceof Error)
 		{
-			let color = this.getColor(ctx, text_color);
+			let color = this.getColor(text_color);
 			let char_27 = String.fromCharCode(27);
 			
 			if (isNode)
 			{
-				this.print(ctx, char_27 + "[" + color + "m", false, "err");
-				this.print(ctx, message.stack, false, "err");
-				this.print(ctx, char_27 + "[0m", true, "err");
+				this.print(char_27 + "[" + color + "m", false, "err");
+				this.print(message.stack, false, "err");
+				this.print(char_27 + "[0m", true, "err");
 			}
 			else
 			{
 				let s = char_27 + "[" + color + "m" + message.stack + char_27 + "[0m";
-				this.print(ctx, s, true, "err");
+				this.print(s, true, "err");
 			}
 		}
 		
 		else
 		{
-			this.print(ctx, this.color(ctx, text_color, message), true, "err");
+			this.print(this.color(text_color, message), true, "err");
 		}
 		
 		#endswitch
@@ -274,5 +274,4 @@ class OutputProvider extends BaseProvider
 		
 		return color;
 	}
-	
 }

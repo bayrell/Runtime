@@ -18,10 +18,6 @@
 
 namespace Runtime;
 
-use Runtime.rtl;
-use Runtime.Map;
-use Runtime.Vector;
-
 
 class BaseObject
 {

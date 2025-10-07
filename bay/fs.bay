@@ -19,7 +19,6 @@
 namespace Runtime;
 
 use Runtime.re;
-use Runtime.rs;
 
 
 #ifcode JAVASCRIPT then

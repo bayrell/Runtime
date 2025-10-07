@@ -18,9 +18,7 @@
  
 namespace Runtime;
 
-use Runtime.rtl;
 use Runtime.BaseObject;
-use Runtime.Dict;
 use Runtime.Math;
 use Runtime.StringInterface;
 
@@ -180,19 +178,19 @@ class DateTime extends BaseObject implements StringInterface
 	static DateTime fromString(string s)
 	{
 		DateTime dt = new DateTime();
-		dt.y = (int)rs::substr(s, 0, 4);
-		dt.m = (int)rs::substr(s, 5, 2);
-		dt.d = (int)rs::substr(s, 8, 2);
-		dt.h = (int)rs::substr(s, 11, 2);
-		dt.i = (int)rs::substr(s, 14, 2);
-		dt.s = (int)rs::substr(s, 17, 2);
+		dt.y = rtl::toInt(rs::substr(s, 0, 4));
+		dt.m = rtl::toInt(rs::substr(s, 5, 2));
+		dt.d = rtl::toInt(rs::substr(s, 8, 2));
+		dt.h = rtl::toInt(rs::substr(s, 11, 2));
+		dt.i = rtl::toInt(rs::substr(s, 14, 2));
+		dt.s = rtl::toInt(rs::substr(s, 17, 2));
 		dt.o = 0;
 		
 		if (rs::strlen(s) > 19)
 		{
 			string sign = rs::substr(s, 19, 1);
-			int tz_h = (int)rs::substr(s, 20, 2);
-			int tz_m = (int)rs::substr(s, 23, 2);
+			int tz_h = rtl::toInt(rs::substr(s, 20, 2));
+			int tz_m = rtl::toInt(rs::substr(s, 23, 2));
 			dt.o = (tz_h * 60 + tz_m) / 60;
 			if (sign == "-") dt.o = 0 - dt.o;
 		}
@@ -349,7 +347,7 @@ class DateTime extends BaseObject implements StringInterface
 		$i = (int)$dt->format("i");
 		$s = (int)$dt->format("s");
 		$o = $dt->getOffset() / 3600;
-		return new \Runtime\DateTime($ctx,
+		return new \Runtime\DateTime(
 			Dict::from(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"o"=>$o])
 		);
 		

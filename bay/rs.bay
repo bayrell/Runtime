@@ -19,10 +19,7 @@
 namespace Runtime;
 
 use Runtime.re;
-use Runtime.rtl;
-use Runtime.lib;
 use Runtime.Math;
-use Runtime.Vector;
 
 
 class rs
@@ -76,7 +73,7 @@ class rs
 		}
 		var end = start + length;
 		if (length < 0){
-			var sz = _rs.strlen(ctx, s);
+			var sz = _rs.strlen(s);
 			end = sz + length;
 		}
 		return _rtl.toStr(s).substring(start, end);
@@ -255,7 +252,7 @@ class rs
 		$arr = [];
 		if ($limit < 0) $arr = explode($delimiter, $s);
 		else $arr = explode($delimiter, $s, $limit);
-		return Vector::create($arr);
+		return \Runtime\Vector::create($arr);
 		
 		#case ifcode JAVASCRIPT then
 		
@@ -285,7 +282,7 @@ class rs
 		$pattern = "[".implode("", $delimiters->_getArr())."]";
 		$pattern = str_replace("/", "\/", $pattern);
 		$arr = preg_split("/".$pattern."/", $s, $limit);
-		return Vector::create($arr);
+		return \Runtime\Vector::create($arr);
 		
 		#case ifcode JAVASCRIPT then
 		
@@ -430,8 +427,8 @@ class rs
 	 */
 	static Dict pathinfo(string filepath)
 	{
-		Vector<string> arr1 = static::split(".", filepath);
-		Vector<string> arr2 = static::split("/", filepath);
+		Collection<string> arr1 = static::split(".", filepath);
+		Collection<string> arr2 = static::split("/", filepath);
 		
 		string filepath = filepath;
 		string extension = arr1.pop();
@@ -667,7 +664,7 @@ class rs
 		return $s;
 	
 		#case ifcode ES6 then
-		s = this.base64_encode(ctx, s)
+		s = this.base64_encode(s)
 			.replace(new RegExp('\\+', 'g'), '-')
 			.replace(new RegExp('\\/', 'g'), '_')
 			.replace(new RegExp('=', 'g'), '')
@@ -699,7 +696,7 @@ class rs
 		s = s.replace(new RegExp('-', 'g'), '+')
 			.replace(new RegExp('_', 'g'), '/')
 		;
-		return this.base64_decode(ctx, s);
+		return this.base64_decode(s);
 		#case ifcode NODEJS then
 		return Buffer.from(s, 'base64').toString('ascii');
 		#endswitch

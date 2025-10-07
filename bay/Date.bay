@@ -18,9 +18,7 @@
  
 namespace Runtime;
 
-use Runtime.rtl;
 use Runtime.BaseObject;
-use Runtime.Dict;
 use Runtime.StringInterface;
 
 
@@ -84,18 +82,18 @@ class Date extends BaseObject implements StringInterface
 
 
 #ifcode JAVASCRIPT then
-Runtime.Date.prototype.toObject = function(ctx)
+Runtime.Date.prototype.toObject = function()
 {
 	var dt = new Date(this.y, this.m - 1, this.d);
 	return dt;
 }
-Runtime.Date.fromObject = function(ctx, dt)
+Runtime.Date.fromObject = function(dt)
 {
 	var Dict = use("Runtime.Dict");
 	var y = Number(dt.getFullYear());
 	var m = Number(dt.getMonth()) + 1;
 	var d = Number(dt.getDate());
-	var dt = new Runtime.Date( ctx, Dict.from({"y":y,"m":m,"d":d}) );
+	var dt = new Runtime.Date(Dict.from({"y":y,"m":m,"d":d}));
 	return dt;
 }
 #endif

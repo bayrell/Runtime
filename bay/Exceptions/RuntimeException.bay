@@ -18,8 +18,6 @@
 
 namespace Runtime.Exceptions;
 
-use Runtime.rtl;
-
 
 abstract class ClassException{}
 
@@ -39,7 +37,7 @@ Runtime.Exceptions.ClassException.prototype = Object.create(Error.prototype);
 Runtime.Exceptions.ClassException.prototype.constructor = Runtime.Exceptions.ClassException;
 Object.assign(Runtime.Exceptions.ClassException.prototype,
 {
-	_init: function(ctx){},
+	_init: function(){},
 });
 Object.assign(Runtime.Exceptions.ClassException,
 {
@@ -52,11 +50,11 @@ use.add(Runtime.Exceptions.ClassException);
 #case ifcode PHP then
 class ClassException extends \Exception
 {
-	function __construct($ctx, $message="", $code=-1, $prev=null)
+	function __construct($message="", $code=-1, $prev=null)
 	{
 		parent::__construct($message, (int)$code, $prev);
 	}
-	function _init($ctx){}
+	function _init(){}
 }
 #endswitch
 

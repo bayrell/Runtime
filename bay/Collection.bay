@@ -18,7 +18,6 @@
  
 namespace Runtime;
 
-use Runtime.rtl;
 use Runtime.Exceptions.IndexOutOfRange;
 use Runtime.Exceptions.RuntimeException;
 

@@ -23,7 +23,6 @@ use Runtime.Callback;
 use Runtime.Context;
 use Runtime.Date;
 use Runtime.DateTime;
-use Runtime.SerializerJson;
 use Runtime.Entity.Provider;
 use Runtime.Exceptions.AssertException;
 
@@ -388,11 +387,28 @@ class rtl
 	/**
 	 * Translate
 	 */
-	string translate(string s, Dict params)
+	static string translate(string s, Dict params)
 	{
 		return @.translate(s, params);
 	}
 	
+	
+	/* ================================= Lib Functions =================================== */
+	
+	static fn compare(string order, fn f = null)
+	{
+		return int (var a, var b) use (order, f)
+		{
+			if (f)
+			{
+				a = f(a);
+				b = f(b);
+			}
+			if (a < b) return 1;
+			if (a > b) return -1;
+			return 0;
+		};
+	}
 	
 	/* =============================== Convert Functions ================================= */
 	
@@ -405,6 +421,20 @@ class rtl
 		return [...generator];
 		#endif
 		return generator;
+	}
+	
+	
+	/**
+	 * Convert to int
+	 */
+	static int toInt(string s)
+	{
+		#switch
+		#case ifcode PHP then
+		return (int)$s;
+		#case ifcode JAVASCRIPT then
+		return Number(s);
+		#endswitch
 	}
 	
 	

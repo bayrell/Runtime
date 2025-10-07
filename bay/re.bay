@@ -18,8 +18,6 @@
 
 namespace Runtime;
 
-use Runtime.Vector;
-
 
 class re
 {
@@ -36,12 +34,11 @@ class re
 		#case ifcode PHP then
 		
 		$arr = preg_split("/" . $delimiter . "/", $s, $limit);
-		return Vector::from($arr);
+		return \Runtime\Vector::from($arr);
 		
 		#case ifcode JAVASCRIPT then
 		
 		var _rtl = use("Runtime.rtl");
-		var _Vector = use("Runtime.Vector");
 		
 		var arr = null;
 		var delimiter = new RegExp(delimiter, "g");
@@ -53,7 +50,7 @@ class re
 		{
 			arr = s.split(delimiter, limit);
 		}
-		return _Vector.from(arr);
+		return arr;
 		
 		#endswitch
 	}
@@ -92,9 +89,9 @@ class re
 	 * Search regular expression
 	 * @param string r regular expression
 	 * @param string s string
-	 * @return Vector result
+	 * @return Collection result
 	 */
-	static Vector<string> matchAll(string r, string s, string pattern="")
+	static Collection<string> matchAll(string r, string s, string pattern="")
 	{
 		#switch
 		
@@ -114,10 +111,10 @@ class re
 			}
 			$res = array_map
 			(
-				function ($item) { return Vector::from($item); },
+				function ($item) { return \Runtime\Vector::from($item); },
 				$res
 			);
-			return Vector::from($res);
+			return \Runtime\Vector::from($res);
 		}
 		
 		return null;
@@ -139,7 +136,7 @@ class re
 		else arr = [...s.matchAll(r)];
 		
 		if (arr.length == 0) return null;
-		return Runtime.Vector.from( arr.map( (v) => Runtime.Vector.from(v) ) );
+		return arr.map((v) => Runtime.Vector.from(v));
 		
 		#endswitch
 		
