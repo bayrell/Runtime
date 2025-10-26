@@ -96,6 +96,8 @@ class BaseModel extends BaseObject implements SerializeInterface
 	 */
 	void assign(Map data)
 	{
+		this.component = data.get("component");
+		this.widget_name = data.get("widget_name");
 		Map widgets = data.get("widgets");
 		this.assignWidgets(widgets);
 	}
@@ -108,16 +110,19 @@ class BaseModel extends BaseObject implements SerializeInterface
 	{
 		if (not widgets) return;
 		
-		Vector keys = rs::list(widgets.keys());
+		Vector keys = rtl::list(widgets.keys());
 		for (int i=0; i<keys.count(); i++)
 		{
 			string widget_name = keys.get(i);
-			Map data = widgets.get(widget_name);
+			Map widget_data = widgets.get(widget_name);
 			BaseModel widget = this.getWidget(widget_name);
-			if (widget)
+			if (not widget)
 			{
-				widget.assign(data);
+				string class_name = widget_data.get("class_name");
+				widget = this.addWidget(class_name);
+				this.widgets.set(widget_name, widget);
 			}
+			widget.assign(widget_data);
 		}
 	}
 	
@@ -129,6 +134,8 @@ class BaseModel extends BaseObject implements SerializeInterface
 	{
 		return {
 			"class_name": static::getClassName(),
+			"component": this.component,
+			"widget_name": this.widget_name,
 			"widgets": this.widgets.map(Dict (BaseModel widget) => widget.getData()),
 		};
 	}
@@ -139,8 +146,11 @@ class BaseModel extends BaseObject implements SerializeInterface
 	 */
 	BaseModel addWidget(string class_name, Dict params = null)
 	{
+		if (params == null) params = {};
 		if (not params.has("parent_widget")) params.set("parent_widget", this);
 		BaseModel widget = rtl::newInstance(class_name, [params]);
+		string widget_name = params.get("widget_name");
+		if (widget_name) this.widgets.set(widget_name, widget);
 		return widget;
 	}
 	

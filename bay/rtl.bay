@@ -488,6 +488,32 @@ class rtl
 	
 	
 	/**
+	 * Convert object to Map
+	 */
+	static Map toMap(var obj)
+	{
+		#switch
+		#case ifcode PHP then
+		#case ifcode JAVASCRIPT then
+		if (typeof obj !== 'object' || obj === null)
+		{
+			return obj;
+		}
+		if (Array.isArray(obj))
+		{
+			return obj.map(item => this.toMap(item));
+		}
+		var obj = Object.entries(obj).map((item) =>
+		{
+			item[1] = this.toMap(item[1]);
+			return item;
+		});
+		return new Map(obj);
+		#endswitch
+	}
+	
+	
+	/**
 	 * Json Decode
 	 */
 	static var jsonDecode(var obj)
@@ -644,9 +670,10 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		static::$_global_context = $context;
-		#case ifcode JAVASCRIPT then
+		#case ifcode NODEJS then
 		use("Runtime.rtl")._global_context = context;
 		#case ifcode ES6 then
+		this._global_context = context;
 		window['global_context'] = context;
 		#endswitch
 	}
@@ -718,5 +745,16 @@ class rtl
 	 */
 	static async void mount(var app_data, string selector)
 	{
+		app_data = static::toMap(app_data);
+		
+		/* Create context */
+		var modules = app_data.get("modules");
+		var context = await static::createContext({
+			"modules": modules,
+		});
+		
+		/* Render app */
+		var render = context.provider("render");
+		render.mount(app_data, selector);
 	}
 }

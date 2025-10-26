@@ -23,4 +23,17 @@ use Runtime.BaseProvider;
 
 class RenderProvider extends BaseProvider
 {
+	/**
+	 * Mount
+	 */
+	async void mount(Dict app_data, string selector)
+	{
+		var layout_data = app_data.get("layout");
+		var class_name = layout_data.get("class_name");
+		var layout = rtl::newInstance(class_name);
+		layout.assign(layout_data);
+		#ifcode ES6 then
+		window["app_layout"] = layout;
+		#endif
+	}
 }

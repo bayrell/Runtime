@@ -40,6 +40,27 @@ class BaseLayout extends BaseModel
 	
 	
 	/**
+	 * Assign data
+	 */
+	void assign(Dict data)
+	{
+		parent(data);
+		this.current_page_model = data.get("current_page_model");
+	}
+	
+	
+	/**
+	 * Returns data
+	 */
+	Dict getData()
+	{
+		Dict result = parent();
+		result.set("current_page_model", this.current_page_model);
+		return result;
+	}
+	
+	
+	/**
 	 * Add component
 	 */
 	void addComponent(string class_name)
@@ -64,7 +85,7 @@ class BaseLayout extends BaseModel
 		BaseModel page = this.getWidget(class_name);
 		if (not page)
 		{
-			page = rtl::newInstance(class_name);
+			page = rtl::newInstance(class_name, [{"widget_name": class_name}]);
 			this.setWidget(class_name, page);
 		}
 	}
