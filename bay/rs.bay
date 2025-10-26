@@ -591,12 +591,12 @@ class rs
 		#switch
 		#case ifcode PHP then
 		
-		return htmlspecialchars($s, ENT_QUOTES | ENT_HTML401);
+		return htmlspecialchars($s, ENT_QUOTES | ENT_HTML5);
 		
 		#case ifcode JAVASCRIPT then
 		
 		var obj = {
-			"<":"&lt;",
+			"<": "&lt;",
 			">": "&gt;", 
 			"&": "&amp;",
 			'"': '&quot;',
@@ -870,20 +870,27 @@ class rs
 	 * @param string
 	 * @return int hash
 	 */
-	static int hash(string s, bool last=true, int x = 257, int p = 1000000007)
+	static int hash(string s, int x = 257, int p = 1000000007)
 	{
 		int h = 0;
 		int sz = rs::strlen(s);
 		for (int i=0; i<sz; i++)
 		{
-			int ch = rs::ord( rs::substr(s, i, 1) );
+			int ch = rs::ord(rs::charAt(s, i, 1));
 			h = (h * x + ch) % p;
 		}
-		if (last)
-		{
-			h = (h * x) % p;
-		}
 		return h;
+	}
+	
+	
+	/**
+	 * Returns CSS Hash
+	 */
+	static string getCssHash(string class_name)
+	{
+		int h = rs::hash(class_name, 337, 65537) + 65537;
+		string res = rs::toHex((h * 337) % 65537);
+		return rs::substr(res, -4);
 	}
 	
 	
@@ -900,7 +907,7 @@ class rs
 		{
 			int c = h & 15;
 			h = h >> 4;
-			r = rs::substr(a, c, 1) ~ r;
+			r = rs::charAt(a, c) ~ r;
 			if (h == 0) break;
 		}
 		return r;
@@ -962,7 +969,7 @@ class rs
 		int sz_s = rs::strlen(s);
 		for (int i=0; i<len; i++)
 		{
-			int code = Math::random(0, sz_s - 1);
+			int code = rtl::random(0, sz_s - 1);
 			res ~= s[code];
 		}
 		

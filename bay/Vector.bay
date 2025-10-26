@@ -184,7 +184,7 @@ use.add(Runtime.Vector);
 
 #case ifcode PHP then
 
-class Vector implements ArrayAccess
+class Vector implements \ArrayAccess, \JsonSerializable
 {
 	var $_arr = [];
 	
@@ -198,7 +198,7 @@ class Vector implements ArrayAccess
 	/**
 	 * Create vector
 	 */
-	static create($arr)
+	static function create($arr)
 	{
 		$res = new static();
 		$res->_arr = $arr;
@@ -372,7 +372,7 @@ class Vector implements ArrayAccess
 	 * @param var value
 	 * @return value
 	 */
-	function reduce(fn f, var value)
+	function reduce($f, $value)
 	{
 		foreach ($this->_arr as $key => $item)
 		{
@@ -474,7 +474,7 @@ class Vector implements ArrayAccess
 	 * Sort Collection
 	 * @param fn f - Sort user function
 	 */
-	sort($f = null)
+	function sort($f = null)
 	{
 		if ($f) usort($this->_arr, $f);
 		else sort($this->_arr);
@@ -484,7 +484,7 @@ class Vector implements ArrayAccess
 	/**
 	 * Reverse Collection
 	 */
-	reverse()
+	function reverse()
 	{
 		$this->_arr = array_reverse($this->_arr);
 	}
@@ -498,7 +498,7 @@ class Vector implements ArrayAccess
 		$res = new static();
 		for ($i=0; $i<$this->count(); $i++)
 		{
-			$pos = array_search($value, $res->_arr, true);
+			$pos = array_search($this[$i], $res->_arr, true);
 			if ($pos === false)
 			{
 				$res->_arr[] = $this[$i];
@@ -509,12 +509,21 @@ class Vector implements ArrayAccess
 	
 	
 	/**
+	 * Json Serialize
+	 */
+	function jsonSerialize() : mixed
+	{
+		return $this->_arr;
+	}
+	
+	
+	/**
 	 * Get and set methods
 	 */
-	function offsetExists($k){return isset($this->_arr[$k]);}
-	function offsetGet($k){return $this->get($k);}
-	function offsetSet($k, $v){$this->set($k, $v);}
-	function offsetUnset($k){
+	function offsetExists(mixed $k): bool{return isset($this->_arr[$k]);}
+	function offsetGet(mixed $k): mixed{return $this->get($k);}
+	function offsetSet(mixed $k, mixed $v): void{$this->set($k, $v);}
+	function offsetUnset(mixed $k): void{
 		throw new \Runtime\Exceptions\RuntimeException("Can't to remove item");
 	}
 }

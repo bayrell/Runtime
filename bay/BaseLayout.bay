@@ -18,64 +18,54 @@
 
 namespace Runtime;
 
+use Runtime.BaseModel;
 
-class BaseObject
+
+class BaseLayout extends BaseModel
 {
-	/** 
-	 * Constructor
+	Vector<string> components = [];
+	string current_page_model = "";
+	string lang = "en";
+	string title = "";
+	
+	
+	/**
+	 * Init params
 	 */
-	public void constructor()
-	{		
-		/* Init object */
-		this._init();
+	void initParams(Dict params = null)
+	{
+		parent(params);
+		this.layout = this;
 	}
 	
 	
 	/**
-	 * Init function
+	 * Add component
 	 */
-	protected void _init()
+	void addComponent(string class_name)
 	{
+		this.components.push(class_name);
 	}
 	
 	
 	/**
-	 * Assign new values
+	 * Returns page model
 	 */
-	protected void _assign_values(Dict changes = null)
+	BaseModel getPageModel() => this.widgets.get(this.current_page_model);
+	
+	
+	/**
+	 * Set page model
+	 */
+	void setPageModel(string class_name)
 	{
-		#switch
-		#case ifcode PHP then
+		this.current_page_model = class_name;
 		
-		if ($changes instanceof \Runtime\Map)
+		BaseModel page = this.getWidget(class_name);
+		if (not page)
 		{
-			foreach ($changes->_map as $key => $value)
-			{
-				$k = $this->__getKey($key);
-				if (property_exists($this, $k))
-				{
-					$this->$k = $value;
-				}
-			}
+			page = rtl::newInstance(class_name);
+			this.setWidget(class_name, page);
 		}
-		
-		#case ifcode JAVASCRIPT then
-		
-		if (changes instanceof Map)
-		{
-			for (var key of changes.keys())
-			{
-				var value = changes.get(key);
-				this[key] = value;
-			}
-		}
-		
-		#endswitch
 	}
-	
-	
-	#switch
-	#case ifcode PHP then
-	function __getKey($k){return $k;}
-	#endswitch
 }

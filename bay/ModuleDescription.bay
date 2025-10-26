@@ -53,6 +53,7 @@ class ModuleDescription
 		new Provider("output", "Runtime.Providers.OutputProvider"),
 		/*new Provider("log", null),*/
 		new Provider("hook", "Runtime.Providers.HookProvider"),
+		new Provider("render", "Runtime.Providers.RenderProvider"),
 	];
 	
 }

@@ -128,5 +128,6 @@ class HookProvider extends BaseProvider
 	 */
 	void apply(string hook_name, Map params = null)
 	{
+		return params;
 	}
 }

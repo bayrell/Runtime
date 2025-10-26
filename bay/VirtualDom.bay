@@ -16,24 +16,11 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Entity;
+namespace Runtime;
 
 use Runtime.BaseObject;
-use Runtime.BaseStruct;
 
 
-class Entity extends BaseObject
+class VirtualDom extends BaseObject
 {
-	/* Entity name */
-	string name = "";
-	
-	
-	/**
-	 * Constructor
-	 */
-	void constructor(Map obj)
-	{
-		parent();
-		this._assign_values(obj);
-	}
 }

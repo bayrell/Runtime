@@ -20,117 +20,31 @@
 
 class Loader
 {
-	var $entry_point = "";
-	var $modules = [];
-	var $params = [
-		"environments" => [],
-	];
-	var $search_path = [];
-	
-	
-	/**
-	 * Set base path
-	 */
-	function setBasePath($base_path)
-	{
-		$this->params["base_path"] = $base_path;
-	}
-	
-	
-	/**
-	 * Set env
-	 */
-	function setEnv($key, $value)
-	{
-		$this->params["environments"]->set($key, $value);
-	}
-	
-
-	/**
-	 * Returns request uri
-	 */
-	function getRequestUri()
-	{
-		$request_url = "";
-		if (isset($_SERVER["HTTP_X_FORWARDED_PREFIX"]))
-		{
-			$request_url .= $_SERVER["HTTP_X_FORWARDED_PREFIX"];
-		}
-		$request_url .= $_SERVER["REQUEST_URI"];
-		return $request_url;
-	}
-	
-	
-	/**
-	 * Create loader
-	 */
-	static function create(string $base_path)
-	{
-		$loader = new Loader();
-		$loader->include(BASE_PATH . "/plugins/plugins.php");
-		$loader->init();
-		$loader->include(BASE_PATH . "/init.php");
-		return $loader;
-	}
+	static $search_path = [];
 	
 	
 	/**
 	 * Init loader
 	 */
-	function init()
+	static function init()
 	{
 		/* Setup load files */
-		spl_autoload_register([ $this, 'load' ]);
+		spl_autoload_register([ static::class, 'load' ]);
 		
 		/* Setup PHP error handler */
-		set_exception_handler([ $this, 'exception' ]);
+		set_exception_handler([ static::class, 'exception' ]);
 		
 		/* Shutdown */
-		register_shutdown_function([ $this, 'shutdown' ]);
-		
-		/* Init values */
-		$this->params["environments"] = new \Runtime\Map();
-	}
-	
-	
-	/**
-	 * Run app
-	 */
-	function runApp()
-	{
-		return \Runtime\rtl::runApp(
-			
-			/* Entry point */
-			$this->entry_point,
-			
-			/* Modules */
-			$this->modules,
-			
-			/* Context parameters */
-			\Runtime\Map::from($this->params)
-		);
-	}
-	
-	
-	/**
-	 * Include modules
-	 */
-	function include($file_name)
-	{
-		if (file_exists($file_name))
-		{
-			$f = require_once $file_name;
-			$f($this);
-		}
+		register_shutdown_function([ static::class, 'shutdown' ]);
 	}
 	
 	
 	/**
 	 * Add module
 	 */
-	function add($module, $path)
+	static function add($module, $path)
 	{
-		$this->search_path[] = [
+		static::$search_path[] = [
 			"module" => $module,
 			"path" => $path,
 		];
@@ -140,14 +54,14 @@ class Loader
 	/**
 	 * Load module
 	 */
-	function loadModule($module_name, $file_path)
+	static function loadModule($module_name, $file_path)
 	{
 		$module_name = implode(".", $module_name);
 		$module_name_sz = mb_strlen($module_name);
 		$file_name = array_pop($file_path);
 		$file_path = implode("/", $file_path);
 		
-		foreach ($this->search_path as $info)
+		foreach (static::$search_path as $info)
 		{
 			/* If module is exists */
 			if ($info["module"] != $module_name)
@@ -173,7 +87,7 @@ class Loader
 	/**
 	 * Load class
 	 */
-	function load($class_name)
+	static function load($class_name)
 	{
 		$arr = explode("\\", $class_name);
 		$arr = array_filter($arr, function ($s){ return $s != ""; });
@@ -196,7 +110,7 @@ class Loader
 	/**
 	 * PHP exception
 	 */
-	function exception($e)
+	static function exception($e)
 	{
 		if (!$e) return;
 		
@@ -222,7 +136,7 @@ class Loader
 	/**
 	 * PHP shutdown
 	 */
-	function shutdown()
+	static function shutdown()
 	{
 		$error = error_get_last();
 		if (!$error) return;

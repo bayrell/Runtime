@@ -1,0 +1,161 @@
+/*!
+ *  BayLang Technology
+ *
+ *  (c) Copyright 2016-2024 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.BaseObject;
+use Runtime.SerializeInterface;
+
+
+class BaseModel extends BaseObject implements SerializeInterface
+{
+	BaseModel layout = null;
+	BaseModel parent_widget = null;
+	string component = "";
+	string widget_name = "";
+	Dict widgets = {};
+	
+	
+	/**
+	 * Create model
+	 */
+	void constructor(Dict params = null)
+	{
+		parent();
+		
+		/* Setup widget params */
+		this.initParams(params);
+		
+		/* Init widget settings */
+		this.initWidget(params);
+		
+		/* Add component */
+		if (this.layout != null and this.component != "")
+		{
+			this.layout.addComponent(this.component);
+		}
+	}
+	
+	
+	/**
+	 * Init widget params
+	 */
+	void initParams(Dict params = null)
+	{
+		if (not params) return;
+		
+		this.parent_widget = params.get("parent_widget");
+		this.layout = this.parent_widget ? this.parent_widget.layout : null;
+		
+		/* Setup params */
+		this.component = params.has("component") ? params.get("component") : this.component;
+		this.widget_name = params.get("widget_name");
+	}
+	
+	
+	/**
+	 * Init widget settings
+	 */
+	void initWidget(Dict params = null)
+	{
+	}
+	
+	
+	/**
+	 * Load widget data
+	 */
+	async void loadData()
+	{
+		Vector keys = rtl::list(this.widgets.keys());
+		for (int i=0; i<keys.count(); i++)
+		{
+			string widget_name = keys.get(i);
+			BaseModel widget = this.widgets.get(widget_name);
+			await widget.loadData();
+		}
+	}
+	
+	
+	/**
+	 * Assign object
+	 */
+	void assign(Map data)
+	{
+		Map widgets = data.get("widgets");
+		this.assignWidgets(widgets);
+	}
+	
+	
+	/**
+	 * Assign widgets
+	 */
+	void assignWidgets(Map widgets)
+	{
+		if (not widgets) return;
+		
+		Vector keys = rs::list(widgets.keys());
+		for (int i=0; i<keys.count(); i++)
+		{
+			string widget_name = keys.get(i);
+			Map data = widgets.get(widget_name);
+			BaseModel widget = this.getWidget(widget_name);
+			if (widget)
+			{
+				widget.assign(data);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Returns object data
+	 */
+	Dict getData()
+	{
+		return {
+			"class_name": static::getClassName(),
+			"widgets": this.widgets.map(Dict (BaseModel widget) => widget.getData()),
+		};
+	}
+	
+	
+	/**
+	 * Add widget
+	 */
+	BaseModel addWidget(string class_name, Dict params = null)
+	{
+		if (not params.has("parent_widget")) params.set("parent_widget", this);
+		BaseModel widget = rtl::newInstance(class_name, [params]);
+		return widget;
+	}
+	
+	
+	/**
+	 * Returns widget by name
+	 */
+	BaseModel getWidget(string name) => this.widgets.get(name);
+	
+	
+	/**
+	 * Set widget
+	 */
+	void setWidget(string name, BaseModel widget)
+	{
+		this.widgets.set(name, widget);
+	}
+}

@@ -16,24 +16,11 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Entity;
+namespace Runtime.Providers;
 
-use Runtime.BaseObject;
-use Runtime.BaseStruct;
+use Runtime.BaseProvider;
 
 
-class Entity extends BaseObject
+class RenderProvider extends BaseProvider
 {
-	/* Entity name */
-	string name = "";
-	
-	
-	/**
-	 * Constructor
-	 */
-	void constructor(Map obj)
-	{
-		parent();
-		this._assign_values(obj);
-	}
 }

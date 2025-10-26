@@ -30,5 +30,5 @@ interface SerializeInterface
 	/**
 	 * Returns object data
 	 */
-	void getData();
+	Dict getData();
 }

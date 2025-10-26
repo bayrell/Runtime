@@ -18,16 +18,18 @@
 
 namespace Runtime.Hooks;
 
-use Runtime.BaseHook;
+use Runtime.Hooks.BaseHook;
 
 
 class RuntimeHook extends BaseHook
 {
-	static const string INIT = "runtime::init";
-	static const string START = "runtime::start";
-	static const string LAUNCHED = "runtime::launched";
-	static const string RUN = "runtime::run";
-	static const string ENV = "runtime::env";
+	const string INIT = "runtime::init";
+	const string START = "runtime::start";
+	const string LAUNCHED = "runtime::launched";
+	const string RUN = "runtime::run";
+	const string ENV = "runtime::env";
+	const string LAYOUT_NAME = "runtime::layout_name";
+	const string CREATE_LAYOUT = "runtime::create_layout";
 	
 	
 	/**

@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Runtime;
+namespace Runtime.Hooks;
 
 use Runtime.BaseObject;
 use Runtime.Entity.Hook;

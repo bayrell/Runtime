@@ -155,18 +155,28 @@ class rtl
 	{
 		if (static::isString(class_name)) return class_name;
 		
+		#switch
+		#case ifcode PHP then
+		
+		return str_replace("\\", ".", get_class($class_name));
+		
+		#case ifcode JAVASCRIPT then
+		
 		var obj = this.findClass(class_name);
-		return obj and obj.getClassName ? obj.getClassName() : "";
+		return obj && obj.getClassName ? obj.getClassName() : "";
+		
+		#endswitch
 	}
 	
 	
 	/**
 	 * Returns parent class name
 	 */
-	static var parentClassName(var class_name)
+	static var parentClassName(string class_name)
 	{
 		#switch
 		#case ifcode PHP then
+		$class_name = static::findClass($class_name);
 		$class_name = get_parent_class($class_name);
 		return str_replace("\\", ".", $class_name);
 		#case ifcode JAVASCRIPT then
@@ -248,7 +258,7 @@ class rtl
 			return false;
 		}
 		
-		$class_name = static::find_class($class_name);
+		$class_name = static::findClass($class_name);
 		if (!class_exists($class_name)) return false;
 		
 		try
@@ -288,7 +298,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		$class_name = static::find_class($class_name);
+		$class_name = static::findClass($class_name);
 		if ($args == null)
 			return new $class_name();
 		$r = new \ReflectionClass($class_name);
@@ -417,9 +427,12 @@ class rtl
 	 */
 	static Collection list(var generator)
 	{
-		#ifcode JAVASCRIPT then
+		#switch
+		#case ifcode PHP then
+		return \Runtime\Vector::create(iterator_to_array($generator));
+		#case ifcode JAVASCRIPT then
 		return [...generator];
-		#endif
+		#endswitch
 		return generator;
 	}
 	
@@ -657,20 +670,30 @@ class rtl
 	
 	
 	/**
+	 * Create app
+	 */
+	static async Context createApp(string app, Collection modules)
+	{
+		Dict params = {
+			"providers": [
+				new Provider("app", app),
+			],
+			"modules": modules,
+		};
+		Context context = await this.createContext(params);
+		await context.start();
+		return context;
+	}
+	
+	
+	/**
 	 * Run app
 	 */
 	static async int runApp(string app, Collection modules)
 	{
 		try
 		{
-			Dict params = {
-				"providers": [
-					new Provider("app", app),
-				],
-				"modules": modules,
-			};
-			Context context = await this.createContext(params);
-			await context.start();
+			Context context = await static::createApp(app, modules);
 			var app = context.provider("app");
 			return await app.main();
 		}
@@ -687,5 +710,13 @@ class rtl
 			process.stderr.write("\x1B[0m\n");
 			#endswitch
 		}
+	}
+	
+	
+	/**
+	 * Mount app
+	 */
+	static async void mount(var app_data, string selector)
+	{
 	}
 }

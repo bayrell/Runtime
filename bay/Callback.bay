@@ -84,7 +84,7 @@ class Callback extends BaseObject
 		#case ifcode PHP then
 		
 		if ($args == null) $args = [];
-		else if ($args implements \Runtime\Collection) $args = $args->toArray();
+		else if ($args instanceof \Runtime\Collection) $args = $args->toArray();
 		
 		$obj = $this->obj;
 		if (gettype($obj) == "string") $obj = rtl::findClass($obj);

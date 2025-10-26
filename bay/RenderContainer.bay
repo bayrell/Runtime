@@ -1,0 +1,83 @@
+/*!
+ *  BayLang Technology
+ *
+ *  (c) Copyright 2016-2024 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.BaseObject;
+use Runtime.BaseModel;
+use Runtime.VirtualDom;
+use Runtime.Hooks.RuntimeHook;
+
+
+class RenderContainer extends BaseObject
+{
+	BaseModel layout = null;
+	
+	
+	/**
+	 * Create layout
+	 */
+	BaseModel createLayout(string layout_name)
+	{
+		string class_name = "Runtime.BaseLayout";
+		
+		/* Get layout params */
+		Dict params = @.hook(RuntimeHook::LAYOUT_NAME, {
+			"class_name": class_name,
+			"layout_name": layout_name,
+		});
+		
+		this.layout = rtl::newInstance(params.get("class_name"), [params]);
+		
+		/* Call create layout */
+		@.hook(RuntimeHook::CREATE_LAYOUT, {
+			"container": this,
+		});
+		
+		return this.layout;
+	}
+	
+	
+	/**
+	 * Load data
+	 */
+	async void loadData()
+	{
+		await this.layout.loadData();
+	}
+	
+	
+	/**
+	 * Returns data
+	 */
+	Dict getData()
+	{
+		return {
+			"modules": @.modules,
+			"layout": this.layout ? this.layout.getData() : null,
+		};
+	}
+	
+	
+	/**
+	 * Render layout
+	 */
+	VirtualDom render()
+	{
+	}
+}

@@ -70,6 +70,49 @@ copy: function()
 
 
 /**
+ * Call function map
+ */
+map: function(f)
+{
+	var map = new Map();
+	for (var key of this.keys())
+	{
+		map.set(key, f(this.get(key), key, this));
+	}
+	return map;
+},
+
+
+/**
+ * Reduce
+ */
+reduce: function(f, result)
+{
+	for (var key of this.keys())
+	{
+		result = f(result, this.get(key), key, this);
+	}
+	return result;
+},
+
+
+/**
+ * Filter
+ */
+filter: function(f)
+{
+	var map = new Map();
+	for (var key of this.keys())
+	{
+		var value = this.get(key);
+		var flag = f(value, key, this);
+		if (flag) map.set(key, value);
+	}
+	return map;
+},
+
+
+/**
  * Call function for each item
  * @param fn f
  */
@@ -104,15 +147,34 @@ use.add(Runtime.Map);
 
 #case ifcode PHP then
 
-class Map
+class Map implements \JsonSerializable
 {
+	var $_map = [];
+	
+	
+	/**
+	 * Constructor
+	 */
+	function __construct($map = null)
+	{
+		if ($map != null)
+		{
+			if (is_array($map)) $this->_map = $map;
+			else $this->_map = $map->_map;
+		}
+	}
+	
+	
 	/**
 	 * Returns value from position
 	 * @param string key
 	 * @param T default_value
 	 * @return T
 	 */
-	T get(string key, T default_value = null);
+	function get($key, $default_value = null)
+	{
+		return isset($this->_map[$key]) ? $this->_map[$key] : $default_value;
+	}
 	
 	
 	/**
@@ -121,7 +183,10 @@ class Map
 	 * @param T value 
 	 * @return self
 	 */
-	Dict<T> set(string key, T value);
+	function set($key, $value)
+	{
+		$this->_map[$key] = $value;
+	}
 	
 	
 	/**
@@ -129,7 +194,10 @@ class Map
 	 * @param string key
 	 * @return bool var
 	 */
-	bool has(string key);
+	function has($key)
+	{
+		return isset($this->_map[$key]);
+	}
 	
 	
 	/**
@@ -137,20 +205,32 @@ class Map
 	 * @param string key
 	 * @return self
 	 */
-	Dict<T> remove(string key);
+	function remove($key)
+	{
+		if (isset($this->_map[$key]))
+		{
+			unset($this->_map[$key]);
+		}
+	}
 	
 	
 	/**
 	 * Clear all values from vector
 	 * @return self
 	 */
-	Dict<T> clear();
+	function clear()
+	{
+		$this->_map = [];
+	}
 	
 	
 	/**
 	 * Copy map
 	 */
-	Dict<T> copy();
+	function copy()
+	{
+		return new static($this);
+	}
 	
 	
 	/**
@@ -158,21 +238,38 @@ class Map
 	 * @param Dict<T> map
 	 * @return self
 	 */
-	Dict<T> concat(Dict<T> map = null);
+	function concat($map = null)
+	{
+		if ($map == null) return;
+		
+		$this->_map = array_merge($this->_map, $map->_map);
+	}
 	
 	
 	/**
 	 * Returns vector of the keys
 	 * @return Collection<string>
 	 */
-	Collection<string> keys();
+	function keys()
+	{
+		foreach ($this->_map as $key => $value)
+		{
+			yield $key;
+		}
+	}
 	
 	
 	/**
 	 * Returns vector of the values
 	 * @return Collection<T>
 	 */
-	Collection<T> values();
+	function values()
+	{
+		foreach ($this->_map as $value)
+		{
+			yield $value;
+		}
+	}
 	
 	
 	/**
@@ -180,7 +277,15 @@ class Map
 	 * @param fn f
 	 * @return Dict
 	 */
-	Dict map(fn f);
+	function map($f)
+	{
+		$map = new static();
+		foreach ($this->_map as $key => $value)
+		{
+			$map->set($key, $f($value, $key, $this));
+		}
+		return $map;
+	}
 	
 	
 	/**
@@ -189,7 +294,14 @@ class Map
 	 * @param var init_value
 	 * @return init_value
 	 */
-	var reduce(fn f, var init_value);
+	function reduce($f, $result)
+	{
+		foreach ($this->_map as $key => $value)
+		{
+			$result = $f($result, $value, $key, $this);
+		}
+		return $result;
+	}
 	
 	
 	/**
@@ -197,14 +309,29 @@ class Map
 	 * @param fn f
 	 * @return Collection
 	 */
-	Dict<T> filter(fn f);
+	function filter($f)
+	{
+		$map = new static();
+		foreach ($this->_map as $key => $value)
+		{
+			$flag = $f($value, $key, $this);
+			if ($flag) $map->set($key, $value);
+		}
+		return $map;
+	}
 	
 	
 	/**
 	 * Call function for each item
 	 * @param fn f
 	 */
-	void each(fn f);
+	function each($f)
+	{
+		foreach ($this->_map as $key => $value)
+		{
+			$f($value, $key, $this);
+		}
+	}
 	
 	
 	/**
@@ -212,7 +339,24 @@ class Map
 	 * @param fn f
 	 * @return Vector
 	 */
-	Vector<T> transition(fn f);
+	function transition($f)
+	{
+		$arr = [];
+		foreach ($this->_map as $key => $value)
+		{
+			$arr[] = $f($value, $key, $this);
+		}
+		return $arr;
+	}
+	
+	
+	/**
+	 * Json Serialize
+	 */
+	function jsonSerialize() : mixed
+	{
+		return $this->_map;
+	}
 }
 
 #endswitch
