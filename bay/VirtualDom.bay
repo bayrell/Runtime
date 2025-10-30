@@ -19,18 +19,45 @@
 namespace Runtime;
 
 use Runtime.BaseObject;
+use Runtime.Component;
 
 
 class VirtualDom extends BaseObject
 {
-    Vector items = [];
-    
-    
-    /**
-     * Push content
-     */
-    void push(var content)
-    {
-        this.items.push(content);
-    }
+	Component component = null;
+	Map attrs = null;
+	Vector items = [];
+	string name = "";
+	
+	
+	/**
+	 * Constructor
+	 */
+	void constructor(Component component = null)
+	{
+		parent();
+		this.component = component;
+	}
+	
+	
+	/**
+	 * Add element
+	 */
+	VirtualDom element(var name, Dict attrs = null)
+	{
+		VirtualDom item = static::newInstance([this.component]);
+		item.name = name;
+		item.attrs = attrs;
+		this.push(item);
+		return item;
+	}
+	
+	
+	/**
+	 * Push content
+	 */
+	void push(var content)
+	{
+		this.items.push(content);
+	}
 }

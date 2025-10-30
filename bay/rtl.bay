@@ -395,6 +395,24 @@ class rtl
 	
 	
 	/**
+	 * Returns true if value is map
+	 */
+	static bool isMap(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return $value instanceof \Runtime\Map;
+		
+		#case ifcode JAVASCRIPT then
+		
+		return value instanceof Map;
+		
+		#endswitch
+	}
+	
+	
+	/**
 	 * Translate
 	 */
 	static string translate(string s, Dict params)

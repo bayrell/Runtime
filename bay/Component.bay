@@ -30,16 +30,17 @@ props BaseModel model = null;
 
 computed var layout()
 {
-    #ifcode JAVASCRIPT then
+	#ifcode JAVASCRIPT then
 	return this.$layout;
-    #endif
+	#endif
 }
 
 static var render()
 {
-    var vdom = this.render();
-    var provider = @.provider("render");
-    return provider.render(vdom);
+	var vdom = this.render();
+	var provider = @.provider("render");
+	var content = provider.render(vdom);
+	return content;
 }
 
 </script>

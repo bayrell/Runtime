@@ -19,6 +19,7 @@
 namespace Runtime.Providers;
 
 use Runtime.BaseProvider;
+use Runtime.VirtualDom;
 
 
 class RenderProvider extends BaseProvider
@@ -94,5 +95,22 @@ class RenderProvider extends BaseProvider
 	 */
 	void render(var vdom)
 	{
+		if (not(vdom instanceof VirtualDom)) return vdom;
+		Vector content = [];
+		for (int i=0; i<vdom.items.count(); i++)
+		{
+			VirtualDom item = vdom.items.get(i);
+			content.push(this.render(item));
+		}
+		fn h = window["Vue"].h;
+		if (vdom.name == "")
+		{
+			if (content.count() == 1) return content.get(0);
+			return content;
+		}
+		return h(vdom.name,
+			rtl::isMap(vdom.attrs) ? vdom.attrs.toObject() : vdom.attrs,
+			rtl::isString(vdom.name) ? content : var () => content,
+		);
 	}
 }

@@ -32,6 +32,14 @@ class BaseObject
 	
 	
 	/**
+	 * Returns new isntance
+	 */
+	static BaseObject newInstance(Collection args) =>
+		rtl::newInstance(static::getClassName(), args)
+	;
+	
+	
+	/**
 	 * Init function
 	 */
 	protected void _init()

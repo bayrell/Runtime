@@ -70,6 +70,15 @@ copy: function()
 
 
 /**
+ * Convert to Object
+ */
+toObject: function()
+{
+	return Object.fromEntries(this);
+},
+
+
+/**
  * Call function map
  */
 map: function(f)
