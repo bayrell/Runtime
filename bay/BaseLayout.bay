@@ -19,11 +19,13 @@
 namespace Runtime;
 
 use Runtime.BaseModel;
+use Runtime.DefaultLayout;
 
 
 class BaseLayout extends BaseModel
 {
 	Vector<string> components = [];
+	string component = classof DefaultLayout;
 	string current_page_model = "";
 	string lang = "en";
 	string title = "";

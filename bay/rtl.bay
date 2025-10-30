@@ -139,10 +139,10 @@ class rtl
 		{
 			class_name = typeof window != "undefined" ? window[class_name] : use(class_name);
 		}
+		else if (!(class_name instanceof Function)) class_name = class_name.constructor;
 		if (class_name == undefined || class_name == null) return null;
-		if (!(class_name instanceof Function)) class_name = class_name.constructor;
 		
-		return class_name instanceof Function ? class_name : null;
+		return class_name;
 		
 		#endswitch
 	}
@@ -743,7 +743,7 @@ class rtl
 	/**
 	 * Mount app
 	 */
-	static async void mount(var app_data, string selector)
+	static async void mount(var app_data, string element, fn callback=null)
 	{
 		app_data = static::toMap(app_data);
 		
@@ -754,7 +754,11 @@ class rtl
 		});
 		
 		/* Render app */
-		var render = context.provider("render");
-		render.mount(app_data, selector);
+		var render = context.factory("render");
+		var result = render.mount(app_data, element);
+		if (callback)
+		{
+			callback(result);
+		}
 	}
 }

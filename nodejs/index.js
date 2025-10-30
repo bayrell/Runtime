@@ -50,6 +50,7 @@ add("Runtime.Date");
 add("Runtime.DateTime");
 add("Runtime.Reference");
 add("Runtime.Entity.Entity");
+add("Runtime.Entity.Factory");
 add("Runtime.Entity.Hook");
 add("Runtime.Entity.Provider");
 add("Runtime.Exceptions.AbstractException");
@@ -64,6 +65,7 @@ add("Runtime.Hooks.BaseHook");
 add("Runtime.Hooks.RuntimeHook");
 add("Runtime.Providers.HookProvider");
 add("Runtime.Providers.OutputProvider");
+add("Runtime.Providers.RenderProvider");
 add("Runtime.ModuleDescription");
 
 module.exports = exports;

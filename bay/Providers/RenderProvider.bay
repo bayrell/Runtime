@@ -23,17 +23,76 @@ use Runtime.BaseProvider;
 
 class RenderProvider extends BaseProvider
 {
+	bool enable_ssr = false;
+	
+	
 	/**
-	 * Mount
+	 * Create layout
 	 */
-	async void mount(Dict app_data, string selector)
+	var createLayout(Dict app_data)
 	{
 		var layout_data = app_data.get("layout");
 		var class_name = layout_data.get("class_name");
 		var layout = rtl::newInstance(class_name);
 		layout.assign(layout_data);
-		#ifcode ES6 then
-		window["app_layout"] = layout;
+		return window["Vue"].reactive(layout);
+	}
+	
+	
+	/**
+	 * Create App
+	 */
+	var createApp(var layout)
+	{
+		var app = null;
+		fn registerLayout = null;
+		#ifcode JAVASCRIPT then
+		registerLayout = (layout) =>
+		{
+			return {
+				install: () => {
+					app.config.globalProperties.$layout = layout;
+				},
+			};
+		};
 		#endif
+		
+		var component = rtl::findClass(layout.component);
+		Dict props = {};
+		
+		var Vue = window["Vue"];
+		if (this.enable_ssr)
+		{
+			app = Vue.createSSRApp(component, props);
+		}
+		else
+		{
+			app = Vue.createApp(component, props);
+		}
+		app.use(registerLayout(layout));
+		return app;
+	}
+	
+	
+	/**
+	 * Mount
+	 */
+	void mount(Dict app_data, var element)
+	{
+		var layout = this.createLayout(app_data);
+		var app = this.createApp(layout);
+		app.mount(element, true);
+		return {
+			"app": app,
+			"layout": layout,
+		};
+	}
+	
+	
+	/**
+	 * Render
+	 */
+	void render(var vdom)
+	{
 	}
 }

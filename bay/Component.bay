@@ -1,4 +1,4 @@
-/*!
+<!--
  *  BayLang Technology
  *
  *  (c) Copyright 2016-2024 "Ildar Bikmamatov" <support@bayrell.org>
@@ -14,23 +14,34 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- */
+ *
+-->
 
-namespace Runtime;
+<class name="Runtime.Component">
 
-use Runtime.BaseObject;
+<use name="Runtime.BaseModel" />
 
+<template>
+</template>
 
-class VirtualDom extends BaseObject
+<script>
+
+props BaseModel model = null;
+
+computed var layout()
 {
-    Vector items = [];
-    
-    
-    /**
-     * Push content
-     */
-    void push(var content)
-    {
-        this.items.push(content);
-    }
+    #ifcode JAVASCRIPT then
+	return this.$layout;
+    #endif
 }
+
+static var render()
+{
+    var vdom = this.render();
+    var provider = @.provider("render");
+    return provider.render(vdom);
+}
+
+</script>
+
+</class>

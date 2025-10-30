@@ -1,4 +1,4 @@
-/*!
+<!--
  *  BayLang Technology
  *
  *  (c) Copyright 2016-2024 "Ildar Bikmamatov" <support@bayrell.org>
@@ -14,33 +14,24 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- */
+ *
+-->
 
-namespace Runtime;
+<class name="Runtime.DefaultLayout">
 
-use Runtime.BaseObject;
-use Runtime.FactoryInterface;
+<use name="Runtime.BaseModel" />
 
-
-class Factory extends BaseObject implements FactoryInterface
-{
-	Collection args = null;
-	
-	
-	/**
-	 * Create factory
-	 */
-	void constructor(string name, Dict args = null)
+<template name="renderCurrentPage">
+	%var BaseModel model = this.layout.getPageModel();
+	%var string class_name = model.component;
+	%if (class_name)
 	{
-		parent({
-			"name": name,
-			"args": args,
-		});
+		<{class_name} model={{ model }} />
 	}
-	
-	
-	/**
-	 * Create new object
-	 */
-	BaseObject createInstance() => rtl::newInstance(this.name, this.args);
-}
+</template>
+
+<template>
+	%render this.renderCurrentPage();
+</template>
+
+</class>

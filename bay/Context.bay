@@ -22,6 +22,7 @@ use Runtime.lib;
 use Runtime.BaseObject;
 use Runtime.BaseProvider;
 use Runtime.Callback;
+use Runtime.FactoryInterface;
 use Runtime.Entity.Entity;
 use Runtime.Entity.Provider;
 use Runtime.Exceptions.ItemNotFound;
@@ -84,6 +85,22 @@ class Context extends BaseObject
 	 * Returns environments
 	 */
 	Dict<string> getEnvironments() => this.environments.copy();
+	
+	
+	/**
+	 * Create new instance
+	 */
+	BaseObject factory(string name)
+	{
+		FactoryInterface item = this.entities.find(
+			bool (Entity entity) use (name) => entity.name == name
+		);
+		if (not item and not(item implements FactoryInterface))
+		{
+			throw new ItemNotFound(name, "Factory");
+		}
+		return item.createInstance();
+	}
 	
 	
 	/**

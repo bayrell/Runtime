@@ -55,5 +55,4 @@ class ModuleDescription
 		new Provider("hook", "Runtime.Providers.HookProvider"),
 		new Provider("render", "Runtime.Providers.RenderProvider"),
 	];
-	
 }

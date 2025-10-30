@@ -18,52 +18,8 @@
 
 namespace Runtime.Entity;
 
-use Runtime.BaseObject;
-use Runtime.BaseProvider;
-use Runtime.FactoryInterface;
-use Runtime.Entity.Entity;
+use Runtime.Entity.Factory;
 
-
-class Provider extends Entity implements FactoryInterface
+class Provider extends Factory
 {
-	/* Provider class name */
-	string value = null;
-	
-	/* Factory params */
-	Dict params = null;
-	
-	
-	/**
-	 * Constructor
-	 */
-	void constructor(string name, string value = null, Dict params = null)
-	{
-		parent({
-			"name": name,
-			"value": value,
-			"params": params,
-		});
-	}
-	
-	
-	/**
-	 * Create provider
-	 */
-	BaseProvider createInstance()
-	{
-		BaseProvider provider = null;
-		var class_name = this.value;
-		
-		if (class_name == null) class_name = this.name;
-		if (class_name instanceof BaseProvider)
-		{
-			provider = class_name;
-		}
-		else if (rtl::isString(class_name))
-		{
-			provider = rtl::newInstance(class_name, [this.params]);
-		}
-		
-		return provider;
-	}
 }
