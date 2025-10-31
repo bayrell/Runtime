@@ -28,128 +28,134 @@ abstract class Map{}
 
 #case ifcode JAVASCRIPT then
 
-Runtime.Map = Map;
-
-Object.assign(Map, {
-
-/**
- * Create map from Object
- */
-create(obj)
+Runtime.Map = class extends Map
 {
-	return new Map(Object.entries(obj));
-},
-
-
-/**
- * Create map from Object
- */
-from(obj)
-{
-	return new Map(Object.entries(obj));
-},
-
-/* Returns namespace */
-getNamespace() { return "Runtime"; },
-
-/* Returns class name */
-getClassName() { return "Runtime.Map"; },
-
-});
-
-Object.assign(Map.prototype, {
-
-
-/**
- * Copy map
- */
-copy: function()
-{
-	return new Map(this);
-},
-
-
-/**
- * Convert to Object
- */
-toObject: function()
-{
-	return Object.fromEntries(this);
-},
-
-
-/**
- * Call function map
- */
-map: function(f)
-{
-	var map = new Map();
-	for (var key of this.keys())
+	/**
+	 * Costructor
+	 */
+	constructor(obj = null)
 	{
-		map.set(key, f(this.get(key), key, this));
+		super(obj ? Object.entries(obj) : null);
 	}
-	return map;
-},
-
-
-/**
- * Reduce
- */
-reduce: function(f, result)
-{
-	for (var key of this.keys())
+	
+	
+	/**
+	 * Copy map
+	 */
+	copy()
 	{
-		result = f(result, this.get(key), key, this);
+		return new Runtime.Map(this.toObject());
 	}
-	return result;
-},
 
 
-/**
- * Filter
- */
-filter: function(f)
-{
-	var map = new Map();
-	for (var key of this.keys())
+	/**
+	 * Convert to Object
+	 */
+	toObject()
 	{
-		var value = this.get(key);
-		var flag = f(value, key, this);
-		if (flag) map.set(key, value);
+		return Object.fromEntries(this);
 	}
-	return map;
-},
 
 
-/**
- * Call function for each item
- * @param fn f
- */
-each: function(f)
-{
-	for (var key of this.keys())
+	/**
+	 * Call function map
+	 */
+	map(f)
 	{
-		var value = this.get(key);
-		f(value, key, this);
+		var map = new Runtime.Map();
+		for (var key of this.keys())
+		{
+			map.set(key, f(this.get(key), key, this));
+		}
+		return map;
 	}
-},
 
 
-/**
- * Transition
- */
-transition: function(f)
-{
-	var arr = [];
-	for (var key of this.keys())
+	/**
+	 * Reduce
+	 */
+	reduce(f, result)
 	{
-		var value = this.get(key);
-		arr.push(f(value, key, this));
+		for (var key of this.keys())
+		{
+			result = f(result, this.get(key), key, this);
+		}
+		return result;
 	}
-	return arr;
-},
 
-});
+
+	/**
+	 * Filter
+	 */
+	filter(f)
+	{
+		var map = new Map();
+		for (var key of this.keys())
+		{
+			var value = this.get(key);
+			var flag = f(value, key, this);
+			if (flag) map.set(key, value);
+		}
+		return map;
+	}
+
+
+	/**
+	 * Call function for each item
+	 * @param fn f
+	 */
+	each(f)
+	{
+		for (var key of this.keys())
+		{
+			var value = this.get(key);
+			f(value, key, this);
+		}
+	}
+
+
+	/**
+	 * Transition
+	 */
+	transition(f)
+	{
+		var arr = [];
+		for (var key of this.keys())
+		{
+			var value = this.get(key);
+			arr.push(f(value, key, this));
+		}
+		return arr;
+	}
+
+
+	/**
+	 * Create map from Object
+	 */
+	static create(obj)
+	{
+		return new Runtime.Map(obj);
+	}
+
+
+	/**
+	 * Create map from Object
+	 */
+	static from(obj)
+	{
+		return new Runtime.Map(obj);
+	}
+
+
+	/* Returns namespace */
+	static getNamespace() { return "Runtime"; }
+
+	/* Returns class name */
+	static getClassName() { return "Runtime.Map"; }
+};
+
+#case ifcode ES6 then
+window["Runtime.Map"] = Runtime.Map;
 
 #case ifcode NODEJS then
 use.add(Runtime.Map);

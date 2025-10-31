@@ -144,6 +144,7 @@ class Context extends BaseObject
 		
 		#case ifcode NODEJS then
 		
+		const RuntimeMap = use("Runtime.Map");
 		if (!params.has("cli_args"))
 		{
 			params.set("cli_args", process.argv.slice(1));
@@ -154,7 +155,7 @@ class Context extends BaseObject
 		}
 		if (!params.has("environments"))
 		{
-			params.set("environments", Map.from(process.env));
+			params.set("environments", RuntimeMap.from(process.env));
 		}
 		
 		#endswitch

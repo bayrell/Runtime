@@ -66,14 +66,13 @@ class rs
 		#case ifcode JAVASCRIPT then
 		
 		var _rtl = use("Runtime.rtl");
-		var _rs = use("Runtime.rs");
 		if (start < 0) start = s.length + start;
 		if (length === null){
 			return _rtl.toStr(s).substring(start);
 		}
 		var end = start + length;
 		if (length < 0){
-			var sz = _rs.strlen(s);
+			var sz = this.strlen(s);
 			end = sz + length;
 		}
 		return _rtl.toStr(s).substring(start, end);
@@ -256,12 +255,14 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		var _rtl = use("Runtime.rtl");
+		const rtl = use("Runtime.rtl");
+		const RuntimeVector = use("Runtime.Vector");
+		
 		var arr = null;
-		if (!_rtl.exists(limit))
+		if (!rtl.exists(limit))
 			arr = s.split(delimiter);
 		arr = s.split(delimiter, limit);
-		return arr;
+		return RuntimeVector.create(arr);
 		
 		#endswitch
 	}
@@ -286,12 +287,12 @@ class rs
 		
 		#case ifcode JAVASCRIPT then
 		
-		var _rtl = use("Runtime.rtl");
-		var _Collection = use("Runtime.Collection");
+		const rtl = use("Runtime.rtl");
+		const RuntimeVector = use("Runtime.Vector");
 		
 		var arr = null;
 		var delimiter = new RegExp("[" + delimiters.join("") + "]", "g");
-		if (!_rtl.exists(limit))
+		if (!rtl.exists(limit))
 		{
 			arr = s.split(delimiter);
 		}
@@ -299,7 +300,7 @@ class rs
 		{
 			arr = s.split(delimiter, limit);
 		}
-		return arr;
+		return RuntimeVector.create(arr);
 		
 		#endswitch
 	}

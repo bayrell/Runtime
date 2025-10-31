@@ -449,7 +449,8 @@ class rtl
 		#case ifcode PHP then
 		return \Runtime\Vector::create(iterator_to_array($generator));
 		#case ifcode JAVASCRIPT then
-		return [...generator];
+		const Vector = this.findClass("Runtime.Vector");
+		return new Vector(...generator);
 		#endswitch
 		return generator;
 	}
@@ -506,9 +507,32 @@ class rtl
 	
 	
 	/**
-	 * Convert object to Map
+	 * Convert primitive to object
 	 */
-	static Map toMap(var obj)
+	static var toNative(var obj)
+	{
+		#switch
+		#case ifcode PHP then
+		#case ifcode JAVASCRIPT then
+		const RuntimeMap = this.findClass("Runtime.Map");
+		const RuntimeVector = this.findClass("Runtime.Vector");
+		if (obj instanceof RuntimeVector)
+		{
+			return obj.map((value) => { return this.toNative(value); });
+		}
+		else if (obj instanceof RuntimeMap)
+		{
+			return obj.map((value) => { return this.toNative(value); }).toObject();
+		}
+		return obj;
+		#endswitch
+	}
+	
+	
+	/**
+	 * Convert native to primitive
+	 */
+	static var fromNative(var obj)
 	{
 		#switch
 		#case ifcode PHP then
@@ -519,14 +543,15 @@ class rtl
 		}
 		if (Array.isArray(obj))
 		{
-			return obj.map(item => this.toMap(item));
+			const RuntimeVector = this.findClass("Runtime.Vector");
+			return RuntimeVector.create(obj.map(item => this.fromNative(item)));
 		}
-		var obj = Object.entries(obj).map((item) =>
+		if (typeof obj == "object")
 		{
-			item[1] = this.toMap(item[1]);
-			return item;
-		});
-		return new Map(obj);
+			const RuntimeMap = this.findClass("Runtime.Map");
+			return RuntimeMap.create(obj).map(item => this.fromNative(item));
+		}
+		return obj;
 		#endswitch
 	}
 	
@@ -539,10 +564,12 @@ class rtl
 		#ifcode JAVASCRIPT then
 		try
 		{
+			const RuntimeVector = this.findClass("Runtime.Vector");
+			const RuntimeMap = this.findClass("Runtime.Map");
 			obj = JSON.parse(obj, (key, value) => {
 				if (value === null) return null;
-				if (Array.isArray(value)) return value;
-				if (typeof value == "object") return Map.create(value);
+				if (Array.isArray(value)) return RuntimeVector.create(value);
+				if (typeof value == "object") return RuntimeMap.create(value);
 				return value;
 			});
 		}
@@ -763,7 +790,7 @@ class rtl
 	 */
 	static async void mount(var app_data, string element, fn callback=null)
 	{
-		app_data = static::toMap(app_data);
+		app_data = static::fromNative(app_data);
 		
 		/* Create context */
 		var modules = app_data.get("modules");
@@ -780,3 +807,7 @@ class rtl
 		}
 	}
 }
+
+#ifcode ES6 then
+window["use"] = Runtime.rtl.findClass;
+#endif

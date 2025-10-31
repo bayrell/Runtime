@@ -110,7 +110,7 @@ class RenderProvider extends BaseProvider
 		}
 		return h(vdom.name,
 			rtl::isMap(vdom.attrs) ? vdom.attrs.toObject() : vdom.attrs,
-			rtl::isString(vdom.name) ? content : var () => content,
+			rtl::isString(vdom.name) ? content : var () use (content) => content,
 		);
 	}
 }
