@@ -319,7 +319,7 @@ class rs
 		#case ifcode PHP then
 		
 		if ($arr == null) return "";
-		return implode($ch, $arr->_getArr());
+		return implode($ch, $arr->_arr);
 		
 		#case ifcode JAVASCRIPT then
 		

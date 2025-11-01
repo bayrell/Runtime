@@ -182,7 +182,7 @@ use.add(Runtime.Vector);
 
 #case ifcode PHP then
 
-class Vector implements \ArrayAccess, \JsonSerializable
+class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 {
 	var $_arr = [];
 	
@@ -512,6 +512,15 @@ class Vector implements \ArrayAccess, \JsonSerializable
 	function jsonSerialize() : mixed
 	{
 		return $this->_arr;
+	}
+	
+	
+	/**
+	 * Returns iterator
+	 */
+	function getIterator(): \Traversable
+	{
+		return new \ArrayIterator($this->_arr);
 	}
 	
 	

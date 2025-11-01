@@ -1,0 +1,87 @@
+/*!
+ *  BayLang Technology
+ *
+ *  (c) Copyright 2016-2024 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime.Providers;
+
+use Runtime.BaseObject;
+use Runtime.Component;
+use Runtime.VirtualDom;
+
+
+class RenderContent extends BaseObject
+{
+	/**
+	 * Render
+	 */
+	void render(var vdom, Collection content)
+	{
+		if (not vdom) return;
+		if (not(vdom instanceof VirtualDom))
+		{
+			content.push(rs::escapeHtml(vdom));
+			return;
+		}
+		
+		if (VirtualDom::isComponent(vdom.name))
+		{
+			Component component = rtl::newInstance(vdom.name);
+			Collection<string> keys = rtl::list(vdom.attrs.keys());
+			for (int i=0; i<keys.count(); i++)
+			{
+				string attr_name = keys.get(i);
+				rtl::setAttr(component, attr_name, vdom.attrs.get(attr_name));
+			}
+			VirtualDom item = component.render();
+			this.render(item, content);
+		}
+		else
+		{
+			Vector item_result = [];
+			for (int i=0; i<vdom.items.count(); i++)
+			{
+				VirtualDom item = vdom.items.get(i);
+				this.render(item, item_result);
+			}
+			if (vdom.name != "")
+			{
+				Vector attr_items = [];
+				if (vdom.attrs)
+				{
+					Collection<string> keys = rtl::list(vdom.attrs.keys());
+					for (int i=0; i<keys.count(); i++)
+					{
+						string attr_name = keys.get(i);
+						string value = vdom.attrs.get(attr_name);
+						if (rs::charAt(attr_name, 0) == "@") continue;
+						attr_items.push(attr_name ~ "=\"" ~ rs::escapeHtml(value) ~ "\"");
+					}
+				}
+				string attrs = attr_items.count() > 0 ? " " ~ rs::join(" ", attr_items) : "";
+				content.push("<" ~ vdom.name ~ attrs ~ ">");
+				content.appendItems(item_result);
+				content.push("</" ~ vdom.name ~ ">");
+			}
+			else
+			{
+				content.push("<!--[-->");
+				content.appendItems(item_result);
+				content.push("<!--]-->");
+			}
+		}
+	}
+}

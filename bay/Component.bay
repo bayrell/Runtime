@@ -28,6 +28,10 @@
 
 props BaseModel model = null;
 
+#ifdef PHP then
+BaseModel layout = null;
+#endif
+
 computed var layout()
 {
 	#ifcode JAVASCRIPT then
@@ -35,6 +39,7 @@ computed var layout()
 	#endif
 }
 
+#ifdef JAVASCRIPT then
 static var render()
 {
 	var vdom = this.render();
@@ -42,6 +47,7 @@ static var render()
 	var content = provider.render(vdom);
 	return content;
 }
+#endif
 
 </script>
 

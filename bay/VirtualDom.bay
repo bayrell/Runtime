@@ -41,6 +41,17 @@ class VirtualDom extends BaseObject
 	
 	
 	/**
+	 * Returns true if tag_name is component
+	 */
+	static bool isComponent(string tag_name)
+	{
+		if (tag_name == "") return false;
+		string first = rs::substr(tag_name, 0, 1);
+		return rs::upper(first) == first;
+	}
+	
+	
+	/**
 	 * Add element
 	 */
 	VirtualDom element(var name, Dict attrs = null)

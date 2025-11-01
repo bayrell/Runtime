@@ -23,6 +23,7 @@ use Runtime.BaseModel;
 use Runtime.Serializer;
 use Runtime.VirtualDom;
 use Runtime.Hooks.RuntimeHook;
+use Runtime.Providers.RenderContent;
 
 
 class RenderContainer extends BaseObject
@@ -80,7 +81,14 @@ class RenderContainer extends BaseObject
 	/**
 	 * Render layout
 	 */
-	VirtualDom render()
+	string render()
 	{
+		Vector content = [];
+		VirtualDom vdom = new VirtualDom();
+		vdom.attrs = {"layout": this.layout};
+		vdom.name = this.layout.component;
+		RenderContent provider = new RenderContent();
+		provider.render(vdom, content);
+		return rs::join("", content);
 	}
 }
