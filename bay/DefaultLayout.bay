@@ -23,7 +23,7 @@
 
 <template name="renderCurrentPage">
 	%var BaseModel model = this.layout.getPageModel();
-	%var string class_name = model.component;
+	%var string class_name = model ? model.component : "";
 	%if (class_name)
 	{
 		<{class_name} model={{ model }} />

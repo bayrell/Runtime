@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.BaseModel;
 use Runtime.DefaultLayout;
+use Runtime.Serializer;
 
 
 class BaseLayout extends BaseModel
@@ -42,23 +43,12 @@ class BaseLayout extends BaseModel
 	
 	
 	/**
-	 * Assign data
+	 * Serialize object
 	 */
-	void assign(Dict data)
+	void serialize(Serializer serializer, Map data)
 	{
-		parent(data);
-		this.current_page_model = data.get("current_page_model");
-	}
-	
-	
-	/**
-	 * Returns data
-	 */
-	Dict getData()
-	{
-		Dict result = parent();
-		result.set("current_page_model", this.current_page_model);
-		return result;
+		parent(serializer, data);
+		serializer.process(this, "current_page_model", data);
 	}
 	
 	

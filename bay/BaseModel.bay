@@ -19,6 +19,8 @@
 namespace Runtime;
 
 use Runtime.BaseObject;
+use Runtime.Callback;
+use Runtime.Serializer;
 use Runtime.SerializeInterface;
 
 
@@ -77,6 +79,28 @@ class BaseModel extends BaseObject implements SerializeInterface
 	
 	
 	/**
+	 * Serialize object
+	 */
+	void serialize(Serializer serializer, Map data)
+	{
+		serializer.process(this, "component", data);
+		serializer.process(this, "widget_name", data);
+		serializer.process(this, "widgets", data, new Callback(this, "serializeCreateWidget"));
+	}
+	
+	
+	/**
+	 * Serialize widget
+	 */
+	void serializeCreateWidget(Serializer serializer, Map data)
+	{
+		string class_name = data.get("__class_name__");
+		BaseModel widget = this.addWidget(class_name);
+		return widget;
+	}
+	
+	
+	/**
 	 * Load widget data
 	 */
 	async void loadData()
@@ -88,56 +112,6 @@ class BaseModel extends BaseObject implements SerializeInterface
 			BaseModel widget = this.widgets.get(widget_name);
 			await widget.loadData();
 		}
-	}
-	
-	
-	/**
-	 * Assign object
-	 */
-	void assign(Map data)
-	{
-		this.component = data.get("component");
-		this.widget_name = data.get("widget_name");
-		Map widgets = data.get("widgets");
-		this.assignWidgets(widgets);
-	}
-	
-	
-	/**
-	 * Assign widgets
-	 */
-	void assignWidgets(Map widgets)
-	{
-		if (not widgets) return;
-		
-		Vector keys = rtl::list(widgets.keys());
-		for (int i=0; i<keys.count(); i++)
-		{
-			string widget_name = keys.get(i);
-			Map widget_data = widgets.get(widget_name);
-			BaseModel widget = this.getWidget(widget_name);
-			if (not widget)
-			{
-				string class_name = widget_data.get("class_name");
-				widget = this.addWidget(class_name);
-				this.widgets.set(widget_name, widget);
-			}
-			widget.assign(widget_data);
-		}
-	}
-	
-	
-	/**
-	 * Returns object data
-	 */
-	Dict getData()
-	{
-		return {
-			"class_name": static::getClassName(),
-			"component": this.component,
-			"widget_name": this.widget_name,
-			"widgets": this.widgets.map(Dict (BaseModel widget) => widget.getData()),
-		};
 	}
 	
 	

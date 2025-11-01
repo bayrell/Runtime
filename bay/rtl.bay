@@ -139,7 +139,10 @@ class rtl
 		{
 			class_name = typeof window != "undefined" ? window[class_name] : use(class_name);
 		}
-		else if (!(class_name instanceof Function)) class_name = class_name.constructor;
+		else if (class_name && !(class_name instanceof Function))
+		{
+			class_name = class_name.constructor;
+		}
 		if (class_name == undefined || class_name == null) return null;
 		
 		return class_name;
@@ -337,6 +340,23 @@ class rtl
 	
 	
 	/**
+	 * Set attr to item
+	 */
+	static var setAttr(var item, string name, var value)
+	{
+		#switch
+		#case ifcode PHP then
+		if (property_exists($item, $name))
+		{
+			$item->$name = $value;
+		}
+		#case ifcode JAVASCRIPT then
+		item[name] = value;
+		#endswitch
+	}
+	
+	
+	/**
 	 * Return true if value is exists
 	 * @param var value
 	 * @return bool
@@ -372,6 +392,21 @@ class rtl
 		else if (value instanceof String) return true;
 		return false;
 		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Returns true if object
+	 */
+	static bool isObject(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		if (is_object($value)) return $value instanceof \Runtime\BaseObject;
+		return false;
+		#case ifcode JAVASCRIPT then
+		return value instanceof use("Runtime.BaseObject");
 		#endswitch
 	}
 	

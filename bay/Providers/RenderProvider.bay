@@ -19,6 +19,7 @@
 namespace Runtime.Providers;
 
 use Runtime.BaseProvider;
+use Runtime.Serializer;
 use Runtime.VirtualDom;
 
 
@@ -33,9 +34,10 @@ class RenderProvider extends BaseProvider
 	var createLayout(Dict app_data)
 	{
 		var layout_data = app_data.get("layout");
-		var class_name = layout_data.get("class_name");
+		var class_name = layout_data.get("__class_name__");
 		var layout = rtl::newInstance(class_name);
-		layout.assign(layout_data);
+		Serializer serializer = new Serializer();
+		serializer.assign(layout, layout_data);
 		return window["Vue"].reactive(layout);
 	}
 	

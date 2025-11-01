@@ -22,13 +22,7 @@ namespace Runtime;
 interface SerializeInterface
 {
 	/**
-	 * Assign object
+	 * Serialize object
 	 */
-	void assign(Dict data);
-	
-	
-	/**
-	 * Returns object data
-	 */
-	Dict getData();
+	void serialize(SerializeInterface serializer, Map data);
 }

@@ -35,6 +35,9 @@
 		"Money.bay",
 		"RawString.bay",
 		"Reference.bay",
+		"RenderContainer.bay",
+		"SerializeInterface.bay",
+		"Serializer.bay",
 		"ModuleDescription.bay",
 		"VirtualDom.bay",
 		"Entity/Entity.bay",
@@ -45,12 +48,7 @@
 		"Hooks/RuntimeHook.bay",
 		"Providers/HookProvider.bay",
 		"Providers/OutputProvider.bay",
-		"Providers/RenderProvider.bay",
-		"Serialize/SerializeInterface.bay",
-		"Serialize/Serializer.bay",
-		"Serialize/SerializerNative.bay",
-		"Serialize/SerializerJson.bay",
-		"Serialize/SerializerBase64.bay"
+		"Providers/RenderProvider.bay"
 	],
 	"groups": [
 		"runtime"
