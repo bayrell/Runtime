@@ -27,6 +27,7 @@ class VirtualDom extends BaseObject
 	Component component = null;
 	Map attrs = null;
 	Vector items = [];
+	bool is_render = false;
 	string name = "";
 	
 	

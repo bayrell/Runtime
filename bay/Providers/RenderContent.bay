@@ -78,9 +78,10 @@ class RenderContent extends BaseObject
 			}
 			else
 			{
-				content.push("<!--[-->");
+				bool is_fragment = vdom.is_render and vdom.items.count() > 1;
+				if (is_fragment) content.push("<!--[-->");
 				content.appendItems(item_result);
-				content.push("<!--]-->");
+				if (is_fragment) content.push("<!--]-->");
 			}
 		}
 	}
