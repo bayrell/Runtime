@@ -46,8 +46,8 @@ Runtime.Map = class extends Map
 	{
 		return new Runtime.Map(this.toObject());
 	}
-
-
+	
+	
 	/**
 	 * Convert to Object
 	 */
@@ -55,8 +55,18 @@ Runtime.Map = class extends Map
 	{
 		return Object.fromEntries(this);
 	}
-
-
+	
+	
+	/**
+	 * Returns value
+	 */
+	get(key, default_value)
+	{
+		var value = super.get(key);
+		return value != undefined ? value : default_value;
+	}
+	
+	
 	/**
 	 * Call function map
 	 */
@@ -69,8 +79,8 @@ Runtime.Map = class extends Map
 		}
 		return map;
 	}
-
-
+	
+	
 	/**
 	 * Reduce
 	 */
@@ -82,8 +92,8 @@ Runtime.Map = class extends Map
 		}
 		return result;
 	}
-
-
+	
+	
 	/**
 	 * Filter
 	 */
@@ -98,8 +108,8 @@ Runtime.Map = class extends Map
 		}
 		return map;
 	}
-
-
+	
+	
 	/**
 	 * Call function for each item
 	 * @param fn f
@@ -112,14 +122,15 @@ Runtime.Map = class extends Map
 			f(value, key, this);
 		}
 	}
-
-
+	
+	
 	/**
 	 * Transition
 	 */
 	transition(f)
 	{
-		var arr = [];
+		const Vector = use("Runtime.Vector");
+		var arr = new Vector();
 		for (var key of this.keys())
 		{
 			var value = this.get(key);
@@ -127,8 +138,8 @@ Runtime.Map = class extends Map
 		}
 		return arr;
 	}
-
-
+	
+	
 	/**
 	 * Create map from Object
 	 */
@@ -136,8 +147,8 @@ Runtime.Map = class extends Map
 	{
 		return new Runtime.Map(obj);
 	}
-
-
+	
+	
 	/**
 	 * Create map from Object
 	 */
@@ -145,11 +156,11 @@ Runtime.Map = class extends Map
 	{
 		return new Runtime.Map(obj);
 	}
-
-
+	
+	
 	/* Returns namespace */
 	static getNamespace() { return "Runtime"; }
-
+	
 	/* Returns class name */
 	static getClassName() { return "Runtime.Map"; }
 };

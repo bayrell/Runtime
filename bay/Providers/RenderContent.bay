@@ -37,7 +37,7 @@ class RenderContent extends BaseObject
 			return;
 		}
 		
-		if (VirtualDom::isComponent(vdom.name))
+		if (vdom.is_component)
 		{
 			Component component = rtl::newInstance(vdom.name);
 			Collection<string> keys = rtl::list(vdom.attrs.keys());

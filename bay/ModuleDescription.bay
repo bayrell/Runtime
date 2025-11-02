@@ -49,6 +49,7 @@ class ModuleDescription
 	 */
 	pure Collection<Dict> entities() => 
 	[
+		new Provider("hash", "Runtime.Providers.GlobalHash"),
 		/*new Provider("input", null),*/
 		new Provider("output", "Runtime.Providers.OutputProvider"),
 		/*new Provider("log", null),*/

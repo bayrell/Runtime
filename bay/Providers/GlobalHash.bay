@@ -1,4 +1,4 @@
-<!--
+/*!
  *  BayLang Technology
  *
  *  (c) Copyright 2016-2024 "Ildar Bikmamatov" <support@bayrell.org>
@@ -14,55 +14,17 @@
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
--->
+ */
 
-<class name="Runtime.Component">
+namespace Runtime.Providers;
 
-<use name="Runtime.BaseModel" />
+use Runtime.BaseProvider;
 
-<template>
-</template>
 
-<script>
-
-props BaseModel model = null;
-
-#ifdef PHP then
-BaseModel layout = null;
-#endif
-
-computed var layout()
+class GlobalHash extends BaseProvider
 {
-	#ifcode JAVASCRIPT then
-	return this.$layout;
-	#endif
+	protected Map hash = {};
+	
+	var get(string key, var value = null) => this.hash.get(key, value);
+	void set(string key, var value){ this.hash.set(key, value); }
 }
-
-#switch
-#case ifdef PHP then
-
-void __get(var name)
-{
-	#ifcode PHP then
-	if (method_exists($this, $name)) return $this->$name();
-	#endif
-	return null;
-}
-
-#case ifdef JAVASCRIPT then
-
-var hash(int s, fn f = null) => f;
-
-static var render()
-{
-	var vdom = this.render();
-	var provider = @.provider("render");
-	var content = provider.render(vdom);
-	return content;
-}
-#endswitch
-
-</script>
-
-</class>

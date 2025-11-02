@@ -36,8 +36,8 @@ Runtime.Vector = class extends Array
 	{
 		return (pos >= 0 && pos < this.length) ? this[pos] : defaultValue;
 	}
-
-
+	
+	
 	/**
 	 * Set value to position
 	 * @param int pos - position
@@ -50,8 +50,8 @@ Runtime.Vector = class extends Array
 			this[pos] = value;
 		}
 	}
-
-
+	
+	
 	/**
 	 * Insert value into array
 	 * @param int pos - position
@@ -61,8 +61,8 @@ Runtime.Vector = class extends Array
 	{
 		this.splice(pos, 0, value);
 	}
-
-
+	
+	
 	/**
 	 * Remove item from array
 	 */
@@ -70,8 +70,8 @@ Runtime.Vector = class extends Array
 	{
 		this.splice(pos, 1);
 	}
-
-
+	
+	
 	/**
 	 * Flatten Array
 	 */
@@ -86,8 +86,8 @@ Runtime.Vector = class extends Array
 		}
 		return res;
 	}
-
-
+	
+	
 	/**
 	 * Find item
 	 */
@@ -97,8 +97,8 @@ Runtime.Vector = class extends Array
 		if (index == -1) return null;
 		return this[index];
 	}
-
-
+	
+	
 	/**
 	 * Get first item
 	 */
@@ -106,8 +106,8 @@ Runtime.Vector = class extends Array
 	{
 		return (this.length > 0) ? this[0] : (value ? value : null);
 	}
-
-
+	
+	
 	/**
 	 * Get last item
 	 */
@@ -115,27 +115,28 @@ Runtime.Vector = class extends Array
 	{
 		return (this.length > 0) ? this[this.length - 1] : (value ? value : null);
 	}
-
-
+	
+	
 	/**
 	 * Each
 	 */
 	each(f) { super.forEach(f); }
-
-
+	
+	
 	/**
 	 * Transition
 	 */
 	transition(f)
 	{
+		const RuntimeMap = use("Runtime.Map");
 		return this.reduce(function(map, value, key){
 			if (f) res = f(value, key, this);
 			else res = [value, key];
 			map.set(res[1], res[0]);
-		}, new Map());
+		}, new RuntimeMap());
 	}
-
-
+	
+	
 	/**
 	 * Append items
 	 */
@@ -143,14 +144,14 @@ Runtime.Vector = class extends Array
 	{
 		for (var item of arr) this.push(item);
 	}
-
-
+	
+	
 	/**
 	 * Returns count items in Array
 	 */
 	count(){ return this.length; }
-
-
+	
+	
 	/**
 	 * Remove dublicate values
 	 */

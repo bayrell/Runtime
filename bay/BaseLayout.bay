@@ -19,6 +19,7 @@
 namespace Runtime;
 
 use Runtime.BaseModel;
+use Runtime.Callback;
 use Runtime.DefaultLayout;
 use Runtime.Serializer;
 
@@ -70,15 +71,72 @@ class BaseLayout extends BaseModel
 	/**
 	 * Set page model
 	 */
-	void setPageModel(string class_name)
+	BaseModel setPageModel(string class_name)
 	{
 		this.current_page_model = class_name;
 		
 		BaseModel page = this.getWidget(class_name);
 		if (not page)
 		{
-			page = rtl::newInstance(class_name, [{"widget_name": class_name}]);
-			this.setWidget(class_name, page);
+			page = this.addWidget(class_name, {"widget_name": class_name});
 		}
+		
+		return page;
+	}
+	
+	
+	/**
+	 * Returns required components
+	 */
+	static void getRequiredComponents(string component, Vector result, Map hash)
+	{
+		Callback f = new Callback(component, "getRequiredComponents");
+		if (f.exists())
+		{
+			Vector items = f.apply();
+			for (int i=0; i<items.count(); i++)
+			{
+				string name = items.get(i);
+				if (not hash.has(name))
+				{
+					hash.set(name, true);
+					static::getRequiredComponents(name, result, hash);
+				}
+			}
+		}
+	}
+	
+	
+	/**
+	 * Returns all components
+	 */
+	Vector getComponents()
+	{
+		Vector components = [];
+		for (int i=0; i<this.components.count(); i++)
+		{
+			string class_name = this.components.get(i);
+			static::getRequiredComponents(class_name, components, {});
+			components.push(class_name);
+		}
+		return components;
+	}
+	
+	
+	/**
+	 * Returns style
+	 */
+	string getStyle()
+	{
+		Vector content = [];
+		Vector components = this.getComponents();
+		for (int i=0; i<components.count(); i++)
+		{
+			string class_name = components.get(i);
+			Callback f = new Callback(class_name, "getComponentStyle");
+			if (not f.exists()) continue;
+			content.push(f.apply());
+		}
+		return rs::join("", content);
 	}
 }

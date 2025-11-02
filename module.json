@@ -46,6 +46,7 @@
 		"Entity/Provider.bay",
 		"Hooks/BaseHook.bay",
 		"Hooks/RuntimeHook.bay",
+		"Providers/GlobalHash.bay",
 		"Providers/HookProvider.bay",
 		"Providers/OutputProvider.bay",
 		"Providers/RenderProvider.bay"

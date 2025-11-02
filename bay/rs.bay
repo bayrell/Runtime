@@ -896,6 +896,33 @@ class rs
 	
 	
 	/**
+	 * Returns component hash
+	 */
+	static string getComponentHash(string class_name)
+	{
+		if (not rtl::isString(class_name)) class_name = rtl::className(class_name);
+		Map global_hash = @.provider("hash");
+		Map component_hash = global_hash.get("component_hash");
+		if (not component_hash)
+		{
+			component_hash = {};
+			global_hash.set("component_hash", component_hash);
+		}
+		if (component_hash.has(class_name)) return component_hash.get(class_name);
+		Vector result = [];
+		string item_name = class_name;
+		while (item_name != "" and item_name != "Runtime.Component")
+		{
+			result.push("h-" ~ static::getCssHash(item_name));
+			item_name = rtl::parentClassName(item_name);
+		}
+		string value = rs::join(" ", result);
+		component_hash.set(class_name, value);
+		return value;
+	}
+	
+	
+	/**
 	 * Convert int to hex
 	 * @param int
 	 * @return string

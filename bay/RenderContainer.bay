@@ -85,8 +85,8 @@ class RenderContainer extends BaseObject
 	{
 		Vector content = [];
 		VirtualDom vdom = new VirtualDom();
-		vdom.attrs = {"layout": this.layout};
-		vdom.name = this.layout.component;
+		vdom.setName(this.layout.component);
+		vdom.setAttrs({"layout": this.layout});
 		RenderContent provider = new RenderContent();
 		provider.render(vdom, content);
 		return rs::join("", content);

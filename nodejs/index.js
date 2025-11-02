@@ -63,6 +63,7 @@ add("Runtime.Exceptions.KeyNotFound");
 add("Runtime.Exceptions.RuntimeException");
 add("Runtime.Hooks.BaseHook");
 add("Runtime.Hooks.RuntimeHook");
+add("Runtime.Providers.GlobalHash");
 add("Runtime.Providers.HookProvider");
 add("Runtime.Providers.OutputProvider");
 add("Runtime.Providers.RenderProvider");

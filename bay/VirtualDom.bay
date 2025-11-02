@@ -25,9 +25,10 @@ use Runtime.Component;
 class VirtualDom extends BaseObject
 {
 	Component component = null;
-	Map attrs = null;
+	Map attrs = {};
 	Vector items = [];
 	bool is_render = false;
+	bool is_component = false;
 	string name = "";
 	
 	
@@ -53,13 +54,32 @@ class VirtualDom extends BaseObject
 	
 	
 	/**
+	 * Set name
+	 */
+	void setName(string name)
+	{
+		this.name = name;
+		this.is_component = static::isComponent(name);
+	}
+	
+	
+	/**
+	 * Set attrs
+	 */
+	void setAttrs(Map attrs)
+	{
+		if (attrs) this.attrs = attrs;
+	}
+	
+	
+	/**
 	 * Add element
 	 */
 	VirtualDom element(var name, Dict attrs = null)
 	{
 		VirtualDom item = static::newInstance([this.component]);
-		item.name = name;
-		item.attrs = attrs;
+		item.setName(name);
+		item.setAttrs(attrs);
 		this.push(item);
 		return item;
 	}
@@ -70,6 +90,19 @@ class VirtualDom extends BaseObject
 	 */
 	void push(var content)
 	{
+		if (not(content instanceof VirtualDom) and not rtl::isString(content))
+		{
+			content = rtl::toStr(content);
+		}
+		if (this.items.count() == 1 and rtl::isString(content))
+		{
+			string item = this.items.get(0);
+			if (rtl::isString(item))
+			{
+				this.items.set(0, item ~ content);
+				return;
+			}
+		}
 		this.items.push(content);
 	}
 }
