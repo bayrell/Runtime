@@ -110,9 +110,21 @@ class RenderProvider extends BaseProvider
 			if (content.count() == 1) return content.get(0);
 			return content;
 		}
+		var children = content;
+		if (not rtl::isString(vdom.name))
+		{
+			var slots = vdom.slots.map(fn (fn f)
+			{
+				return var () use (f){
+					VirtualDom vdom = f();
+					return this.render(vdom);
+				};
+			});
+			children = slots.toObject();
+		}
 		return h(vdom.name,
 			rtl::isMap(vdom.attrs) ? vdom.attrs.toObject() : vdom.attrs,
-			rtl::isString(vdom.name) ? content : var () use (content) => content,
+			children
 		);
 	}
 }

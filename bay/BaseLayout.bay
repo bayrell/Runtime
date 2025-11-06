@@ -90,6 +90,8 @@ class BaseLayout extends BaseModel
 	 */
 	static void getRequiredComponents(string component, Vector result, Map hash)
 	{
+		if (hash.has(component)) return;
+		hash.set(component, true);
 		Callback f = new Callback(component, "getRequiredComponents");
 		if (f.exists())
 		{
@@ -99,11 +101,11 @@ class BaseLayout extends BaseModel
 				string name = items.get(i);
 				if (not hash.has(name))
 				{
-					hash.set(name, true);
 					static::getRequiredComponents(name, result, hash);
 				}
 			}
 		}
+		result.push(component);
 	}
 	
 	
@@ -112,12 +114,12 @@ class BaseLayout extends BaseModel
 	 */
 	Vector getComponents()
 	{
+		Map hash = {};
 		Vector components = [];
 		for (int i=0; i<this.components.count(); i++)
 		{
 			string class_name = this.components.get(i);
-			static::getRequiredComponents(class_name, components, {});
-			components.push(class_name);
+			static::getRequiredComponents(class_name, components, hash);
 		}
 		return components;
 	}

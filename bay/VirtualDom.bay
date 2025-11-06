@@ -26,6 +26,7 @@ class VirtualDom extends BaseObject
 {
 	Component component = null;
 	Map attrs = {};
+	Map slots = {};
 	Vector items = [];
 	bool is_render = false;
 	bool is_component = false;
@@ -90,6 +91,13 @@ class VirtualDom extends BaseObject
 	 */
 	void push(var content)
 	{
+		#ifcode JAVASCRIPT then
+		if (Array.isArray(content))
+		{
+			this.items.appendItems(content);
+			return;
+		}
+		#endif
 		if (not(content instanceof VirtualDom) and not rtl::isString(content))
 		{
 			content = rtl::toStr(content);
@@ -104,5 +112,14 @@ class VirtualDom extends BaseObject
 			}
 		}
 		this.items.push(content);
+	}
+	
+	
+	/**
+	 * Add slot
+	 */
+	void slot(string slot_name, fn content)
+	{
+		this.slots.set(slot_name, content);
 	}
 }

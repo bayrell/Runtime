@@ -30,13 +30,45 @@ props BaseModel model = null;
 
 #ifdef PHP then
 BaseModel layout = null;
+props Map _slots = {};
 #endif
 
+
+/**
+ * Returns layout
+ */
 computed var layout()
 {
 	#ifcode JAVASCRIPT then
 	return this.$layout;
 	#endif
+}
+
+
+/**
+ * Render slot
+ */
+var renderSlot(string slot_name)
+{
+	#switch
+	#case ifcode PHP then
+	$f = $this->_slots->get($slot_name);
+	return $f ? $f() : null;
+	#case ifcode JAVASCRIPT then
+	var f = this.$slots[slot_name];
+	return f ? f() : null;
+	#endswitch
+}
+
+
+/**
+ * Merge styles
+ */
+string mergeStyles(string class_name, Vector items)
+{
+	return rs::join(" ", items.map(
+		string (string item) use (class_name) => class_name ~ "--" ~ item)
+	);
 }
 
 #switch
@@ -57,9 +89,7 @@ var hash(int s, fn f = null) => f;
 static var render()
 {
 	var vdom = this.render();
-	var provider = @.provider("render");
-	var content = provider.render(vdom);
-	return content;
+	return @.provider("render").render(vdom);
 }
 #endswitch
 

@@ -58,6 +58,16 @@ Runtime.Map = class extends Map
 	
 	
 	/**
+	 * Concat Map
+	 */
+	concat(map)
+	{
+		var obj = this.toObject();
+		return new Runtime.Map(Object.assign(obj, map.toObject()));
+	}
+	
+	
+	/**
 	 * Returns value
 	 */
 	get(key, default_value)

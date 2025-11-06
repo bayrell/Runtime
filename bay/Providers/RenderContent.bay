@@ -40,6 +40,7 @@ class RenderContent extends BaseObject
 		if (vdom.is_component)
 		{
 			Component component = rtl::newInstance(vdom.name);
+			component._slots = vdom.slots;
 			Collection<string> keys = rtl::list(vdom.attrs.keys());
 			for (int i=0; i<keys.count(); i++)
 			{
