@@ -99,10 +99,13 @@ class RenderProvider extends BaseProvider
 	{
 		if (not(vdom instanceof VirtualDom)) return vdom;
 		Vector content = [];
-		for (int i=0; i<vdom.items.count(); i++)
+		if (not vdom.attrs.has("@raw"))
 		{
-			VirtualDom item = vdom.items.get(i);
-			content.push(this.render(item));
+			for (int i=0; i<vdom.items.count(); i++)
+			{
+				VirtualDom item = vdom.items.get(i);
+				content.push(this.render(item));
+			}
 		}
 		fn h = window["Vue"].h;
 		if (vdom.name == "")
@@ -122,9 +125,23 @@ class RenderProvider extends BaseProvider
 			});
 			children = slots.toObject();
 		}
-		return h(vdom.name,
-			rtl::isMap(vdom.attrs) ? vdom.attrs.toObject() : vdom.attrs,
-			children
-		);
+		var attrs = vdom.attrs;
+		if (attrs instanceof Map)
+		{
+			attrs = attrs
+				.mapWithKeys(Vector (var value, string key)
+				{
+					if (key == "@ref") key = "ref";
+					return [value, key];
+				})
+				.filter(bool (var value, string key) => rs::charAt(key, 0) != "@")
+			;
+			attrs = attrs.toObject();
+			if (vdom.attrs.has("@raw"))
+			{
+				attrs["innerHTML"] = vdom.attrs.get("@raw");
+			}
+		}
+		return h(vdom.name, attrs, children);
 	}
 }

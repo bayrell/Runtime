@@ -62,14 +62,15 @@ var renderSlot(string slot_name)
 
 
 /**
- * Merge styles
+ * Returns ref
  */
-string mergeStyles(string class_name, Vector items)
+var getRef(string name)
 {
-	return rs::join(" ", items.map(
-		string (string item) use (class_name) => class_name ~ "--" ~ item)
-	);
+	#ifcode JAVASCRIPT then
+	return this.$refs[name];
+	#endif
 }
+
 
 #switch
 #case ifdef PHP then

@@ -53,10 +53,17 @@ class RenderContent extends BaseObject
 		else
 		{
 			Vector item_result = [];
-			for (int i=0; i<vdom.items.count(); i++)
+			if (not vdom.attrs.has("@raw"))
 			{
-				VirtualDom item = vdom.items.get(i);
-				this.render(item, item_result);
+				for (int i=0; i<vdom.items.count(); i++)
+				{
+					VirtualDom item = vdom.items.get(i);
+					this.render(item, item_result);
+				}
+			}
+			else
+			{
+				item_result.push(vdom.attrs.get("@raw"));
 			}
 			if (vdom.name != "")
 			{

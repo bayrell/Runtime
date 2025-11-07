@@ -867,6 +867,25 @@ class rs
 	
 	
 	/**
+	 * Join class name
+	 */
+	static string className(Vector arr) => rs::join(" ", arr
+		.map(string (string s) => static::trim(s))
+		.filter(bool (string s) => s != "")
+	);
+	
+	
+	/**
+	 * Merge styles
+	 */
+	static string mergeStyles(string class_name, Vector items) => rs::join(" ", items
+		.map(string (string s) => static::trim(s))
+		.filter(bool (string s) => s != "")
+		.map(string (string item) use (class_name) => class_name ~ "--" ~ item)
+	);
+	
+	
+	/**
 	 * Hash function
 	 * @param string
 	 * @return int hash

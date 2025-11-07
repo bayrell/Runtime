@@ -92,6 +92,21 @@ Runtime.Map = class extends Map
 	
 	
 	/**
+	 * Call function map
+	 */
+	mapWithKeys(f)
+	{
+		var map = new Runtime.Map();
+		for (var key of this.keys())
+		{
+			var item = f(this.get(key), key, this);
+			map.set(item[1], item[0]);
+		}
+		return map;
+	}
+	
+	
+	/**
 	 * Reduce
 	 */
 	reduce(f, result)
@@ -109,7 +124,7 @@ Runtime.Map = class extends Map
 	 */
 	filter(f)
 	{
-		var map = new Map();
+		var map = new Runtime.Map();
 		for (var key of this.keys())
 		{
 			var value = this.get(key);
@@ -319,6 +334,23 @@ class Map implements \JsonSerializable
 		foreach ($this->_map as $key => $value)
 		{
 			$map->set($key, $f($value, $key, $this));
+		}
+		return $map;
+	}
+	
+	
+	/**
+	 * Call function map
+	 * @param fn f
+	 * @return Dict
+	 */
+	function mapWithKeys($f)
+	{
+		$map = new static();
+		foreach ($this->_map as $key => $value)
+		{
+			$item = $f($value, $key, $this);
+			$map->set($item[1], $item[0]);
 		}
 		return $map;
 	}
