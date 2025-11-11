@@ -28,18 +28,24 @@ class RenderContent extends BaseObject
 	/**
 	 * Render
 	 */
-	void render(var vdom, Collection content)
+	void render(var vdom, Collection content, VirtualDom parent_vdom = null)
 	{
 		if (not vdom) return;
 		if (not(vdom instanceof VirtualDom))
 		{
-			content.push(rs::escapeHtml(vdom));
+			if (parent_vdom and (parent_vdom.name == "style" or
+				parent_vdom.name == "script" or parent_vdom.is_raw))
+			{
+				content.push(vdom);
+			}
+			else content.push(rs::escapeHtml(vdom));
 			return;
 		}
 		
 		if (vdom.is_component)
 		{
 			Component component = rtl::newInstance(vdom.name);
+			component.layout = vdom.component ? vdom.component.layout : null;
 			component._slots = vdom.slots;
 			Collection<string> keys = rtl::list(vdom.attrs.keys());
 			for (int i=0; i<keys.count(); i++)
@@ -58,7 +64,7 @@ class RenderContent extends BaseObject
 				for (int i=0; i<vdom.items.count(); i++)
 				{
 					VirtualDom item = vdom.items.get(i);
-					this.render(item, item_result);
+					this.render(item, item_result, vdom);
 				}
 			}
 			else
@@ -74,15 +80,23 @@ class RenderContent extends BaseObject
 					for (int i=0; i<keys.count(); i++)
 					{
 						string attr_name = keys.get(i);
-						string value = vdom.attrs.get(attr_name);
+						string value = rs::trim(vdom.attrs.get(attr_name));
+						if (value == "") continue;
 						if (rs::charAt(attr_name, 0) == "@") continue;
 						attr_items.push(attr_name ~ "=\"" ~ rs::escapeHtml(value) ~ "\"");
 					}
 				}
 				string attrs = attr_items.count() > 0 ? " " ~ rs::join(" ", attr_items) : "";
-				content.push("<" ~ vdom.name ~ attrs ~ ">");
-				content.appendItems(item_result);
-				content.push("</" ~ vdom.name ~ ">");
+				if (vdom.name == "br" or vdom.name == "hr" or vdom.name == "link")
+				{
+					content.push("<" ~ vdom.name ~ attrs ~ "/>");
+				}
+				else
+				{
+					content.push("<" ~ vdom.name ~ attrs ~ ">");
+					content.appendItems(item_result);
+					content.push("</" ~ vdom.name ~ ">");
+				}
 			}
 			else
 			{

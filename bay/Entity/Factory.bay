@@ -48,10 +48,17 @@ class Factory extends Entity implements FactoryInterface
 	/**
 	 * Create new object
 	 */
-	BaseObject createInstance()
+	BaseObject createInstance(Map params = null)
 	{
 		BaseObject instance = null;
 		var class_name = this.value;
+		
+		Map factory_params = this.params;
+		if (params)
+		{
+			if (factory_params) factory_params = factory_params.concat(params);
+			else factory_params = params;
+		}
 		
 		if (class_name == null) class_name = this.name;
 		if (class_name instanceof BaseObject)
@@ -60,7 +67,7 @@ class Factory extends Entity implements FactoryInterface
 		}
 		else if (rtl::isString(class_name))
 		{
-			instance = rtl::newInstance(class_name, [this.params]);
+			instance = rtl::newInstance(class_name, [factory_params]);
 		}
 		
 		return instance;

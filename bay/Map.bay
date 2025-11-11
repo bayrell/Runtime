@@ -72,6 +72,7 @@ Runtime.Map = class extends Map
 	 */
 	get(key, default_value)
 	{
+		if (default_value == undefined) default_value = null;
 		var value = super.get(key);
 		return value != undefined ? value : default_value;
 	}
@@ -293,7 +294,9 @@ class Map implements \JsonSerializable
 	{
 		if ($map == null) return;
 		
-		$this->_map = array_merge($this->_map, $map->_map);
+		$instance = new static($this);
+		$instance->_map = array_merge($this->_map, $map->_map);
+		return $instance;
 	}
 	
 	

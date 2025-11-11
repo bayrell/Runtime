@@ -348,20 +348,20 @@ class DateTime extends BaseObject implements StringInterface
 		$s = (int)$dt->format("s");
 		$o = $dt->getOffset() / 3600;
 		return new \Runtime\DateTime(
-			Dict::from(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"o"=>$o])
+			new Map(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"o"=>$o])
 		);
 		
 		#case ifcode JAVASCRIPT then
 		
-		var Dict = use("Runtime.Dict");
-		offset = -dt.getTimezoneOffset() / 60;
+		var Map = use("Runtime.Map");
+		var offset = -dt.getTimezoneOffset() / 60;
 		var y = Number(dt.getFullYear());
 		var m = Number(dt.getMonth()) + 1;
 		var d = Number(dt.getDate());
 		var h = Number(dt.getHours());
 		var i = Number(dt.getMinutes());
 		var s = Number(dt.getSeconds());
-		var obj = new Runtime.DateTime(Dict.from({
+		var obj = new Runtime.DateTime(new Map({
 			"y":y,"m":m,"d":d,"h":h,"i":i,"s":s,"o":offset
 		}));
 		return obj;

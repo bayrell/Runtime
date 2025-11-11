@@ -572,9 +572,9 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		#case ifcode JAVASCRIPT then
-		if (typeof obj !== 'object' || obj === null)
+		if (obj === null || obj === undefined)
 		{
-			return obj;
+			return null;
 		}
 		if (Array.isArray(obj))
 		{
@@ -596,7 +596,10 @@ class rtl
 	 */
 	static var jsonDecode(var obj)
 	{
-		#ifcode JAVASCRIPT then
+		#switch
+		#case ifcode PHP then
+		return json_decode($obj);
+		#case ifcode JAVASCRIPT then
 		try
 		{
 			const RuntimeVector = this.findClass("Runtime.Vector");
@@ -610,7 +613,7 @@ class rtl
 		}
 		catch (e){}
 		return obj;
-		#endif
+		#endswitch
 	}
 	
 	
@@ -619,9 +622,12 @@ class rtl
 	 */
 	static var jsonEncode(var obj)
 	{
-		#ifcode JAVASCRIPT then
+		#switch
+		#case ifcode PHP then
+		return json_encode($obj);
+		#case ifcode JAVASCRIPT then
 		return JSON.stringify(obj);
-		#endif
+		#endswitch
 	}
 	
 	

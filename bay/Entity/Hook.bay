@@ -18,12 +18,10 @@
 
 namespace Runtime.Entity;
 
-use Runtime.Entity.Entity;
-use Runtime.BaseHook;
-use Runtime.FactoryInterface;
+use Runtime.Entity.Factory;
 
 
-class Hook extends Entity implements FactoryInterface
+class Hook extends Factory
 {
 	Dict params = null;
 	
@@ -33,18 +31,6 @@ class Hook extends Entity implements FactoryInterface
 	 */
 	void constructor(string name, Map params = null)
 	{
-		parent({
-			"name": name,
-			"params": params,
-		});
-	}
-	
-	
-	/**
-	 * Create hook instance
-	 */
-	BaseHook createInstance()
-	{
-		return rtl::newInstance(this.name, [this.params]);
+		parent(name, null, params);
 	}
 }

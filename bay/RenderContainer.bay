@@ -45,6 +45,7 @@ class RenderContainer extends BaseObject
 		});
 		
 		this.layout = rtl::newInstance(params.get("class_name"), [params]);
+		this.layout.name = layout_name;
 		
 		/* Call create layout */
 		@.hook(RuntimeHook::CREATE_LAYOUT, {
@@ -52,6 +53,65 @@ class RenderContainer extends BaseObject
 		});
 		
 		return this.layout;
+	}
+	
+	
+	/**
+	 * Change layout
+	 */
+	void changeLayout(string layout_name)
+	{
+		if (this.layout and this.layout.name == layout_name) return;
+		
+		/* Save widgets */
+		Map old_widgets = this.layout ? this.layout.widgets : {};
+		
+		/* Create new layout */
+		this.createLayout(layout_name);
+		
+		/* Restore widgets */
+		Vector keys = rtl::list(old_widgets.keys());
+		for (int i=0; i<keys.count(); i++)
+		{
+			string key = keys.get(i);
+			BaseModel widget = old_widgets.get(key);
+			widget.parent_widget = this.layout;
+			this.layout.widgets.set(key, widget);
+		}
+		
+		/* Restore storage */
+		if (old_widgets.has("storage")) this.layout.storage = old_widgets.get("storage");
+		
+		/* Call create layout */
+		@.hook(RuntimeHook::CHANGE_LAYOUT, {
+			"container": this,
+		});
+	}
+	
+	
+	/**
+	 * Resolve container
+	 */
+	async void resolve()
+	{
+	}
+	
+	
+	/**
+	 * Render page model
+	 */
+	async void renderPageModel(string model_name, Dict params = null)
+	{
+		/* Set page model */
+		this.layout.setPageModel(model_name, params);
+		
+		/* Action index */
+		BaseModel page_model = this.layout.getPageModel();
+		if (page_model)
+		{
+			await page_model.loadData(this);
+			page_model.buildTitle(this);
+		}
 	}
 	
 	

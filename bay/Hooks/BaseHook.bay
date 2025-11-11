@@ -19,6 +19,8 @@
 namespace Runtime.Hooks;
 
 use Runtime.BaseObject;
+use Runtime.Chain;
+use Runtime.Method;
 use Runtime.Entity.Hook;
 use Runtime.Providers.HookProvider;
 
@@ -47,13 +49,10 @@ class BaseHook extends BaseObject
 	void setup(Dict params)
 	{
 		if (params == null) return;
+		
+		this.hook = params.get("hook");
+		this.provider = params.get("provider");
 	}
-	
-	
-	/**
-	 * Returns method name by hook name
-	 */
-	string getMethodName(string hook_name) => "";
 	
 	
 	/**
@@ -61,14 +60,9 @@ class BaseHook extends BaseObject
 	 */
 	void register(string hook_name, var method_name = "", int priority = 100)
 	{
-		if (rtl::isInt(method_name))
-		{
-			priority = method_name;
-			method_name = "";
-		}
-		if (method_name == "") method_name = this.getMethodName(hook_name);
-		if (method_name == "") return;
-		this.provider.register(hook_name, this, method_name, priority);
+		Chain chain = this.provider.getChain(hook_name);
+		if (not chain) return;
+		chain.add(new Method(this, method_name), priority);
 	}
 	
 	

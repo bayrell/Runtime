@@ -20,6 +20,8 @@
 <class name="Runtime.DefaultLayout">
 
 <use name="Runtime.BaseModel" />
+<use name="Runtime.VirtualDom" />
+<use name="Runtime.Hooks.RuntimeHook" />
 
 <template name="renderCurrentPage">
 	%var BaseModel model = this.layout.getPageModel();
@@ -33,5 +35,73 @@
 <template>
 	%render this.renderCurrentPage();
 </template>
+
+<template name="renderComponents" args="Vector components">
+	%for (int i=0; i<components.count(); i++)
+	{
+		%set string class_name = components.get(i);
+		%if (class_name instanceof VirtualDom)
+		{
+			%render class_name;
+		}
+		%else if (rtl::isString(class_name))
+		{
+			<{class_name} />
+		}
+	}
+</template>
+
+<template name="renderHeader">
+	<title>{{ this.layout.title }}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	%render this.renderComponents(this.getComponents(RuntimeHook::LAYOUT_HEADER));
+</template>
+
+<template name="renderFooter">
+	%render this.renderComponents(this.getComponents(RuntimeHook::LAYOUT_FOOTER));
+	<script>
+		var app_data = {{ rtl::jsonEncode(this.container.getData()) }};
+		Runtime.rtl.mount(app_data, document.querySelector(".root_container"), function (result){
+			window["app"] = result.get("app");
+			window["app_layout"] = result.get("layout");
+		});
+	</script>
+</template>
+
+<template name="renderStyle">
+	<style>{{ this.layout.getStyle() }}</style>
+</template>
+
+<template name="renderApp">
+	<html lang={{ this.layout.lang }}>
+		<head>
+			%render this.renderHeader();
+			%render this.renderStyle();
+		</head>
+		<body class={{ "theme_" ~ this.layout.theme }}>
+		<div class="root_container">
+			%render this.render();
+		</div>
+		%render this.renderFooter();
+		</body>
+	</html>
+</template>
+
+<script>
+
+#ifdef BACKEND then
+var container = null;
+#endif
+
+Vector getComponents(string name)
+{
+	Map d = @.hook(name, {
+		"layout": this.layout,
+		"components": [],
+	});
+	return d.get("components");
+}
+
+</script>
 
 </class>

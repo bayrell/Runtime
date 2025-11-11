@@ -189,12 +189,6 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	
 	
 	/**
-	 * Returns namespace
-	 */
-	static function getNamespace(){ return "Runtime.Vector"; }
-	
-	
-	/**
 	 * Create vector
 	 */
 	static function create($arr)
@@ -202,6 +196,15 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 		$res = new static();
 		$res->_arr = $arr;
 		return $res;
+	}
+	
+	
+	/**
+	 * Returns array
+	 */
+	function toArray()
+	{
+		return $this->_arr;
 	}
 	
 	
@@ -389,9 +392,9 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	function filter($f)
 	{
 		$res = new static();
-		$res->_arr = array_filter($this->_arr, function($value, $key) use ($f){
+		$res->_arr = array_values(array_filter($this->_arr, function($value, $key) use ($f){
 			return $f($value, $key, $this);
-		}, ARRAY_FILTER_USE_BOTH);
+		}, ARRAY_FILTER_USE_BOTH));
 		return $res;
 	}
 	

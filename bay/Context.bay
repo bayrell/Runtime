@@ -21,8 +21,8 @@ namespace Runtime;
 use Runtime.lib;
 use Runtime.BaseObject;
 use Runtime.BaseProvider;
-use Runtime.Callback;
 use Runtime.FactoryInterface;
+use Runtime.Method;
 use Runtime.Entity.Entity;
 use Runtime.Entity.Provider;
 use Runtime.Exceptions.ItemNotFound;
@@ -90,7 +90,7 @@ class Context extends BaseObject
 	/**
 	 * Create new instance
 	 */
-	BaseObject factory(string name)
+	BaseObject factory(string name, Dict params = null)
 	{
 		FactoryInterface item = this.entities.find(
 			bool (Entity entity) use (name) => entity.name == name
@@ -99,7 +99,7 @@ class Context extends BaseObject
 		{
 			throw new ItemNotFound(name, "Factory");
 		}
-		return item.createInstance();
+		return item.createInstance(params);
 	}
 	
 	
@@ -280,7 +280,7 @@ class Context extends BaseObject
 		
 		if (not(provider instanceof BaseProvider))
 		{
-			throw new RuntimeException("Provider '" + provider_name +
+			throw new RuntimeException("Provider '" ~ provider_name ~
 				"' must be intstanceof BaseProvider");
 		}
 		
@@ -321,7 +321,7 @@ class Context extends BaseObject
 	/**
 	 * Call hook
 	 */
-	Map hook(string hook_name, Map params = null)
+	void hook(string hook_name, Map params = null)
 	{
 		var hook = this.provider("hook");
 		return hook.apply(hook_name, params);
@@ -371,7 +371,7 @@ class Context extends BaseObject
 			if (not cache.has(module_name))
 			{
 				cache.set(module_name, true);
-				Callback f = new Callback(module_name ~ ".ModuleDescription", "requiredModules");
+				Method f = new Method(module_name ~ ".ModuleDescription", "requiredModules");
 				if (f.exists())
 				{
 					Map<string> sub_modules = f.apply();
@@ -395,7 +395,7 @@ class Context extends BaseObject
 		return modules.reduce(
 			void (Collection entities, string module_name)
 			{
-				Callback f = new Callback(module_name ~ ".ModuleDescription", "entities");
+				Method f = new Method(module_name ~ ".ModuleDescription", "entities");
 				if (!f.exists()) return entities;
 				Vector<Entity> arr = f.apply();
 				if (!arr) return entities;

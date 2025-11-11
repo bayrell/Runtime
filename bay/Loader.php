@@ -18,6 +18,8 @@
  *  limitations under the License.
  */
 
+namespace Runtime;
+
 class Loader
 {
 	static $search_path = [];

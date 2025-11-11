@@ -18,10 +18,10 @@
 
 namespace Runtime;
 
-use Runtime.Callback;
+use Runtime.Method;
 
 
-class Chain extends Callback
+class Chain extends Method
 {
 	public Collection<Dict> chain = [];
 	
@@ -42,7 +42,7 @@ class Chain extends Callback
 	
 	
 	/**
-	 * Check callback
+	 * Check method
 	 */
 	void check()
 	{
@@ -61,7 +61,7 @@ class Chain extends Callback
 	public Chain add(fn f, int priority = 100)
 	{
 		this.chain.push({
-			"callback": f,
+			"method": f,
 			"priority": priority,
 		});
 		return this;
@@ -87,13 +87,8 @@ class Chain extends Callback
 		for (int i=0; i<this.chain.count(); i++)
 		{
 			Dict item = this.chain.get(i);
-			Callback f = item.get("callback");
-			#switch
-			#case ifcode PHP then
-			call_user_func_array([$obj, $this->name], $args);
-			#case ifcode JAVASCRIPT then
-			obj[this.name].bind(obj).apply(null, args);
-			#endswitch
+			Method f = item.get("method");
+			f.apply(args);
 		}
 	}
 	

@@ -46,6 +46,31 @@ class Serializer extends BaseObject
 	
 	
 	/**
+	 * Convert value to object
+	 */
+	var decode(var value, fn create = null)
+	{
+		this.kind = static::ASSIGN_DATA;
+		var new_value = value;
+		if (value instanceof Map and value.has("__class_name__"))
+		{
+			string class_name = value.get("__class_name__");
+			new_value = create ? create.apply([this, value]) : rtl::newInstance(class_name);
+			this.assign(new_value, value);
+		}
+		else if (value instanceof Vector or value instanceof Map)
+		{
+			new_value = value.map(var (var item) use (create)
+			{
+				var new_item = this.decode(item, create);
+				return new_item;
+			});
+		}
+		return new_value;
+	}
+	
+	
+	/**
 	 * Convert object to Map
 	 */
 	var encode(var obj)
@@ -71,26 +96,7 @@ class Serializer extends BaseObject
 		if (this.kind == static::ASSIGN_DATA)
 		{
 			var value = data.get(field_name);
-			var new_value = value;
-			if (value instanceof Map and value.has("__class_name__"))
-			{
-				string class_name = value.has("__class_name__");
-				new_value = create ? create(value) : rtl::newInstance(class_name);
-				this.assign(new_value, value);
-			}
-			else if (value instanceof Vector or value instanceof Map)
-			{
-				new_value = value.map(var (var item) use (create)
-				{
-					var new_item = item;
-					if (create)
-					{
-						new_item = create.apply([this, item]);
-						this.assign(new_item, item);
-					}
-					return new_item;
-				});
-			}
+			var new_value = this.decode(value, create);
 			rtl::setAttr(obj, field_name, new_value);
 		}
 		else
@@ -107,5 +113,18 @@ class Serializer extends BaseObject
 			}
 			data.set(field_name, new_value);
 		}
+	}
+	
+	
+	/**
+	 * Copy object
+	 */
+	static var copy(var obj)
+	{
+		Serializer serializer = new Serializer();
+		var data = serializer.encode(obj);
+		string s = rtl::jsonEncode(data);
+		data = rtl::jsonDecode(s);
+		return serializer.decode(obj);
 	}
 }

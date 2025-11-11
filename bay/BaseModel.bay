@@ -19,7 +19,8 @@
 namespace Runtime;
 
 use Runtime.BaseObject;
-use Runtime.Callback;
+use Runtime.RenderContainer;
+use Runtime.Method;
 use Runtime.Serializer;
 use Runtime.SerializeInterface;
 
@@ -57,7 +58,7 @@ class BaseModel extends BaseObject implements SerializeInterface
 	/**
 	 * Init widget params
 	 */
-	void initParams(Dict params = null)
+	void initParams(Dict params)
 	{
 		if (not params) return;
 		
@@ -73,7 +74,7 @@ class BaseModel extends BaseObject implements SerializeInterface
 	/**
 	 * Init widget settings
 	 */
-	void initWidget(Dict params = null)
+	void initWidget(Dict params)
 	{
 	}
 	
@@ -85,7 +86,7 @@ class BaseModel extends BaseObject implements SerializeInterface
 	{
 		serializer.process(this, "component", data);
 		serializer.process(this, "widget_name", data);
-		serializer.process(this, "widgets", data, new Callback(this, "serializeCreateWidget"));
+		serializer.process(this, "widgets", data, new Method(this, "serializeCreateWidget"));
 	}
 	
 	
@@ -103,15 +104,23 @@ class BaseModel extends BaseObject implements SerializeInterface
 	/**
 	 * Load widget data
 	 */
-	async void loadData()
+	async void loadData(RenderContainer container)
 	{
 		Vector keys = rtl::list(this.widgets.keys());
 		for (int i=0; i<keys.count(); i++)
 		{
 			string widget_name = keys.get(i);
 			BaseModel widget = this.widgets.get(widget_name);
-			await widget.loadData();
+			await widget.loadData(container);
 		}
+	}
+	
+	
+	/**
+	 * Build page title
+	 */
+	void buildTitle(RenderContainer container)
+	{
 	}
 	
 	

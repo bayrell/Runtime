@@ -111,10 +111,10 @@ class re
 			}
 			$res = array_map
 			(
-				function ($item) { return \Runtime\Vector::from($item); },
+				function ($item) { return \Runtime\Vector::create($item); },
 				$res
 			);
-			return \Runtime\Vector::from($res);
+			return \Runtime\Vector::create($res);
 		}
 		
 		return null;
@@ -136,7 +136,7 @@ class re
 		else arr = [...s.matchAll(r)];
 		
 		if (arr.length == 0) return null;
-		return arr.map((v) => Runtime.Vector.from(v));
+		return arr.map((v) => Runtime.Vector.create(v));
 		
 		#endswitch
 		

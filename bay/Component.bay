@@ -27,6 +27,7 @@
 <script>
 
 props BaseModel model = null;
+props string class = "";
 
 #ifdef PHP then
 BaseModel layout = null;

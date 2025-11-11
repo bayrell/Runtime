@@ -19,27 +19,53 @@
 namespace Runtime;
 
 use Runtime.BaseModel;
-use Runtime.Callback;
+use Runtime.BaseStorage;
 use Runtime.DefaultLayout;
+use Runtime.Method;
 use Runtime.Serializer;
+use Runtime.Hooks.RuntimeHook;
 
 
 class BaseLayout extends BaseModel
 {
+	BaseStorage storage = null;
 	Vector<string> components = [];
 	string component = classof DefaultLayout;
 	string current_page_model = "";
+	string name = "";
 	string lang = "en";
 	string title = "";
+	string theme = "light";
 	
 	
 	/**
 	 * Init params
 	 */
-	void initParams(Dict params = null)
+	void initParams(Dict params)
 	{
 		parent(params);
 		this.layout = this;
+	}
+	
+	
+	/**
+	 * Init widget settings
+	 */
+	void initWidget(Dict params)
+	{
+		parent(params);
+		
+		/* Init storage */
+		this.initStorage();
+	}
+	
+	
+	/**
+	 * Init storage
+	 */
+	void initStorage()
+	{
+		this.storage = this.addWidget(classof BaseStorage);
 	}
 	
 	
@@ -49,7 +75,9 @@ class BaseLayout extends BaseModel
 	void serialize(Serializer serializer, Map data)
 	{
 		parent(serializer, data);
+		serializer.process(this, "components", data);
 		serializer.process(this, "current_page_model", data);
+		serializer.process(this, "lang", data);
 	}
 	
 	
@@ -71,17 +99,33 @@ class BaseLayout extends BaseModel
 	/**
 	 * Set page model
 	 */
-	BaseModel setPageModel(string class_name)
+	BaseModel setPageModel(string class_name, Map params=null)
 	{
+		if (not params) params = {};
 		this.current_page_model = class_name;
 		
 		BaseModel page = this.getWidget(class_name);
 		if (not page)
 		{
-			page = this.addWidget(class_name, {"widget_name": class_name});
+			params.set("widget_name", class_name);
+			page = this.addWidget(class_name, params);
 		}
 		
 		return page;
+	}
+	
+	
+	/**
+	 * Set page title
+	 */
+	void setPageTitle(string title, bool full_title=true)
+	{
+		Map d = @.hook(RuntimeHook::TITLE, {
+			"title": title,
+			"title_orig": title,
+			"full_title": full_title,
+		});
+		this.title = d.get("title");
 	}
 	
 	
@@ -92,7 +136,7 @@ class BaseLayout extends BaseModel
 	{
 		if (hash.has(component)) return;
 		hash.set(component, true);
-		Callback f = new Callback(component, "getRequiredComponents");
+		Method f = new Method(component, "getRequiredComponents");
 		if (f.exists())
 		{
 			Vector items = f.apply();
@@ -115,13 +159,17 @@ class BaseLayout extends BaseModel
 	Vector getComponents()
 	{
 		Map hash = {};
-		Vector components = [];
-		for (int i=0; i<this.components.count(); i++)
+		Map res = @.hook(RuntimeHook::COMPONENTS, {
+			"components": this.components.slice(),
+		});
+		Vector result_components = [];
+		Vector components = res.get("components");
+		for (int i=0; i<components.count(); i++)
 		{
-			string class_name = this.components.get(i);
-			static::getRequiredComponents(class_name, components, hash);
+			string class_name = components.get(i);
+			static::getRequiredComponents(class_name, result_components, hash);
 		}
-		return components;
+		return result_components;
 	}
 	
 	
@@ -135,7 +183,7 @@ class BaseLayout extends BaseModel
 		for (int i=0; i<components.count(); i++)
 		{
 			string class_name = components.get(i);
-			Callback f = new Callback(class_name, "getComponentStyle");
+			Method f = new Method(class_name, "getComponentStyle");
 			if (not f.exists()) continue;
 			content.push(f.apply());
 		}

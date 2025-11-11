@@ -28,65 +28,27 @@ class RuntimeHook extends BaseHook
 	const string LAUNCHED = "runtime::launched";
 	const string RUN = "runtime::run";
 	const string ENV = "runtime::env";
+	const string COMPONENTS = "runtime::components";
+	const string LAYOUT_HEADER = "runtime::header";
+	const string LAYOUT_FOOTER = "runtime::footer";
 	const string LAYOUT_NAME = "runtime::layout_name";
+	const string CREATE_CONTAINER = "runtime::create_container";
 	const string CREATE_LAYOUT = "runtime::create_layout";
+	const string CHANGE_LAYOUT = "runtime::change_layout";
+	const string TITLE = "runtime::title";
 	
 	
 	/**
-	 * Returns method name by hook name
+	 * Register hooks
 	 */
-	string getMethodName(string hook_name)
+	void register_hooks()
 	{
-		if (hook_name == static::INIT) return "init";
-		if (hook_name == static::START) return "start";
-		if (hook_name == static::LAUNCHED) return "launched";
-		if (hook_name == static::RUN) return "run";
-		if (hook_name == static::ENV) return "env";
-		return "";
-	}
-	
-	
-	/**
-	 * Init context
-	 */
-	async Dict init(Dict d)
-	{
-		return d;
-	}
-	
-	
-	/**
-	 * Start context
-	 */
-	async Dict start(Dict d)
-	{
-		return d;
-	}
-	
-	
-	/**
-	 * Launched context
-	 */
-	async Dict launched(Dict d)
-	{
-		return d;
-	}
-	
-	
-	/**
-	 * Run entry point
-	 */
-	async Dict run(Dict d)
-	{
-		return d;
-	}
-	
-	
-	/**
-	 * Init context
-	 */
-	Dict env(Dict d)
-	{
-		return d;
+		parent();
+		this.provider.setAsync([
+			static::INIT,
+			static::START,
+			static::LAUNCHED,
+			static::RUN,
+		]);
 	}
 }

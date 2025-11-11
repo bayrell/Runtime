@@ -22,6 +22,8 @@ use Runtime.lib;
 use Runtime.BaseHook;
 use Runtime.BaseProvider;
 use Runtime.Callback;
+use Runtime.Chain;
+use Runtime.ChainAsync;
 use Runtime.Context;
 use Runtime.Entity.Hook;
 
@@ -29,7 +31,8 @@ use Runtime.Entity.Hook;
 class HookProvider extends BaseProvider
 {
 	protected Vector<BaseHook> base_hooks = [];
-	protected Map<Map<Vector>> hooks = new Map();
+	protected Map<Chain> chains = {};
+	protected Map<bool> async_hooks = {};
 	
 	
 	/**
@@ -43,9 +46,10 @@ class HookProvider extends BaseProvider
 		for (int i=0; i<hooks.count(); i++)
 		{
 			Hook hook = hooks[i];
-			BaseHook base_hook = hook.createHook();
-			base_hook.hook = hook;
-			base_hook.provider = this;
+			BaseHook base_hook = hook.createInstance({
+				"hook": hook,
+				"provider": this,
+			});
 			base_hook.register_hooks();
 			this.base_hooks.push(base_hook);
 		}
@@ -62,64 +66,46 @@ class HookProvider extends BaseProvider
 	
 	
 	/**
-	 * Register hook
+	 * Set async
 	 */
-	void register(string hook_name, var obj, string method_name, int priority = 100)
+	void setAsync(Vector arr)
 	{
-		if (not this.hooks.has(hook_name)) this.hooks.set(hook_name, new Map());
-		
-		Map priorities = this.hooks[hook_name];
-		if (not priorities.has(priority)) priorities.set(priority, new Vector());
-		
-		Vector methods_list = priorities.get(priority);
-		methods_list.push(new Callback(obj, method_name));
-	}
-	
-	
-	/**
-	 * Remove hook
-	 */
-	void remove(string hook_name, var obj, string method_name, int priority = 100)
-	{
-		if (not this.hooks.has(hook_name)) this.hooks.setValue(hook_name, new Map());
-		
-		Map priorities = this.hooks[hook_name];
-		if (not priorities.has(priority)) priorities.setValue(priority, new Vector());
-		
-		Vector methods_list = priorities.get(priority);
-		int index = methods_list.find(
-			bool (Callback info) use (obj, method_name)
-			{
-				return info.obj == obj and info.name == method_name;
-			}
-		);
-		if (index > -1)
+		for (int i=0; i<arr.count(); i++)
 		{
-			methods_list.removePosition(index);
+			string hook_name = arr.get(i);
+			this.async_hooks.set(hook_name, true);
 		}
 	}
 	
 	
 	/**
-	 * Returns method list
+	 * Returns if chain is async
 	 */
-	Collection<fn> getMethods(string hook_name)
+	bool isAsync(string name)
 	{
-		if (not this.hooks.has(hook_name)) return [];
-		
-		Vector res = new Vector();
-		
-		Map priorities = this.hooks[hook_name];
-		Collection priorities_keys = priorities.keys().sort(lib::compareInt());
-		for (int i=0; i<priorities_keys.count(); i++)
-		{
-			int priority = priorities_keys[i];
-			Vector methods_list = priorities.get(priority);
-			
-			res.appendItems(methods_list);
-		}
-		
-		return res.toCollection();
+		if (not this.async_hooks.has(name)) return false;
+		return this.async_hooks.get(name);
+	}
+	
+	
+	/**
+	 * Create chain
+	 */
+	void createChain(string name, bool is_async)
+	{
+		if (this.chains.has(name)) return;
+		if (is_async) this.chains.set(name, new ChainAsync());
+		else this.chains.set(name, new Chain());
+	}
+	
+	
+	/**
+	 * Returns chain
+	 */
+	Chain getChain(string name)
+	{
+		if (not this.chains.has(name)) this.createChain(name, this.isAsync(name));
+		return this.chains.get(name);
 	}
 	
 	
@@ -128,6 +114,20 @@ class HookProvider extends BaseProvider
 	 */
 	void apply(string hook_name, Map params = null)
 	{
+		Chain chain = this.chains.get(hook_name);
+		if (not chain) return params;
+		
+		if (chain instanceof ChainAsync)
+		{
+			fn f = async void () use (chain, params)
+			{
+				await chain.apply([params]);
+				return params;
+			}
+			return f();
+		}
+		
+		chain.apply([params]);
 		return params;
 	}
 }

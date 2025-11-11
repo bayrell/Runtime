@@ -28,6 +28,7 @@ class VirtualDom extends BaseObject
 	Map attrs = {};
 	Map slots = {};
 	Vector items = [];
+	bool is_raw = false;
 	bool is_render = false;
 	bool is_component = false;
 	string name = "";

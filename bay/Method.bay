@@ -22,7 +22,7 @@ use Runtime.BaseObject;
 use Runtime.Exceptions.RuntimeException;
 
 
-class Callback extends BaseObject
+class Method extends BaseObject
 {
 	var obj;
 	string name;
@@ -60,7 +60,7 @@ class Callback extends BaseObject
 	
 	
 	/**
-	 * Check callback
+	 * Check method
 	 */
 	void check()
 	{
@@ -84,7 +84,7 @@ class Callback extends BaseObject
 		#case ifcode PHP then
 		
 		if ($args == null) $args = [];
-		else if ($args instanceof \Runtime\Collection) $args = $args->toArray();
+		else if ($args instanceof \Runtime\Vector) $args = $args->toArray();
 		
 		$obj = $this->obj;
 		if (gettype($obj) == "string") $obj = rtl::findClass($obj);

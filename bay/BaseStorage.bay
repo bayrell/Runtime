@@ -18,29 +18,26 @@
 
 namespace Runtime;
 
-use Runtime.Chain;
-use Runtime.Method;
+use Runtime.BaseModel;
+use Runtime.Serializer;
 
 
-class ChainAsync extends Chain
+class BaseStorage extends BaseModel
 {
-	/**
-	 * Apply chain
-	 */
-	void apply(Collection args = null)
-	{
-		fn f = async void () use (args)
-		{
-			for (int i=0; i<this.chain.count(); i++)
-			{
-				Dict item = this.chain.get(i);
-				Method f = item.get("method");
-				var res = f.apply(args);
-				#ifcode JAVASCRIPT then
-				if (res instanceof Promise) await res;
-				#endif
-			}
-		};
-		return f();
-	}
+    string widget_name = "storage";
+    Map frontend_params = {};
+    
+    #ifdef BACKEND then
+    Map backend_params = {};
+    #endif
+    
+    
+    /**
+     * Serializer model
+     */
+    void serialize(Serializer serializer, Map data)
+    {
+        parent(serializer, data);
+        serializer.process(this, "frontend_params", "data");
+    }
 }
