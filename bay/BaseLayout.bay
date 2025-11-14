@@ -78,6 +78,7 @@ class BaseLayout extends BaseModel
 		serializer.process(this, "components", data);
 		serializer.process(this, "current_page_model", data);
 		serializer.process(this, "lang", data);
+		serializer.process(this, "title", data);
 	}
 	
 	
@@ -118,7 +119,7 @@ class BaseLayout extends BaseModel
 	/**
 	 * Set page title
 	 */
-	void setPageTitle(string title, bool full_title=true)
+	void setPageTitle(string title, bool full_title=false)
 	{
 		Map d = @.hook(RuntimeHook::TITLE, {
 			"title": title,

@@ -103,12 +103,12 @@ class VirtualDom extends BaseObject
 		{
 			content = rtl::toStr(content);
 		}
-		if (this.items.count() == 1 and rtl::isString(content))
+		if (this.items.count() > 0 and rtl::isString(content))
 		{
-			string item = this.items.get(0);
+			string item = this.items.last();
 			if (rtl::isString(item))
 			{
-				this.items.set(0, item ~ content);
+				this.items.set(this.items.count() - 1, item ~ content);
 				return;
 			}
 		}
