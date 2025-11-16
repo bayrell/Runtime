@@ -121,9 +121,10 @@ class re
 		
 		#case ifcode JAVASCRIPT then
 		
+		const Vector = use("Runtime.Vector");
 		pattern = "g" + pattern;
 		
-		var arr = [];
+		var arr = new Vector();
 		var r = new RegExp(r, pattern);
 		
 		if (s.matchAll == undefined)
@@ -133,10 +134,10 @@ class re
 				arr.push(m);
 			}
 		}
-		else arr = [...s.matchAll(r)];
+		else arr = Vector.create(s.matchAll(r));
 		
 		if (arr.length == 0) return null;
-		return arr.map((v) => Runtime.Vector.create(v));
+		return arr.map((v) => Vector.create(v));
 		
 		#endswitch
 		

@@ -122,6 +122,7 @@ class BaseLayout extends BaseModel
 	void setPageTitle(string title, bool full_title=false)
 	{
 		Map d = @.hook(RuntimeHook::TITLE, {
+			"layout": this,
 			"title": title,
 			"title_orig": title,
 			"full_title": full_title,
