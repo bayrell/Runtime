@@ -16,6 +16,8 @@
  *  limitations under the License.
  */
 
+const { use } = require("bay-lang");
+
 
 var exports = {
 	VERSION: '0.11.8',
@@ -35,6 +37,28 @@ function add(name)
 	require(path);
 }
 
+const ClassException = function(message, code, prev)
+{
+	Error.call(this);
+	Error.captureStackTrace(this, this.constructor);
+	this.message = message;
+	this.code = code;
+	this.prev = prev;
+}
+ClassException.prototype = Object.create(Error.prototype);
+ClassException.prototype.constructor = ClassException;
+Object.assign(ClassException.prototype,
+{
+	_init: function(){},
+});
+Object.assign(ClassException,
+{
+	getNamespace: function(){ return "Runtime.Exceptions"; },
+	getClassName: function(){ return "Runtime.Exceptions.ClassException"; },
+	getParentClassName: function(){ return ""; },
+});
+use.add(ClassException);
+
 add("Runtime.re");
 add("Runtime.rtl");
 add("Runtime.rs");
@@ -43,7 +67,6 @@ add("Runtime.Map");
 add("Runtime.Vector");
 add("Runtime.BaseObject");
 add("Runtime.BaseProvider");
-add("Runtime.BaseStruct");
 add("Runtime.Context");
 add("Runtime.Date");
 add("Runtime.DateTime");
@@ -53,7 +76,6 @@ add("Runtime.Entity.Entity");
 add("Runtime.Entity.Factory");
 add("Runtime.Entity.Hook");
 add("Runtime.Entity.Provider");
-add("Runtime.Exceptions.AbstractException");
 add("Runtime.Exceptions.ApiError");
 add("Runtime.Exceptions.AssertException");
 add("Runtime.Exceptions.CurlException");
