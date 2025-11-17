@@ -377,8 +377,8 @@ class Context extends BaseObject
 					Map<string> sub_modules = f.apply();
 					if (sub_modules != null)
 					{
-						Vector<string> sub_modules = rtl::list(sub_modules.keys());
-						static::_getRequiredModules(res, cache, sub_modules);
+						Vector<string> sub_modules_keys = rtl::list(sub_modules.keys());
+						static::_getRequiredModules(res, cache, sub_modules_keys);
 					}
 					res.push(module_name);
 				}

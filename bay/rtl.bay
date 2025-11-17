@@ -205,7 +205,7 @@ class rtl
 		while (parent_class_name != "")
 		{
 			if (parent_class_name == class_name) return true;
-			string parent_class_name = static::parentClassName(parent_class_name);
+			parent_class_name = static::parentClassName(parent_class_name);
 		}
 	}
 	
@@ -807,8 +807,8 @@ class rtl
 		try
 		{
 			Context context = await static::createApp(app, modules);
-			var app = context.provider("app");
-			return await app.main();
+			var provider = context.provider("app");
+			return await provider.main();
 		}
 		catch (var e)
 		{

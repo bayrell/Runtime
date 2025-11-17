@@ -431,7 +431,6 @@ class rs
 		Collection<string> arr1 = static::split(".", filepath);
 		Collection<string> arr2 = static::split("/", filepath);
 		
-		string filepath = filepath;
 		string extension = arr1.pop();
 		string basename = arr2.pop();
 		string dirname = static::join("/", arr2);
@@ -581,6 +580,29 @@ class rs
 	
 	
 	/**
+	 * Decode HTML
+	 */
+	static string htmlDecode(string s)
+	{
+		#switch
+		#case ifcode NODEJS then
+		const he = require("he");
+		return he.decode(s);
+		#case ifcode ES6 then
+		let count_spaces = 0;
+		while (count_spaces < s.length && s.charAt(count_spaces) == " ") count_spaces++;
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(s.substr(count_spaces), "text/html");
+		return this.str_repeat(" ", count_spaces) + doc.body.textContent;
+		#case ifcode PHP then
+		return html_entity_decode($s);
+		#endswitch
+	}
+	pure string decodeHtml(string s) =>
+		static::htmlDecode(s);
+	
+	
+	/**
 	 * Escape HTML special chars
 	 * @param string s
 	 * @return string
@@ -609,7 +631,8 @@ class rs
 		
 		#endswitch
 	}
-	pure string escapeHtml(string s) => static::htmlEscape(s);
+	pure string escapeHtml(string s) =>
+		static::htmlEscape(s);
 	
 	
 	/**
