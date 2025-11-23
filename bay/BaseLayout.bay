@@ -79,6 +79,7 @@ class BaseLayout extends BaseModel
 		serializer.process(this, "components", data);
 		serializer.process(this, "current_page_model", data);
 		serializer.process(this, "lang", data);
+		serializer.process(this, "theme", data);
 		serializer.process(this, "title", data);
 		serializer.process(this, "pages", data, new Method(this, "serializePage"));
 		serializer.process(this, "storage", data);
