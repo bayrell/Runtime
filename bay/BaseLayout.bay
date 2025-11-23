@@ -1,7 +1,7 @@
 /*!
  *  BayLang Technology
  *
- *  (c) Copyright 2016-2024 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2025 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ class BaseLayout extends BaseModel
 {
 	BaseStorage storage = null;
 	Vector<string> components = [];
+	Map pages = {};
 	string component = classof DefaultLayout;
 	string current_page_model = "";
 	string name = "";
@@ -65,7 +66,7 @@ class BaseLayout extends BaseModel
 	 */
 	void initStorage()
 	{
-		this.storage = this.addWidget(classof BaseStorage);
+		this.storage = this.createWidget(classof BaseStorage);
 	}
 	
 	
@@ -79,6 +80,18 @@ class BaseLayout extends BaseModel
 		serializer.process(this, "current_page_model", data);
 		serializer.process(this, "lang", data);
 		serializer.process(this, "title", data);
+		serializer.process(this, "pages", data, new Method(this, "serializePage"));
+		serializer.process(this, "storage", data);
+	}
+	
+	
+	/**
+	 * Serialize page
+	 */
+	void serializePage(Serializer serializer, Map data)
+	{
+		string class_name = data.get("__class_name__");
+		return this.createWidget(class_name, data);
 	}
 	
 	
@@ -94,7 +107,7 @@ class BaseLayout extends BaseModel
 	/**
 	 * Returns page model
 	 */
-	BaseModel getPageModel() => this.widgets.get(this.current_page_model);
+	BaseModel getPageModel() => this.pages.get(this.current_page_model);
 	
 	
 	/**
@@ -105,11 +118,12 @@ class BaseLayout extends BaseModel
 		if (not params) params = {};
 		this.current_page_model = class_name;
 		
-		BaseModel page = this.getWidget(class_name);
+		BaseModel page = this.pages.get(class_name);
 		if (not page)
 		{
 			params.set("widget_name", class_name);
-			page = this.addWidget(class_name, params);
+			page = this.createWidget(class_name, params);
+			this.pages.set(class_name, page);
 		}
 		
 		return page;
@@ -121,13 +135,26 @@ class BaseLayout extends BaseModel
 	 */
 	void setPageTitle(string title, bool full_title=false)
 	{
-		Map d = @.hook(RuntimeHook::TITLE, {
+		Map res = @.hook(RuntimeHook::TITLE, {
 			"layout": this,
 			"title": title,
 			"title_orig": title,
 			"full_title": full_title,
 		});
-		this.title = d.get("title");
+		this.title = res.get("title");
+	}
+	
+	
+	/**
+	 * Assets
+	 */
+	void assets(string path)
+	{
+		Map res = @.hook(RuntimeHook::ASSETS, {
+			"layout": this,
+			"path": path,
+		});
+		return res.get("path");
 	}
 	
 	

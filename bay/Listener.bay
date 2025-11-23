@@ -1,0 +1,110 @@
+/*!
+ *  BayLang Technology
+ *
+ *  (c) Copyright 2016-2025 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.BaseObject;
+use Runtime.Chain;
+use Runtime.Message;
+use Runtime.Method;
+
+
+class Listener extends BaseObject
+{
+	BaseObject object = null;
+	Map<Chain> listeners = {};
+	
+	
+	/**
+	 * Constructor
+	 */
+	void constructor(BaseObject object)
+	{
+		parent();
+		this.object = object;
+	}
+	
+	
+	/**
+	 * Clear listeners
+	 */
+	void clear(string message_name)
+	{
+		this.listeners.set(message_name, new Chain());
+	}
+	
+	
+	/**
+	 * Add listener
+	 */
+	void add(string message_name, fn f, int priority = 100)
+	{
+		if (not (f instanceof Method)) return;
+		if (not this.listeners.has(message_name))
+		{
+			this.clearListener(message_name);
+		}
+		
+		Chain chain = this.listeners.get(message_name);
+		chain.add(f, priority);
+		chain.sort();
+	}
+	
+	
+	/**
+	 * Emit message
+	 */
+	void emit(Message message)
+	{
+		if (message.src == null)
+		{
+			message.src = this.object;
+		}
+		this.emitMessage(message::getClassName(), message);
+		this.emitMessage(message.name, message);
+	}
+	
+	
+	/**
+	 * Emit async message
+	 */
+	async void emitAsync(Message message)
+	{
+		if (message.src == null)
+		{
+			message.src = this.object;
+		}
+		var res1 = this.emitMessage(message::getClassName(), message);
+		var res2 = this.emitMessage(message.name, message);
+		#ifcode JAVASCRIPT then
+		if (res1 instanceof Promise) await res1;
+		if (res2 instanceof Promise) await res2;
+		#endif
+	}
+	
+	
+	/**
+	 * Emit message
+	 */
+	void emitMessage(string message_name, Message message)
+	{
+		if (not this.listeners.has(message_name)) return;
+		Chain chain = this.listeners.get(message_name);
+		return chain.apply([message]);
+	}
+}

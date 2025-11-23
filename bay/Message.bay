@@ -16,20 +16,26 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Exceptions;
+namespace Runtime;
 
-use Runtime.RuntimeConstant;
-use Runtime.Exceptions.RuntimeException;
+use Runtime.BaseObject;
 
 
-class KeyNotFound extends RuntimeException
+class Message extends BaseObject
 {
-	void constructor(string key, Object prev = null)
+	var data = null;
+	string name = "";
+	BaseObject src = null;
+	
+	
+	/**
+	 * Create message
+	 */
+	void constructor(Dict params = null)
 	{
-		parent(
-			rtl::translate("Key '%key%' not found", {"key": key}),
-			rtl::ERROR_KEY_NOT_FOUND,
-			prev
-		);
+		parent();
+		
+		/* Setup params */
+		this._assign_values(params);
 	}
 }

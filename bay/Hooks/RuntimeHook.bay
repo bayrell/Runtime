@@ -1,7 +1,7 @@
 /*!
  *  BayLang Technology
  *
- *  (c) Copyright 2016-2024 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2025 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ class RuntimeHook extends BaseHook
 	const string LAUNCHED = "runtime::launched";
 	const string RUN = "runtime::run";
 	const string ENV = "runtime::env";
+	const string ASSETS = "runtime::assets";
 	const string COMPONENTS = "runtime::components";
 	const string LAYOUT_HEADER = "runtime::header";
 	const string LAYOUT_FOOTER = "runtime::footer";

@@ -1,7 +1,7 @@
 /*!
  *  BayLang Technology
  *
- *  (c) Copyright 2016-2024 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2025 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.BaseObject;
 use Runtime.RenderContainer;
+use Runtime.Listener;
 use Runtime.Method;
 use Runtime.Serializer;
 use Runtime.SerializeInterface;
@@ -29,9 +30,8 @@ class BaseModel extends BaseObject implements SerializeInterface
 {
 	BaseModel layout = null;
 	BaseModel parent_widget = null;
+	Listener listener = new Listener(this);
 	string component = "";
-	string widget_name = "";
-	Dict widgets = {};
 	
 	
 	/**
@@ -67,7 +67,6 @@ class BaseModel extends BaseObject implements SerializeInterface
 		
 		/* Setup params */
 		this.component = params.has("component") ? params.get("component") : this.component;
-		this.widget_name = params.get("widget_name");
 	}
 	
 	
@@ -85,19 +84,6 @@ class BaseModel extends BaseObject implements SerializeInterface
 	void serialize(Serializer serializer, Map data)
 	{
 		serializer.process(this, "component", data);
-		serializer.process(this, "widget_name", data);
-		serializer.process(this, "widgets", data, new Method(this, "serializeCreateWidget"));
-	}
-	
-	
-	/**
-	 * Serialize widget
-	 */
-	void serializeCreateWidget(Serializer serializer, Map data)
-	{
-		string class_name = data.get("__class_name__");
-		BaseModel widget = this.addWidget(class_name);
-		return widget;
 	}
 	
 	
@@ -106,13 +92,6 @@ class BaseModel extends BaseObject implements SerializeInterface
 	 */
 	async void loadData(RenderContainer container)
 	{
-		Vector keys = rtl::list(this.widgets.keys());
-		for (int i=0; i<keys.count(); i++)
-		{
-			string widget_name = keys.get(i);
-			BaseModel widget = this.widgets.get(widget_name);
-			await widget.loadData(container);
-		}
 	}
 	
 	
@@ -125,30 +104,13 @@ class BaseModel extends BaseObject implements SerializeInterface
 	
 	
 	/**
-	 * Add widget
+	 * Create widget
 	 */
-	BaseModel addWidget(string class_name, Dict params = null)
+	BaseModel createWidget(string class_name, Dict params = null)
 	{
 		if (params == null) params = {};
 		if (not params.has("parent_widget")) params.set("parent_widget", this);
 		BaseModel widget = rtl::newInstance(class_name, [params]);
-		string widget_name = params.get("widget_name");
-		if (widget_name) this.widgets.set(widget_name, widget);
 		return widget;
-	}
-	
-	
-	/**
-	 * Returns widget by name
-	 */
-	BaseModel getWidget(string name) => this.widgets.get(name);
-	
-	
-	/**
-	 * Set widget
-	 */
-	void setWidget(string name, BaseModel widget)
-	{
-		this.widgets.set(name, widget);
 	}
 }

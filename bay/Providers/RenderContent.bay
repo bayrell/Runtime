@@ -1,7 +1,7 @@
 /*!
  *  BayLang Technology
  *
- *  (c) Copyright 2016-2024 "Ildar Bikmamatov" <support@bayrell.org>
+ *  (c) Copyright 2016-2025 "Ildar Bikmamatov" <support@bayrell.org>
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -33,8 +33,7 @@ class RenderContent extends BaseObject
 		if (not vdom) return;
 		if (not(vdom instanceof VirtualDom))
 		{
-			if (parent_vdom and (parent_vdom.name == "style" or
-				parent_vdom.name == "script" or parent_vdom.is_raw))
+			if (parent_vdom and parent_vdom.is_raw)
 			{
 				content.push(vdom);
 			}
