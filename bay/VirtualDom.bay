@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.BaseObject;
 use Runtime.Component;
+use Runtime.Providers.RenderContent;
 
 
 class VirtualDom extends BaseObject
@@ -122,5 +123,18 @@ class VirtualDom extends BaseObject
 	void slot(string slot_name, fn content)
 	{
 		this.slots.set(slot_name, content);
+	}
+	
+	
+	/**
+	 * Render vdom to string
+	 */
+	string render()
+	{
+		Vector content = [];
+		RenderContent provider = new RenderContent;
+		provider.components = @.provider("render").components;
+		provider.render(this, content);
+		return rs::join("", content);
 	}
 }

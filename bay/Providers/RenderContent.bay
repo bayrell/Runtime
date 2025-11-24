@@ -18,13 +18,36 @@
 
 namespace Runtime.Providers;
 
-use Runtime.BaseObject;
+use Runtime.BaseProvider;
 use Runtime.Component;
 use Runtime.VirtualDom;
 
 
-class RenderContent extends BaseObject
+class RenderContent extends BaseProvider
 {
+	Map components = {};
+	
+	
+	/**
+	 * Add replace component
+	 */
+	void addComponent(string component, string name)
+	{
+		this.components.set(component, name);
+	}
+	
+	
+	/**
+	 * Find component
+	 */
+	string findComponent(VirtualDom vdom)
+	{
+		string name = vdom.name;
+		if (this.components.has(name)) name = this.compoentns.get(name);
+		return name;
+	}
+	
+	
 	/**
 	 * Render
 	 */
@@ -43,7 +66,8 @@ class RenderContent extends BaseObject
 		
 		if (vdom.is_component)
 		{
-			Component component = rtl::newInstance(vdom.name);
+			string component_name = this.findComponent(vdom);
+			Component component = rtl::newInstance(component_name);
 			component.layout = vdom.component ? vdom.component.layout : null;
 			component._slots = vdom.slots;
 			Collection<string> keys = rtl::list(vdom.attrs.keys());

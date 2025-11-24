@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.BaseObject;
 use Runtime.BaseModel;
+use Runtime.Component;
 use Runtime.Serializer;
 use Runtime.VirtualDom;
 use Runtime.Hooks.RuntimeHook;
@@ -139,16 +140,26 @@ class RenderContainer extends BaseObject
 	
 	
 	/**
+	 * Render app
+	 */
+	string renderApp()
+	{
+		Component component = rtl::newInstance(this.layout.component);
+		component.container = this;
+		component.layout = this.layout;
+		VirtualDom vdom = component.renderApp();
+		return vdom.render();
+	}
+	
+	
+	/**
 	 * Render layout
 	 */
 	string render()
 	{
-		Vector content = [];
 		VirtualDom vdom = new VirtualDom();
 		vdom.setName(this.layout.component);
 		vdom.setAttrs({"layout": this.layout});
-		RenderContent provider = new RenderContent();
-		provider.render(vdom, content);
-		return rs::join("", content);
+		return vdom.render();
 	}
 }

@@ -312,7 +312,7 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	function find($f)
 	{
 		$index = $this->findIndex($f);
-		if ($index === null) return null;
+		if ($index === -1) return null;
 		return $this[$index];
 	}
 	
@@ -324,11 +324,11 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	 */
 	function findIndex($f)
 	{
-		$index = array_find_key($this->_arr, function($value, $key) use ($f){
-			return $f($value, $key, $this);
-		});
-		if ($index === null) return null;
-		return $index;
+		foreach ($this->_arr as $key => $value)
+		{
+			if ($f($value, $key, $this)) return $key;
+		}
+		return -1;
 	}
 	
 	

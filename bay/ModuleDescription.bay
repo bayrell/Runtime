@@ -18,6 +18,7 @@
 
 namespace Runtime;
 
+use Runtime.Entity.Entity;
 use Runtime.Entity.Provider;
 
 
@@ -47,13 +48,20 @@ class ModuleDescription
 	/**
 	 * Returns enities
 	 */
-	pure Collection<Dict> entities() => 
+	pure Vector<Entity> entities() =>
 	[
 		new Provider("hash", "Runtime.Providers.GlobalHash"),
 		/*new Provider("input", null),*/
 		new Provider("output", "Runtime.Providers.OutputProvider"),
 		/*new Provider("log", null),*/
 		new Provider("hook", "Runtime.Providers.HookProvider"),
+		
+		#ifdef BACKEND then
+		new Provider("render", "Runtime.Providers.RenderContent"),
+		#endif
+		
+		#ifdef FRONTEND then
 		new Provider("render", "Runtime.Providers.RenderProvider"),
+		#endif
 	];
 }

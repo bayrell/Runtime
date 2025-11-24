@@ -26,6 +26,7 @@ use Runtime.VirtualDom;
 class RenderProvider extends BaseProvider
 {
 	bool enable_ssr = true;
+	Map components = {};
 	
 	
 	/**
@@ -93,6 +94,30 @@ class RenderProvider extends BaseProvider
 	
 	
 	/**
+	 * Add replace component
+	 */
+	void addComponent(string component, string name)
+	{
+		this.components.set(component, name);
+	}
+	
+	
+	/**
+	 * Returns find element
+	 */
+	var findElement(VirtualDom vdom)
+	{
+		if (vdom.is_component)
+		{
+			string name = vdom.name;
+			if (this.components.has(name)) name = this.components.get(name);
+			return rtl::findClass(name);
+		}
+		return vdom.name;
+	}
+	
+	
+	/**
 	 * Render
 	 */
 	void render(var vdom)
@@ -114,7 +139,7 @@ class RenderProvider extends BaseProvider
 			return content;
 		}
 		var children = content;
-		if (not rtl::isString(vdom.name))
+		if (vdom.is_component)
 		{
 			var slots = vdom.slots.map(fn (fn f)
 			{
@@ -142,6 +167,7 @@ class RenderProvider extends BaseProvider
 				attrs["innerHTML"] = vdom.attrs.get("@raw");
 			}
 		}
-		return h(vdom.name, attrs, children);
+		string name = this.findElement(vdom);
+		return h(name, attrs, children);
 	}
 }
