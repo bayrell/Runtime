@@ -83,6 +83,7 @@ class VirtualDom extends BaseObject
 		VirtualDom item = static::newInstance([this.component]);
 		item.setName(name);
 		item.setAttrs(attrs);
+		if (name == "script" or name == "style") item.is_raw = true;
 		this.push(item);
 		return item;
 	}
