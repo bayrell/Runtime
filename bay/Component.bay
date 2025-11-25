@@ -29,6 +29,7 @@
 
 props BaseModel model = null;
 props string class = "";
+var parent_component = null;
 
 #ifdef PHP then
 BaseModel layout = null;
@@ -64,6 +65,20 @@ var renderSlot(string slot_name)
 
 
 /**
+ * Returns parent
+ */
+var getParent()
+{
+	#switch
+	#case ifcode PHP then
+	return $this->parent_component;
+	#case ifcode JAVASCRIPT then
+	return this.$parent;
+	#endswitch
+}
+
+
+/**
  * Returns ref
  */
 var getRef(string name)
@@ -80,6 +95,7 @@ var getRef(string name)
 void emit(Message message)
 {
 	#ifcode JAVASCRIPT then
+	message.src = this;
 	this.$emit(message.name, message);
 	#endif
 }

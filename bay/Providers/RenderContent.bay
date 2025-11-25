@@ -25,6 +25,7 @@ use Runtime.VirtualDom;
 
 class RenderContent extends BaseProvider
 {
+	Vector items = [];
 	Map components = {};
 	
 	
@@ -68,6 +69,7 @@ class RenderContent extends BaseProvider
 		{
 			string component_name = this.findComponent(vdom);
 			Component component = rtl::newInstance(component_name);
+			component.parent_component = this.items.count() > 0 ? this.items.last() : null;
 			component.layout = vdom.component ? vdom.component.layout : null;
 			component._slots = vdom.slots;
 			Collection<string> keys = rtl::list(vdom.attrs.keys());
@@ -77,7 +79,9 @@ class RenderContent extends BaseProvider
 				rtl::setAttr(component, attr_name, vdom.attrs.get(attr_name));
 			}
 			VirtualDom item = component.render();
+			this.items.push(component);
 			this.render(item, content);
+			this.items.pop();
 		}
 		else
 		{

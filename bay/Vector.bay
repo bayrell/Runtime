@@ -271,6 +271,15 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	
 	
 	/**
+	 * Array pop
+	 */
+	function pop()
+	{
+		return array_pop($this->_arr);
+	}
+	
+	
+	/**
 	 * Flatten Vector
 	 */
 	function flatten()
