@@ -150,6 +150,7 @@ class RenderProvider extends BaseProvider
 			});
 			children = slots.toObject();
 		}
+		if (children instanceof Vector) children = children.flatten();
 		var attrs = vdom.attrs;
 		if (attrs instanceof Map)
 		{

@@ -38,15 +38,15 @@ class BaseHook extends BaseObject
 	{
 		parent();
 		
-		/* Setup hook params */
-		this.setup(params);
+		/* Init params */
+		this.initParams(params);
 	}
 	
 	
 	/**
-	 * Setup hook params
+	 * Init params
 	 */
-	void setup(Dict params)
+	void initParams(Dict params)
 	{
 		if (params == null) return;
 		

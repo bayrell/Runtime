@@ -788,7 +788,10 @@ class rs
 					if (arr[0] == key)
 					{
 						find = true;
-						if (value != "") return key ~ "=" ~ static::htmlEscape(value);
+						if (key != "" and value != "")
+						{
+							return key ~ "=" ~ static::htmlEscape(value);
+						}
 						return "";
 					}
 					return s;

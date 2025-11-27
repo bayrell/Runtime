@@ -81,7 +81,7 @@ Runtime.Vector = class extends Array
 		for (var i=0; i<this.length; i++)
 		{
 			if (Array.isArray(this[i]))
-				res = res.concat(this[i]);
+				res = res.concat(this[i].flatten());
 			else res.push(this[i]);
 		}
 		return res;
@@ -130,6 +130,7 @@ Runtime.Vector = class extends Array
 	{
 		const RuntimeMap = use("Runtime.Map");
 		return this.reduce(function(map, value, key){
+			var res;
 			if (f) res = f(value, key, this);
 			else res = [value, key];
 			map.set(res[1], res[0]);
@@ -289,7 +290,7 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 		{
 			if ($item instanceof Vector)
 			{
-				array_splice($res->_arr, $res->count(), 0, $item->_arr);
+				array_splice($res->_arr, $res->count(), 0, $item->flatten()->_arr);
 			}
 			else
 			{
@@ -428,10 +429,11 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	 */
 	function transition($f = null)
 	{
-		return $this->reduce(function($map, $value, $key){
+		return $this->reduce(function($map, $value, $key) use ($f){
 			if ($f) $res = $f($value, $key, $this);
 			else $res = [$value, $key];
 			$map->set($res[1], $res[0]);
+			return $map;
 		}, new \Runtime\Map());
 	}
 	
