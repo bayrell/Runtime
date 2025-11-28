@@ -147,6 +147,30 @@ class BaseLayout extends BaseModel
 	
 	
 	/**
+	 * Returns object
+	 */
+	var get(string name) => this.storage.frontend_params.get(name);
+	
+	
+	/**
+	 * Translate
+	 */
+	string translate(Map text, Map params = null)
+	{
+		string s = text.has(this.lang) ? text.get(this.lang) :
+			text.get(this.getDefaultLang())
+		;
+		return rs::format(s, params);
+	}
+	
+	
+	/**
+	 * Returns default lang
+	 */
+	string getDefaultLang() => "en";
+	
+	
+	/**
 	 * Assets
 	 */
 	void assets(string path)

@@ -73,7 +73,7 @@ class Chain extends Method
 	 */
 	public void sort()
 	{
-		this.chain = this.chain.sort(rtl::compare(
+		this.chain.sort(rtl::compare(
 			string (Dict item) => item.get("priority")
 		));
 	}

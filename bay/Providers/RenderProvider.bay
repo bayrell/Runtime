@@ -21,6 +21,7 @@ namespace Runtime.Providers;
 use Runtime.BaseProvider;
 use Runtime.Serializer;
 use Runtime.VirtualDom;
+use Runtime.Hooks.RuntimeHook;
 
 
 class RenderProvider extends BaseProvider
@@ -86,6 +87,11 @@ class RenderProvider extends BaseProvider
 		var layout = this.createLayout(app_data);
 		var app = this.createApp(layout);
 		app.mount(element, true);
+		@.hook(RuntimeHook::MOUNT, {
+			"app": app,
+			"layout": layout,
+			"data": app_data,
+		});
 		return {
 			"app": app,
 			"layout": layout,

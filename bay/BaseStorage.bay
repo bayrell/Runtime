@@ -40,4 +40,13 @@ class BaseStorage extends BaseModel
         parent(serializer, data);
         serializer.process(this, "frontend_params", data);
     }
+    
+    
+    /**
+     * Set frontend params
+     */
+    void set(string key, var value)
+    {
+        this.frontend_params.set(key, value);
+    }
 }

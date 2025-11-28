@@ -458,7 +458,7 @@ class rtl
 	
 	/* ================================= Lib Functions =================================== */
 	
-	static fn compare(string order, fn f = null)
+	static fn compare(fn f = null, string order = "asc")
 	{
 		return int (var a, var b) use (order, f)
 		{
@@ -467,9 +467,9 @@ class rtl
 				a = f(a);
 				b = f(b);
 			}
-			if (a < b) return 1;
-			if (a > b) return -1;
-			return 0;
+			if (a == b) return 0;
+			if (order == "asc") return a < b ? -1 : 1;
+			return a > b ? -1 : 1;
 		};
 	}
 	
@@ -838,6 +838,9 @@ class rtl
 		var context = await static::createContext({
 			"modules": modules,
 		});
+		
+		/* Start context */
+		await context.start();
 		
 		/* Render app */
 		var render = context.factory("render");

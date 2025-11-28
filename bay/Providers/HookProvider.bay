@@ -62,6 +62,7 @@ class HookProvider extends BaseProvider
 	async void start()
 	{
 		await parent::start();
+		this.sort();
 	}
 	
 	
@@ -85,6 +86,29 @@ class HookProvider extends BaseProvider
 	{
 		if (not this.async_hooks.has(name)) return false;
 		return this.async_hooks.get(name);
+	}
+	
+	
+	/**
+	 * Register hook
+	 */
+	void register(string hook_name, var f, int priority = 100)
+	{
+		Chain chain = this.getChain(hook_name);
+		if (not chain) return;
+		chain.add(f, priority);
+	}
+	
+	
+	/**
+	 * Sort
+	 */
+	void sort()
+	{
+		this.chains.each(void (Chain chain)
+		{
+			chain.sort();
+		});
 	}
 	
 	
