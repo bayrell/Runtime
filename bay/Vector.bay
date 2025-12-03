@@ -129,11 +129,14 @@ Runtime.Vector = class extends Array
 	transition(f)
 	{
 		const RuntimeMap = use("Runtime.Map");
-		return this.reduce(function(map, value, key){
-			if (f) res = f(value, key, this);
-			else res = [value, key];
+		const map = new RuntimeMap();
+		for (let i=0; i<this.length; i++)
+		{
+			if (f) res = f(this[i], i, this);
+			else res = [this[i], i];
 			map.set(res[1], res[0]);
-		}, new RuntimeMap());
+		};
+		return map;
 	}
 	
 	
@@ -428,11 +431,14 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	 */
 	function transition($f = null)
 	{
-		return $this->reduce(function($map, $value, $key){
+		$map = new \Runtime\Map();
+		foreach ($this->_arr as $key => $value)
+		{
 			if ($f) $res = $f($value, $key, $this);
 			else $res = [$value, $key];
 			$map->set($res[1], $res[0]);
-		}, new \Runtime\Map());
+		}
+		return $map;
 	}
 	
 	
@@ -489,6 +495,7 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	{
 		if ($f) usort($this->_arr, $f);
 		else sort($this->_arr);
+		return $this;
 	}
 	
 	

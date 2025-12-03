@@ -571,6 +571,14 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
+		if ($obj === null) return null;
+		if (is_array($obj)) return \Runtime\Vector::create(
+			array_map(function ($item) { return static::fromNative($item); }, $obj)
+		);
+		if (is_object($obj)) return \Runtime\Map::create($obj)->map(
+			function ($item) { return static::fromNative($item); }
+		);
+		return $obj;
 		#case ifcode JAVASCRIPT then
 		if (obj === null || obj === undefined)
 		{
@@ -598,7 +606,7 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
-		return json_decode($obj);
+		return static::fromNative(json_decode($obj));
 		#case ifcode JAVASCRIPT then
 		try
 		{

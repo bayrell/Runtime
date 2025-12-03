@@ -211,9 +211,19 @@ class Map implements \JsonSerializable
 	{
 		if ($map != null)
 		{
+			if ($map instanceof \stdClass) $map = (array)$map;
 			if (is_array($map)) $this->_map = $map;
 			else $this->_map = $map->_map;
 		}
+	}
+	
+	
+	/**
+	 * Create map from Object
+	 */
+	static function create($obj)
+	{
+		return new Map($obj);
 	}
 	
 	
@@ -412,10 +422,10 @@ class Map implements \JsonSerializable
 	 */
 	function transition($f)
 	{
-		$arr = [];
+		$arr = new \Runtime\Vector();
 		foreach ($this->_map as $key => $value)
 		{
-			$arr[] = $f($value, $key, $this);
+			$arr->push($f($value, $key, $this));
 		}
 		return $arr;
 	}
