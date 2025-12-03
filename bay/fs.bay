@@ -226,7 +226,7 @@ class fs
 		
 		$arr = scandir($dirpath);
 		$arr = array_filter($arr, function($s){ return $s != "." && $s != ".."; });
-		return \Runtime\Vector::from(array_values($arr));
+		return \Runtime\Vector::create(array_values($arr));
 		
 		#endswitch
 		

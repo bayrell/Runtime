@@ -36,6 +36,7 @@ class Context extends BaseObject
 	protected Dict<BaseObject> providers = {};
 	protected Collection<string> modules = [];
 	protected Collection<BaseObject> entities = [];
+	protected Map<string> cli_args = [];
 	protected string base_path = "";
 	protected int start_time = 0;
 	protected bool initialized = false;
