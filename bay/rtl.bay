@@ -419,7 +419,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		
-		return $value instanceof \Runtime\Collection;
+		return $value instanceof \Runtime\Vector;
 		
 		#case ifcode JAVASCRIPT then
 		
@@ -864,11 +864,14 @@ class rtl
 	
 	async static void wait(int timeout)
 	{
-		#ifcode JAVASCRIPT then
+		#switch
+		#case ifcode PHP then
+		sleep($timeout / 1000);
+		#case ifcode JAVASCRIPT then
 		return new Promise((resolve, reject) => {
 			setTimeout(()=>{ resolve(); }, timeout);
 		});
-		#endif
+		#endswitch
 	}
 }
 
