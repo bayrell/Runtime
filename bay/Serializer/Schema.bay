@@ -16,12 +16,11 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Serializer;
+namespace Runtime;
 
 use Runtime.BaseObject;
-use Runtime.Serializer.BaseRule;
 
 
-class BaseType extends BaseObject implements BaseRule
+class Schema extends BaseObject
 {
 }

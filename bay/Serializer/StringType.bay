@@ -22,7 +22,7 @@ use Runtime.BaseObject;
 use Runtime.Serializer.BaseType;
 
 
-class StringType extends BaseObject implements BaseType
+class StringType extends BaseType
 {
 	/**
 	 * Filter type

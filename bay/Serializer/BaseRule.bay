@@ -18,10 +18,11 @@
 
 namespace Runtime.Serializer;
 
-use Runtime.BaseObject;
-use Runtime.Serializer.BaseRule;
 
-
-class BaseType extends BaseObject implements BaseRule
+interface BaseType
 {
+	/**
+	 * Filter value
+	 */
+	var filter(string value, Vector errors);
 }
