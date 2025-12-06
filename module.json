@@ -52,7 +52,9 @@
 		"Providers/GlobalHash.bay",
 		"Providers/HookProvider.bay",
 		"Providers/OutputProvider.bay",
-		"Providers/RenderProvider.bay"
+		"Providers/RenderProvider.bay",
+		"Rules/BaseRule.bay",
+		"Rules/StringRule.bay"
 	],
 	"groups": [
 		"runtime"

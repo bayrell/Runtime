@@ -228,6 +228,15 @@ class Map implements \JsonSerializable
 	
 	
 	/**
+	 * Convert to Object
+	 */
+	function toObject()
+	{
+		return $this->_map;
+	}
+	
+	
+	/**
 	 * Returns value from position
 	 * @param string key
 	 * @param T default_value

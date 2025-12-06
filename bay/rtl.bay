@@ -326,6 +326,15 @@ class rtl
 	
 	
 	/**
+	 * Assert
+	 */
+	static void assert(bool value, string message)
+	{
+		if (not value) throw new AssertException(message);
+	}
+	
+	
+	/**
 	 * Return attr value by name
 	 */
 	static var attr(var item, string name, var def_val = null)
@@ -370,6 +379,52 @@ class rtl
 		#case ifcode JAVASCRIPT then
 		
 		return (value != null) && (value != undefined);
+		#endswitch
+	}
+	
+	
+	/**
+	 * Returns value type
+	 */
+	static string getType(string value)
+	{
+		if (static::isBoolean(value)) return "boolean";
+		if (static::isInteger(value)) return "integer";
+		if (static::isString(value)) return "string";
+		if (value instanceof Vector) return "vector";
+		if (value instanceof Map) return "map";
+		return "object";
+	}
+	
+	
+	/**
+	 * Returns true if value is boolean
+	 * @param var value
+	 * @return bool
+	 */
+	static bool isBoolean(var value)
+	{
+		return value == true or value === false;
+	}
+	
+	
+	/**
+	 * Returns true if value is integer
+	 * @param var value
+	 * @return bool
+	 */
+	static bool isInteger(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return is_int($value);
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (typeof value == 'number') return true;
+		return false;
+		
 		#endswitch
 	}
 	
@@ -548,6 +603,15 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
+		if ($obj instanceof \Runtime\Vector)
+		{
+			return $obj->map(function ($value) { return static::toNative($value); });
+		}
+		else if ($obj instanceof \Runtime\Map)
+		{
+			return $obj->map(function ($value) { return static::toNative($value); })->toObject();
+		}
+		return $obj;
 		#case ifcode JAVASCRIPT then
 		const RuntimeMap = this.findClass("Runtime.Map");
 		const RuntimeVector = this.findClass("Runtime.Vector");
