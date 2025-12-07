@@ -40,7 +40,6 @@
 		"Reference.bay",
 		"RenderContainer.bay",
 		"SerializeInterface.bay",
-		"Serializer.bay",
 		"ModuleDescription.bay",
 		"VirtualDom.bay",
 		"Entity/Entity.bay",
@@ -53,8 +52,12 @@
 		"Providers/HookProvider.bay",
 		"Providers/OutputProvider.bay",
 		"Providers/RenderProvider.bay",
-		"Rules/BaseRule.bay",
-		"Rules/StringRule.bay"
+		"Serializer/BaseRule.bay",
+		"Serializer/BaseType.bay",
+		"Serializer/Schema.bay",
+		"Serializer/Serializer.bay",
+		"Serializer/StringType.bay",
+		"Serializer/TypeError.bay"
 	],
 	"groups": [
 		"runtime"

@@ -19,22 +19,27 @@
 namespace Runtime.Serializer;
 
 use Runtime.BaseObject;
-use Runtime.Serializer.BaseType;
-use Runtime.Serializer.TypeError;
 
 
-class StringType extends BaseType
+class TypeError extends BaseObject
 {
-	/**
-	 * Filter type
-	 */
-	string filter(var value, Vector errors)
-	{
-		if (not rtl::isString(value))
-		{
-			errors.push(new TypeError("Does not string"));
-			return "";
-		}
-		return value;
-	}
+    string field_name = "";
+    string message = "";
+    
+    
+    /**
+     * Create type error
+     */
+    void constructor(string message, string field_name = "")
+    {
+        parent();
+        this.field_name = field_name;
+        this.message = message;
+    }
+    
+    
+    /**
+     * Returns error message
+     */
+    string getMessage() => this.message;
 }
