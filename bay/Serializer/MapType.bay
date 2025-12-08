@@ -39,17 +39,6 @@ class MapType extends BaseObject implements BaseType
 	
 	
 	/**
-	 * Add type to map
-	 */
-	void addType(string field_name, BaseType item)
-	{
-		if (not this.fields.has(field_name)) this.fields.set(field_name, []);
-		Vector items = this.fields.get(field_name);
-		items.push(item);
-	}
-	
-	
-	/**
 	 * Filter type
 	 */
 	Map filter(Map value, Vector errors, var old_value = null)

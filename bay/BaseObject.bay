@@ -18,6 +18,8 @@
 
 namespace Runtime;
 
+use Runtime.Serliazer.Schema;
+
 
 class BaseObject
 {
@@ -43,6 +45,14 @@ class BaseObject
 	 * Init function
 	 */
 	protected void _init()
+	{
+	}
+	
+	
+	/**
+	 * Returns object schema
+	 */
+	static void getSchema(Schema schema)
 	{
 	}
 	

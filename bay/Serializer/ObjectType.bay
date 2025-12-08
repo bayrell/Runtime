@@ -20,17 +20,101 @@ namespace Runtime.Serializer;
 
 use Runtime.BaseObject;
 use Runtime.Serializer.BaseType;
+use Runtime.Serializer.MapType;
+use Runtime.Serializer.Schema;
+use Runtime.Serializer.TypeError;
 use Runtime.SerializeInterface;
 
 
 class ObjectType extends BaseObject implements BaseType
 {
+	fn create = null;
+	string class_name = "";
+	string class_extends = "";
+	string class_implements = "";
+	
+	
+	/**
+	 * Create object
+	 */
+	void constructor(Map params = null)
+	{
+		parent();
+		if (not params) return;
+		if (params.has("create")) this.create = params.get("create");
+		if (params.has("class_name")) this.class_name = params.get("class_name");
+		if (params.has("class_extends")) this.class_extends = params.get("extends");
+		if (params.has("class_implements")) this.class_implements = params.get("implements");
+	}
+	
+	
+	/**
+	 * Create object
+	 */
+	SerializeInterface createObject(Map value)
+	{
+		return this.create ? this.create(value) : null;
+	}
+	
+	
 	/**
 	 * Filter value
 	 */
-	SerializeInterface filter(Map value, Vector errors, var old_value = null)
+	SerializeInterface filter(Map value, Vector errors, SerializeInterface old_value = null)
 	{
-		return null;
+		if (value === null) return null;
+		if (not (value instanceof Map)) return null;
+		
+		SerializeInterface new_value = this.create ? this.create(value, old_value) : old_value;
+		if (new_value == null)
+		{
+			errors.push(new TypeError("Object does not exists"));
+			return null;
+		}
+		
+		string class_name = new_value::getClassName();
+		if (this.class_name != "" and this.class_name != class_name)
+		{
+			errors.push(new TypeError("Wrong class name \"" ~ class_name ~ "\""));
+			return null;
+		}
+		if (this.class_extends != "" and not rtl::isInstanceOf(new_value, this.class_extends))
+		{
+			errors.push(new TypeError("Wrong class name \"" ~ class_name ~ "\""));
+			return null;
+		}
+		if (this.class_implements != "" and not rtl::isImplements(new_value, this.class_implements))
+		{
+			errors.push(new TypeError("Wrong class name \"" ~ class_name ~ "\""));
+			return null;
+		}
+		
+		Schema schema = new Schema();
+		new_value::getSchema(schema);
+		
+		Vector keys = rtl::list(schema.fields.keys());
+		for (int i=0; i<keys.count(); i++)
+		{
+			string key = keys.get(i);
+			var item_value = value.get(key);
+			Vector item_errors = [];
+			Vector items = schema.fields.get(key);
+			for (int j=0; j<items.count(); j++)
+			{
+				BaseType item = items.get(j);
+				if (item implements BaseType)
+				{
+					item_value = item.filter(
+						item_value, item_errors,
+						old_value ? rtl::attr(old_value, key) : null
+					);
+				}
+			}
+			rtl::setAttr(new_value, key, item_value);
+			errors.appendItems(item_errors);
+			TypeError::addFieldErrors(item_errors, key);
+		}
+		return new_value;
 	}
 	
 	
@@ -39,6 +123,29 @@ class ObjectType extends BaseObject implements BaseType
 	 */
 	Map serialize(SerializeInterface value)
 	{
-		return null;
+		if (value === null) return null;
+		if (not (value implements SerializeInterface)) return null;
+		Map new_value = {};
+		
+		Schema schema = new Schema();
+		value::getSchema(schema);
+		
+		Vector keys = rtl::list(schema.fields.keys());
+		for (int i=0; i<keys.count(); i++)
+		{
+			string key = keys.get(i);
+			var item_value = rtl::attr(value, key);
+			Vector items = schema.fields.get(key);
+			for (int j=0; j<items.count(); j++)
+			{
+				BaseType item = items.get(j);
+				if (item implements BaseType)
+				{
+					item_value = item.serialize(item_value);
+				}
+			}
+			new_value.set(key, item_value);
+		}
+		return new_value;
 	}
 }

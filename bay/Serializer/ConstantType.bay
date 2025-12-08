@@ -16,15 +16,35 @@
  *  limitations under the License.
  */
 
-namespace Runtime;
+namespace Runtime.Serializer;
 
-use Runtime.Serializer.Schema;
+use Runtime.BaseObject;
+use Runtime.Serializer.BaseType;
 
 
-interface SerializeInterface
+class ConstantType extends BaseObject implements BaseType
 {
-	/**
-	 * Returns object schema
+    var value = null;
+    
+    
+    /**
+     * Create object
+     */
+    void constructor(var value)
+    {
+        parent();
+        this.value = value;
+    }
+    
+    
+    /**
+	 * Filter value
 	 */
-	static void getSchema(Schema schema);
+	var filter(var value, Vector errors, var old_value = null) => this.value;
+	
+	
+	/**
+	 * Returns data
+	 */
+	var serialize(var value) => this.value;
 }
