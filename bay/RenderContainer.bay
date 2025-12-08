@@ -130,12 +130,11 @@ class RenderContainer extends BaseObject
 	 */
 	Dict getData()
 	{
-		Serializer serializer = new Serializer();
-		Map layout_data = serializer.encode(this.layout);
+		Map layout_data = rtl::serialize(this.layout);
 		Map data = {
 			"modules": @.modules,
+			"class": this.layout::getClassName(),
 			"layout": layout_data,
-			"storage": {},
 		};
 		Map res = @.hook(RuntimeHook::CREATE_CONTAINER_DATA, {
 			"container": this,

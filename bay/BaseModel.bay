@@ -23,6 +23,7 @@ use Runtime.RenderContainer;
 use Runtime.Listener;
 use Runtime.Method;
 use Runtime.Serializer;
+use Runtime.Serializer.StringType;
 use Runtime.SerializeInterface;
 
 
@@ -81,9 +82,9 @@ class BaseModel extends BaseObject implements SerializeInterface
 	/**
 	 * Serialize object
 	 */
-	void serialize(Serializer serializer, Map data)
+	void serialize(Serializer serializer)
 	{
-		serializer.process(this, "component", data);
+		serializer.addType("component", new StringType());
 	}
 	
 	

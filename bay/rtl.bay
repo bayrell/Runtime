@@ -25,7 +25,7 @@ use Runtime.Date;
 use Runtime.DateTime;
 use Runtime.Entity.Provider;
 use Runtime.Exceptions.AssertException;
-use Runtime.Serializer.Schema;
+use Runtime.Serializer;
 use Runtime.SerializeInterface;
 
 
@@ -668,12 +668,11 @@ class rtl
 	/**
 	 * Assign object
 	 */
-	static Schema assign(SerializeInterface obj, Map data)
+	static Serializer assign(SerializeInterface obj, Map data)
 	{
-		Schema schema = new Schema();
-		obj::getSchema(schema);
-		schema.assign(obj, data);
-		return schema;
+		Serializer serializer = new Serializer();
+		serializer.assign(obj, data);
+		return serializer;
 	}
 	
 	
@@ -682,9 +681,8 @@ class rtl
 	 */
 	static Map serialize(SerializeInterface obj)
 	{
-		Schema schema = new Schema();
-		obj::getSchema(schema);
-		return schema.serialize(obj);
+		Serializer serializer = new Serializer();
+		return serializer.serialize(obj);
 	}
 	
 	
@@ -725,6 +723,18 @@ class rtl
 		#case ifcode JAVASCRIPT then
 		return JSON.stringify(obj);
 		#endswitch
+	}
+	
+	
+	/**
+	 * Copy object
+	 */
+	static var copy(SerializeInterface obj)
+	{
+		Map data = static::serialize(obj);
+		SerializeInterface item = static::newInstance(obj::getClassName());
+		static::assign(item, data);
+		return item;
 	}
 	
 	

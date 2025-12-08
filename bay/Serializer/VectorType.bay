@@ -25,31 +25,42 @@ use Runtime.Serializer.TypeError;
 
 class VectorType extends BaseObject implements BaseType
 {
-	BaseType field = null;
+	Vector<BaseType> fields = null;
 	
 	
 	/**
 	 * Create object
 	 */
-	void constructor(BaseType field)
+	void constructor(BaseType fields)
 	{
 		parent();
-		this.field = field;
+		if (fields implements BaseType) this.fields = [fields];
+		else if (fields instanceof Vector) this.fields = fields;
 	}
 	
 	
 	/**
 	 * Filter value
 	 */
-	Vector filter(var value, Vector errors, var old_value)
+	Vector filter(Vector value, Vector errors, Vector old_value)
 	{
 		if (value === null) return null;
 		if (not(value instanceof Vector)) return null;
 		Vector new_value = [];
 		for (int i=0; i<value.count(); i++)
 		{
-			var item = value.get(i);
-			var new_item = this.field.filter(item, errors);
+			var new_item = value.get(i);
+			for (int j=0; j<this.fields.count(); j++)
+			{
+				BaseType field = this.fields.get(j);
+				if (field implements BaseType)
+				{
+					new_item = field.filter(
+						new_item, errors,
+						old_value ? old_value.get(i) : null
+					);
+				}
+			}
 			new_value.push(new_item);
 			TypeError::addFieldErrors(errors, "[" ~ i ~ "]");
 		}
@@ -67,8 +78,15 @@ class VectorType extends BaseObject implements BaseType
 		Vector new_value = [];
 		for (int i=0; i<value.count(); i++)
 		{
-			var item = value.get(i);
-			var new_item = this.field.serialize(item);
+			var new_item = value.get(i);
+			for (int j=0; j<this.fields.count(); j++)
+			{
+				BaseType field = this.fields.get(j);
+				if (field implements BaseType)
+				{
+					new_item = field.serialize(new_item);
+				}
+			}
 			new_value.push(new_item);
 		}
 		return new_value;

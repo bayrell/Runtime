@@ -445,7 +445,7 @@ class Map implements \JsonSerializable
 	 */
 	function jsonSerialize() : mixed
 	{
-		return $this->_map;
+		return (object)$this->_map;
 	}
 }
 

@@ -35,11 +35,10 @@ class RenderProvider extends BaseProvider
 	 */
 	var createLayout(Dict app_data)
 	{
+		var class_name = app_data.get("class");
 		var layout_data = app_data.get("layout");
-		var class_name = layout_data.get("__class_name__");
 		var layout = rtl::newInstance(class_name);
-		Serializer serializer = new Serializer();
-		serializer.assign(layout, layout_data);
+		rtl::assign(layout, layout_data);
 		return window["Vue"].reactive(layout);
 	}
 	

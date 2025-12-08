@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Serializer;
+namespace Runtime;
 
 use Runtime.BaseObject;
 use Runtime.Exceptions.AssertException;
@@ -25,7 +25,7 @@ use Runtime.Serializer.ObjectType;
 use Runtime.Serializer.TypeError;
 
 
-class Schema extends BaseObject
+class Serializer extends BaseObject
 {
 	Map<Vector> fields = {};
 	Vector errors = [];

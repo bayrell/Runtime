@@ -25,36 +25,36 @@ use Runtime.Serializer.TypeError;
 
 class MapType extends BaseObject implements BaseType
 {
-	Map fields = {};
+	Vector<BaseType> fields = [];
 	
 	
 	/**
 	 * Fields
 	 */
-	void constructor(Map fields = null)
+	void constructor(BaseType fields = null)
 	{
 		parent();
-		if (fields) this.fields = fields;
+		if (fields implements BaseType) this.fields = [fields];
+		else if (fields instanceof Vector) this.fields = fields;
 	}
 	
 	
 	/**
 	 * Filter type
 	 */
-	Map filter(Map value, Vector errors, var old_value = null)
+	Map filter(Map value, Vector errors, Map old_value)
 	{
 		if (not (value instanceof Map)) return null;
 		Map new_value = {};
-		Vector keys = rtl::list(this.fields.keys());
+		Vector keys = rtl::list(value.keys());
 		for (int i=0; i<keys.count(); i++)
 		{
 			string key = keys.get(i);
 			var item_value = value.get(key);
 			Vector item_errors = [];
-			Vector items = this.fields.get(key);
-			for (int j=0; j<items.count(); j++)
+			for (int j=0; j<this.fields.count(); j++)
 			{
-				BaseType item = items.get(j);
+				BaseType item = this.fields.get(j);
 				if (item implements BaseType)
 				{
 					item_value = item.filter(
@@ -78,15 +78,14 @@ class MapType extends BaseObject implements BaseType
 	{
 		if (not (value instanceof Map)) return null;
 		Map new_value = {};
-		Vector keys = rtl::list(this.fields.keys());
+		Vector keys = rtl::list(value.keys());
 		for (int i=0; i<keys.count(); i++)
 		{
 			string key = keys.get(i);
 			var item_value = value.get(key);
-			Vector items = this.fields.get(key);
-			for (int j=0; j<items.count(); j++)
+			for (int j=0; j<this.fields.count(); j++)
 			{
-				BaseType item = items.get(j);
+				BaseType item = this.fields.get(j);
 				if (item implements BaseType)
 				{
 					item_value = item.serialize(item_value);

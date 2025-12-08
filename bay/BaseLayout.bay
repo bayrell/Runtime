@@ -22,8 +22,12 @@ use Runtime.BaseModel;
 use Runtime.BaseStorage;
 use Runtime.DefaultLayout;
 use Runtime.Method;
-use Runtime.Serializer;
 use Runtime.Hooks.RuntimeHook;
+use Runtime.Serializer.MapType;
+use Runtime.Serializer.ObjectType;
+use Runtime.Serializer.Serializer;
+use Runtime.Serializer.StringType;
+use Runtime.Serializer.VectorType;
 
 
 class BaseLayout extends BaseModel
@@ -73,26 +77,29 @@ class BaseLayout extends BaseModel
 	/**
 	 * Serialize object
 	 */
-	void serialize(Serializer serializer, Map data)
+	void serialize(Serializer serializer)
 	{
-		parent(serializer, data);
-		serializer.process(this, "components", data);
-		serializer.process(this, "current_page_model", data);
-		serializer.process(this, "lang", data);
-		serializer.process(this, "theme", data);
-		serializer.process(this, "title", data);
-		serializer.process(this, "pages", data, new Method(this, "serializePage"));
-		serializer.process(this, "storage", data);
-	}
-	
-	
-	/**
-	 * Serialize page
-	 */
-	void serializePage(Serializer serializer, Map data)
-	{
-		string class_name = data.get("__class_name__");
-		return this.createWidget(class_name, data);
+		parent(serializer);
+		serializer.addType("components", new VectorType(new StringType()));
+		serializer.addType("current_page_model", new StringType());
+		serializer.addType("lang", new StringType());
+		serializer.addType("theme", new StringType());
+		serializer.addType("title", new StringType());
+		serializer.addType("pages", new MapType(new ObjectType{
+			"extends": classof BaseModel,
+			"create": BaseModel (Map data)
+			{
+				string class_name = data.get("__class_name__");
+				if (not rtl::classExists(class_name)) return null;
+				if (not rtl::isInstanceOf(class_name, classof BaseModel)) return null;
+				return this.createWidget(class_name, data);
+			},
+			"serialize": Map (Map data, BaseModel model)
+			{
+				data.set("__class_name__", model::getClassName());
+			}
+		}));
+		serializer.addType("storage", new ObjectType({"class_name": classof BaseStorage}));
 	}
 	
 	

@@ -18,7 +18,7 @@
 
 namespace Runtime;
 
-use Runtime.Serliazer.Schema;
+use Runtime.Serializer;
 
 
 class BaseObject
@@ -50,9 +50,9 @@ class BaseObject
 	
 	
 	/**
-	 * Returns object schema
+	 * Serialize object
 	 */
-	static void getSchema(Schema schema)
+	void serialize(Serializer serializer)
 	{
 	}
 	

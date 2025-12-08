@@ -21,14 +21,15 @@ namespace Runtime.Serializer;
 use Runtime.BaseObject;
 use Runtime.Serializer.BaseType;
 use Runtime.Serializer.MapType;
-use Runtime.Serializer.Schema;
 use Runtime.Serializer.TypeError;
+use Runtime.Serializer;
 use Runtime.SerializeInterface;
 
 
 class ObjectType extends BaseObject implements BaseType
 {
-	fn create = null;
+	fn fn_create = null;
+	fn fn_serialize = null;
 	string class_name = "";
 	string class_extends = "";
 	string class_implements = "";
@@ -41,10 +42,11 @@ class ObjectType extends BaseObject implements BaseType
 	{
 		parent();
 		if (not params) return;
-		if (params.has("create")) this.create = params.get("create");
+		if (params.has("create")) this.fn_create = params.get("create");
 		if (params.has("class_name")) this.class_name = params.get("class_name");
 		if (params.has("class_extends")) this.class_extends = params.get("extends");
 		if (params.has("class_implements")) this.class_implements = params.get("implements");
+		if (params.has("serialize")) this.fn_serialize = params.get("serialize");
 	}
 	
 	
@@ -65,7 +67,8 @@ class ObjectType extends BaseObject implements BaseType
 		if (value === null) return null;
 		if (not (value instanceof Map)) return null;
 		
-		SerializeInterface new_value = this.create ? this.create(value, old_value) : old_value;
+		fn create = this.fn_create;
+		SerializeInterface new_value = create ? create(value, old_value) : old_value;
 		if (new_value == null)
 		{
 			errors.push(new TypeError("Object does not exists"));
@@ -89,25 +92,22 @@ class ObjectType extends BaseObject implements BaseType
 			return null;
 		}
 		
-		Schema schema = new Schema();
-		new_value::getSchema(schema);
+		Serializer serializer = new Serializer();
+		new_value.serialize(serializer);
 		
-		Vector keys = rtl::list(schema.fields.keys());
+		Vector keys = rtl::list(serializer.fields.keys());
 		for (int i=0; i<keys.count(); i++)
 		{
 			string key = keys.get(i);
 			var item_value = value.get(key);
 			Vector item_errors = [];
-			Vector items = schema.fields.get(key);
+			Vector items = serializer.fields.get(key);
 			for (int j=0; j<items.count(); j++)
 			{
 				BaseType item = items.get(j);
 				if (item implements BaseType)
 				{
-					item_value = item.filter(
-						item_value, item_errors,
-						old_value ? rtl::attr(old_value, key) : null
-					);
+					item_value = item.filter(item_value, item_errors, rtl::attr(new_value, key));
 				}
 			}
 			rtl::setAttr(new_value, key, item_value);
@@ -127,15 +127,15 @@ class ObjectType extends BaseObject implements BaseType
 		if (not (value implements SerializeInterface)) return null;
 		Map new_value = {};
 		
-		Schema schema = new Schema();
-		value::getSchema(schema);
+		Serializer serializer = new Serializer();
+		value.serialize(serializer);
 		
-		Vector keys = rtl::list(schema.fields.keys());
+		Vector keys = rtl::list(serializer.fields.keys());
 		for (int i=0; i<keys.count(); i++)
 		{
 			string key = keys.get(i);
 			var item_value = rtl::attr(value, key);
-			Vector items = schema.fields.get(key);
+			Vector items = serializer.fields.get(key);
 			for (int j=0; j<items.count(); j++)
 			{
 				BaseType item = items.get(j);
@@ -146,6 +146,10 @@ class ObjectType extends BaseObject implements BaseType
 			}
 			new_value.set(key, item_value);
 		}
+		
+		fn serialize = this.fn_serialize;
+		if (serialize) serialize(new_value, value);
+		
 		return new_value;
 	}
 }

@@ -39,6 +39,7 @@
 		"RawString.bay",
 		"Reference.bay",
 		"RenderContainer.bay",
+		"Serializer.bay",
 		"SerializeInterface.bay",
 		"ModuleDescription.bay",
 		"VirtualDom.bay",
@@ -57,7 +58,6 @@
 		"Serializer/IntegerType.bay",
 		"Serializer/MapType.bay",
 		"Serializer/ObjectType.bay",
-		"Serializer/Schema.bay",
 		"Serializer/StringType.bay",
 		"Serializer/TypeError.bay",
 		"Serializer/VectorType.bay"
