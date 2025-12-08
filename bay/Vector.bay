@@ -172,8 +172,17 @@ Runtime.Vector = class extends Array
 		return res;
 	}
 	
-	static create(arr){ return new Runtime.Vector(...arr); }
-	static from(arr){ return new Runtime.Vector(...arr); }
+	static create(arr)
+	{
+		if (arr.length == 1)
+		{
+			let value = new Runtime.Vector();
+			value.push(arr[0]);
+			return value;
+		}
+		return new Runtime.Vector(...arr);
+	}
+	static from(arr){ return this.create(arr); }
 	static getNamespace(){ return "Runtime"; }
 	static getClassName(){ return "Runtime.Vector"; }
 }

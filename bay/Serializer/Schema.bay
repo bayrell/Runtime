@@ -16,11 +16,88 @@
  *  limitations under the License.
  */
 
-namespace Runtime;
+namespace Runtime.Serializer;
 
 use Runtime.BaseObject;
+use Runtime.Exceptions.AssertException;
+use Runtime.Serializer.BaseType;
+use Runtime.Serializer.MapType;
+use Runtime.Serializer.TypeError;
 
 
 class Schema extends BaseObject
 {
+	MapType map = new MapType();
+	Vector errors = [];
+	
+	
+	/**
+	 * Add type to map
+	 */
+	void addType(string field_name, BaseType item)
+	{
+		this.map.addType(field_name, item);
+	}
+	
+	
+	/**
+	 * Assign data to object
+	 */
+	void assign(BaseObject item, Map data)
+	{
+		Map new_data = this.map.filter(data, this.errors, item);
+		
+		Vector keys = rtl::list(new_data.keys());
+		for (int i=0; i<keys.count(); i++)
+		{
+			string field_name = keys.get(i);
+			var value = new_data.get(field_name);
+			rtl::setAttr(item, field_name, value);
+		}
+	}
+	
+	
+	/**
+	 * Returns object data
+	 */
+	Map serialize(BaseObject item)
+	{
+		Map data = {};
+		Vector keys = rtl::list(this.map.fields.keys());
+		for (int i=0; i<keys.count(); i++)
+		{
+			string field_name = keys.get(i);
+			var value = rtl::attr(item, field_name);
+			data.set(field_name, value);
+		}
+		return this.map.serialize(data);
+	}
+	
+	
+	/**
+	 * Returns errors
+	 */
+	Vector<TypeError> getErrors() => this.errors;
+	
+	
+	/**
+	 * Returns error message
+	 */
+	string getErrorMessage()
+	{
+		Vector errors = TypeError::getMessages(this.errors);
+		return rs::join(", ", errors);
+	}
+	
+	
+	/**
+	 * Throw error
+	 */
+	void checkError()
+	{
+		if (errors.count() != 0)
+		{
+			throw new AssertException(this.getErrorMessage());
+		}
+	}
 }

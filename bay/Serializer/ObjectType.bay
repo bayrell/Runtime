@@ -18,11 +18,27 @@
 
 namespace Runtime.Serializer;
 
+use Runtime.BaseObject;
+use Runtime.Serializer.BaseType;
+use Runtime.SerializeInterface;
 
-interface BaseType
+
+class ObjectType extends BaseObject implements BaseType
 {
 	/**
 	 * Filter value
 	 */
-	var filter(string value, Vector errors);
+	SerializeInterface filter(Map value, Vector errors, var old_value = null)
+	{
+		return null;
+	}
+	
+	
+	/**
+	 * Returns data
+	 */
+	Map serialize(SerializeInterface value)
+	{
+		return null;
+	}
 }

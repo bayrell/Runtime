@@ -52,12 +52,14 @@
 		"Providers/HookProvider.bay",
 		"Providers/OutputProvider.bay",
 		"Providers/RenderProvider.bay",
-		"Serializer/BaseRule.bay",
 		"Serializer/BaseType.bay",
+		"Serializer/IntegerType.bay",
+		"Serializer/MapType.bay",
+		"Serializer/ObjectType.bay",
 		"Serializer/Schema.bay",
-		"Serializer/Serializer.bay",
 		"Serializer/StringType.bay",
-		"Serializer/TypeError.bay"
+		"Serializer/TypeError.bay",
+		"Serializer/VectorType.bay"
 	],
 	"groups": [
 		"runtime"

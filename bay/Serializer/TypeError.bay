@@ -23,23 +23,55 @@ use Runtime.BaseObject;
 
 class TypeError extends BaseObject
 {
-    string field_name = "";
-    string message = "";
-    
-    
-    /**
-     * Create type error
-     */
-    void constructor(string message, string field_name = "")
-    {
-        parent();
-        this.field_name = field_name;
-        this.message = message;
-    }
-    
-    
-    /**
-     * Returns error message
-     */
-    string getMessage() => this.message;
+	string field_name = "";
+	string message = "";
+	
+	
+	/**
+	 * Create type error
+	 */
+	void constructor(string message, string field_name = "")
+	{
+		parent();
+		this.field_name = field_name;
+		this.message = message;
+	}
+	
+	
+	/**
+	 * Returns error message
+	 */
+	string getMessage() => this.field_name ? this.field_name ~ ": " ~ this.message : this.message;
+	
+	
+	/**
+	 * Returns messages;
+	 */
+	static Vector getMessages(Vector<TypeError> errors) =>
+		errors.map(string (TypeError error) => error.getMessage())
+	;
+	
+	
+	/**
+	 * Add key to field name
+	 */
+	void addKey(string key)
+	{
+		if (this.field_name == "") this.field_name = key;
+		else if (rs::charAt(this.field_name, 0) == "[") this.field_name = key ~ this.field_name;
+		else this.field_name = key ~ "." ~ this.field_name;
+	}
+	
+	
+	/**
+	 * Add field to errors
+	 */
+	static void addFieldErrors(Vector<TypeError> errors, string key)
+	{
+		for (int i=0; i<errors.count(); i++)
+		{
+			TypeError error = errors.get(i);
+			error.addKey(key);
+		}
+	}
 }

@@ -23,35 +23,35 @@ use Runtime.Serializer.BaseType;
 use Runtime.Serializer.TypeError;
 
 
-class StringType extends BaseObject implements BaseType
+class IntegerType extends BaseObject implements BaseType
 {
 	bool convert = true;
 	
 	
 	/**
-	 * Constructor
+	 * Create type
 	 */
 	void constructor(Map params = null)
 	{
 		parent();
 		if (not params) return;
-		if (params.has("convert")) this.convert = params.get("convert");
+		if (params.has("convert")) this.conver = params.get("convert");
 	}
 	
 	
 	/**
 	 * Filter type
 	 */
-	string filter(var value, Vector errors, var old_value)
+	string filter(var value, Vector errors, var old_value = null)
 	{
-		if (value === null) return "";
+		if (value === null) return 0;
 		if (this.convert and (rtl::isInteger(value) or rtl::isBoolean(value)))
 		{
-			value = rtl::toStr(value);
+			value = rtl::toInt(value);
 		}
-		if (not rtl::isString(value))
+		if (not rtl::isInteger(value))
 		{
-			errors.push(new TypeError("Does not string"));
+			errors.push(new TypeError("Does not integer"));
 			return "";
 		}
 		return value;
@@ -59,13 +59,12 @@ class StringType extends BaseObject implements BaseType
 	
 	
 	/**
-	 * Serialize data
+	 * Serialize
 	 */
 	string serialize(string value)
 	{
-		if (value === null) return "";
-		if (rtl::isString(value)) return value;
-		if (rtl::isBoolean(value) or rtl::isInteger(value)) return rtl::toStr(value);
-		return "";
+		if (rtl::isInteger(value)) return value;
+		if (rtl::isBoolean(value) or rtl::isString(value)) return rtl::toInt(value);
+		return 0;
 	}
 }

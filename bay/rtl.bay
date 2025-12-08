@@ -25,6 +25,8 @@ use Runtime.Date;
 use Runtime.DateTime;
 use Runtime.Entity.Provider;
 use Runtime.Exceptions.AssertException;
+use Runtime.Serializer.Schema;
+use Runtime.SerializeInterface;
 
 
 class rtl
@@ -388,9 +390,9 @@ class rtl
 	 */
 	static string getType(string value)
 	{
-		if (static::isBoolean(value)) return "boolean";
-		if (static::isInteger(value)) return "integer";
 		if (static::isString(value)) return "string";
+		if (static::isInteger(value)) return "integer";
+		if (static::isBoolean(value)) return "boolean";
 		if (value instanceof Vector) return "vector";
 		if (value instanceof Map) return "map";
 		return "object";
@@ -660,6 +662,29 @@ class rtl
 		}
 		return obj;
 		#endswitch
+	}
+	
+	
+	/**
+	 * Assign object
+	 */
+	static Schema assign(SerializeInterface obj, Map data)
+	{
+		Schema schema = new Schema();
+		obj::getSchema(schema);
+		schema.assign(obj, data);
+		return schema;
+	}
+	
+	
+	/**
+	 * Serialize object
+	 */
+	static Map serialize(SerializeInterface obj)
+	{
+		Schema schema = new Schema();
+		obj::getSchema(schema);
+		return schema.serialize(obj);
 	}
 	
 	
