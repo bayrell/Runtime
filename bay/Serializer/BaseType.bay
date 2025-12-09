@@ -24,7 +24,7 @@ interface BaseType
 	/**
 	 * Filter value
 	 */
-	var filter(var value, Vector errors, Vector old_values);
+	var filter(var value, Vector errors, var old_value);
 	
 	
 	/**

@@ -25,17 +25,22 @@ use Runtime.Serializer.TypeError;
 
 class MapType extends BaseObject implements BaseType
 {
-	Vector<BaseType> fields = [];
+	Vector<BaseType> fields = null;
+	Map<BaseType> params = null;
 	
 	
 	/**
 	 * Fields
 	 */
-	void constructor(BaseType fields = null)
+	void constructor(var params = null)
 	{
 		parent();
-		if (fields implements BaseType) this.fields = [fields];
-		else if (fields instanceof Vector) this.fields = fields;
+		if (params implements BaseType) this.fields = [params];
+		else if (params instanceof Vector) this.fields = params;
+		else if (params instanceof Map)
+		{
+			this.params = params;
+		}
 	}
 	
 	
@@ -51,19 +56,39 @@ class MapType extends BaseObject implements BaseType
 		{
 			string key = keys.get(i);
 			var item_value = value.get(key);
+			bool setup = false;
+			
 			Vector item_errors = [];
-			for (int j=0; j<this.fields.count(); j++)
+			Vector fields = null;
+			if (this.fields) fields = this.fields;
+			else if (this.params)
 			{
-				BaseType item = this.fields.get(j);
-				if (item implements BaseType)
+				if (this.params.has(key))
 				{
-					item_value = item.filter(
-						item_value, item_errors,
-						old_value ? old_value.get(key) : null
-					);
+					fields = this.params.get(key);
+					if (not (fields instanceof Vector)) fields = [fields];
 				}
 			}
-			new_value.set(key, item_value);
+			else setup = true;
+			
+			if (fields)
+			{
+				for (int j=0; j<fields.count(); j++)
+				{
+					BaseType item = fields.get(j);
+					if (item implements BaseType)
+					{
+						item_value = item.filter(
+							item_value, item_errors,
+							old_value ? old_value.get(key) : null
+						);
+					}
+				}
+				setup = true;
+			}
+			
+			if (setup) new_value.set(key, item_value);
+			
 			errors.appendItems(item_errors);
 			TypeError::addFieldErrors(item_errors, key);
 		}
@@ -83,15 +108,34 @@ class MapType extends BaseObject implements BaseType
 		{
 			string key = keys.get(i);
 			var item_value = value.get(key);
-			for (int j=0; j<this.fields.count(); j++)
+			bool setup = false;
+			
+			Vector fields = null;
+			if (this.fields) fields = this.fields;
+			else if (this.params)
 			{
-				BaseType item = this.fields.get(j);
-				if (item implements BaseType)
+				if (this.params.has(key))
 				{
-					item_value = item.serialize(item_value);
+					fields = this.params.get(key);
+					if (not (fields instanceof Vector)) fields = [fields];
 				}
 			}
-			new_value.set(key, item_value);
+			else setup = true;
+			
+			if (fields)
+			{
+				for (int j=0; j<fields.count(); j++)
+				{
+					BaseType item = fields.get(j);
+					if (item implements BaseType)
+					{
+						item_value = item.serialize(item_value);
+					}
+				}
+				setup = true;
+			}
+			
+			if (setup) new_value.set(key, item_value);
 		}
 		return new_value;
 	}
