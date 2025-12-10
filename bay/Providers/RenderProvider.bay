@@ -146,14 +146,13 @@ class RenderProvider extends BaseProvider
 		var children = content;
 		if (vdom.is_component)
 		{
-			var slots = vdom.slots.map(fn (fn f)
-			{
-				return var () use (f){
-					VirtualDom vdom = f();
-					return this.render(vdom);
+			#ifcode JAVASCRIPT then
+			children = vdom.slots.map(function (f){
+				return (...args) => {
+					return Runtime.rtl.render(f.apply(null, args));
 				};
-			});
-			children = slots.toObject();
+			}).toObject();
+			#endif
 		}
 		if (children instanceof Vector) children = children.flatten();
 		var attrs = vdom.attrs;

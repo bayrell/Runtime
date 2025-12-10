@@ -27,6 +27,7 @@ use Runtime.Entity.Provider;
 use Runtime.Exceptions.AssertException;
 use Runtime.Serializer;
 use Runtime.SerializeInterface;
+use Runtime.VirtualDom;
 
 
 class rtl
@@ -793,6 +794,62 @@ class rtl
 	/* ================================= Math Functions ================================== */
 	
 	/**
+	 * Abs
+	 */
+	static int abs(int value)
+	{
+		#switch
+		#case ifcode PHP then
+		return abs($value);
+		#case ifcode JAVASCRIPT then
+		return Math.abs(value);
+		#endswitch
+	}
+	
+	
+	/**
+	 * Ceil
+	 */
+	static int ceil(int value)
+	{
+		#switch
+		#case ifcode PHP then
+		return ceil($value);
+		#case ifcode JAVASCRIPT then
+		return Math.ceil(value);
+		#endswitch
+	}
+	
+	
+	/**
+	 * Floor
+	 */
+	static int floor(int value)
+	{
+		#switch
+		#case ifcode PHP then
+		return floor($value);
+		#case ifcode JAVASCRIPT then
+		return Math.floor(value);
+		#endswitch
+	}
+	
+	
+	/**
+	 * Round
+	 */
+	static int round(int value)
+	{
+		#switch
+		#case ifcode PHP then
+		return round($value);
+		#case ifcode JAVASCRIPT then
+		return Math.round(value);
+		#endswitch
+	}
+	
+	
+	/**
 	 * Returns random value x, where 0 <= x < 1
 	 * @return double
 	 */
@@ -941,8 +998,10 @@ class rtl
 		app_data = static::fromNative(app_data);
 		
 		/* Create context */
+		var environments = app_data.get("environments");
 		var modules = app_data.get("modules");
 		var context = await static::createContext({
+			"environments": environments,
 			"modules": modules,
 		});
 		
@@ -957,6 +1016,12 @@ class rtl
 			callback(result);
 		}
 	}
+	
+	
+	/**
+	 * Render Virtual Dom
+	 */
+	static var render(VirtualDom vdom) => @.provider("render").render(vdom);
 	
 	
 	/* ================================= Other Functions ================================= */

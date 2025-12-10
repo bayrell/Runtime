@@ -59,11 +59,16 @@
 
 <template name="renderFooter">
 	%render this.renderComponents(this.getComponents(RuntimeHook::LAYOUT_FOOTER));
+</template>
+
+<template name="renderMountApp">
 	<script>
 		var app_data = {{ rtl::jsonEncode(this.container.getData()) }};
-		Runtime.rtl.mount(app_data, document.querySelector(".root_container"), function (result){
-			window["app"] = result.get("app");
-			window["app_layout"] = result.get("layout");
+		document.addEventListener("DOMContentLoaded", function(){
+			Runtime.rtl.mount(app_data, document.querySelector(".root_container"), function (result){
+				window["app"] = result.get("app");
+				window["app_layout"] = result.get("layout");
+			});
 		});
 	</script>
 </template>
@@ -83,6 +88,7 @@
 			%render this.render();
 		</div>
 		%render this.renderFooter();
+		%render this.renderMountApp();
 		</body>
 	</html>
 </template>

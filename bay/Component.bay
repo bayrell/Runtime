@@ -51,15 +51,17 @@ computed var layout()
 /**
  * Render slot
  */
-var renderSlot(string slot_name)
+var renderSlot(string slot_name, Vector args = null)
 {
 	#switch
 	#case ifcode PHP then
 	$f = $this->_slots->get($slot_name);
-	return $f ? $f() : null;
+	if (!$f) return null;
+	return $args ? call_user_func_array($f, $args->toArray()) : $f();
 	#case ifcode JAVASCRIPT then
+	if (!args) args = [];
 	var f = this.$slots[slot_name];
-	return f ? f() : null;
+	return f ? f.apply(null, args) : null;
 	#endswitch
 }
 

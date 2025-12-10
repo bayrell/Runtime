@@ -54,6 +54,7 @@
 		"Providers/OutputProvider.bay",
 		"Providers/RenderProvider.bay",
 		"Serializer/BaseType.bay",
+		"Serializer/DateTimeType.bay",
 		"Serializer/ConstantType.bay",
 		"Serializer/IntegerType.bay",
 		"Serializer/MapType.bay",

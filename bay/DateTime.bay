@@ -160,7 +160,7 @@ class DateTime extends BaseObject implements StringInterface
 		
 		/* Get offset */
 		double offset = this.o * 60;
-		int offset_h = Math::abs(Math::floor(offset / 60));
+		int offset_h = rtl::abs(rtl::floor(offset / 60));
 		int offset_m = offset % 60;
 		offset_h = (offset_h < 10) ? "0" ~ offset_h : "" ~ offset_h;
 		offset_m = (offset_m < 10) ? "0" ~ offset_m : "" ~ offset_m;
@@ -202,7 +202,7 @@ class DateTime extends BaseObject implements StringInterface
 	/**
 	 * Returns date time string
 	 */
-	string getDateTimeString()
+	string format()
 	{
 		string m = (this.m < 10) ? "0" ~ this.m : "" ~ this.m;
 		string d = (this.d < 10) ? "0" ~ this.d : "" ~ this.d;
@@ -323,7 +323,7 @@ class DateTime extends BaseObject implements StringInterface
 		#case ifcode JAVASCRIPT then
 		
 		var dt = new Date(this.y, this.m - 1, this.d, this.h, this.i, this.s);
-		offset = dt.getTimezoneOffset() + this.o * 60;
+		var offset = dt.getTimezoneOffset() + this.o * 60;
 		dt = this.constructor.modify(dt, -offset * 60);
 		return dt;
 		

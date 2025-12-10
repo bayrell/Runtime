@@ -135,6 +135,13 @@ class RenderContainer extends BaseObject
 			"modules": @.modules,
 			"class": this.layout::getClassName(),
 			"layout": layout_data,
+			"environments": {
+				"CLOUD_ENV": @.env("CLOUD_ENV"),
+				"DEBUG": @.env("DEBUG"),
+				"LOCALE": @.env("LOCALE"),
+				"TZ": @.env("TZ"),
+				"TZ_OFFSET": @.env("TZ_OFFSET"),
+			},
 		};
 		Map res = @.hook(RuntimeHook::CREATE_CONTAINER_DATA, {
 			"container": this,
