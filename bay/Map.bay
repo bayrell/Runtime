@@ -167,6 +167,16 @@ Runtime.Map = class extends Map
 	
 	
 	/**
+	 * Intersect
+	 */
+	intersect(fields)
+	{
+		const h = fields.transition((value, key) => [key, value]);
+		return this.filter((value, key) => h.has(key));
+	}
+	
+	
+	/**
 	 * Create map from Object
 	 */
 	static create(obj)
@@ -437,6 +447,16 @@ class Map implements \JsonSerializable
 			$arr->push($f($value, $key, $this));
 		}
 		return $arr;
+	}
+	
+	
+	/**
+	 * Intersect
+	 */
+	function intersect($fields)
+	{
+		$h = $fields->transition(function ($value, $key){ return [$key, $value]; });
+		return $this->filter(function($value, $key) use ($h){ return $h->has($key); });
 	}
 	
 	

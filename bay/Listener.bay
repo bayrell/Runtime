@@ -57,7 +57,7 @@ class Listener extends BaseObject
 		if (not (f instanceof Method)) return;
 		if (not this.listeners.has(message_name))
 		{
-			this.clearListener(message_name);
+			this.clear(message_name);
 		}
 		
 		Chain chain = this.listeners.get(message_name);

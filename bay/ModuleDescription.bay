@@ -61,6 +61,7 @@ class ModuleDescription
 		#endif
 		
 		#ifdef FRONTEND then
+		new Provider("api", "Runtime.BusHttp"),
 		new Provider("render", "Runtime.Providers.RenderProvider"),
 		#endif
 	];

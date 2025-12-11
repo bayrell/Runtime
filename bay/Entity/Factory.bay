@@ -25,9 +25,6 @@ use Runtime.Entity.Entity;
 
 class Factory extends Entity implements FactoryInterface
 {
-	/* Provider class name */
-	string value = null;
-	
 	/* Factory params */
 	Dict params = null;
 	
@@ -35,41 +32,27 @@ class Factory extends Entity implements FactoryInterface
 	/**
 	 * Create factory
 	 */
-	void constructor(string name, string value = null, Dict params = null)
+	void constructor(string name, Dict params = null)
 	{
 		parent({
 			"name": name,
-			"value": value,
 			"params": params,
 		});
 	}
 	
 	
 	/**
+	 * Returns class name
+	 */
+	string getName() => this.name;
+	
+	
+	/**
 	 * Create new object
 	 */
-	BaseObject createInstance(Map params = null)
+	BaseObject createInstance()
 	{
-		BaseObject instance = null;
-		var class_name = this.value;
-		
-		Map factory_params = this.params;
-		if (params)
-		{
-			if (factory_params) factory_params = factory_params.concat(params);
-			else factory_params = params;
-		}
-		
-		if (class_name == null) class_name = this.name;
-		if (class_name instanceof BaseObject)
-		{
-			instance = class_name;
-		}
-		else if (rtl::isString(class_name))
-		{
-			instance = rtl::newInstance(class_name, [factory_params]);
-		}
-		
-		return instance;
+		string class_name = this.getName();
+		return rtl::newInstance(class_name, [this.params]);
 	}
 }

@@ -16,28 +16,12 @@
  *  limitations under the License.
  */
 
-namespace Runtime.Entity;
+namespace Runtime;
 
-use Runtime.Entity.Factory;
-
-class Provider extends Factory
+interface BusInterface
 {
-	/* Provider class name */
-	string value = null;
-	
-	
 	/**
-	 * Create factory
+	 * Send request
 	 */
-	void constructor(string name, string value = "", Dict params = null)
-	{
-		parent(name, params);
-		this.value = value;
-	}
-	
-	
-	/**
-	 * Returns class name
-	 */
-	string getName() => this.value ? this.value : this.name;
+	async var send(Dict params);
 }

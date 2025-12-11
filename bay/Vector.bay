@@ -132,6 +132,7 @@ Runtime.Vector = class extends Array
 		const map = new RuntimeMap();
 		for (let i=0; i<this.length; i++)
 		{
+			let res = null;
 			if (f) res = f(this[i], i, this);
 			else res = [this[i], i];
 			map.set(res[1], res[0]);

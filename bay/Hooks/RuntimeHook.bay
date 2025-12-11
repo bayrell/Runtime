@@ -38,6 +38,7 @@ class RuntimeHook extends BaseHook
 	const string CREATE_CONTAINER_DATA = "runtime::create_container_data";
 	const string CREATE_LAYOUT = "runtime::create_layout";
 	const string CHANGE_LAYOUT = "runtime::change_layout";
+	const string SEND_API_BEFORE = "runtime::send_api_before";
 	const string TITLE = "runtime::title";
 	
 	

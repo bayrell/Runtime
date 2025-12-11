@@ -154,7 +154,10 @@ class RenderProvider extends BaseProvider
 			}).toObject();
 			#endif
 		}
-		if (children instanceof Vector) children = children.flatten();
+		if (children instanceof Vector)
+		{
+			children = children.flatten().filter(bool (var item) => item != null and item != "");
+		}
 		var attrs = vdom.attrs;
 		if (attrs instanceof Map)
 		{

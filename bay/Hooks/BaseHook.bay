@@ -27,7 +27,6 @@ use Runtime.Providers.HookProvider;
 
 class BaseHook extends BaseObject
 {
-	Hook hook = null;
 	HookProvider provider = null;
 	
 	
@@ -48,10 +47,6 @@ class BaseHook extends BaseObject
 	 */
 	void initParams(Dict params)
 	{
-		if (params == null) return;
-		
-		this.hook = params.get("hook");
-		this.provider = params.get("provider");
 	}
 	
 	

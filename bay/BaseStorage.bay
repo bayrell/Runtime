@@ -28,10 +28,10 @@ use Runtime.Serializer.Schema;
 class BaseStorage extends BaseModel
 {
 	string widget_name = "storage";
-	Map frontend_params = {};
+	Map frontend = {};
 	
 	#ifdef BACKEND then
-	Map backend_params = {};
+	Map backend = {};
 	#endif
 	
 	
@@ -41,7 +41,7 @@ class BaseStorage extends BaseModel
 	void serialize(Serializer serializer)
 	{
 		parent(serializer);
-		serializer.addType("frontend_params", new MapType(new ObjectType{
+		serializer.addType("frontend", new MapType(new ObjectType{
 			"create": BaseModel (Map data)
 			{
 				string class_name = data.get("__class_name__");
@@ -61,6 +61,6 @@ class BaseStorage extends BaseModel
 	 */
 	void set(string key, var value)
 	{
-		this.frontend_params.set(key, value);
+		this.frontend.set(key, value);
 	}
 }

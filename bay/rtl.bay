@@ -187,6 +187,7 @@ class rtl
 		return str_replace("\\", ".", $class_name);
 		#case ifcode JAVASCRIPT then
 		var obj = this.findClass(class_name);
+		if (obj.extends && obj.extends.name) return obj.extends.name;
 		var parentObj = obj ? Object.getPrototypeOf(obj) : null;
 		return parentObj && parentObj.getClassName ? parentObj.getClassName() : "";
 		#endswitch
@@ -500,6 +501,24 @@ class rtl
 		#case ifcode JAVASCRIPT then
 		
 		return value instanceof Map;
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Returns true if function
+	 */
+	static bool isFunction(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return is_callable($value);
+		
+		#case ifcode JAVASCRIPT then
+		
+		return value instanceof Function;
 		
 		#endswitch
 	}

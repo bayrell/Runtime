@@ -18,8 +18,10 @@
 
 namespace Runtime;
 
+use Runtime.ApiResult;
 use Runtime.BaseModel;
 use Runtime.BaseStorage;
+use Runtime.BusInterface;
 use Runtime.DefaultLayout;
 use Runtime.Method;
 use Runtime.Hooks.RuntimeHook;
@@ -156,7 +158,30 @@ class BaseLayout extends BaseModel
 	/**
 	 * Returns object
 	 */
-	var get(string name) => this.storage.frontend_params.get(name);
+	var get(string name) => this.storage.frontend.get(name);
+	
+	
+	/**
+	 * Create url
+	 */
+	string url(string name, Map params = null)
+	{
+		var router = this.get("router");
+		return router.url(name, params);
+	}
+	
+	
+	/**
+	 * Send api
+	 */
+	ApiResult sendApi(Map params)
+	{
+		BusInterface api = @.provider("api");
+		#ifdef BACKEND then
+		params.set("storage", this.storage.backend);
+		#endif
+		return api.send(params);
+	}
 	
 	
 	/**

@@ -22,6 +22,11 @@
 <use name="Runtime.BaseModel" />
 <use name="Runtime.Message" />
 
+<template name="renderWidget" args="BaseModel model">
+	%set string component = model.component;
+	<{component} model={{ model }} />
+</template>
+
 <template>
 </template>
 
@@ -45,6 +50,20 @@ computed var layout()
 	#ifcode JAVASCRIPT then
 	return this.$layout;
 	#endif
+}
+
+
+/**
+ * Returns true if slot is exists
+ */
+bool slot(string name)
+{
+	#switch
+	#case ifcode PHP then
+	return $this->_slots->has($name);
+	#case ifcode JAVASCRIPT then
+	return this.$slots[name] != undefined;
+	#endswitch
 }
 
 

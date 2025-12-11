@@ -29,6 +29,7 @@ class Serializer extends BaseObject
 {
 	Map<Vector> fields = {};
 	Vector errors = [];
+	Map params = {};
 	
 	
 	/**
@@ -40,6 +41,12 @@ class Serializer extends BaseObject
 		Vector items = this.fields.get(field_name);
 		items.push(item);
 	}
+	
+	
+	/**
+	 * Returns params
+	 */
+	var getParam(string name) => this.params.get(name);
 	
 	
 	/**

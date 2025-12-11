@@ -114,4 +114,13 @@ class BaseModel extends BaseObject implements SerializeInterface
 		BaseModel widget = rtl::newInstance(class_name, [params]);
 		return widget;
 	}
+	
+	
+	/**
+	 * Add event listener
+	 */
+	void addEventListener(string event_name, Method f, int priority = 100)
+	{
+		this.listener.add(event_name, f, priority);
+	}
 }

@@ -1,0 +1,217 @@
+/*!
+ *  BayLang Technology
+ *
+ *  (c) Copyright 2016-2025 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.BaseObject;
+use Runtime.Exceptions.RuntimeException;
+
+
+class ApiResult extends BaseObject
+{
+	int code = 0;
+	string message = "";
+	Map data = {};
+	string api_name = "";
+	string method_name = "";
+	string ob_content = "";
+	string error_name = null;
+	string error_file = "";
+	string error_line = "";
+	int error_pos = 0;
+	Collection<string> error_trace = null;
+	bool is_exception = false;
+	
+	
+	/**
+	 * Returns true if error
+	 */
+	bool isError() => this.code < 0;
+	
+	
+	/**
+	 * Returns true if is exception
+	 */
+	bool isException() => this.is_exception;
+	
+	
+	/**
+	 * Returns true if success
+	 */
+	bool isSuccess() => this.code > 0;
+	
+	
+	/**
+	 * Get error message
+	 */
+	string getErrorMessage() => this.message;
+	
+	
+	/**
+	 * Get error code
+	 */
+	int getErrorCode() => this.code;
+	
+	
+	/**
+	 * Returns content
+	 */
+	Map getContent()
+	{
+		Map res = {
+			"api_name": this.api_name,
+			"method_name": this.method_name,
+			"code": this.code,
+			"message": this.message,
+			"data": this.data,
+		};
+		
+		if (this.error_name != "") res.set("error_name", this.error_name);
+		if (this.error_file != "") res.set("error_file", this.error_file);
+		if (this.error_line != "") res.set("error_line", this.error_line);
+		if (this.error_pos != "") res.set("error_pos", this.error_pos);
+		if (this.error_trace != "") res.set("error_trace", this.error_trace);
+		
+		return res;
+	}
+	
+	
+	/**
+	 * Import content
+	 */
+	ApiResult importContent(Map content)
+	{
+		this.api_name = content.get("api_name", "");
+		this.method_name = content.get("method_name", "");
+		this.data = content.get("data", null);
+		this.code = content.get("code", -1);
+		this.message = content.get("message", "Unknown error");
+		this.ob_content = content.get("ob_content", "");
+		this.error_name = content.get("error_name", "");
+		this.error_file = content.get("error_file", "");
+		this.error_line = content.get("error_line", "");
+		this.error_trace = content.get("error_trace", []);
+		this.error_pos = content.get("error_pos", "");
+		this.is_exception = this.error_file != "";
+		return this;
+	}
+	
+	
+	/**
+	 * Set data
+	 */
+	ApiResult setData(var data)
+	{
+		if (data == null) return;
+		if (data instanceof Dict)
+		{
+			Collection<string> keys = data.keys();
+			for (int i=0; i<keys.count(); i++)
+			{
+				string key = keys.get(i);
+				this.data.set(key, data.get(key));
+			}
+		}
+		else
+		{
+			this.data = data;
+		}
+		return this;
+	}
+	
+	
+	/**
+	 * Setup success
+	 */
+	ApiResult success(Dict data = null)
+	{
+		this.code = rtl::ERROR_OK;
+		this.message = "Ok";
+		if (not data) return this;
+		
+		/* Set code */
+		if (data.has("code")) this.code = data.get("code");
+		else this.code = rtl::ERROR_OK;
+		
+		/* Set message */
+		if (data.has("message")) this.message = data.get("message");
+		else this.message = "Ok";
+		
+		/* Set data */
+		if (data.has("data")) this.setData(data.get("data"));
+		
+		return this;
+	}
+	
+	
+	/**
+	 * Setup exception
+	 */
+	ApiResult exception(RuntimeException e)
+	{
+		this.code = e.getErrorCode();
+		this.message = e.getErrorMessage();
+		this.error_name = e::getClassName();
+		this.error_file = e.getFileName();
+		this.error_line = e.getErrorLine();
+		this.error_pos = e.getErrorPos();
+		if (@.env("DEBUG"))
+		{
+			this.error_trace = e.getTraceCollection();
+		}
+		this.is_exception = true;
+		return this;
+	}
+	
+	
+	/**
+	 * Setup fail
+	 */
+	ApiResult fail(var data = null)
+	{
+		this.code = rtl::ERROR_UNKNOWN;
+		this.message = "Unknown error";
+		
+		if (data instanceof RuntimeException)
+		{
+			this.code = data.getErrorCode();
+			this.message = data.getErrorMessage();
+			this.error_name = data::getClassName();
+		}
+		
+		else if (data instanceof Map)
+		{
+			/* Set code */
+			if (data.has("code")) this.code = data.get("code");
+			else this.code = rtl::ERROR_UNKNOWN;
+			
+			/* Set message */
+			if (data.has("message")) this.message = data.get("message");
+			else this.message = "Error";
+			
+			/* Set data */
+			if (data.has("data")) this.setData(data.get("data"));
+		}
+		else
+		{
+			this.code = rtl::ERROR_UNKNOWN;
+			this.message = "Error";
+		}
+		return this;
+	}
+}

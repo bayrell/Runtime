@@ -31,7 +31,7 @@ class Entity extends BaseObject
 	/**
 	 * Constructor
 	 */
-	void constructor(Map obj)
+	void constructor(Map obj = null)
 	{
 		parent();
 		this._assign_values(obj);

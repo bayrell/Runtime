@@ -101,6 +101,7 @@ class VirtualDom extends BaseObject
 			return;
 		}
 		#endif
+		if (rtl::isString(content) and content == "") return;
 		if (not(content instanceof VirtualDom) and not rtl::isString(content))
 		{
 			content = rtl::toStr(content);

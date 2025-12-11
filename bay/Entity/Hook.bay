@@ -31,6 +31,6 @@ class Hook extends Factory
 	 */
 	void constructor(string name, Map params = null)
 	{
-		parent(name, null, params);
+		parent(name, params);
 	}
 }

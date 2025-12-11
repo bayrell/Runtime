@@ -33,6 +33,7 @@ class ObjectType extends BaseObject implements BaseType
 	string class_name = "";
 	string class_extends = "";
 	string class_implements = "";
+	Map params = {};
 	
 	
 	/**
@@ -41,6 +42,8 @@ class ObjectType extends BaseObject implements BaseType
 	void constructor(Map params = null)
 	{
 		parent();
+		this.params = params;
+		
 		if (not params) return;
 		if (params.has("create")) this.fn_create = params.get("create");
 		if (params.has("class_name")) this.class_name = params.get("class_name");
@@ -93,6 +96,7 @@ class ObjectType extends BaseObject implements BaseType
 		}
 		
 		Serializer serializer = new Serializer();
+		serializer.params = this.params;
 		new_value.serialize(serializer);
 		
 		Vector keys = rtl::list(serializer.fields.keys());
@@ -128,6 +132,7 @@ class ObjectType extends BaseObject implements BaseType
 		Map new_value = {};
 		
 		Serializer serializer = new Serializer();
+		serializer.params = this.params;
 		value.serialize(serializer);
 		
 		Vector keys = rtl::list(serializer.fields.keys());

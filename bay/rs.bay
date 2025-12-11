@@ -814,6 +814,23 @@ class rs
 	
 	
 	/**
+	 * Url get add
+	 */
+	static string urlGetAdd(string s, Map params)
+	{
+		Vector keys = rtl::list(params.keys());
+		for (int i=0; i<keys.count(); i++)
+		{
+			string key = keys.get(i);
+			string value = params.get(key);
+			if (not value) continue;
+			s = static::url_get_add(s, key, value);
+		}
+		return s;
+	}
+	
+	
+	/**
 	 * Strip tags
 	 */
 	pure string strip_tags(string content, Collection<string> allowed_tags = null)

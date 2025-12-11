@@ -1,0 +1,124 @@
+/*!
+ *  BayLang Technology
+ *
+ *  (c) Copyright 2016-2025 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.ApiResult;
+use Runtime.BaseProvider;
+use Runtime.BusInterface;
+use Runtime.Curl;
+use Runtime.Exceptions.ApiError;
+use Runtime.Exceptions.CurlException;
+use Runtime.Exceptions.RuntimeException;
+use Runtime.Hooks.RuntimeHook;
+
+
+class BusHttp extends BaseProvider implements BusInterface
+{
+	/**
+	 * Send api to frontend
+	 */
+	async ApiResult send(Dict params)
+	{
+		string service = params.get("service", "");
+		string api_name = params.get("api_name", "");
+		string method_name = params.get("method_name", "");
+		Dict data = params.get("data", null);
+		
+		/* Get route prefix */
+		string api_kind = "api";
+		string route_prefix = @.env("ROUTE_PREFIX");
+		route_prefix = rs::removeFirstSlash(route_prefix);
+		route_prefix = rs::removeLastSlash(route_prefix);
+		
+		/* Get api url */
+		Vector api_url_arr = [
+			route_prefix,
+			api_kind,
+			api_name,
+			method_name,
+		];
+		api_url_arr = api_url_arr.filter( bool (string s) => s != "" );
+		string api_url = "/" ~ api_url_arr.join("/");
+		
+		ApiResult res = new ApiResult();
+		
+		/* Call api before hook */
+		Dict d = @.hook(RuntimeHook::SEND_API_BEFORE, {
+			"api_url": api_url,
+			"service": service,
+			"api_name": api_name,
+			"method_name": method_name,
+			"params": params,
+			"data": data,
+		});
+		api_url = d.get("api_url");
+		
+		/* Create curl */
+		Curl curl = new Curl(api_url, {
+			"post": d.get("data"),
+		});
+		
+		/* Send curl */
+		try
+		{
+			await curl.send();
+		}
+		catch (CurlException e)
+		{
+			res.exception(e);
+		}
+		
+		/* Get answer */
+		Map answer = rtl::jsonDecode(curl.response);
+		if (answer and answer instanceof Map)
+		{
+			res.importContent(answer);
+		}
+		
+		/* Response error */
+		else
+		{
+			res.ob_content = curl.response;
+		}
+		
+		/* Print content */
+		if (@.env("DEBUG") and res.ob_content)
+		{
+			rtl::error(res.ob_content);
+		}
+		
+		/* Print exception */
+		if (@.env("DEBUG") and res.isException() and res.error_trace)
+		{
+			Collection arr = [];
+			arr.push(
+				res.error_name ~ " " ~
+				"in file " ~ res.error_file ~ ":" ~ res.error_line
+			);
+			arr.appendItems(
+				res.error_trace.map(
+					string (string value, int pos) => (pos + 1) ~ ") " ~ value
+				)
+			);
+			rtl::error(rs::join("\n", arr));
+		}
+		
+		return res;
+	}
+}

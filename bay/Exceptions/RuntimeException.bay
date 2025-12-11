@@ -199,7 +199,7 @@ class RuntimeException extends ClassException
 			},
 			$error_trace
 		);
-		return \Runtime\Collection::from($error_trace);
+		return \Runtime\Vector::create($error_trace);
 		#endswitch
 	}
 }

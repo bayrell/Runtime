@@ -45,6 +45,12 @@ class Curl extends BaseObject
 	
 	
 	/**
+	 * Returns true if curl is success
+	 */
+	bool isSuccess() => this.code == 200;
+	
+	
+	/**
 	 * Send
 	 */
 	async string send()
@@ -92,9 +98,9 @@ Object.assign(Runtime.Curl.prototype,
 				this.buildPostData(result, this.getKey(key, i), value[i]);
 			}
 		}
-		else if (value instanceof Runtime.Dict)
+		else if (value instanceof Runtime.Map)
 		{
-			var keys = value.keys();
+			var keys = Runtime.rtl.list(value.keys());
 			for (var i=0; i<keys.length; i++)
 			{
 				var name = keys.get(i);
