@@ -408,7 +408,7 @@ class rtl
 	 */
 	static bool isBoolean(var value)
 	{
-		return value == true or value === false;
+		return value === true or value === false;
 	}
 	
 	

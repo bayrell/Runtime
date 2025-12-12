@@ -45,32 +45,41 @@ class MapType extends BaseObject implements BaseType
 	
 	
 	/**
-	 * Filter type
+	 * Returns rules
 	 */
-	Map filter(Map value, Vector errors, Map old_value)
+	Vector<BaseType> getRules(string field_name)
 	{
-		if (not (value instanceof Map)) return null;
+		if (this.fields) return this.fields;
+		if (this.params and this.params.has(field_name))
+		{
+			Vector fields = this.params.get(field_name);
+			if (not (fields instanceof Vector)) fields = [fields];
+			return fields;
+		}
+		return null;
+	}
+	
+	
+	/**
+	 * Walk fields
+	 */
+	void walk(Map value, Vector errors, Map old_value, fn f)
+	{
 		Map new_value = {};
-		Vector keys = rtl::list(value.keys());
+		Vector keys = [];
+		if (this.params) keys = rtl::list(this.params.keys());
+		else keys = rtl::list(value.keys());
+		
 		for (int i=0; i<keys.count(); i++)
 		{
 			string key = keys.get(i);
 			var item_value = value.get(key);
 			bool setup = false;
 			
-			Vector item_errors = [];
-			Vector fields = null;
-			if (this.fields) fields = this.fields;
-			else if (this.params)
-			{
-				if (this.params.has(key))
-				{
-					fields = this.params.get(key);
-					if (not (fields instanceof Vector)) fields = [fields];
-				}
-			}
-			else setup = true;
+			Vector fields = this.getRules(key);
+			if (fields == null and this.params == null) setup = true;
 			
+			Vector item_errors = [];
 			if (fields)
 			{
 				for (int j=0; j<fields.count(); j++)
@@ -78,8 +87,8 @@ class MapType extends BaseObject implements BaseType
 					BaseType item = fields.get(j);
 					if (item implements BaseType)
 					{
-						item_value = item.filter(
-							item_value, item_errors,
+						item_value = f(
+							item, item_value, item_errors,
 							old_value ? old_value.get(key) : null
 						);
 					}
@@ -92,6 +101,29 @@ class MapType extends BaseObject implements BaseType
 			errors.appendItems(item_errors);
 			TypeError::addFieldErrors(item_errors, key);
 		}
+		
+		return new_value;
+	}
+	
+	
+	/**
+	 * Filter type
+	 */
+	Map filter(Map value, Vector errors, Map old_value)
+	{
+		if (not (value instanceof Map)) return null;
+		
+		Map new_value = this.walk(
+			value, errors, old_value,
+			void (BaseType rule, var item_value, Vector item_errors, var old_item_value)
+			{
+				return rule.filter(
+					item_value, item_errors,
+					old_item_value
+				);
+			}
+		);
+		
 		return new_value;
 	}
 	
@@ -102,41 +134,16 @@ class MapType extends BaseObject implements BaseType
 	Map serialize(Map value)
 	{
 		if (not (value instanceof Map)) return null;
-		Map new_value = {};
-		Vector keys = rtl::list(value.keys());
-		for (int i=0; i<keys.count(); i++)
-		{
-			string key = keys.get(i);
-			var item_value = value.get(key);
-			bool setup = false;
-			
-			Vector fields = null;
-			if (this.fields) fields = this.fields;
-			else if (this.params)
+		
+		Vector errors = [];
+		Map new_value = this.walk(
+			value, errors, null,
+			void (BaseType rule, var item_value, Vector item_errors, var old_item_value)
 			{
-				if (this.params.has(key))
-				{
-					fields = this.params.get(key);
-					if (not (fields instanceof Vector)) fields = [fields];
-				}
+				return rule.serialize(item_value);
 			}
-			else setup = true;
-			
-			if (fields)
-			{
-				for (int j=0; j<fields.count(); j++)
-				{
-					BaseType item = fields.get(j);
-					if (item implements BaseType)
-					{
-						item_value = item.serialize(item_value);
-					}
-				}
-				setup = true;
-			}
-			
-			if (setup) new_value.set(key, item_value);
-		}
+		);
+		
 		return new_value;
 	}
 }

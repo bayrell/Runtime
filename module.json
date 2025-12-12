@@ -62,6 +62,7 @@
 		"Serializer/IntegerType.bay",
 		"Serializer/MapType.bay",
 		"Serializer/ObjectType.bay",
+		"Serializer/Required.bay",
 		"Serializer/StringType.bay",
 		"Serializer/TypeError.bay",
 		"Serializer/VectorType.bay"

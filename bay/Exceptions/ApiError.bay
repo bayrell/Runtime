@@ -18,19 +18,24 @@
 
 namespace Runtime.Exceptions;
 
+use Runtime.ApiResult;
 use Runtime.RuntimeConstant;
 use Runtime.Exceptions.RuntimeException;
 
 
 class ApiError extends RuntimeException
 {
+	ApiResult result = null;
+	
+	
 	void constructor(Object prev = null)
 	{
 		parent(
 			prev.getErrorMessage(),
-			rtl::ERROR_API_ERROR,
-			prev
+			rtl::ERROR_API,
+			prev instanceof RuntimeException ? prev : null
 		);
+		if (prev instanceof ApiResult) this.result = prev;
 	}
 	
 	
