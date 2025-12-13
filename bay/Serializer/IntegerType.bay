@@ -45,9 +45,10 @@ class IntegerType extends BaseObject implements BaseType
 	string filter(var value, Vector errors, var old_value)
 	{
 		if (value === null) return 0;
-		if (this.convert and (rtl::isInteger(value) or rtl::isBoolean(value)))
+		if (this.convert)
 		{
-			value = rtl::toInt(value);
+			if (rtl::isInteger(value) or rtl::isBoolean(value)) value = rtl::toInt(value);
+			else if (rtl::isString(value)) value = rtl::toInt(value);
 		}
 		if (not rtl::isInteger(value))
 		{

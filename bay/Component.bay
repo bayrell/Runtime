@@ -22,9 +22,12 @@
 <use name="Runtime.BaseModel" />
 <use name="Runtime.Message" />
 
-<template name="renderWidget" args="BaseModel model">
+<template name="renderWidget" args="BaseModel model, Map attrs = null">
 	%set string component = model.component;
-	<{component} model={{ model }} />
+	%if (not attrs){
+		%set attrs = {};
+	}
+	<{component} model={{ model }} ...attrs />
 </template>
 
 <template>
