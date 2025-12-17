@@ -73,6 +73,16 @@ Runtime.Vector = class extends Array
 	
 	
 	/**
+	 * Remove item
+	 */
+	removeItem(item)
+	{
+		let pos = this.findIndex((elem) => { return elem == item; });
+		if (pos >=0) this.remove(pos);
+	}
+	
+	
+	/**
 	 * Flatten Array
 	 */
 	flatten()
@@ -270,6 +280,16 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	function remove($pos)
 	{
 		array_splice($this->_arr, $pos, 1);
+	}
+	
+	
+	/**
+	 * Remove item
+	 */
+	function removeItem($item)
+	{
+		$pos = $this->find(function ($elem) use ($item){ return $elem == $item; });
+		if ($pos >=0) $this->remove($pos);
 	}
 	
 	

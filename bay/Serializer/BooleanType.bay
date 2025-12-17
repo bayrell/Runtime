@@ -23,7 +23,7 @@ use Runtime.Serializer.BaseType;
 use Runtime.Serializer.TypeError;
 
 
-class StringType extends BaseObject implements BaseType
+class BooleanType extends BaseObject implements BaseType
 {
 	bool convert = true;
 	
@@ -40,36 +40,29 @@ class StringType extends BaseObject implements BaseType
 	
 	
 	/**
-	 * Filter type
+	 * Filter value
 	 */
-	string filter(var value, Vector errors, var old_value)
+	bool filter(var value, Vector errors, var old_value)
 	{
 		if (value === null)
 		{
-			if (!this.convert) errors.push(new TypeError("Does not string"));
-			return "";
+			if (!this.convert) errors.push(new TypeError("Does not boolean"));
+			return false;
 		}
 		if (this.convert and (rtl::isInteger(value) or rtl::isBoolean(value)))
 		{
-			value = rtl::toStr(value);
+			if (value == 1) return true;
+			return false;
 		}
-		if (not rtl::isString(value))
-		{
-			errors.push(new TypeError("Does not string"));
-			return "";
-		}
-		return value;
+		if (value == "true") return true;
+		if (value == "false") return false;
+		errors.push(new TypeError("Does not boolean"));
+		return false;
 	}
 	
 	
 	/**
-	 * Serialize data
+	 * Returns data
 	 */
-	string serialize(string value)
-	{
-		if (value === null) return "";
-		if (rtl::isString(value)) return value;
-		if (rtl::isBoolean(value) or rtl::isInteger(value)) return rtl::toStr(value);
-		return "";
-	}
+	var serialize(var value) => value;
 }

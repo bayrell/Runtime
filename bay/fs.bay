@@ -48,6 +48,7 @@ class fs
 	 */
 	static string join(Collection arr)
 	{
+		arr = arr.filter(bool (string s) => s != "");
 		string path = rs::join(static::DIRECTORY_SEPARATOR, arr);
 		path = re::replace("\\/+", "/", path);
 		path = re::replace("\\/\\.\\/", "/", path);

@@ -96,7 +96,7 @@ class BaseLayout extends BaseModel
 				if (not rtl::isInstanceOf(class_name, classof BaseModel)) return null;
 				return this.createWidget(class_name, data);
 			},
-			"serialize": Map (Map data, BaseModel model)
+			"serialize": void (Map data, BaseModel model)
 			{
 				data.set("__class_name__", model::getClassName());
 			}
@@ -221,7 +221,10 @@ class BaseLayout extends BaseModel
 	static void getRequiredComponents(string component, Vector result, Map hash)
 	{
 		if (hash.has(component)) return;
-		hash.set(component, true);
+		Vector components = rtl::getParents(component, "Runtime.Component");
+		components.each(void (string class_name) use (hash){
+			hash.set(class_name, true);
+		});
 		Method f = new Method(component, "getRequiredComponents");
 		if (f.exists())
 		{
@@ -235,7 +238,7 @@ class BaseLayout extends BaseModel
 				}
 			}
 		}
-		result.push(component);
+		result.appendItems(components);
 	}
 	
 	

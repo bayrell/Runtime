@@ -111,6 +111,7 @@ class BusHttp extends BaseProvider implements BusInterface
 				res.error_name ~ " " ~
 				"in file " ~ res.error_file ~ ":" ~ res.error_line
 			);
+			arr.push("Error message: " ~ res.message);
 			arr.appendItems(
 				res.error_trace.map(
 					string (string value, int pos) => (pos + 1) ~ ") " ~ value
