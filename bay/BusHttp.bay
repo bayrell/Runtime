@@ -106,12 +106,10 @@ class BusHttp extends BaseProvider implements BusInterface
 		/* Print exception */
 		if (@.env("DEBUG") and res.isException() and res.error_trace)
 		{
-			Collection arr = [];
-			arr.push(
-				res.error_name ~ " " ~
+			Collection arr = [
+				"Error message: " ~ res.message,
 				"in file " ~ res.error_file ~ ":" ~ res.error_line
-			);
-			arr.push("Error message: " ~ res.message);
+			];
 			arr.appendItems(
 				res.error_trace.map(
 					string (string value, int pos) => (pos + 1) ~ ") " ~ value

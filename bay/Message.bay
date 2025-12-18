@@ -25,7 +25,7 @@ class Message extends BaseObject
 {
 	var data = null;
 	string name = "";
-	BaseObject src = null;
+	BaseObject model = null;
 	
 	
 	/**

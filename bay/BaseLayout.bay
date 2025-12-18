@@ -221,7 +221,11 @@ class BaseLayout extends BaseModel
 	static void getRequiredComponents(string component, Vector result, Map hash)
 	{
 		if (hash.has(component)) return;
-		Vector components = rtl::getParents(component, "Runtime.Component");
+		Vector components = rtl::getParents(component, "Runtime.Component")
+			.filter(
+				bool (string class_name) use (hash) => not hash.has(class_name)
+			)
+		;
 		components.each(void (string class_name) use (hash){
 			hash.set(class_name, true);
 		});

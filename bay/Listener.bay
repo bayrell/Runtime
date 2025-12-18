@@ -71,9 +71,9 @@ class Listener extends BaseObject
 	 */
 	void emit(Message message)
 	{
-		if (message.src == null)
+		if (message.model == null)
 		{
-			message.src = this.object;
+			message.model = this.object;
 		}
 		this.emitMessage(message::getClassName(), message);
 		this.emitMessage(message.name, message);
@@ -85,9 +85,9 @@ class Listener extends BaseObject
 	 */
 	async void emitAsync(Message message)
 	{
-		if (message.src == null)
+		if (message.model == null)
 		{
-			message.src = this.object;
+			message.model = this.object;
 		}
 		var res1 = this.emitMessage(message::getClassName(), message);
 		var res2 = this.emitMessage(message.name, message);
