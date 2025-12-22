@@ -38,5 +38,5 @@ class Required extends BaseObject implements BaseType
 	/**
 	 * Returns data
 	 */
-	var serialize(var value) => value;
+	var encode(var value) => value;
 }

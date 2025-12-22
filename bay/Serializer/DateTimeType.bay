@@ -28,7 +28,7 @@ class DateTimeType extends BaseObject implements BaseType
 	/**
 	 * Filter value
 	 */
-	DateTime filter(Map value, Vector errors, var old_value)
+	DateTime filter(Map value, Vector errors)
 	{
 		if (value === null) return null;
 		if (not (value instanceof Map))
@@ -43,7 +43,7 @@ class DateTimeType extends BaseObject implements BaseType
 	/**
 	 * Returns data
 	 */
-	var serialize(DateTime value)
+	var encode(DateTime value)
 	{
 		if (value === null) return null;
 		return value.toMap();

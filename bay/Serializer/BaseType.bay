@@ -24,11 +24,11 @@ interface BaseType
 	/**
 	 * Filter value
 	 */
-	var filter(var value, Vector errors, var old_value);
+	var filter(var value, Vector errors);
 	
 	
 	/**
 	 * Returns data
 	 */
-	var serialize(var value);
+	var encode(var value);
 }

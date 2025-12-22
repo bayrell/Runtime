@@ -25,8 +25,8 @@ use Runtime.Date;
 use Runtime.DateTime;
 use Runtime.Entity.Provider;
 use Runtime.Exceptions.AssertException;
-use Runtime.Serializer;
 use Runtime.SerializeInterface;
+use Runtime.Serializer.ObjectType;
 use Runtime.VirtualDom;
 
 
@@ -346,6 +346,28 @@ class rtl
 	
 	
 	/**
+	 * Apply method
+	 */
+	static void apply(fn f, Vector args)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		if ($args) $args = $args->toArray();
+		else $args = [];
+		
+		return call_user_func_array($f, $args);
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (!args) args = [];
+		return f.apply(null, args);
+		
+		#endswitch
+	}
+	
+	
+	/**
 	 * Assert
 	 */
 	static void assert(bool value, string message)
@@ -408,6 +430,7 @@ class rtl
 	 */
 	static string getType(string value)
 	{
+		if (value === null) return "null";
 		if (static::isString(value)) return "string";
 		if (static::isInteger(value)) return "integer";
 		if (static::isBoolean(value)) return "boolean";
@@ -704,11 +727,10 @@ class rtl
 	/**
 	 * Assign object
 	 */
-	static Serializer assign(SerializeInterface obj, Map data)
+	static void assign(SerializeInterface obj, Map data, Vector errors = [])
 	{
-		Serializer serializer = new Serializer();
-		serializer.assign(obj, data);
-		return serializer;
+		ObjectType rules = new ObjectType();
+		return rules.filter(data, errors, obj);
 	}
 	
 	
@@ -717,8 +739,8 @@ class rtl
 	 */
 	static Map serialize(SerializeInterface obj)
 	{
-		Serializer serializer = new Serializer();
-		return serializer.serialize(obj);
+		ObjectType rules = new ObjectType();
+		return rules.encode(obj);
 	}
 	
 	
@@ -751,11 +773,13 @@ class rtl
 	/**
 	 * Json encode
 	 */
-	static var jsonEncode(var obj)
+	static var jsonEncode(var obj, int flags = 0)
 	{
 		#switch
 		#case ifcode PHP then
-		return json_encode($obj);
+		$f = 0;
+		if ($flags & static::JSON_PRETTY == static::JSON_PRETTY) $f = $f | JSON_PRETTY_PRINT;
+		return json_encode($obj, $f);
 		#case ifcode JAVASCRIPT then
 		return JSON.stringify(obj);
 		#endswitch

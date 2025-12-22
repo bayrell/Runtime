@@ -18,7 +18,7 @@
 
 namespace Runtime;
 
-use Runtime.Serializer;
+use Runtime.Serializer.ObjectType;
 
 
 interface SerializeInterface
@@ -26,5 +26,5 @@ interface SerializeInterface
 	/**
 	 * Returns object schema
 	 */
-	void serialize(Serializer serializer);
+	static void serialize(ObjectType rules);
 }

@@ -535,6 +535,7 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	function reverse()
 	{
 		$this->_arr = array_reverse($this->_arr);
+		return $this;
 	}
 	
 	

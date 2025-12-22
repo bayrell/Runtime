@@ -26,6 +26,7 @@ use Runtime.Serializer.TypeError;
 class StringType extends BaseObject implements BaseType
 {
 	bool convert = true;
+	bool multiline = true;
 	
 	
 	/**
@@ -36,13 +37,14 @@ class StringType extends BaseObject implements BaseType
 		parent();
 		if (not params) return;
 		if (params.has("convert")) this.convert = params.get("convert");
+		if (params.has("multiline")) this.multiline = params.get("multiline");
 	}
 	
 	
 	/**
 	 * Filter type
 	 */
-	string filter(var value, Vector errors, var old_value)
+	string filter(var value, Vector errors)
 	{
 		if (value === null)
 		{
@@ -58,6 +60,7 @@ class StringType extends BaseObject implements BaseType
 			errors.push(new TypeError("Does not string"));
 			return "";
 		}
+		if (this.multiline) value = rs::replace("\r\n", "\n", value);
 		return value;
 	}
 	
@@ -65,7 +68,7 @@ class StringType extends BaseObject implements BaseType
 	/**
 	 * Serialize data
 	 */
-	string serialize(string value)
+	string encode(string value)
 	{
 		if (value === null) return "";
 		if (rtl::isString(value)) return value;

@@ -19,6 +19,7 @@
 namespace Runtime.Serializer;
 
 use Runtime.BaseObject;
+use Runtime.Chain;
 use Runtime.Serializer.BaseType;
 use Runtime.Serializer.MapType;
 use Runtime.Serializer.TypeError;
@@ -26,10 +27,12 @@ use Runtime.Serializer;
 use Runtime.SerializeInterface;
 
 
-class ObjectType extends BaseObject implements BaseType
+class ObjectType extends MapType
 {
 	fn fn_create = null;
+	fn fn_rules = null;
 	fn fn_serialize = null;
+	Chain setup = new Chain;
 	string class_name = "";
 	string class_extends = "";
 	string class_implements = "";
@@ -45,79 +48,144 @@ class ObjectType extends BaseObject implements BaseType
 		this.params = params;
 		
 		if (not params) return;
+		if (params.has("autocreate")) this.autocreate();
 		if (params.has("create")) this.fn_create = params.get("create");
 		if (params.has("class_name")) this.class_name = params.get("class_name");
 		if (params.has("class_extends")) this.class_extends = params.get("extends");
 		if (params.has("class_implements")) this.class_implements = params.get("implements");
+		if (params.has("rules")) this.fn_rules = params.get("rules");
 		if (params.has("serialize")) this.fn_serialize = params.get("serialize");
+	}
+	
+	
+	/**
+	 * Set class name
+	 */
+	void setClassName(string class_name)
+	{
+		this.class_name = class_name;
+	}
+	
+	
+	/**
+	 * Copy object
+	 */
+	ObjectType copy()
+	{
+		ObjectType rules = new ObjectType();
+		rules.fn_create = this.fn_create;
+		rules.fn_rules = this.fn_rules;
+		rules.fn_serialize = this.fn_serialize;
+		rules.setup = this.setup;
+		rules.items = this.items.map(Vector (Vector items) => items.slice());
+		rules.class_name = this.class_name;
+		rules.class_extends = this.class_extends;
+		rules.class_implements = this.class_implements;
+		return rules;
+	}
+	
+	
+	/**
+	 * Autocreate
+	 */
+	void autocreate()
+	{
+		this.fn_rules = SerializeInterface(ObjectType rules, Map value)
+		{
+			rules.class_name = value.get("__class_name__");
+		};
+		this.fn_serialize = void (SerializeInterface item, Map value)
+		{
+			value.set("__class_name__", item::getClassName());
+		};
 	}
 	
 	
 	/**
 	 * Create object
 	 */
-	SerializeInterface createObject(Map value)
+	SerializeInterface createObject(Map value, Vector errors, SerializeInterface prev)
 	{
-		return this.create ? this.create(value) : null;
+		if (this.class_name == "") return null;
+		if (not rtl::classExists(this.class_name))
+		{
+			errors.push("Class '" ~ this.class_name ~ "' does not exists");
+			return null;
+		}
+		if (this.class_extends != "" and
+			not(rtl::isInstanceOf(this.class_name, this.class_extends)))
+		{
+			errors.push("Class '" ~ this.class_name ~
+				"' does not extends '" ~ this.class_extends ~ "'");
+			return null;
+		}
+		if (this.class_implements != "" and
+			not(rtl::isImplements(this.class_name, this.class_implements)))
+		{
+			errors.push("Class '" ~ this.class_name ~
+				"' does not implements '" ~ this.class_implements ~ "'");
+			return null;
+		}
+		if (this.fn_create)
+		{
+			fn fn_create = this.fn_create;
+			return fn_create(prev, this, value);
+		}
+		return rtl::newInstance(this.class_name, [value]);
+	}
+	
+	
+	/**
+	 * Init rules
+	 */
+	void initRules(Map value)
+	{
+		if (this.fn_rules)
+		{
+			fn rules = this.fn_rules;
+			rules(this, value);
+		}
+		return this;
 	}
 	
 	
 	/**
 	 * Filter value
 	 */
-	SerializeInterface filter(Map value, Vector errors, SerializeInterface old_value = null)
+	SerializeInterface filter(
+		Map value, Vector errors, SerializeInterface old_value = null, SerializeInterface prev = null
+	)
 	{
-		if (value === null) return null;
-		if (not (value instanceof Map)) return null;
+		if (value == null) return null;
 		
-		fn create = this.fn_create;
-		SerializeInterface new_value = create ? create(value, old_value) : old_value;
-		if (new_value == null)
+		SerializeInterface new_value = old_value;
+		if (not new_value)
 		{
-			errors.push(new TypeError("Object does not exists"));
-			return null;
+			BaseType rules = this.copy().initRules(value);
+			new_value = rules.createObject(value, errors, prev);
 		}
+		if (not new_value) return null;
 		
-		string class_name = new_value::getClassName();
-		if (this.class_name != "" and this.class_name != class_name)
-		{
-			errors.push(new TypeError("Wrong class name \"" ~ class_name ~ "\""));
-			return null;
-		}
-		if (this.class_extends != "" and not rtl::isInstanceOf(new_value, this.class_extends))
-		{
-			errors.push(new TypeError("Wrong class name \"" ~ class_name ~ "\""));
-			return null;
-		}
-		if (this.class_implements != "" and not rtl::isImplements(new_value, this.class_implements))
-		{
-			errors.push(new TypeError("Wrong class name \"" ~ class_name ~ "\""));
-			return null;
-		}
+		BaseType rules = new ObjectType(this.params);
+		new_value::serialize(rules);
 		
-		Serializer serializer = new Serializer();
-		serializer.params = this.params;
-		new_value.serialize(serializer);
+		rules.setup.apply([new_value, rules]);
 		
-		Vector keys = rtl::list(serializer.fields.keys());
-		for (int i=0; i<keys.count(); i++)
-		{
-			string key = keys.get(i);
-			var item_value = value.get(key);
-			Vector item_errors = [];
-			Vector items = serializer.fields.get(key);
-			for (int j=0; j<items.count(); j++)
+		rules.walk(
+			value, errors,
+			void (BaseType field, var new_item, Vector item_errors, string key)
+				use (value, prev, new_value)
 			{
-				BaseType item = items.get(j);
-				if (item implements BaseType)
+				if (not value.has(key)) return;
+				var old_item = new_value ? rtl::attr(new_value, key) : null
+				new_item = field.filter(new_item, item_errors, old_item, new_value);
+				if (key != "__class_name__")
 				{
-					item_value = item.filter(item_value, item_errors, rtl::attr(new_value, key));
+					rtl::setAttr(new_value, key, new_item);
 				}
 			}
-			rtl::setAttr(new_value, key, item_value);
-			errors.appendItems(item_errors);
-			TypeError::addFieldErrors(item_errors, key);
-		}
+		)
+		
 		return new_value;
 	}
 	
@@ -125,35 +193,25 @@ class ObjectType extends BaseObject implements BaseType
 	/**
 	 * Returns data
 	 */
-	Map serialize(SerializeInterface value)
+	Map encode(SerializeInterface value)
 	{
 		if (value === null) return null;
 		if (not (value implements SerializeInterface)) return null;
-		Map new_value = {};
 		
-		Serializer serializer = new Serializer();
-		serializer.params = this.params;
-		value.serialize(serializer);
+		BaseType rules = new ObjectType(this.params);
+		value::serialize(rules);
 		
-		Vector keys = rtl::list(serializer.fields.keys());
-		for (int i=0; i<keys.count(); i++)
-		{
-			string key = keys.get(i);
-			var item_value = rtl::attr(value, key);
-			Vector items = serializer.fields.get(key);
-			for (int j=0; j<items.count(); j++)
+		Vector errors = [];
+		Map new_value = rules.walk(
+			value, errors,
+			void (BaseType field, var new_item, Vector item_errors)
 			{
-				BaseType item = items.get(j);
-				if (item implements BaseType)
-				{
-					item_value = item.serialize(item_value);
-				}
+				return field.encode(new_item);
 			}
-			new_value.set(key, item_value);
-		}
+		)
 		
 		fn serialize = this.fn_serialize;
-		if (serialize) serialize(new_value, value);
+		if (serialize) serialize(value, new_value);
 		
 		return new_value;
 	}

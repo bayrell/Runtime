@@ -128,6 +128,17 @@ void emit(Message message)
 }
 
 
+/**
+ * Next tick
+ */
+void nextTick(fn f)
+{
+	#ifcode JAVASCRIPT then
+	this.$nextTick(f);
+	#endif
+}
+
+
 #switch
 #case ifdef PHP then
 

@@ -22,7 +22,7 @@ use Runtime.BaseObject;
 use Runtime.RenderContainer;
 use Runtime.Listener;
 use Runtime.Method;
-use Runtime.Serializer;
+use Runtime.Serializer.ObjectType;
 use Runtime.Serializer.StringType;
 use Runtime.SerializeInterface;
 
@@ -64,7 +64,8 @@ class BaseModel extends BaseObject implements SerializeInterface
 		if (not params) return;
 		
 		this.parent_widget = params.get("parent_widget");
-		this.layout = this.parent_widget ? this.parent_widget.layout : null;
+		if (params.has("layout")) this.layout = params.get("layout");
+		else this.layout = this.parent_widget ? this.parent_widget.layout : null;
 		
 		/* Setup params */
 		this.component = params.has("component") ? params.get("component") : this.component;
@@ -82,9 +83,9 @@ class BaseModel extends BaseObject implements SerializeInterface
 	/**
 	 * Serialize object
 	 */
-	void serialize(Serializer serializer)
+	static void serialize(ObjectType rules)
 	{
-		serializer.addType("component", new StringType());
+		rules.addType("component", new StringType());
 	}
 	
 	

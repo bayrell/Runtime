@@ -23,17 +23,16 @@ use Runtime.BaseObject;
 
 class TypeError extends BaseObject
 {
-	string field_name = "";
+	Vector<string> path = [];
 	string message = "";
 	
 	
 	/**
 	 * Create type error
 	 */
-	void constructor(string message, string field_name = "")
+	void constructor(string message)
 	{
 		parent();
-		this.field_name = field_name;
 		this.message = message;
 	}
 	
@@ -41,7 +40,13 @@ class TypeError extends BaseObject
 	/**
 	 * Returns error message
 	 */
-	string getMessage() => this.field_name ? this.field_name ~ ": " ~ this.message : this.message;
+	string getMessage()
+	{
+		Vector path = this.path.slice().reverse();
+		string field_name = path.first();
+		if (path.count() > 1) field_name ~= "[" ~ rs::join("][", path) ~ "]";
+		return field_name ~ ": " ~ this.message;
+	}
 	
 	
 	/**
@@ -57,9 +62,7 @@ class TypeError extends BaseObject
 	 */
 	void addKey(string key)
 	{
-		if (this.field_name == "") this.field_name = key;
-		else if (rs::charAt(this.field_name, 0) == "[") this.field_name = key ~ this.field_name;
-		else this.field_name = key ~ "." ~ this.field_name;
+		this.path.push(key);
 	}
 	
 	
@@ -70,8 +73,13 @@ class TypeError extends BaseObject
 	{
 		for (int i=0; i<errors.count(); i++)
 		{
-			TypeError error = errors.get(i);
-			error.addKey(key);
+			TypeError item = errors.get(i);
+			if (rtl::isString(item))
+			{
+				item = new TypeError(item);
+				errors.set(i, item);
+			}
+			item.addKey(key);
 		}
 	}
 }

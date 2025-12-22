@@ -19,13 +19,14 @@
 namespace Runtime.Serializer;
 
 use Runtime.BaseObject;
+use Runtime.SerializeInterface;
 use Runtime.Serializer.BaseType;
 use Runtime.Serializer.TypeError;
 
 
 class VectorType extends BaseObject implements BaseType
 {
-	Vector<BaseType> fields = null;
+	Vector<BaseType> fields = [];
 	
 	
 	/**
@@ -40,30 +41,51 @@ class VectorType extends BaseObject implements BaseType
 	
 	
 	/**
-	 * Filter value
+	 * Walk item
 	 */
-	Vector filter(Vector value, Vector errors, Vector old_value)
+	void walk(Vector value, Vector errors, fn f)
 	{
-		if (value === null) return null;
-		if (not(value instanceof Vector)) return null;
 		Vector new_value = [];
 		for (int i=0; i<value.count(); i++)
 		{
+			Vector item_errors = [];
 			var new_item = value.get(i);
 			for (int j=0; j<this.fields.count(); j++)
 			{
 				BaseType field = this.fields.get(j);
 				if (field implements BaseType)
 				{
-					new_item = field.filter(
-						new_item, errors,
-						old_value ? old_value.get(i) : null
-					);
+					new_item = f(field, new_item, item_errors, i);
 				}
 			}
 			new_value.push(new_item);
-			TypeError::addFieldErrors(errors, "[" ~ i ~ "]");
+			TypeError::addFieldErrors(item_errors, i);
+			errors.appendItems(item_errors);
 		}
+		return new_value;
+	}
+	
+	
+	/**
+	 * Filter value
+	 */
+	Vector filter(
+		Vector value, Vector errors, Vector old_value = null, SerializeInterface prev = null
+	)
+	{
+		if (value === null) return null;
+		if (not(value instanceof Vector)) return null;
+		
+		Vector new_value = this.walk(
+			value, errors,
+			var (BaseType field, var new_item, Vector item_errors, var i) use (old_value, prev)
+			{
+				return field.filter(
+					new_item, item_errors, old_value ? old_value.get(i) : null, prev
+				);
+			}
+		);
+		
 		return new_value;
 	}
 	
@@ -71,24 +93,20 @@ class VectorType extends BaseObject implements BaseType
 	/**
 	 * Returns data
 	 */
-	Vector serialize(Vector value)
+	Vector encode(Vector value)
 	{
 		if (value === null) return null;
 		if (not(value instanceof Vector)) return null;
-		Vector new_value = [];
-		for (int i=0; i<value.count(); i++)
-		{
-			var new_item = value.get(i);
-			for (int j=0; j<this.fields.count(); j++)
+		
+		Vector errors = [];
+		Vector new_value = this.walk(
+			value, errors,
+			var (BaseType field, var new_item, Vector item_errors, var i)
 			{
-				BaseType field = this.fields.get(j);
-				if (field implements BaseType)
-				{
-					new_item = field.serialize(new_item);
-				}
+				return field.encode(new_item);
 			}
-			new_value.push(new_item);
-		}
+		);
+		
 		return new_value;
 	}
 }

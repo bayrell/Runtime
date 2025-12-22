@@ -18,7 +18,7 @@
 
 namespace Runtime;
 
-use Runtime.Serializer;
+use Runtime.Serializer.ObjectType;
 
 
 class BaseObject
@@ -52,8 +52,9 @@ class BaseObject
 	/**
 	 * Serialize object
 	 */
-	void serialize(Serializer serializer)
+	static void serialize(ObjectType rules)
 	{
+		rules.setClassName(static::getClassName());
 	}
 	
 	

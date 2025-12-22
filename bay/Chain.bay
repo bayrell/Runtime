@@ -88,7 +88,8 @@ class Chain extends Method
 		{
 			Dict item = this.chain.get(i);
 			Method f = item.get("method");
-			f.apply(args);
+			if (f instanceof Method) f.apply(args);
+			else rtl::apply(f, args);
 		}
 	}
 	

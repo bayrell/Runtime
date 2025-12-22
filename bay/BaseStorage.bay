@@ -38,20 +38,11 @@ class BaseStorage extends BaseModel
 	/**
 	 * Returns object schema
 	 */
-	void serialize(Serializer serializer)
+	static void serialize(Serializer serializer)
 	{
 		parent(serializer);
 		serializer.addType("frontend", new MapType(new ObjectType{
-			"create": BaseModel (Map data)
-			{
-				string class_name = data.get("__class_name__");
-				if (not rtl::classExists(class_name)) return null;
-				return rtl::newInstance(class_name);
-			},
-			"serialize": Map (Map data, BaseModel model)
-			{
-				data.set("__class_name__", model::getClassName());
-			}
+			"autocreate": true,
 		}));
 	}
 	

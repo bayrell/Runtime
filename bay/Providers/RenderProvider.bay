@@ -116,6 +116,9 @@ class RenderProvider extends BaseProvider
 		{
 			string name = vdom.name;
 			if (this.components.has(name)) name = this.components.get(name);
+			#ifcode JAVASCRIPT then
+			if (name == "TransitionGroup") return Vue.TransitionGroup;
+			#endif
 			return rtl::findClass(name);
 		}
 		return vdom.name;

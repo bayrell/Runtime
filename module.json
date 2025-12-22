@@ -42,7 +42,6 @@
 		"RawString.bay",
 		"Reference.bay",
 		"RenderContainer.bay",
-		"Serializer.bay",
 		"SerializeInterface.bay",
 		"ModuleDescription.bay",
 		"VirtualDom.bay",

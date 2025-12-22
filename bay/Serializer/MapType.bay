@@ -19,6 +19,7 @@
 namespace Runtime.Serializer;
 
 use Runtime.BaseObject;
+use Runtime.SerializeInterface;
 use Runtime.Serializer.BaseType;
 use Runtime.Serializer.TypeError;
 
@@ -26,7 +27,7 @@ use Runtime.Serializer.TypeError;
 class MapType extends BaseObject implements BaseType
 {
 	Vector<BaseType> fields = null;
-	Map<BaseType> params = null;
+	Map<Vector<BaseType>> items = {};
 	
 	
 	/**
@@ -37,10 +38,18 @@ class MapType extends BaseObject implements BaseType
 		parent();
 		if (params implements BaseType) this.fields = [params];
 		else if (params instanceof Vector) this.fields = params;
-		else if (params instanceof Map)
-		{
-			this.params = params;
-		}
+		else if (params instanceof Map) this.items = params;
+	}
+	
+	
+	/**
+	 * Add type
+	 */
+	void addType(string key, BaseType rule)
+	{
+		if (not this.items.has(key)) this.items.set(key, []);
+		Vector items = this.items.get(key);
+		items.push(rule);
 	}
 	
 	
@@ -49,36 +58,41 @@ class MapType extends BaseObject implements BaseType
 	 */
 	Vector<BaseType> getRules(string field_name)
 	{
-		if (this.fields) return this.fields;
-		if (this.params and this.params.has(field_name))
+		if (this.items and this.items.has(field_name))
 		{
-			Vector fields = this.params.get(field_name);
+			Vector fields = this.items.get(field_name);
 			if (not (fields instanceof Vector)) fields = [fields];
 			return fields;
 		}
+		if (this.fields) return this.fields;
 		return null;
 	}
 	
 	
 	/**
+	 * Returns keys
+	 */
+	Vector keys(Map value = null) =>
+		rtl::list((this.fields and value) ? value.keys() : this.items.keys())
+	;
+	
+	
+	/**
 	 * Walk fields
 	 */
-	void walk(Map value, Vector errors, Map old_value, fn f)
+	void walk(Map value, Vector errors, fn f)
 	{
 		Map new_value = {};
-		Vector keys = [];
-		if (this.params) keys = rtl::list(this.params.keys());
-		else keys = rtl::list(value.keys());
 		
+		Vector keys = this.keys(value);
 		for (int i=0; i<keys.count(); i++)
 		{
 			string key = keys.get(i);
-			var item_value = value.get(key);
-			bool setup = false;
+			var item_value = null;
+			if (value implements SerializeInterface) item_value = rtl::attr(value, key);
+			else if (value instanceof Map) item_value = value.get(key);
 			
 			Vector fields = this.getRules(key);
-			if (fields == null and this.params == null) setup = true;
-			
 			Vector item_errors = [];
 			if (fields)
 			{
@@ -87,16 +101,12 @@ class MapType extends BaseObject implements BaseType
 					BaseType item = fields.get(j);
 					if (item implements BaseType)
 					{
-						item_value = f(
-							item, item_value, item_errors,
-							old_value ? old_value.get(key) : null
-						);
+						item_value = f(item, item_value, item_errors, key);
 					}
 				}
-				setup = true;
 			}
 			
-			if (setup) new_value.set(key, item_value);
+			new_value.set(key, item_value);
 			
 			errors.appendItems(item_errors);
 			TypeError::addFieldErrors(item_errors, key);
@@ -109,17 +119,18 @@ class MapType extends BaseObject implements BaseType
 	/**
 	 * Filter type
 	 */
-	Map filter(Map value, Vector errors, Map old_value)
+	Map filter(Map value, Vector errors, Map old_value = null, SerializeInterface prev = null)
 	{
 		if (not (value instanceof Map)) return null;
 		
 		Map new_value = this.walk(
-			value, errors, old_value,
-			void (BaseType rule, var item_value, Vector item_errors, var old_item_value)
+			value, errors,
+			void (BaseType rule, var item_value, Vector item_errors, string key)
+				use (old_value, prev)
 			{
 				return rule.filter(
 					item_value, item_errors,
-					old_item_value
+					old_value ? old_value.get(key) : null, prev
 				);
 			}
 		);
@@ -131,16 +142,16 @@ class MapType extends BaseObject implements BaseType
 	/**
 	 * Serialize
 	 */
-	Map serialize(Map value)
+	Map encode(Map value)
 	{
 		if (not (value instanceof Map)) return null;
 		
 		Vector errors = [];
 		Map new_value = this.walk(
-			value, errors, null,
-			void (BaseType rule, var item_value, Vector item_errors, var old_item_value)
+			value, errors,
+			void (BaseType rule, var item_value, Vector item_errors)
 			{
-				return rule.serialize(item_value);
+				return rule.encode(item_value);
 			}
 		);
 		

@@ -40,11 +40,11 @@ class ConstantType extends BaseObject implements BaseType
     /**
 	 * Filter value
 	 */
-	var filter(var value, Vector errors, var old_value) => this.value;
+	var filter(var value, Vector errors) => this.value;
 	
 	
 	/**
 	 * Returns data
 	 */
-	var serialize(var value) => this.value;
+	var encode(var value) => this.value;
 }

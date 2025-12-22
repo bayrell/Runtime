@@ -42,7 +42,7 @@ class BooleanType extends BaseObject implements BaseType
 	/**
 	 * Filter value
 	 */
-	bool filter(var value, Vector errors, var old_value)
+	bool filter(var value, Vector errors)
 	{
 		if (value === null)
 		{
@@ -64,5 +64,5 @@ class BooleanType extends BaseObject implements BaseType
 	/**
 	 * Returns data
 	 */
-	var serialize(var value) => value;
+	var encode(var value) => value;
 }

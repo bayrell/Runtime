@@ -35,7 +35,9 @@ class ChainAsync extends Chain
 			{
 				Dict item = this.chain.get(i);
 				Method f = item.get("method");
-				var res = f.apply(args);
+				var res = null;
+				if (f instanceof Method) res = f.apply(args);
+				else res = rtl::apply(f, args);
 				#ifcode JAVASCRIPT then
 				if (res instanceof Promise) await res;
 				#endif

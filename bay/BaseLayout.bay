@@ -79,29 +79,23 @@ class BaseLayout extends BaseModel
 	/**
 	 * Serialize object
 	 */
-	void serialize(Serializer serializer)
+	static void serialize(ObjectType rules)
 	{
-		parent(serializer);
-		serializer.addType("components", new VectorType(new StringType()));
-		serializer.addType("current_page_model", new StringType());
-		serializer.addType("lang", new StringType());
-		serializer.addType("theme", new StringType());
-		serializer.addType("title", new StringType());
-		serializer.addType("pages", new MapType(new ObjectType{
+		parent(rules);
+		rules.addType("components", new VectorType(new StringType()));
+		rules.addType("current_page_model", new StringType());
+		rules.addType("lang", new StringType());
+		rules.addType("theme", new StringType());
+		rules.addType("title", new StringType());
+		rules.addType("storage", new ObjectType({"class_name": classof BaseStorage}));
+		rules.addType("pages", new MapType(new ObjectType{
+			"autocreate": true,
 			"extends": classof BaseModel,
-			"create": BaseModel (Map data)
+			"create": void (BaseLayout layout, ObjectType rules, Map data)
 			{
-				string class_name = data.get("__class_name__");
-				if (not rtl::classExists(class_name)) return null;
-				if (not rtl::isInstanceOf(class_name, classof BaseModel)) return null;
-				return this.createWidget(class_name, data);
-			},
-			"serialize": void (Map data, BaseModel model)
-			{
-				data.set("__class_name__", model::getClassName());
+				return layout.createWidget(rules.class_name, data);
 			}
 		}));
-		serializer.addType("storage", new ObjectType({"class_name": classof BaseStorage}));
 	}
 	
 	

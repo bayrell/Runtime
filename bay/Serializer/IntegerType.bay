@@ -42,7 +42,7 @@ class IntegerType extends BaseObject implements BaseType
 	/**
 	 * Filter type
 	 */
-	string filter(var value, Vector errors, var old_value)
+	string filter(var value, Vector errors)
 	{
 		if (value === null) return 0;
 		if (this.convert)
@@ -62,7 +62,7 @@ class IntegerType extends BaseObject implements BaseType
 	/**
 	 * Serialize
 	 */
-	string serialize(string value)
+	string encode(string value)
 	{
 		if (rtl::isInteger(value)) return value;
 		if (rtl::isBoolean(value) or rtl::isString(value)) return rtl::toInt(value);
