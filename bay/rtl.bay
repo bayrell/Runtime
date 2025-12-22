@@ -19,10 +19,10 @@
 namespace Runtime;
 
 use Runtime.BaseObject;
-use Runtime.Callback;
 use Runtime.Context;
 use Runtime.Date;
 use Runtime.DateTime;
+use Runtime.Method;
 use Runtime.Entity.Provider;
 use Runtime.Exceptions.AssertException;
 use Runtime.SerializeInterface;
@@ -350,6 +350,8 @@ class rtl
 	 */
 	static void apply(fn f, Vector args)
 	{
+		if (f instanceof Method) return f.apply(args);
+		
 		#switch
 		#case ifcode PHP then
 		

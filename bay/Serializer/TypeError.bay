@@ -58,6 +58,12 @@ class TypeError extends BaseObject
 	
 	
 	/**
+	 * Returns field name
+	 */
+	string getFieldName() => rs::join(".", this.path);
+	
+	
+	/**
 	 * Add key to field name
 	 */
 	void addKey(string key)

@@ -28,7 +28,7 @@ class Required extends BaseObject implements BaseType
 	/**
 	 * Filter value
 	 */
-	var filter(var value, Vector errors, var old_value)
+	var filter(var value, Vector errors)
 	{
 		if (value === null or value === "") errors.push(new TypeError("Required"));
 		return value;
