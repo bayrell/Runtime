@@ -19,6 +19,7 @@
 namespace Runtime;
 
 use Runtime.BaseObject;
+use Runtime.BaseModel;
 use Runtime.Component;
 use Runtime.Providers.RenderContent;
 
@@ -138,5 +139,29 @@ class VirtualDom extends BaseObject
 		provider.components = @.provider("render").components;
 		provider.render(this, content);
 		return rs::join("", content);
+	}
+	
+	
+	/**
+	 * Raw string
+	 */
+	static VirtualDom raw(string content)
+	{
+		VirtualDom vdom = new VirtualDom();
+		vdom.is_raw = true;
+		vdom.push(content);
+		return vdom;
+	}
+	
+	
+	/**
+	 * Render model
+	 */
+	static VirtualDom renderModel(BaseModel model)
+	{
+		VirtualDom vdom = new VirtualDom();
+		vdom.setName(model.component);
+		vdom.attrs = { "model": model, "layout": model.layout };
+		return vdom;
 	}
 }

@@ -55,6 +55,7 @@
 		"Providers/HookProvider.bay",
 		"Providers/OutputProvider.bay",
 		"Providers/RenderProvider.bay",
+		"Serializer/Allowed.bay",
 		"Serializer/BaseType.bay",
 		"Serializer/BooleanType.bay",
 		"Serializer/DateTimeType.bay",

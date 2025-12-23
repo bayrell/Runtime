@@ -435,6 +435,7 @@ class rtl
 		if (value === null) return "null";
 		if (static::isString(value)) return "string";
 		if (static::isInteger(value)) return "integer";
+		if (static::isFloat(value)) return "float";
 		if (static::isBoolean(value)) return "boolean";
 		if (value instanceof Vector) return "vector";
 		if (value instanceof Map) return "map";
@@ -464,6 +465,25 @@ class rtl
 		#case ifcode PHP then
 		
 		return is_int($value);
+		
+		#case ifcode JAVASCRIPT then
+		
+		if (typeof value == 'number') return true;
+		return false;
+		
+		#endswitch
+	}
+	
+	
+	/**
+	 * Returns true if float
+	 */
+	static bool isFloat(var value)
+	{
+		#switch
+		#case ifcode PHP then
+		
+		return is_float($value);
 		
 		#case ifcode JAVASCRIPT then
 		
@@ -869,13 +889,25 @@ class rtl
 	
 	
 	/**
+	 * Returns max a and b
+	 */
+	static var max(var a, var b) => a > b ? a : b
+	
+	
+	/**
+	 * Returns min a and b
+	 */
+	static var min(var a, var b) => a < b ? a : b;
+	
+	
+	/**
 	 * Ceil
 	 */
 	static int ceil(int value)
 	{
 		#switch
 		#case ifcode PHP then
-		return ceil($value);
+		return (int)ceil($value);
 		#case ifcode JAVASCRIPT then
 		return Math.ceil(value);
 		#endswitch
@@ -889,7 +921,7 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
-		return floor($value);
+		return (int)floor($value);
 		#case ifcode JAVASCRIPT then
 		return Math.floor(value);
 		#endswitch

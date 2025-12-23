@@ -19,34 +19,40 @@
 namespace Runtime.Serializer;
 
 use Runtime.BaseObject;
-use Runtime.DateTime;
 use Runtime.Serializer.BaseType;
 
 
-class DateTimeType extends BaseObject implements BaseType
+class Allowed extends BaseObject implements BaseType
 {
+	Vector items = [];
+	
+	
+	/**
+	 * Create object
+	 */
+	void constructor(Vector items)
+	{
+		parent();
+		this.items = items;
+	}
+	
+	
 	/**
 	 * Filter value
 	 */
-	DateTime filter(Map value, Vector errors)
+	var filter(var value, Vector errors)
 	{
 		if (value === null) return null;
-		if (value instanceof DateTime) return value;
-		if (not (value instanceof Map))
+		if (this.items.indexOf(value) == -1)
 		{
-			errors.push("Must be Map");
-			return null;
+			errors.push("Value not allowed");
 		}
-		return new DateTime(value);
+		return value;
 	}
 	
 	
 	/**
 	 * Returns data
 	 */
-	var encode(DateTime value)
-	{
-		if (value === null) return null;
-		return value.toMap();
-	}
+	var encode(var value) => value;
 }

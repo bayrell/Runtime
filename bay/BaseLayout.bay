@@ -125,7 +125,6 @@ class BaseLayout extends BaseModel
 		BaseModel page = this.pages.get(class_name);
 		if (not page)
 		{
-			params.set("widget_name", class_name);
 			page = this.createWidget(class_name, params);
 			this.pages.set(class_name, page);
 		}
@@ -153,6 +152,12 @@ class BaseLayout extends BaseModel
 	 * Returns object
 	 */
 	var get(string name) => this.storage.frontend.get(name);
+	
+	
+	/**
+	 * Returns site name
+	 */
+	string getSiteName() => "";
 	
 	
 	/**
