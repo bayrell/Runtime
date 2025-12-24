@@ -26,6 +26,7 @@ use Runtime.Serializer.TypeError;
 class IntegerType extends BaseObject implements BaseType
 {
 	bool convert = true;
+	int default_value = 0;
 	
 	
 	/**
@@ -36,6 +37,7 @@ class IntegerType extends BaseObject implements BaseType
 		parent();
 		if (not params) return;
 		if (params.has("convert")) this.conver = params.get("convert");
+		if (params.has("default")) this.default_value = params.get("default");
 	}
 	
 	
@@ -44,7 +46,7 @@ class IntegerType extends BaseObject implements BaseType
 	 */
 	string filter(var value, Vector errors)
 	{
-		if (value === null) return 0;
+		if (value === null) return this.default_value;
 		if (this.convert)
 		{
 			if (rtl::isInteger(value) or rtl::isBoolean(value)) value = rtl::toInt(value);

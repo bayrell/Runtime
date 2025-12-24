@@ -27,6 +27,7 @@ class StringType extends BaseObject implements BaseType
 {
 	bool convert = true;
 	bool multiline = true;
+	string default_value = "";
 	
 	
 	/**
@@ -38,6 +39,7 @@ class StringType extends BaseObject implements BaseType
 		if (not params) return;
 		if (params.has("convert")) this.convert = params.get("convert");
 		if (params.has("multiline")) this.multiline = params.get("multiline");
+		if (params.has("default")) this.default_value = params.get("default");
 	}
 	
 	
@@ -49,7 +51,7 @@ class StringType extends BaseObject implements BaseType
 		if (value === null)
 		{
 			if (!this.convert) errors.push(new TypeError("Does not string"));
-			return "";
+			return this.default_value;
 		}
 		if (this.convert and (rtl::isInteger(value) or rtl::isBoolean(value)))
 		{

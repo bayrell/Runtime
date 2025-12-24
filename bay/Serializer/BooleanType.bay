@@ -26,6 +26,7 @@ use Runtime.Serializer.TypeError;
 class BooleanType extends BaseObject implements BaseType
 {
 	bool convert = true;
+	bool default_value = false;
 	
 	
 	/**
@@ -36,6 +37,7 @@ class BooleanType extends BaseObject implements BaseType
 		parent();
 		if (not params) return;
 		if (params.has("convert")) this.convert = params.get("convert");
+		if (params.has("default")) this.default_value = params.get("default");
 	}
 	
 	
@@ -47,7 +49,7 @@ class BooleanType extends BaseObject implements BaseType
 		if (value === null)
 		{
 			if (!this.convert) errors.push(new TypeError("Does not boolean"));
-			return false;
+			return this.default_value;
 		}
 		if (this.convert and (rtl::isInteger(value) or rtl::isBoolean(value)))
 		{
