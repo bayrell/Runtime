@@ -111,7 +111,7 @@ class RenderContainer extends BaseObject
 		if (page_model)
 		{
 			await page_model.loadData(this);
-			page_model.buildTitle(this);
+			if (page_model == this.layout.getPageModel()) page_model.buildTitle(this);
 		}
 	}
 	
