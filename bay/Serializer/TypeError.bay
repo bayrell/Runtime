@@ -73,6 +73,24 @@ class TypeError extends BaseObject
 	
 	
 	/**
+	 * Convert errors to Map
+	 */
+	static Map getMap(Vector errors)
+	{
+		Map result = {};
+		for (int i=0; i<errors.count(); i++)
+		{
+			TypeError item = errors.get(i);
+			string key = item.getFieldName();
+			if (not result.has(key)) result.set(key, []);
+			Vector arr = result.get(key);
+			arr.push(item.message);
+		}
+		return result;
+	}
+	
+	
+	/**
 	 * Add field to errors
 	 */
 	static void addFieldErrors(Vector<TypeError> errors, string key)

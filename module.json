@@ -16,6 +16,8 @@
 		"Exceptions/ApiError.bay",
 		"Exceptions/AssertException.bay",
 		"Exceptions/CurlException.bay",
+		"Exceptions/DataError.bay",
+		"Exceptions/FieldException.bay",
 		"Exceptions/IndexOutOfRange.bay",
 		"Exceptions/ItemNotFound.bay",
 		"Exceptions/KeyNotFound.bay",

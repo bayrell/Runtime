@@ -800,8 +800,8 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		$f = 0;
-		if ($flags & static::JSON_PRETTY == static::JSON_PRETTY) $f = $f | JSON_PRETTY_PRINT;
-		return json_encode($obj, $f);
+		if (($flags & static::JSON_PRETTY) == static::JSON_PRETTY) $f = $f | JSON_PRETTY_PRINT;
+		return json_encode($obj, $f | JSON_UNESCAPED_SLASHES);
 		#case ifcode JAVASCRIPT then
 		return JSON.stringify(obj);
 		#endswitch

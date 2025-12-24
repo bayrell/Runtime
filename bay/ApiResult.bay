@@ -20,6 +20,7 @@ namespace Runtime;
 
 use Runtime.BaseObject;
 use Runtime.Exceptions.RuntimeException;
+use Runtime.Exceptions.DataError;
 
 
 class ApiResult extends BaseObject
@@ -174,6 +175,7 @@ class ApiResult extends BaseObject
 		{
 			this.error_trace = e.getTraceCollection();
 		}
+		if (e implements DataError) this.data = e.getData();
 		this.is_exception = true;
 		return this;
 	}
@@ -192,6 +194,7 @@ class ApiResult extends BaseObject
 			this.code = data.getErrorCode();
 			this.message = data.getErrorMessage();
 			this.error_name = data::getClassName();
+			if (data implements DataError) this.data = data.getData();
 		}
 		
 		else if (data instanceof Map)
