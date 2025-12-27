@@ -187,7 +187,7 @@ class rtl
 		return str_replace("\\", ".", $class_name);
 		#case ifcode JAVASCRIPT then
 		var obj = this.findClass(class_name);
-		if (obj.extends && obj.extends.name) return obj.extends.name;
+		if (obj && obj.extends && obj.extends.name) return obj.extends.name;
 		var parentObj = obj ? Object.getPrototypeOf(obj) : null;
 		return parentObj && parentObj.getClassName ? parentObj.getClassName() : "";
 		#endswitch
