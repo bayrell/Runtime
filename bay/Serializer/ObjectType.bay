@@ -157,6 +157,7 @@ class ObjectType extends MapType
 	)
 	{
 		if (value == null) return null;
+		if (value implements SerializeInterface) return value;
 		
 		SerializeInterface new_value = old_value;
 		if (not new_value)

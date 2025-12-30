@@ -54,7 +54,7 @@ class RenderContent extends BaseProvider
 	 */
 	void render(var vdom, Collection content, VirtualDom parent_vdom = null)
 	{
-		if (not vdom) return;
+		if (vdom === null) return;
 		if (not(vdom instanceof VirtualDom))
 		{
 			if (parent_vdom and parent_vdom.is_raw)
