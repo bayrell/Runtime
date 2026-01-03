@@ -37,7 +37,9 @@ class BaseLayout extends BaseModel
 	BaseStorage storage = null;
 	Vector<string> components = [];
 	Map pages = {};
+	Map component_props = {};
 	string component = classof DefaultLayout;
+	string current_component = "";
 	string current_page_model = "";
 	string name = "";
 	string lang = "en";
@@ -82,7 +84,9 @@ class BaseLayout extends BaseModel
 	static void serialize(ObjectType rules)
 	{
 		parent(rules);
+		rules.addType("component_props", new StringType());
 		rules.addType("components", new VectorType(new StringType()));
+		rules.addType("current_component", new StringType());
 		rules.addType("current_page_model", new StringType());
 		rules.addType("lang", new StringType());
 		rules.addType("theme", new StringType());
@@ -130,6 +134,16 @@ class BaseLayout extends BaseModel
 		}
 		
 		return page;
+	}
+	
+	
+	/**
+	 * Set current page
+	 */
+	void setCurrentPage(string component_name, Map props = null)
+	{
+		this.current_component = component_name;
+		this.component_props = props;
 	}
 	
 	
@@ -268,10 +282,9 @@ class BaseLayout extends BaseModel
 	/**
 	 * Returns style
 	 */
-	string getStyle()
+	static string getStyle(Vector components)
 	{
 		Vector content = [];
-		Vector components = this.getComponents();
 		for (int i=0; i<components.count(); i++)
 		{
 			string class_name = components.get(i);

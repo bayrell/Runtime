@@ -33,6 +33,7 @@
 		"Method.bay",
 		"Chain.bay",
 		"ChainAsync.bay",
+		"ClearLayout.bay",
 		"Component.bay",
 		"Context.bay",
 		"Curl.bay",

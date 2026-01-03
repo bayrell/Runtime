@@ -17,12 +17,26 @@
  *
 -->
 
-<class name="Runtime.DefaultLayout">
+<class name="Runtime.ClearLayout">
 
 <use name="Runtime.BaseLayout" />
 <use name="Runtime.BaseModel" />
-<use name="Runtime.VirtualDom" />
-<use name="Runtime.Hooks.RuntimeHook" />
+
+<template name="renderHeader">
+	<title>{{ this.layout.title }}</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</template>
+
+<template name="renderStyle">
+	%set string style = BaseLayout::getStyle(this.getComponents());
+	%if (style)
+	{
+		<style>{{ style }}</style>
+	}
+</template>
+
+<template name="renderFooter">
+</template>
 
 <template name="renderCurrentPage">
 	%if (this.layout.current_component != "")
@@ -45,47 +59,6 @@
 	%render this.renderCurrentPage();
 </template>
 
-<template name="renderComponents" args="Vector components">
-	%for (int i=0; i<components.count(); i++)
-	{
-		%set string class_name = components.get(i);
-		%if (class_name instanceof VirtualDom)
-		{
-			%render class_name;
-		}
-		%else if (rtl::isString(class_name))
-		{
-			<{class_name} />
-		}
-	}
-</template>
-
-<template name="renderHeader">
-	<title>{{ this.layout.title }}</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	%render this.renderComponents(this.getComponents(RuntimeHook::LAYOUT_HEADER));
-</template>
-
-<template name="renderFooter">
-	%render this.renderComponents(this.getComponents(RuntimeHook::LAYOUT_FOOTER));
-</template>
-
-<template name="renderMountApp">
-	<script>
-		var app_data = {{ rtl::jsonEncode(this.container.getData()) }};
-		document.addEventListener("DOMContentLoaded", function(){
-			Runtime.rtl.mount(app_data, document.querySelector(".root_container"), function (result){
-				window["app"] = result.get("app");
-				window["app_layout"] = result.get("layout");
-			});
-		});
-	</script>
-</template>
-
-<template name="renderStyle">
-	<style>{{ BaseLayout::getStyle(this.layout.getComponents()) }}</style>
-</template>
-
 <template name="renderApp">
 	<html lang={{ this.layout.lang }}>
 		<head>
@@ -97,24 +70,26 @@
 			%render this.render();
 		</div>
 		%render this.renderFooter();
-		%render this.renderMountApp();
 		</body>
 	</html>
 </template>
 
 <script>
 
-#ifdef BACKEND then
-var container = null;
-#endif
-
-Vector getComponents(string name)
+/**
+ * Returns layout components
+ */
+Vector getComponents()
 {
-	Map d = @.hook(name, {
-		"layout": this.layout,
-		"components": [],
-	});
-	return d.get("components");
+	Map hash = {};
+	Vector result_components = [];
+	Vector components = this.layout.components.slice();
+	for (int i=0; i<components.count(); i++)
+	{
+		string class_name = components.get(i);
+		BaseLayout::getRequiredComponents(class_name, result_components, hash);
+	}
+	return components;
 }
 
 </script>
