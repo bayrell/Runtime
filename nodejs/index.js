@@ -67,6 +67,8 @@ add("Runtime.Map");
 add("Runtime.Vector");
 add("Runtime.BaseObject");
 add("Runtime.BaseProvider");
+add("Runtime.BaseStorage");
+add("Runtime.BusHttp");
 add("Runtime.Context");
 add("Runtime.Date");
 add("Runtime.DateTime");
