@@ -22,6 +22,7 @@ use Runtime.BaseObject;
 use Runtime.RenderContainer;
 use Runtime.Listener;
 use Runtime.Method;
+use Runtime.Serializer.BaseType;
 use Runtime.Serializer.ObjectType;
 use Runtime.Serializer.StringType;
 use Runtime.SerializeInterface;
@@ -29,6 +30,7 @@ use Runtime.SerializeInterface;
 
 class BaseModel extends BaseObject implements SerializeInterface
 {
+	bool autoload = false;
 	BaseModel layout = null;
 	BaseModel parent_widget = null;
 	Listener listener = new Listener(this);
@@ -67,6 +69,9 @@ class BaseModel extends BaseObject implements SerializeInterface
 		if (params.has("layout")) this.layout = params.get("layout");
 		else this.layout = this.parent_widget ? this.parent_widget.layout : null;
 		
+		/* Autoload */
+		if (params.has("autoload")) this.autoload = params.get("autoload");
+		
 		/* Setup params */
 		this.component = params.has("component") ? params.get("component") : this.component;
 	}
@@ -94,6 +99,21 @@ class BaseModel extends BaseObject implements SerializeInterface
 	 */
 	async void loadData(RenderContainer container)
 	{
+		ObjectType rules = new ObjectType();
+		static::serialize(rules);
+		for (string key in rules.items.keys())
+		{
+			BaseType item = rules.items.get(key).find(
+				bool (BaseType item) => item instanceof ObjectType
+			);
+			if (not (item instanceof ObjectType)) continue;
+			
+			BaseObject obj = rtl::attr(this, key);
+			if (not (obj instanceof BaseModel)) continue;
+			if (not obj.autoload) continue;
+			
+			await obj.loadData(container);
+		}
 	}
 	
 	
