@@ -84,7 +84,7 @@ class BaseLayout extends BaseModel
 	static void serialize(ObjectType rules)
 	{
 		parent(rules);
-		rules.addType("component_props", new StringType());
+		rules.addType("component_props", new MapType());
 		rules.addType("components", new VectorType(new StringType()));
 		rules.addType("current_component", new StringType());
 		rules.addType("current_page_model", new StringType());
