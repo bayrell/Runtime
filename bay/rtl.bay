@@ -694,7 +694,8 @@ class rtl
 		{
 			return $obj->map(function ($value) { return static::toNative($value); })->toObject();
 		}
-		return $obj;
+		if ($obj instanceof SerializeInterface) return static::serialize($obj);
+		else return $obj;
 		#case ifcode JAVASCRIPT then
 		const RuntimeMap = this.findClass("Runtime.Map");
 		const RuntimeVector = this.findClass("Runtime.Vector");

@@ -45,7 +45,7 @@ class ObjectType extends MapType
 	void constructor(Map params = null)
 	{
 		parent();
-		this.params = params;
+		this.params = params ? params : {};
 		
 		if (not params) return;
 		if (params.has("autocreate")) this.autocreate();
@@ -72,7 +72,7 @@ class ObjectType extends MapType
 	 */
 	ObjectType copy()
 	{
-		ObjectType rules = new ObjectType();
+		ObjectType rules = static::newInstance();
 		rules.fn_create = this.fn_create;
 		rules.fn_rules = this.fn_rules;
 		rules.fn_serialize = this.fn_serialize;
@@ -160,14 +160,14 @@ class ObjectType extends MapType
 		if (value implements SerializeInterface) return value;
 		
 		SerializeInterface new_value = old_value;
-		if (not new_value)
+		if (not new_value or not (new_value implements SerializeInterface))
 		{
 			BaseType rules = this.copy().initRules(value);
 			new_value = rules.createObject(value, errors, prev);
 		}
 		if (not new_value) return null;
 		
-		BaseType rules = new ObjectType(this.params);
+		BaseType rules = static::newInstance([this.params]);
 		new_value::serialize(rules);
 		
 		rules.setup.apply([new_value, rules]);

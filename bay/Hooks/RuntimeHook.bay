@@ -31,6 +31,7 @@ class RuntimeHook extends BaseHook
 	const string MOUNT = "runtime::mount";
 	const string ASSETS = "runtime::assets";
 	const string COMPONENTS = "runtime::components";
+	const string CREATE_APP = "runtime::create_app";
 	const string LAYOUT_HEADER = "runtime::header";
 	const string LAYOUT_FOOTER = "runtime::footer";
 	const string LAYOUT_NAME = "runtime::layout_name";

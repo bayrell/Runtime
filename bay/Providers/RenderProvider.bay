@@ -74,6 +74,10 @@ class RenderProvider extends BaseProvider
 			app = Vue.createApp(component, props);
 		}
 		app.use(registerLayout(layout));
+		@.hook(RuntimeHook::CREATE_APP, {
+			"app": app,
+			"layout": layout,
+		});
 		return app;
 	}
 	

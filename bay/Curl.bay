@@ -91,11 +91,13 @@ Object.assign(Runtime.Curl.prototype,
 	 */
 	buildPostData: function(result, key, value)
 	{
-		if (Runtime.rtl.isImplements(value, "Runtime.SerializeInterface"))
+		if (Runtime.rtl.isObject(value) &&
+			Runtime.rtl.isImplements(value, "Runtime.SerializeInterface")
+		)
 		{
 			value = Runtime.rtl.serialize(value);
 		}
-		if (value instanceof Array)
+		else if (value instanceof Array)
 		{
 			for (var i=0; i<value.length; i++)
 			{
