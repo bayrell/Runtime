@@ -83,7 +83,7 @@
 </template>
 
 <template name="renderStyle">
-	<style>{{ BaseLayout::getStyle(this.layout.getComponents()) }}</style>
+	<style class="style_components">{{ BaseLayout::getStyle(this.layout.getComponents()) }}</style>
 </template>
 
 <template name="renderApp">

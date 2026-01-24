@@ -64,6 +64,7 @@
 		"Serializer/DateTimeType.bay",
 		"Serializer/ConstantType.bay",
 		"Serializer/IntegerType.bay",
+		"Serializer/JsonType.bay",
 		"Serializer/MapType.bay",
 		"Serializer/ObjectType.bay",
 		"Serializer/Required.bay",

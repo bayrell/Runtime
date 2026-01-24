@@ -804,7 +804,13 @@ class rtl
 		if (($flags & static::JSON_PRETTY) == static::JSON_PRETTY) $f = $f | JSON_PRETTY_PRINT;
 		return json_encode($obj, $f | JSON_UNESCAPED_SLASHES);
 		#case ifcode JAVASCRIPT then
-		return JSON.stringify(obj);
+		const RuntimeVector = this.findClass("Runtime.Vector");
+		const RuntimeMap = this.findClass("Runtime.Map");
+		return JSON.stringify(obj, (key, value) => {
+			if (value instanceof RuntimeVector) return value;
+			if (value instanceof RuntimeMap) return value.toObject();
+			return value;
+		});
 		#endswitch
 	}
 	
