@@ -220,42 +220,15 @@ class BaseLayout extends BaseModel
 	 */
 	void assets(string path)
 	{
-		Map res = @.hook(RuntimeHook::ASSETS, {
-			"layout": this,
-			"path": path,
-		});
-		return res.get("path");
-	}
-	
-	
-	/**
-	 * Returns required components
-	 */
-	static void getRequiredComponents(string component, Vector result, Map hash)
-	{
-		if (hash.has(component)) return;
-		Vector components = rtl::getParents(component, "Runtime.Component")
-			.filter(
-				bool (string class_name) use (hash) => not hash.has(class_name)
-			)
-		;
-		components.each(void (string class_name) use (hash){
-			hash.set(class_name, true);
-		});
-		Method f = new Method(component, "getRequiredComponents");
-		if (f.exists())
+		string library = "app";
+		var arr = rs::split(":", path);
+		if (arr.count() >= 2)
 		{
-			Vector items = f.apply();
-			for (int i=0; i<items.count(); i++)
-			{
-				string name = items.get(i);
-				if (not hash.has(name))
-				{
-					static::getRequiredComponents(name, result, hash);
-				}
-			}
+			library = arr.get(0);
+			path = arr.get(1);
 		}
-		result.appendItems(components);
+		var assets = this.get("assets");
+		return assets ? assets.get(library, path) : path;
 	}
 	
 	
@@ -265,17 +238,37 @@ class BaseLayout extends BaseModel
 	Vector getComponents()
 	{
 		Map hash = {};
+		fn isHash = bool (string class_name) => not hash.has(class_name);
+		
 		Map res = @.hook(RuntimeHook::COMPONENTS, {
 			"components": this.components.slice(),
 		});
 		Vector result_components = [];
 		Vector components = res.get("components");
-		for (int i=0; i<components.count(); i++)
+		while (components.count() > 0)
 		{
-			string class_name = components.get(i);
-			static::getRequiredComponents(class_name, result_components, hash);
+			string class_name = components.first();
+			components.remove(0);
+			if (not hash.has(class_name))
+			{
+				hash.set(class_name, true);
+				result_components.push(class_name);
+				
+				/* Add parent components */
+				Vector items = rtl::getParents(class_name, "Runtime.Component").filter(isHash);
+				components.appendItems(items);
+				
+				/* Add required components */
+				Method f = new Method(class_name, "getRequiredComponents");
+				if (f.exists())
+				{
+					items = f.apply().filter(isHash);
+					components.appendItems(items);
+				}
+			}
 		}
-		return result_components;
+		
+		return result_components.reverse();
 	}
 	
 	
