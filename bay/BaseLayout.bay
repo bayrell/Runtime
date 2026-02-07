@@ -35,6 +35,7 @@ use Runtime.Serializer.VectorType;
 class BaseLayout extends BaseModel
 {
 	BaseStorage storage = null;
+	Vector<string> body_class = [];
 	Vector<string> components = [];
 	Map pages = {};
 	Map component_props = {};
@@ -88,6 +89,7 @@ class BaseLayout extends BaseModel
 		rules.addType("components", new VectorType(new StringType()));
 		rules.addType("current_component", new StringType());
 		rules.addType("current_page_model", new StringType());
+		rules.addType("body_class", new VectorType(new StringType()));
 		rules.addType("lang", new StringType());
 		rules.addType("theme", new StringType());
 		rules.addType("title", new StringType());

@@ -92,12 +92,14 @@
 			%render this.renderHeader();
 			%render this.renderStyle();
 		</head>
-		<body class={{ "theme_" ~ this.layout.theme }}>
-		<div class="root_container">
-			%render this.render();
-		</div>
-		%render this.renderFooter();
-		%render this.renderMountApp();
+		<body class={{ "theme_" ~ this.layout.theme }}
+			class={{ rs::join(" ", this.layout.body_class) }}
+		>
+			<div class="root_container">
+				%render this.render();
+			</div>
+			%render this.renderFooter();
+			%render this.renderMountApp();
 		</body>
 	</html>
 </template>
