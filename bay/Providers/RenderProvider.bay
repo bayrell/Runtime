@@ -18,6 +18,7 @@
 
 namespace Runtime.Providers;
 
+use Runtime.BaseLayout;
 use Runtime.BaseProvider;
 use Runtime.Serializer;
 use Runtime.VirtualDom;
@@ -31,14 +32,27 @@ class RenderProvider extends BaseProvider
 	
 	
 	/**
+	 * Init params
+	 */
+	void initParams(Map params)
+	{
+		parent(params);
+		if (params.has("ssr")) this.enable_ssr = params.get("ssr");
+	}
+	
+	
+	/**
 	 * Create layout
 	 */
 	var createLayout(Dict app_data)
 	{
 		var class_name = app_data.get("class");
-		var layout_data = app_data.get("layout");
-		var layout = rtl::newInstance(class_name);
-		rtl::assign(layout, layout_data);
+		var layout = app_data.get("layout");
+		if (not(layout instanceof BaseLayout))
+		{
+			layout = rtl::newInstance(class_name);
+			rtl::assign(layout, app_data.get("layout"));
+		}
 		return window["Vue"].reactive(layout);
 	}
 	
@@ -74,7 +88,7 @@ class RenderProvider extends BaseProvider
 			app = Vue.createApp(component, props);
 		}
 		app.use(registerLayout(layout));
-		@.hook(RuntimeHook::CREATE_APP, {
+		@.hook(RuntimeHook::CREATE_VUE, {
 			"app": app,
 			"layout": layout,
 		});

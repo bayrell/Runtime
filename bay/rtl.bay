@@ -737,6 +737,8 @@ class rtl
 			const RuntimeVector = this.findClass("Runtime.Vector");
 			return RuntimeVector.create(obj.map(item => this.fromNative(item)));
 		}
+		const BaseObject = use("Runtime.BaseObject");
+		if (obj instanceof BaseObject) return obj;
 		if (typeof obj == "object")
 		{
 			const RuntimeMap = this.findClass("Runtime.Map");
@@ -1109,7 +1111,7 @@ class rtl
 		await context.start();
 		
 		/* Render app */
-		var render = context.factory("render");
+		var render = context.provider("render");
 		var result = render.mount(app_data, element);
 		if (callback)
 		{

@@ -139,6 +139,12 @@ void nextTick(fn f)
 }
 
 
+/**
+ * Returns widget params
+ */
+static Vector<Map> widgetParams() => [];
+
+
 #switch
 #case ifdef PHP then
 
