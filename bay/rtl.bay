@@ -638,7 +638,8 @@ class rtl
 		#case ifcode PHP then
 		return (int)$s;
 		#case ifcode JAVASCRIPT then
-		return Number(s);
+		var val = Number(s);
+		return !isNaN(val) ? val : 0;
 		#endswitch
 	}
 	

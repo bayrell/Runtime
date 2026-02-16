@@ -31,7 +31,7 @@ class File extends BaseObject
 	/**
 	 * Constructor
 	 */
-	void constructor(Dict params)
+	void constructor(Dict params = null)
 	{
 		parent();
 		this._assign_values(params);
