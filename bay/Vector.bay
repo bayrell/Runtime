@@ -170,6 +170,15 @@ Runtime.Vector = class extends Array
 	
 	
 	/**
+	 * Prepend items
+	 */
+	prependItems(arr)
+	{
+		for (var i=arr.length-1; i>=0; i--) this.insert(0, arr[i]);
+	}
+	
+	
+	/**
 	 * Returns count items in Array
 	 */
 	count(){ return this.length; }
@@ -508,6 +517,15 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	function prepend($item)
 	{
 		$this->insert(0, $item);
+	}
+	
+	
+	/**
+	 * Prepend items
+	 */
+	function prependItems($arr)
+	{
+		$this->_arr = array_merge($arr->_arr, $this->_arr);
 	}
 	
 	
