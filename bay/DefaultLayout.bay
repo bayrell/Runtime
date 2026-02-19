@@ -72,8 +72,9 @@
 
 <template name="renderMountApp">
 	<script>
-		var app_data = {{ rtl::jsonEncode(this.container.getData()) }};
+		var app_data = "{{ rs::base64_encode_url(rtl::jsonEncode(this.container.getData())) }}";
 		document.addEventListener("DOMContentLoaded", function(){
+			app_data = Runtime.rtl.jsonDecode(Runtime.rs.base64_decode_url(app_data));
 			Runtime.rtl.mount(app_data, document.querySelector(".root_container"), function (result){
 				window["app"] = result.get("app");
 				window["app_layout"] = result.get("layout");

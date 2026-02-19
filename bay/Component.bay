@@ -40,6 +40,7 @@
 
 props BaseModel model = null;
 props string class = "";
+props string key = "";
 var parent_component = null;
 
 #ifdef PHP then

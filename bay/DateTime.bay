@@ -257,7 +257,7 @@ class DateTime extends BaseObject implements StringInterface
 		dt = static::modify(dt, delta);
 		
 		DateTime obj = static::fromObject(dt);
-		obj.o = offset;
+		obj.o = offset / 3600;
 		return obj;
 	}
 	

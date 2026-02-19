@@ -1098,8 +1098,6 @@ class rtl
 	 */
 	static async void mount(var app_data, string element, fn callback=null)
 	{
-		app_data = static::fromNative(app_data);
-		
 		/* Create context */
 		var environments = app_data.get("environments");
 		var modules = app_data.get("modules");

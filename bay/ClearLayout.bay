@@ -65,7 +65,9 @@
 			%render this.renderHeader();
 			%render this.renderStyle();
 		</head>
-		<body class={{ "theme_" ~ this.layout.theme }}>
+		<body class={{ "theme_" ~ this.layout.theme }}
+			class={{ rs::join(" ", this.layout.body_class) }}
+		>
 		<div class="root_container">
 			%render this.render();
 		</div>
@@ -81,15 +83,7 @@
  */
 Vector getComponents()
 {
-	Map hash = {};
-	Vector result_components = [];
-	Vector components = this.layout.components.slice();
-	for (int i=0; i<components.count(); i++)
-	{
-		string class_name = components.get(i);
-		BaseLayout::getRequiredComponents(class_name, result_components, hash);
-	}
-	return components;
+	return BaseLayout::getRequiredComponents(this.layout.components.slice());
 }
 
 </script>

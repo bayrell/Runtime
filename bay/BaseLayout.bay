@@ -45,6 +45,7 @@ class BaseLayout extends BaseModel
 	string name = "";
 	string lang = "en";
 	string title = "";
+	string description = "";
 	string theme = "light";
 	
 	
@@ -93,6 +94,7 @@ class BaseLayout extends BaseModel
 		rules.addType("lang", new StringType());
 		rules.addType("theme", new StringType());
 		rules.addType("title", new StringType());
+		rules.addType("description", new StringType());
 		rules.addType("storage", new ObjectType({"class_name": classof BaseStorage}));
 		rules.addType("pages", new MapType(new ObjectType{
 			"autocreate": true,
@@ -136,6 +138,15 @@ class BaseLayout extends BaseModel
 		}
 		
 		return page;
+	}
+	
+	
+	/**
+	 * Set page description
+	 */
+	void setDescription(string description)
+	{
+		this.description = description;
 	}
 	
 	
@@ -189,13 +200,13 @@ class BaseLayout extends BaseModel
 	/**
 	 * Send api
 	 */
-	ApiResult sendApi(Map params)
+	async ApiResult sendApi(Map params)
 	{
 		BusInterface api = @.provider("api");
 		#ifdef BACKEND then
 		params.set("storage", this.storage.backend);
 		#endif
-		return api.send(params);
+		return await api.send(params);
 	}
 	
 	
@@ -235,16 +246,25 @@ class BaseLayout extends BaseModel
 	
 	
 	/**
-	 * Returns all components
+	 * Returns components
 	 */
 	Vector getComponents()
+	{
+		Map res = @.hook(RuntimeHook::COMPONENTS, {
+			"components": this.components.slice(),
+		});
+		return static::getRequiredComponents(res.get("components"));
+	}
+	
+	
+	/**
+	 * Returns all components
+	 */
+	static Vector getRequiredComponents(Vector components)
 	{
 		Map hash = {};
 		fn isHash = bool (string class_name) => not hash.has(class_name);
 		
-		Map res = @.hook(RuntimeHook::COMPONENTS, {
-			"components": this.components.slice(),
-		});
 		Vector result_components = [];
 		
 		fn deep = void (fn deep, Vector components)
@@ -276,7 +296,7 @@ class BaseLayout extends BaseModel
 			}
 		};
 		
-		deep(deep, res.get("components"));
+		deep(deep, components);
 		
 		return result_components;
 	}
