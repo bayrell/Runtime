@@ -44,7 +44,7 @@ class RenderContent extends BaseProvider
 	string findComponent(VirtualDom vdom)
 	{
 		string name = vdom.name;
-		if (this.components.has(name)) name = this.compoentns.get(name);
+		if (this.components.has(name)) name = this.components.get(name);
 		return name;
 	}
 	

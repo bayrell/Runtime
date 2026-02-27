@@ -134,6 +134,7 @@ class rtl
 	{
 		#switch
 		#case ifcode PHP then
+		
 		return "\\" . preg_replace("/\\./", "\\", $class_name);
 		
 		#case ifcode JAVASCRIPT then
@@ -183,6 +184,7 @@ class rtl
 		#switch
 		#case ifcode PHP then
 		$class_name = static::findClass($class_name);
+		if (!class_exists($class_name)) return "";
 		$class_name = get_parent_class($class_name);
 		return str_replace("\\", ".", $class_name);
 		#case ifcode JAVASCRIPT then

@@ -176,6 +176,15 @@ class BaseLayout extends BaseModel
 	
 	
 	/**
+	 * Set page description
+	 */
+	void setPageDescription(string description)
+	{
+		this.description = description;
+	}
+	
+	
+	/**
 	 * Returns object
 	 */
 	var get(string name) => this.storage.frontend.get(name);

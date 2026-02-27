@@ -105,11 +105,9 @@ class MapType extends BaseObject implements BaseType
 					}
 				}
 			}
-			
 			new_value.set(key, item_value);
-			
-			errors.appendItems(item_errors);
 			TypeError::addFieldErrors(item_errors, key);
+			errors.appendItems(item_errors);
 		}
 		
 		return new_value;
