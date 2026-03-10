@@ -23,6 +23,7 @@
 		"Exceptions/KeyNotFound.bay",
 		"StringInterface.bay",
 		"ApiResult.bay",
+		"BaseDTO.bay",
 		"BaseModel.bay",
 		"BaseLayout.bay",
 		"BaseProvider.bay",

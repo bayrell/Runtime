@@ -1,0 +1,58 @@
+/*!
+ *  BayLang Technology
+ *
+ *  (c) Copyright 2016-2025 "Ildar Bikmamatov" <support@bayrell.org>
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+namespace Runtime;
+
+use Runtime.BaseObject;
+use Runtime.SerializeInterface;
+
+
+class BaseDTO extends BaseObject implements SerializeInterface
+{
+	/**
+	 * Returns field by name
+	 */
+	var get(string field_name) => rtl::attr(this, field_name);
+	
+	
+	/**
+	 * Set field value
+	 */
+	void set(string field_name, var value)
+	{
+		rtl::setAttr(this, field_name, value);
+	}
+	
+	
+	/**
+	 * Copy object
+	 */
+	BaseDTO copy() => rtl::copy(this);
+	
+	
+	/**
+	 * Returns object data
+	 */
+	Map data() => rtl::serialize(this);
+	
+	
+	/**
+	 * Intersect data
+	 */
+	Map intersect(Vector items) => this.data().intersect(items);
+}
