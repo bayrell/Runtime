@@ -185,6 +185,15 @@ Runtime.Vector = class extends Array
 	
 	
 	/**
+	 * Clear vector
+	 */
+	clear()
+	{
+		this.splice(0);
+	}
+	
+	
+	/**
 	 * Remove dublicate values
 	 */
 	removeDuplicates()
@@ -535,6 +544,15 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 	function count()
 	{
 		return count($this->_arr);
+	}
+	
+	
+	/**
+	 * Clear vector
+	 */
+	function clear()
+	{
+		$this->_arr = [];
 	}
 	
 	

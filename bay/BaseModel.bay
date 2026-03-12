@@ -138,6 +138,21 @@ class BaseModel extends BaseObject implements SerializeInterface
 	
 	
 	/**
+	 * Set field
+	 */
+	void filter(string field_name, var item)
+	{
+		ObjectType rules = new ObjectType;
+		static::serialize(rules);
+		BaseType field_rule = rules.items.get(field_name).get(0);
+		if (!field_rule) return;
+		
+		Vector errors = [];
+		return field_rule.filter(item, errors);
+	}
+	
+	
+	/**
 	 * Add event listener
 	 */
 	void addEventListener(string event_name, Method f, int priority = 100)

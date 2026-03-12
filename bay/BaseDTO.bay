@@ -25,6 +25,15 @@ use Runtime.SerializeInterface;
 class BaseDTO extends BaseObject implements SerializeInterface
 {
 	/**
+	 * Create object
+	 */
+	constructor(Map params)
+	{
+		parent();
+		this._assign_values(params);
+	}
+	
+	/**
 	 * Returns field by name
 	 */
 	var get(string field_name) => rtl::attr(this, field_name);

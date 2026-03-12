@@ -41,6 +41,16 @@ class DateTime extends BaseObject implements StringInterface
 	void constructor(Dict data = null)
 	{
 		parent();
+		this.setData(data);
+	}
+	
+	
+	/**
+	 * Set data
+	 */
+	DateTime setData(Map data)
+	{
+		if (data instanceof DateTime) data = data.toMap();
 		if (data != null)
 		{
 			if (data.has("y")) this.y = data.get("y");
@@ -52,6 +62,17 @@ class DateTime extends BaseObject implements StringInterface
 			if (data.has("ms")) this.ms = data.get("ms");
 			if (data.has("o")) this.o = data.get("o");
 		}
+		return this;
+	}
+	
+	
+	/**
+	 * Copy datetime
+	 */
+	DateTime copy(Map data = null)
+	{
+		DateTime date = new DateTime(this.toMap());
+		return date.setData(data);
 	}
 	
 	
@@ -75,21 +96,22 @@ class DateTime extends BaseObject implements StringInterface
 	 */
 	pure DateTime create(int time = -1)
 	{
+		var dt = null;
+		
 		#switch
 		#case ifcode PHP then
 		if ($time == -1) $time = time();
 		$dt = new \DateTime();
 		$dt->setTimestamp($time);
-		return static::fromObject($dt);
 		
 		#case ifcode JAVASCRIPT then
-		var dt = null;
 		if (time == -1) dt = new Date();
 		else dt = new Date(time*1000);
-		return this.fromObject(dt);
 		#endswitch
 		
-		return null;
+		var date = new DateTime();
+		date.fromObject(dt);
+		return date;
 	}
 	
 	
@@ -122,6 +144,77 @@ class DateTime extends BaseObject implements StringInterface
 		return null;
 	}
 	int timestamp() => this.getTimestamp();
+	
+	
+	/**
+	 * Set timestamp
+	 */
+	DateTime setTimestamp(int seconds)
+	{
+		DateTime date = DateTime::create(seconds);
+		this.fromObject(date.toObject());
+		return this;
+	}
+	
+	
+	/**
+	 * Set hour
+	 */
+	DateTime setHour(int value)
+	{
+		this.h = value;
+		return this;
+	}
+	
+	
+	/**
+	 * Set minutes
+	 */
+	DateTime setMinute(int value)
+	{
+		this.i = value;
+		return this;
+	}
+	
+	
+	/**
+	 * Set seconds
+	 */
+	DateTime setSecond(int value)
+	{
+		this.s = value;
+		return this;
+	}
+	
+	
+	/**
+	 * Set day
+	 */
+	DateTime setDay(int value)
+	{
+		this.d = value;
+		return this;
+	}
+	
+	
+	/**
+	 * Set month
+	 */
+	DateTime setMonth(int value)
+	{
+		this.m = value;
+		return this;
+	}
+	
+	
+	/**
+	 * Set year
+	 */
+	DateTime setYear(int value)
+	{
+		this.y = value;
+		return this;
+	}
 	
 	
 	/**
@@ -220,7 +313,7 @@ class DateTime extends BaseObject implements StringInterface
 	{
 		DateTime dt = this;
 		double offset = @.env("TZ_OFFSET");
-		if (offset) dt = dt.setOffset(offset);
+		if (offset) dt = dt.copy().setOffset(offset);
 		return dt;
 	}
 	
@@ -230,10 +323,8 @@ class DateTime extends BaseObject implements StringInterface
 	 */
 	DateTime shift(int seconds)
 	{
-		int timestamp = this.getTimestamp();
-		DateTime dt = static::create(timestamp + seconds);
-		dt.setOffset(this.o);
-		return dt;
+		this.setTimestamp(this.getTimestamp() + seconds);
+		return this;
 	}
 	
 	
@@ -334,38 +425,34 @@ class DateTime extends BaseObject implements StringInterface
 	/**
 	 * Create from native object
 	 */
-	protected static var fromObject(var dt)
+	protected var fromObject(var dt)
 	{
 		#switch
 		
 		#case ifcode PHP then
 		
-		$y = (int)$dt->format("Y");
-		$m = (int)$dt->format("m");
-		$d = (int)$dt->format("d");
-		$h = (int)$dt->format("H");
-		$i = (int)$dt->format("i");
-		$s = (int)$dt->format("s");
-		$o = $dt->getOffset() / 3600;
-		return new \Runtime\DateTime(
-			new Map(["y"=>$y,"m"=>$m,"d"=>$d,"h"=>$h,"i"=>$i,"s"=>$s,"o"=>$o])
-		);
+		$this->y = (int)$dt->format("Y");
+		$this->m = (int)$dt->format("m");
+		$this->d = (int)$dt->format("d");
+		$this->h = (int)$dt->format("H");
+		$this->i = (int)$dt->format("i");
+		$this->s = (int)$dt->format("s");
+		$this->o = $dt->getOffset() / 3600;
 		
 		#case ifcode JAVASCRIPT then
 		
 		var Map = use("Runtime.Map");
 		var offset = -dt.getTimezoneOffset() / 60;
-		var y = Number(dt.getFullYear());
-		var m = Number(dt.getMonth()) + 1;
-		var d = Number(dt.getDate());
-		var h = Number(dt.getHours());
-		var i = Number(dt.getMinutes());
-		var s = Number(dt.getSeconds());
-		var obj = new Runtime.DateTime(new Map({
-			"y":y,"m":m,"d":d,"h":h,"i":i,"s":s,"o":offset
-		}));
-		return obj;
+		this.y = Number(dt.getFullYear());
+		this.m = Number(dt.getMonth()) + 1;
+		this.d = Number(dt.getDate());
+		this.h = Number(dt.getHours());
+		this.i = Number(dt.getMinutes());
+		this.s = Number(dt.getSeconds());
+		this.o = offset;
 		
 		#endswitch
+		
+		return this;
 	}
 }
