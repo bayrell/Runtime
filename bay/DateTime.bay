@@ -231,11 +231,11 @@ class DateTime extends BaseObject implements StringInterface
 		
 		#case ifcode PHP then
 		$dt = $date->toObject();
-		return $dt->format("w");
+		return (int)$dt->format("w");
 		
 		#case ifcode JAVASCRIPT then
-		var dt = date.toObject();
-		return dt.getDay();
+		var dt = this.toObject();
+		return Number(dt.getDay());
 		
 		#endswitch
 		

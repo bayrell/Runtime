@@ -39,6 +39,7 @@
 		"Context.bay",
 		"Curl.bay",
 		"Date.bay",
+		"DateRange.bay",
 		"DateTime.bay",
 		"DefaultLayout.bay",
 		"Message.bay",

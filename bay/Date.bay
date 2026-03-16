@@ -19,6 +19,9 @@
 namespace Runtime;
 
 use Runtime.BaseObject;
+use Runtime.Serializer.DateTimeType;
+use Runtime.Serializer.IntegerType;
+use Runtime.Serializer.ObjectType;
 use Runtime.StringInterface;
 
 
@@ -27,6 +30,18 @@ class Date extends BaseObject implements StringInterface
 	public int y = 0;
 	public int m = 0;
 	public int d = 0;
+	
+	
+	/**
+	 * Serialize object
+	 */
+	static void serialize(ObjectType rules)
+	{
+		parent(rules);
+		rules.addType("y", new IntegerType());
+		rules.addType("m", new IntegerType());
+		rules.addType("d", new IntegerType());
+	}
 	
 	
 	/**

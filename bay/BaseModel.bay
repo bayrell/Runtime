@@ -90,6 +90,7 @@ class BaseModel extends BaseObject implements SerializeInterface
 	 */
 	static void serialize(ObjectType rules)
 	{
+		parent(rules);
 		rules.addType("component", new StringType());
 	}
 	
