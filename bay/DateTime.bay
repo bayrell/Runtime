@@ -151,8 +151,10 @@ class DateTime extends BaseObject implements StringInterface
 	 */
 	DateTime setTimestamp(int seconds)
 	{
+		int offset = this.o;
 		DateTime date = DateTime::create(seconds);
-		this.fromObject(date.toObject());
+		this.setData(date.toMap());
+		this.setOffset(offset * 60 * 60);
 		return this;
 	}
 	
@@ -223,14 +225,16 @@ class DateTime extends BaseObject implements StringInterface
 	 */
 	int getDayOfWeek()
 	{
+		DateTime date = this.copy({ "o": 0 });
+		
 		#switch
 		
 		#case ifcode PHP then
-		$dt = $this->toObject();
+		$dt = $date->toObject();
 		return $dt->format("w");
 		
 		#case ifcode JAVASCRIPT then
-		var dt = this.toObject();
+		var dt = date.toObject();
 		return dt.getDay();
 		
 		#endswitch
@@ -347,7 +351,7 @@ class DateTime extends BaseObject implements StringInterface
 		double delta = offset - dt_offset;
 		dt = static::modify(dt, delta);
 		
-		DateTime obj = static::fromObject(dt);
+		DateTime obj = this.fromObject(dt);
 		obj.o = offset / 3600;
 		return obj;
 	}
