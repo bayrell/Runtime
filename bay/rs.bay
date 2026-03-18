@@ -822,9 +822,7 @@ class rs
 		for (int i=0; i<keys.count(); i++)
 		{
 			string key = keys.get(i);
-			string value = params.get(key);
-			if (not value) continue;
-			s = static::url_get_add(s, key, value);
+			s = static::url_get_add(s, key, params.get(key));
 		}
 		return s;
 	}

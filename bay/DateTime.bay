@@ -297,17 +297,22 @@ class DateTime extends BaseObject implements StringInterface
 	
 	
 	/**
+	 * Pad2
+	 */
+	static string pad2(int value) => value < 10 ? "0" ~ value : rtl::toStr(value);
+	
+	
+	/**
 	 * Returns date time string
 	 */
-	string format()
-	{
-		string m = (this.m < 10) ? "0" ~ this.m : "" ~ this.m;
-		string d = (this.d < 10) ? "0" ~ this.d : "" ~ this.d;
-		string h = (this.h < 10) ? "0" ~ this.h : "" ~ this.h;
-		string i = (this.i < 10) ? "0" ~ this.i : "" ~ this.i;
-		string s = (this.s < 10) ? "0" ~ this.s : "" ~ this.s;
-		return this.y ~ "-" ~ m ~ "-" ~ d ~ " " ~ h ~ ":" ~ i ~ ":" ~ s;
-	}
+	string format() =>
+		this.y ~ "-" ~ static::pad2(this.m) ~ "-" ~ static::pad2(this.d) ~ " " ~ static::pad2(this.h) ~ ":" ~ static::pad2(this.i) ~ ":" ~ static::pad2(this.s);
+	
+	
+	/**
+	 * Returns date string
+	 */
+	string getDate() => this.y ~ "-" ~ static::pad2(this.m) ~ "-" ~ static::pad2(this.d);
 	
 	
 	/**

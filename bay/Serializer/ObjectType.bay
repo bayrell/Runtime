@@ -202,6 +202,8 @@ class ObjectType extends MapType
 		BaseType rules = new ObjectType(this.params);
 		value::serialize(rules);
 		
+		rules.setup.apply([value, rules]);
+		
 		Vector errors = [];
 		Map new_value = rules.walk(
 			value, errors,

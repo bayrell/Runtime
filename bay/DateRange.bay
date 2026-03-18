@@ -39,4 +39,14 @@ class DateRange extends BaseObject implements SerializeInterface
 		rules.addType("start_date", new DateTimeType());
 		rules.addType("end_date", new DateTimeType());
 	}
+	
+	
+	/**
+	 * Create object
+	 */
+	void constructor(Map params)
+	{
+		parent();
+		this._assign_values(params);
+	}
 }
