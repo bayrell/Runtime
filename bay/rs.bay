@@ -728,6 +728,26 @@ class rs
 	
 	
 	/**
+	 * Add padding
+	 */
+	static string pad(string value, string pad, int count)
+	{
+		count = count - static::strlen(value);
+		return count > 0 ? static::str_repeat(pad, count) : "";
+	}
+	
+	
+	/**
+	 * Pad2
+	 */
+	static string pad2(var value, string pad = "0")
+	{
+		value = rtl::toStr(value);
+		return static::pad(value, pad, 2) ~ value;
+	}
+	
+	
+	/**
 	 * Parser url
 	 * @param string s The string
 	 * @return int

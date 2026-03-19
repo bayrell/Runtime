@@ -51,7 +51,7 @@ class ObjectType extends MapType
 		if (params.has("autocreate")) this.autocreate();
 		if (params.has("create")) this.fn_create = params.get("create");
 		if (params.has("class_name")) this.class_name = params.get("class_name");
-		if (params.has("class_extends")) this.class_extends = params.get("extends");
+		if (params.has("class_extends")) this.class_extends = params.get("class_extends");
 		if (params.has("class_implements")) this.class_implements = params.get("implements");
 		if (params.has("rules")) this.fn_rules = params.get("rules");
 		if (params.has("serialize")) this.fn_serialize = params.get("serialize");

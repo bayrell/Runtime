@@ -64,24 +64,24 @@ class RenderContainer extends BaseObject
 	{
 		if (this.layout and this.layout.name == layout_name) return;
 		
-		/* Save widgets */
-		Map old_widgets = this.layout ? this.layout.widgets : {};
+		/* Save pages */
+		Map old_pages = this.layout ? this.layout.pages : {};
 		
 		/* Create new layout */
 		this.createLayout(layout_name);
 		
-		/* Restore widgets */
-		Vector keys = rtl::list(old_widgets.keys());
+		/* Restore pages */
+		Vector keys = rtl::list(old_pages.keys());
 		for (int i=0; i<keys.count(); i++)
 		{
 			string key = keys.get(i);
-			BaseModel widget = old_widgets.get(key);
+			BaseModel widget = old_pages.get(key);
 			widget.parent_widget = this.layout;
-			this.layout.widgets.set(key, widget);
+			this.layout.pages.set(key, widget);
 		}
 		
 		/* Restore storage */
-		if (old_widgets.has("storage")) this.layout.storage = old_widgets.get("storage");
+		if (old_pages.has("storage")) this.layout.storage = old_pages.get("storage");
 		
 		/* Call create layout */
 		@.hook(RuntimeHook::CHANGE_LAYOUT, {

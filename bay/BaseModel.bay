@@ -72,6 +72,16 @@ class BaseModel extends BaseObject implements SerializeInterface
 		/* Autoload */
 		if (params.has("autoload")) this.autoload = params.get("autoload");
 		
+		/* Register events */
+		if (params.has("events"))
+		{
+			Map events = params.get("events");
+			for (string name in events.keys())
+			{
+				this.listener.add(name, events.get(name));
+			}
+		}
+		
 		/* Setup params */
 		this.component = params.has("component") ? params.get("component") : this.component;
 	}
