@@ -30,10 +30,11 @@ class TypeError extends BaseObject
 	/**
 	 * Create type error
 	 */
-	void constructor(string message)
+	void constructor(string message, string key = "")
 	{
 		parent();
 		this.message = message;
+		if (key) this.path = [key];
 	}
 	
 	
@@ -66,9 +67,20 @@ class TypeError extends BaseObject
 	/**
 	 * Add key to field name
 	 */
-	void addKey(string key)
+	TypeError addKey(string key)
 	{
 		this.path.push(key);
+		return this;
+	}
+	
+	
+	/**
+	 * Set message
+	 */
+	TypeError setMessage(string message)
+	{
+		this.message = message;
+		return this;
 	}
 	
 	
