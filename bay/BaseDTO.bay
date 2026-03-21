@@ -27,7 +27,7 @@ class BaseDTO extends BaseObject implements SerializeInterface
 	/**
 	 * Create object
 	 */
-	constructor(Map params)
+	void constructor(Map params = null)
 	{
 		parent();
 		this._assign_values(params);

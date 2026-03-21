@@ -202,7 +202,7 @@ class BaseLayout extends BaseModel
 	string url(string name, Map params = null)
 	{
 		var router = this.get("router");
-		return router.url(name, params);
+		return router ? router.url(name, params) : "";
 	}
 	
 	
@@ -216,6 +216,28 @@ class BaseLayout extends BaseModel
 		params.set("storage", this.storage.backend);
 		#endif
 		return await api.send(params);
+	}
+	
+	
+	/**
+	 * Restore layout
+	 */
+	void restore(BaseLayout layout)
+	{
+		Map old_pages = layout ? layout.pages : {};
+		
+		/* Restore pages */
+		Vector keys = rtl::list(old_pages.keys());
+		for (int i=0; i<keys.count(); i++)
+		{
+			string key = keys.get(i);
+			BaseModel widget = old_pages.get(key);
+			widget.parent_widget = this;
+			this.pages.set(key, widget);
+		}
+		
+		/* Restore storage */
+		this.storage = layout.storage;
 	}
 	
 	

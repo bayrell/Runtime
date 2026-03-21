@@ -18,6 +18,7 @@
 
 namespace Runtime;
 
+use Runtime.BaseLayout;
 use Runtime.BaseObject;
 use Runtime.BaseModel;
 use Runtime.Component;
@@ -64,24 +65,14 @@ class RenderContainer extends BaseObject
 	{
 		if (this.layout and this.layout.name == layout_name) return;
 		
-		/* Save pages */
-		Map old_pages = this.layout ? this.layout.pages : {};
+		/* Save old layout */
+		BaseLayout old_layout = this.layout;
 		
 		/* Create new layout */
 		this.createLayout(layout_name);
 		
-		/* Restore pages */
-		Vector keys = rtl::list(old_pages.keys());
-		for (int i=0; i<keys.count(); i++)
-		{
-			string key = keys.get(i);
-			BaseModel widget = old_pages.get(key);
-			widget.parent_widget = this.layout;
-			this.layout.pages.set(key, widget);
-		}
-		
-		/* Restore storage */
-		if (old_pages.has("storage")) this.layout.storage = old_pages.get("storage");
+		/* Restore layout */
+		this.layout.restore(old_layout);
 		
 		/* Call create layout */
 		@.hook(RuntimeHook::CHANGE_LAYOUT, {

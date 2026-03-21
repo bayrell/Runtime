@@ -88,6 +88,15 @@ class HookProvider extends BaseProvider
 	
 	
 	/**
+	 * Find hook by name
+	 */
+	BaseHook find(string name) =>
+		this.base_hooks.find(
+			bool (BaseHook hook) => hook::getClassName() == name
+		);
+	
+	
+	/**
 	 * Register hook
 	 */
 	void register(string hook_name, var f, int priority = 100)
