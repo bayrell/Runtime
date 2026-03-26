@@ -137,6 +137,10 @@ class rtl
 		
 		return "\\" . preg_replace("/\\./", "\\", $class_name);
 		
+		#case ifcode NODEJSE then
+		
+		return use(class_name);
+		
 		#case ifcode JAVASCRIPT then
 		
 		if (typeof class_name == "string")
@@ -1054,15 +1058,15 @@ class rtl
 	/**
 	 * Create app
 	 */
-	static async Context createApp(string app, Collection modules)
+	static async Context createApp(var app, Collection modules)
 	{
 		Dict params = {
 			"providers": [
-				new Provider("app", app),
+				app instanceof Provider ? app : new Provider("app", app),
 			],
 			"modules": modules,
 		};
-		Context context = await this.createContext(params);
+		Context context = await static::createContext(params);
 		await context.start();
 		return context;
 	}
@@ -1141,6 +1145,19 @@ class rtl
 		#endswitch
 	}
 }
+
+#ifcode NODEJS then
+Runtime.rtl.add = function(dir, params)
+{
+	return function(class_name)
+	{
+		var module_name = params.MODULE_NAME;
+		var class_path = class_name.substring(module_name.length + 1).replaceAll(".", "/");
+		var path = dir + "/" + class_path + ".js";
+		return require(path);
+	};
+}
+#endif
 
 #ifcode ES6 then
 window["use"] = Runtime.rtl.findClass;

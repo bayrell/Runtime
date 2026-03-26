@@ -132,6 +132,7 @@ class RenderContainer extends BaseObject
 				"LOCALE": @.env("LOCALE"),
 				"TZ": @.env("TZ"),
 				"TZ_OFFSET": @.env("TZ_OFFSET"),
+				"ROUTE_PREFIX": @.env("ROUTE_PREFIX"),
 			},
 		};
 		Map res = @.hook(RuntimeHook::CREATE_CONTAINER_DATA, {

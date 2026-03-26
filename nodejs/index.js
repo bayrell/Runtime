@@ -20,7 +20,7 @@ const { use } = require("bay-lang");
 
 
 var exports = {
-	VERSION: '0.11.8',
+	VERSION: '1.0',
 	MODULE_NAME: 'Runtime',
 }
 
@@ -66,14 +66,35 @@ add("Runtime.fs");
 add("Runtime.Map");
 add("Runtime.Vector");
 add("Runtime.BaseObject");
+add("Runtime.BaseModel");
+add("Runtime.BaseDTO");
+add("Runtime.BaseLayout");
 add("Runtime.BaseProvider");
 add("Runtime.BaseStorage");
 add("Runtime.BusHttp");
-add("Runtime.Context");
-add("Runtime.Date");
-add("Runtime.DateTime");
+add("Runtime.BusInterface");
+add("Runtime.ApiResult");
 add("Runtime.Method");
+add("Runtime.Chain");
+add("Runtime.ChainAsync");
+add("Runtime.ClearLayout");
+add("Runtime.Component");
+add("Runtime.Context");
+add("Runtime.Curl");
+add("Runtime.Date");
+add("Runtime.DateRange");
+add("Runtime.DateTime");
+add("Runtime.DefaultLayout");
+add("Runtime.FactoryInterface");
+add("Runtime.Listener");
+add("Runtime.Message");
+add("Runtime.Money");
+add("Runtime.RawString");
 add("Runtime.Reference");
+add("Runtime.RenderContainer");
+add("Runtime.SerializeInterface");
+add("Runtime.StringInterface");
+add("Runtime.VirtualDom");
 add("Runtime.Entity.Entity");
 add("Runtime.Entity.Factory");
 add("Runtime.Entity.Hook");
@@ -82,6 +103,8 @@ add("Runtime.Exceptions.RuntimeException");
 add("Runtime.Exceptions.ApiError");
 add("Runtime.Exceptions.AssertException");
 add("Runtime.Exceptions.CurlException");
+add("Runtime.Exceptions.DataError");
+add("Runtime.Exceptions.FieldException");
 add("Runtime.Exceptions.IndexOutOfRange");
 add("Runtime.Exceptions.ItemNotFound");
 add("Runtime.Exceptions.KeyNotFound");
@@ -92,6 +115,19 @@ add("Runtime.Providers.HookProvider");
 add("Runtime.Providers.OutputProvider");
 add("Runtime.Providers.RenderContent");
 add("Runtime.Providers.RenderProvider");
+add("Runtime.Serializer.BaseType");
+add("Runtime.Serializer.TypeError");
+add("Runtime.Serializer.Allowed");
+add("Runtime.Serializer.BooleanType");
+add("Runtime.Serializer.ConstantType");
+add("Runtime.Serializer.DateTimeType");
+add("Runtime.Serializer.IntegerType");
+add("Runtime.Serializer.JsonType");
+add("Runtime.Serializer.MapType");
+add("Runtime.Serializer.ObjectType");
+add("Runtime.Serializer.Required");
+add("Runtime.Serializer.StringType");
+add("Runtime.Serializer.VectorType");
 add("Runtime.ModuleDescription");
 
 module.exports = exports;

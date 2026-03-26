@@ -120,9 +120,9 @@ class Context extends BaseObject
 	/**
 	 * Return environment
 	 */
-	var env(string name)
+	var env(string name, string default_value = "")
 	{
-		var value = this.environments.get(name);
+		var value = this.environments.get(name, default_value);
 		Dict res = { "name": name, "value": value };
 		this.hook(RuntimeHook::ENV, res);
 		return res.get("value");

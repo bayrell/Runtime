@@ -40,8 +40,11 @@
 
 props BaseModel model = null;
 props string class = "";
-props string key = "";
 var parent_component = null;
+
+#ifdef BACKEND then
+props string key = "";
+#endif
 
 #ifdef PHP then
 BaseModel layout = null;
@@ -84,7 +87,10 @@ var renderSlot(string slot_name, Vector args = null)
 	$f = $this->_slots->get($slot_name);
 	if (!$f) return null;
 	return $args ? call_user_func_array($f, $args->toArray()) : $f();
-	#case ifcode JAVASCRIPT then
+	#case ifcode NODEJS then
+	var f = this._slots.get(slot_name);
+	return f ? f.apply(null, args) : null;
+	#case ifcode ES6 then
 	if (!args) args = [];
 	var f = this.$slots[slot_name];
 	return f ? f.apply(null, args) : null;

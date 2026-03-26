@@ -49,6 +49,40 @@ class RenderContent extends BaseProvider
 	}
 	
 	
+	#ifdef NODEJS then
+	
+	/**
+	 * Make proxy
+	 */
+	var makeProxy(Component component)
+	{
+		var computed = Vector::from(component::getComputed());
+		if (computed.length > 0)
+		{
+			computed = computed.transition(
+				var (string value, int key)
+				{
+					return [true, value];
+				}
+			);
+			#ifcode NODEJS then
+			component = new Proxy(component, {
+				get: (target, name) =>
+				{
+					if (computed.has(name))
+					{
+						return target[name]();
+					}
+					return target[name];
+				}
+			});
+			#endif
+		}
+		return component;
+	}
+	
+	#endif
+	
 	/**
 	 * Render
 	 */
@@ -69,6 +103,11 @@ class RenderContent extends BaseProvider
 		{
 			string component_name = this.findComponent(vdom);
 			Component component = rtl::newInstance(component_name);
+			
+			#ifcode NODEJS then
+			component = this.makeProxy(component);
+			#endif
+			
 			component.parent_component = this.items.count() > 0 ? this.items.last() : null;
 			component.layout = vdom.component ? vdom.component.layout : null;
 			component._slots = vdom.slots;
