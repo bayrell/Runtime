@@ -119,12 +119,10 @@ class ApiResult extends BaseObject
 	ApiResult setData(var data)
 	{
 		if (data == null) return;
-		if (data instanceof Dict)
+		if (data instanceof Map)
 		{
-			Collection<string> keys = data.keys();
-			for (int i=0; i<keys.count(); i++)
+			for (string key in data.keys())
 			{
-				string key = keys.get(i);
 				this.data.set(key, data.get(key));
 			}
 		}
