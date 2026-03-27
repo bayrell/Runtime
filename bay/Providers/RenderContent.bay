@@ -147,7 +147,7 @@ class RenderContent extends BaseProvider
 					{
 						string attr_name = keys.get(i);
 						string value = rs::trim(vdom.attrs.get(attr_name));
-						if (value == "") continue;
+						/*if (value == "") continue;*/
 						if (rs::charAt(attr_name, 0) == "@") continue;
 						attr_items.push(attr_name ~ "=\"" ~ rs::escapeHtml(value) ~ "\"");
 					}
