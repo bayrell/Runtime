@@ -71,7 +71,9 @@ bool slot(string name)
 	#switch
 	#case ifcode PHP then
 	return $this->_slots->has($name);
-	#case ifcode JAVASCRIPT then
+	#case ifcode NODEJS then
+	return this._slots.has(name);
+	#case ifcode ES6 then
 	return this.$slots[name] != undefined;
 	#endswitch
 }

@@ -186,6 +186,23 @@ class RuntimeException extends ClassException
 	Collection<string> getTraceCollection()
 	{
 		#switch
+		#case ifcode JAVASCRIPT then
+		
+		const RuntimeVector = use("Runtime.Vector");
+		
+		/* Get stack trace as string and split into lines */
+		var trace = this.stack;
+		var lines = RuntimeVector.create(trace.split("\n"));
+		
+		/* Filter and format stack trace lines */
+		return lines
+			.filter(function(line) {
+				return line.trim() != "";
+			})
+			.map(function(line) {
+				return line.trim();
+			})
+		;
 		#case ifcode PHP then
 		$error_trace = $this->getTrace();
 		$error_trace = array_map(
