@@ -33,6 +33,14 @@ class BaseHook extends BaseObject
 	/**
 	 * Create hook
 	 */
+	static Hook hook(Map params) =>
+		new Hook(static::getClassName(), params)
+	;
+	
+	
+	/**
+	 * Create hook
+	 */
 	void constructor(Dict params = null)
 	{
 		parent();

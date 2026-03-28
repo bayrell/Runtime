@@ -20,6 +20,8 @@ namespace Runtime;
 
 use Runtime.BaseObject;
 use Runtime.Context;
+use Runtime.Method;
+use Runtime.Providers.HookProvider;
 
 
 class BaseProvider extends BaseObject
@@ -45,6 +47,27 @@ class BaseProvider extends BaseObject
 	
 	
 	/**
+	 * Register hook
+	 */
+	void register(string hook_name,
+		string method_name, int priority = 100)
+	{
+		HookProvider hook = @.provider("hook");
+		hook.register(hook_name,
+			new Method(this, method_name), priority
+		);
+	}
+	
+	
+	/**
+	 * Register hooks
+	 */
+	void register_hooks()
+	{
+	}
+	
+	
+	/**
 	 * Init params
 	 */
 	void initParams(Map params)
@@ -57,6 +80,7 @@ class BaseProvider extends BaseObject
 	 */
 	async void init()
 	{
+		this.register_hooks();
 	}
 	
 	
