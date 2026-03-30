@@ -92,6 +92,7 @@ class BaseLayout extends BaseModel
 		rules.addType("current_page_model", new StringType());
 		rules.addType("body_class", new VectorType(new StringType()));
 		rules.addType("lang", new StringType());
+		rules.addType("name", new StringType());
 		rules.addType("theme", new StringType());
 		rules.addType("title", new StringType());
 		rules.addType("description", new StringType());
