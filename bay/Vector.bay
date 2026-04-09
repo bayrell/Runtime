@@ -210,6 +210,18 @@ Runtime.Vector = class extends Array
 		return res;
 	}
 	
+	
+	/**
+	 * Check if value is in the vector
+	 * @param T item - item to find
+	 * @return bool
+	 */
+	contains(item)
+	{
+		return this.indexOf(item) !== -1;
+	}
+	
+	
 	static create(arr)
 	{
 		if (arr.length == 1)
@@ -608,6 +620,16 @@ class Vector implements \ArrayAccess, \JsonSerializable, \IteratorAggregate
 			}
 		}
 		return $res;
+	}
+	
+	/**
+	 * Check if value is in the vector
+	 * @param T item - item to find
+	 * @return bool
+	 */
+	function contains($item)
+	{
+		return $this->indexOf($item) !== -1;
 	}
 	
 	

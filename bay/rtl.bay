@@ -393,7 +393,7 @@ class rtl
 		#case ifcode PHP then
 		return property_exists($item, $name) ? $item->$name : $def_val;
 		#case ifcode JAVASCRIPT then
-		return item[name] || def_val;
+		return item[name] != undefined ? item[name] : def_val;
 		#endswitch
 	}
 	
@@ -796,7 +796,7 @@ class rtl
 				return value;
 			});
 		}
-		catch (e){}
+		catch (e){ obj = null; }
 		return obj;
 		#endswitch
 	}
@@ -1058,14 +1058,11 @@ class rtl
 	/**
 	 * Create app
 	 */
-	static async Context createApp(var app, Collection modules)
+	static async Context createApp(var app, Map params)
 	{
-		Dict params = {
-			"providers": [
-				app instanceof Provider ? app : new Provider("app", app),
-			],
-			"modules": modules,
-		};
+		if (not params.has("providers")) params.set("providers", []);
+		Vector providers = params.get("providers");
+		providers.push(app instanceof Provider ? app : new Provider("app", app));
 		Context context = await static::createContext(params);
 		await context.start();
 		return context;
@@ -1075,11 +1072,13 @@ class rtl
 	/**
 	 * Run app
 	 */
-	static async int runApp(string app, Collection modules)
+	static async int runApp(string app, Map params)
 	{
 		try
 		{
-			Context context = await static::createApp(app, modules);
+			Context context = await static::createApp(
+				app, params
+			);
 			var provider = context.provider("app");
 			return await provider.main();
 		}

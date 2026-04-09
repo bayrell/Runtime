@@ -24,9 +24,11 @@ use Runtime.BaseObject;
 class Curl extends BaseObject
 {
 	string url = "";
-	Dict post = null;
+	Map post = null;
+	Map headers = null;
 	int code = 0;
 	string response = "";
+	Map response_headers = null;
 	
 	
 	/**
@@ -40,7 +42,12 @@ class Curl extends BaseObject
 		
 		/* Setup params */
 		if (params == null) return;
-		if (params.has("post")) this.post = params.get("post");
+		if (params.has("post"))
+		{
+			this.method = "POST";
+			this.post = params.get("post");
+		}
+		if (params.has("headers")) this.headers = params.get("headers");
 	}
 	
 	
@@ -64,10 +71,68 @@ class Curl extends BaseObject
 		
 		#endif
 		
+		#ifcode NODEJS then
+		
+		await this.sendPost();
+		
+		#endif
+		
 		return this.response;
 	}
 	
 }
+
+
+#ifcode NODEJS then
+Object.assign(Runtime.Curl.prototype,
+{
+	/**
+	 * Build query string from map
+	 */
+	buildQueryString: function(params)
+	{
+		if (!params) return "";
+		var parts = [];
+		var keys = params.keys();
+		for (var i = 0; i < keys.length; i++) {
+			var key = keys.get(i);
+			var value = params.get(key);
+			parts.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
+		}
+		return parts.join("&");
+	},
+	
+	/**
+	 * Send api request using Node.js https module
+	 */
+	sendPost: async function()
+	{
+		const rtl = use("Runtime.rtl");
+		const CurlException = use("Runtime.Exceptions.CurlException");
+		const RuntimeMap = use("Runtime.Map");
+		
+		let response = null;
+		try
+		{
+			response = await fetch(this.url, {
+				method: this.method,
+				headers: rtl.toNative(this.headers),
+				body: JSON.stringify(rtl.toNative(this.post)),
+			});
+			
+			this.code = response.status;
+			this.response = await response.text();
+			this.response_headers = new RuntimeMap(Object.fromEntries(response.headers.entries()));
+		}
+		catch (error)
+		{
+			this.code = 0;
+			this.response = error.message || "Unknown error";
+		}
+	},
+	
+});
+#endif
 
 
 #ifcode ES6 then
@@ -135,7 +200,18 @@ Object.assign(Runtime.Curl.prototype,
 				var data = new FormData();
 				this.buildPostData(data, "", this.post);
 				let xhr = new XMLHttpRequest();
-				xhr.open('POST', this.url, true);
+				xhr.open(this.method, this.url, true);
+				
+				/* Set headers */
+				if (this.headers instanceof Runtime.Map)
+				{
+					var keys = this.headers.keys();
+					for (var i = 0; i < keys.length; i++) {
+						var key = keys.get(i);
+						xhr.setRequestHeader(key, this.headers.get(key));
+					}
+				}
+				
 				xhr.send(data);
 				xhr.onreadystatechange = (function(curl, xhr, resolve, reject) {
 					return function()

@@ -192,6 +192,8 @@ class RuntimeException extends ClassException
 		
 		/* Get stack trace as string and split into lines */
 		var trace = this.stack;
+		if (trace.startsWith("Error: "))
+			trace = trace.substring(7);
 		var lines = RuntimeVector.create(trace.split("\n"));
 		
 		/* Filter and format stack trace lines */
