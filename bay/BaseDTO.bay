@@ -33,6 +33,7 @@ class BaseDTO extends BaseObject implements SerializeInterface
 		this._assign_values(params);
 	}
 	
+	
 	/**
 	 * Returns field by name
 	 */
@@ -57,11 +58,11 @@ class BaseDTO extends BaseObject implements SerializeInterface
 	/**
 	 * Returns object data
 	 */
-	Map data() => rtl::serialize(this);
+	Map all() => rtl::serialize(this);
 	
 	
 	/**
 	 * Intersect data
 	 */
-	Map intersect(Vector items) => this.data().intersect(items);
+	Map intersect(Vector items) => this.all().intersect(items);
 }
