@@ -19,6 +19,8 @@
 namespace Runtime;
 
 use Runtime.BaseObject;
+use Runtime.Serializer.BaseType;
+use Runtime.Serializer.ObjectType;
 use Runtime.SerializeInterface;
 
 
@@ -46,6 +48,32 @@ class BaseDTO extends BaseObject implements SerializeInterface
 	void set(string field_name, var value)
 	{
 		rtl::setAttr(this, field_name, value);
+	}
+	
+	
+	/**
+	 * Set value
+	 */
+	void setValue(string field_name, var value)
+	{
+		value = static::filter(field_name, value);
+		this.set(field_name, value);
+	}
+	
+	
+	/**
+	 * Set field
+	 */
+	static void filter(string field_name, var item)
+	{
+		ObjectType rules = new ObjectType;
+		static::serialize(rules);
+		BaseType field_rule = rules.items.get(field_name)
+			.get(0);
+		if (!field_rule) return;
+		
+		Vector errors = [];
+		return field_rule.filter(item, errors);
 	}
 	
 	

@@ -149,9 +149,19 @@ class BaseModel extends BaseObject implements SerializeInterface
 	
 	
 	/**
+	 * Set value
+	 */
+	void setValue(string field_name, var value)
+	{
+		value = static::filter(field_name, value);
+		rtl::setAttr(this, field_name, value);
+	}
+	
+	
+	/**
 	 * Set field
 	 */
-	void filter(string field_name, var item)
+	static void filter(string field_name, var item)
 	{
 		ObjectType rules = new ObjectType;
 		static::serialize(rules);
