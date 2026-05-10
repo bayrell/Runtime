@@ -54,7 +54,10 @@ class BaseObject
 	 */
 	static void serialize(ObjectType rules)
 	{
-		rules.setClassName(static::getClassName());
+		if (rules instanceof ObjectType)
+		{
+			rules.setClassName(static::getClassName());
+		}
 	}
 	
 	
