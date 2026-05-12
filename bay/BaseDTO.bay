@@ -52,6 +52,17 @@ class BaseDTO extends BaseObject implements SerializeInterface
 	
 	
 	/**
+	 * Assign data
+	 */
+	static BaseDTO create(Map data, Vector errors = [])
+	{
+		BaseDTO item = rtl::newInstance(static::getClassName());
+		rtl::assign(item, data, errors);
+		return item;
+	}
+	
+	
+	/**
 	 * Set value
 	 */
 	void setValue(string field_name, var value)

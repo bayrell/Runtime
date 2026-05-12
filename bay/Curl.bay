@@ -114,11 +114,20 @@ Object.assign(Runtime.Curl.prototype,
 		let response = null;
 		try
 		{
-			response = await fetch(this.url, {
+			let data = {
 				method: this.method,
-				headers: rtl.toNative(this.headers),
-				body: JSON.stringify(rtl.toNative(this.post)),
-			});
+			};
+			
+			if (this.headers)
+			{
+				data["headers"] = rtl.toNative(this.headers);
+			}
+			if (this.post)
+			{
+				data["body"] = JSON.stringify(rtl.toNative(this.post));
+			}
+			
+			response = await fetch(this.url, data);
 			
 			this.code = response.status;
 			this.response = await response.text();
