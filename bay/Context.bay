@@ -122,6 +122,7 @@ class Context extends BaseObject
 	 */
 	var env(string name, string default_value = "")
 	{
+		name = rs::upper(name);
 		var value = this.environments.get(name, default_value);
 		Dict res = { "name": name, "value": value };
 		this.hook(RuntimeHook::ENV, res);
@@ -165,6 +166,7 @@ class Context extends BaseObject
 		if (not params.has("environments")) params.set("environments", new Map());
 		
 		Dict env = params.get("environments");
+		for (string key in env.keys()) env.set(rs::upper(key), env.get(key));
 		if (not env.has("CLOUD_ENV")) env.set("CLOUD_ENV", false);
 		if (not env.has("DEBUG")) env.set("DEBUG", false);
 		if (not env.has("LOCALE")) env.set("LOCALE", "en_US");
