@@ -972,7 +972,7 @@ class rtl
 		#case ifcode JAVASCRIPT then
 		
 		if (
-			window != undefined && window.crypto != undefined &&
+			typeof window != "undefined" && window.crypto != undefined &&
 			window.crypto.getRandomValues != undefined)
 		{
 			var s = new Uint32Array(1);
